@@ -15,25 +15,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
-  <!-- Google Font: Source Sans Pro -->
-  <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,700,900" rel="stylesheet">
-    <style type = "text/css">
-	  @font-face {
-	  	font-family: "Rusia";
-	  	src: url(dist/fonts/Rusia.ttf);
-	  }
-	  body{
-	  	font-family:Rusia;
-	  }
-	  h5 {
-	  	color: white;
-	  	font-weight: 900;
-	  	padding-left: 5px;
-	  }
-      .results{
-        width: 5%;
-      }
-	</style>
+  <link rel="stylesheet" href="dist/css/index.css">
+  <link rel="stylesheet" href="plugins/datatables/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="plugins/datatables/extensions/FixedColumns/css/dataTables.fixedColumns.min.css">
+  <link rel="icon" type="image/png" href="dist/img/logo.png">
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -53,8 +38,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </li>
     </ul>
 
-    
-
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
 	<!-- SEARCH FORM -->
@@ -67,281 +50,1178 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" style="margin: 0px;background-image:url(dist/img/back3.jpg);">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-      <div class="container-fluid">
-		<div>
-			<button class="btn btn-block btn-success" type="button" style="width:300px;margin:0 auto;">Guardar</button>	
+	  <div id="grupos">
+		    <!-- Content Header (Page header) -->
+		    <div class="content-header">
+		      <div class="container-fluid">
+		      	<div>
+		      		<button class="btn btn-block btn-primary" type="button" data-toggle="modal" data-target="#myModal5" id="atras" style="float:left;margin-right:10px">Reglas</button>
+					<button class="btn btn-block btn-primary" type="button" onclick="app.poss();" id="atras2">Posiciones</button>
+		      	</div>
+				<div style="text-align: center;">
+					<h5>Fase de Grupos</h5>
+				</div>
+		      </div><!-- /.container-fluid -->
+		    </div>
+		    <!-- /.content-header -->
+
+		    <!-- Main content -->
+		    <div class="content">
+		      <div class="container-fluid">
+		        <div class="row">
+		          <div class="col-lg-6">
+
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		              	<div style="">
+			                <h5 class="card-title" style="background: rgba(19,73,150,0.9);">Grupo A</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/rus.png" height="25px">&nbsp;&nbsp; Rusia <input type="text" name="" id="rus-ars-1" class="results"> - <input type="text" name="" id="rus-ars-2" class="results"> Arabia Saudita &nbsp;&nbsp;<img src="dist/img/ars.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Jue 14 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td>
+			                				<div>
+			                					<img src="dist/img/egi.png" height="25px">&nbsp;&nbsp; Egipto <input type="text" name="" id="egi-uru-1" class="results"> - <input type="text" name="" id="egi-uru-2" class="results"> Uruguay &nbsp;&nbsp;<img src="dist/img/uru.png" height="25px"> 
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Ekaterimburgo</p> <p class="rightalign">Vie 15 Jun 8:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/rus.png" height="25px">&nbsp;&nbsp; Rusia <input type="text" name="" id="rus-egi-1" class="results"> - <input type="text" name="" id="rus-egi-2" class="results"> Egipto &nbsp;&nbsp;<img src="dist/img/egi.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Mar 19 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/uru.png" height="25px">&nbsp;&nbsp; Uruguay <input type="text" name="" id="uru-ars-1" class="results"> - <input type="text" name="" id="uru-ars-2" class="results"> Arabia Saudita &nbsp;&nbsp;<img src="dist/img/ars.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Mie 20 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/ars.png" height="25px">&nbsp;&nbsp; Arabia Saudita <input type="text" name="" id="ars-egi-1" class="results"> - <input type="text" name="" id="ars-egi-2" class="results"> Egipto &nbsp;&nbsp;<img src="dist/img/egi.png" height="25px"> 
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Volgogrado</p> <p class="rightalign">Lun 25 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div> 
+			                					<img src="dist/img/uru.png" height="25px">&nbsp;&nbsp; Uruguay <input type="text" name="" id="uru-rus-1" class="results"> - <input type="text" name="" id="uru-rus-2" class="results"> Rusia &nbsp;&nbsp;<img src="dist/img/rus.png" height="25px"> 
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Samara</p> <p class="rightalign">Lun 25 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			            </div>
+		              </div>
+		            </div>
+		          </div>
+
+		          <div class="col-lg-6">
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		                <h5 class="card-title" style="background: rgba(116,54,156,0.9);">Grupo B</h5>
+
+		                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+		                	<tbody>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					<img src="dist/img/mar.png" height="25px">&nbsp;&nbsp; Marruecos <input type="text" name="" id="mar-ira-1" class="results"> - <input type="text" name="" id="mar-ira-2" class="results"> Irán &nbsp;&nbsp;<img src="dist/img/ira.png" height="25px">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Vie 15 Jun 11:00 am</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					<img src="dist/img/por.png" height="25px">&nbsp;&nbsp; Portugal <input type="text" name="" id="por-esp-1" class="results"> - <input type="text" name="" id="por-esp-2" class="results"> España &nbsp;&nbsp;<img src="dist/img/esp.png" height="25px"> 
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Sochi</p> <p class="rightalign">Vie 15 Jun 2:00 pm</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					<img src="dist/img/por.png" height="25px">&nbsp;&nbsp; Portugal <input type="text" name="" id="por-mar-1" class="results"> - <input type="text" name="" id="por-mar-2" class="results"> Marruecos &nbsp;&nbsp;<img src="dist/img/mar.png" height="25px"> 
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Mie 20 Jun 8:00 am</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					<img src="dist/img/ira.png" height="25px">&nbsp;&nbsp; Irán <input type="text" name="" id="ira-esp-1" class="results"> - <input type="text" name="" id="ira-esp-2" class="results"> España &nbsp;&nbsp;<img src="dist/img/esp.png" height="25px"> 
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Kazán</p> <p class="rightalign">Mie 20 Jun 2:00 pm</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					<img src="dist/img/esp.png" height="25px">&nbsp;&nbsp; España <input type="text" name="" id="esp-mar-1" class="results"> - <input type="text" name="" id="esp-mar-2" class="results"> Marruecos &nbsp;&nbsp;<img src="dist/img/mar.png" height="25px"> 
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Kaliningrado</p> <p class="rightalign">Lun 25 Jun 2:00 pm</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					<img src="dist/img/ira.png" height="25px">&nbsp;&nbsp; Irán <input type="text" name="" id="ira-por-1" class="results"> - <input type="text" name="" id="ira-por-2" class="results"> Portugal &nbsp;&nbsp;<img src="dist/img/por.png" height="25px"> 
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Saransk</p> <p class="rightalign">Lun 25 Jun 2:00 pm</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                	</tbody>
+		                </table>
+		              </div>
+		            </div>
+		          </div>
+		        </div>
+		        <!-- /.row -->
+		        <div class="row">
+		        	<div class="col-lg-6">
+		        		<div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+			              <div class="card-body">
+			                <h5 class="card-title" style="background: rgba(230,31,46,0.9);">Grupo C</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia <input type="text" name="" id="fra-aus-1" class="results"> - <input type="text" name="" id="fra-aus-2" class="results"> Australia &nbsp;&nbsp;<img src="dist/img/aus.png" height="25px">  
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Kazán</p> <p class="rightalign">Sab 16 Jun 6:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/per.png" height="25px">&nbsp;&nbsp; Perú <input type="text" name="" id="per-din-1" class="results"> - <input type="text" name="" id="per-din-2" class="results"> Dinamarca &nbsp;&nbsp;<img src="dist/img/din.png" height="25px">  
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Saransk</p> <p class="rightalign">Sab 16 Jun 12:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia <input type="text" name="" id="fra-per-1" class="results"> - <input type="text" name="" id="fra-per-2" class="results"> Perú &nbsp;&nbsp;<img src="dist/img/per.png" height="25px">  
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Ekaterimburgo</p> <p class="rightalign">Jue 21 Jun 8:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/din.png" height="25px">&nbsp;&nbsp; Dinamarca <input type="text" name="" id="din-aus-1" class="results"> - <input type="text" name="" id="din-aus-2" class="results"> Australia &nbsp;&nbsp;<img src="dist/img/aus.png" height="25px">  
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Samara</p> <p class="rightalign">Jue 21 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/aus.png" height="25px">&nbsp;&nbsp; Australia <input type="text" name="" id="aus-per-1" class="results"> - <input type="text" name="" id="aus-per-2" class="results"> Perú &nbsp;&nbsp;<img src="dist/img/per.png" height="25px">  
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Sochi</p> <p class="rightalign">Mar 26 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/din.png" height="25px">&nbsp;&nbsp; Dinamarca <input type="text" name="" id="din-fra-1" class="results"> - <input type="text" name="" id="din-fra-2" class="results"> Francia &nbsp;&nbsp;<img src="dist/img/fra.png" height="25px">  
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Mar 26 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			              </div>
+			            </div>
+			        </div>
+
+			        <div class="col-lg-6">
+			            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+			              <div class="card-body">
+			                <h5 class="card-title" style="background: rgba(236,168,3,0.9);">Grupo D</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/arg.png" height="25px">&nbsp;&nbsp; Argentina <input type="text" name="" id="arg-isl-1" class="results"> - <input type="text" name="" id="arg-isl-2" class="results"> Islandia &nbsp;&nbsp;<img src="dist/img/isl.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Sab 16 Jun 9:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/cro.png" height="25px">&nbsp;&nbsp; Croacia <input type="text" name="" id="cro-nig-1" class="results"> - <input type="text" name="" id="cro-nig-2" class="results"> Nigeria &nbsp;&nbsp;<img src="dist/img/nig.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Kaliningrado</p> <p class="rightalign">Sab 16 Jun 3:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/arg.png" height="25px">&nbsp;&nbsp; Argentina <input type="text" name="" id="arg-cro-1" class="results"> - <input type="text" name="" id="arg-cro-2" class="results"> Croacia &nbsp;&nbsp;<img src="dist/img/cro.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Jue 21 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/nig.png" height="25px">&nbsp;&nbsp; Nigeria <input type="text" name="" id="nig-isl-1" class="results"> - <input type="text" name="" id="nig-isl-2" class="results"> Islandia &nbsp;&nbsp;<img src="dist/img/isl.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Volgogrado</p> <p class="rightalign">Vie 22 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/isl.png" height="25px">&nbsp;&nbsp; Islandia <input type="text" name="" id="isl-cro-1" class="results"> - <input type="text" name="" id="isl-cro-2" class="results"> Croacia &nbsp;&nbsp;<img src="dist/img/cro.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Mar 26 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/nig.png" height="25px">&nbsp;&nbsp; Nigeria <input type="text" name="" id="nig-arg-1" class="results"> - <input type="text" name="" id="nig-arg-2" class="results"> Argentina &nbsp;&nbsp;<img src="dist/img/arg.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Mar 26 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			              </div>
+			            </div>
+			        </div>
+			    </div>
+
+			    <div class="row">
+			          <div class="col-lg-6">
+			            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+			              <div class="card-body">
+			                <h5 class="card-title" style="background: rgba(2,134,103,0.9);">Grupo E</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/cos.png" height="25px">&nbsp;&nbsp; Costa Rica <input type="text" name="" id="cos-ser-1" class="results"> - <input type="text" name="" id="cos-ser-2" class="results"> Serbia &nbsp;&nbsp;<img src="dist/img/ser.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Samara</p> <p class="rightalign">Dom 17 Jun 8:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/bra.png" height="25px">&nbsp;&nbsp; Brasil <input type="text" name="" id="bra-sui-1" class="results"> - <input type="text" name="" id="bra-sui-2" class="results"> Suiza &nbsp;&nbsp;<img src="dist/img/sui.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Dom 17 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/bra.png" height="25px">&nbsp;&nbsp; Brasil <input type="text" name="" id="bra-cos-1" class="results"> - <input type="text" name="" id="bra-cos-2" class="results"> Costa Rica &nbsp;&nbsp;<img src="dist/img/cos.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Vie 22 Jun 8:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/ser.png" height="25px">&nbsp;&nbsp; Serbia <input type="text" name="" id="ser-sui-1" class="results"> - <input type="text" name="" id="ser-sui-2" class="results"> Suiza &nbsp;&nbsp;<img src="dist/img/sui.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Kaliningrado</p> <p class="rightalign">Vie 22 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/sui.png" height="25px">&nbsp;&nbsp; Suiza <input type="text" name="" id="sui-cos-1" class="results"> - <input type="text" name="" id="sui-cos-2" class="results"> Costa Rica &nbsp;&nbsp;<img src="dist/img/cos.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Mie 27 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/ser.png" height="25px">&nbsp;&nbsp; Serbia <input type="text" name="" id="ser-bra-1" class="results"> - <input type="text" name="" id="ser-bra-2" class="results"> Brasil &nbsp;&nbsp;<img src="dist/img/bra.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Mie 27 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			              </div>
+			            </div>
+			        </div>
+
+			        <div class="col-lg-6">
+			            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+			              <div class="card-body">
+			                <h5 class="card-title" style="background: rgba(255,91,52,0.9);">Grupo F</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/ale.png" height="25px">&nbsp;&nbsp; Alemania <input type="text" name="" id="ale-mex-1" class="results"> - <input type="text" name="" id="ale-mex-2" class="results"> México &nbsp;&nbsp;<img src="dist/img/mex.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Dom 17 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/sue.png" height="25px">&nbsp;&nbsp; Suecia <input type="text" name="" id="sue-cor-1" class="results"> - <input type="text" name="" id="sue-cor-2" class="results"> Corea del Sur &nbsp;&nbsp;<img src="dist/img/cor.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Lun 18 Jun 8:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/ale.png" height="25px">&nbsp;&nbsp; Alemania <input type="text" name="" id="ale-sue-1" class="results"> - <input type="text" name="" id="ale-sue-2" class="results">Suecia &nbsp;&nbsp;<img src="dist/img/sue.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Sochi</p> <p class="rightalign">Sab 23 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/cor.png" height="25px">&nbsp;&nbsp; Corea del Sur <input type="text" name="" id="cor-mex-1" class="results"> - <input type="text" name="" id="cor-mex-2" class="results"> México &nbsp;&nbsp;<img src="dist/img/mex.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Sab 23 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/mex.png" height="25px">&nbsp;&nbsp; México <input type="text" name="" id="mex-sue-1" class="results"> - <input type="text" name="" id="mex-sue-2" class="results"> Suecia &nbsp;&nbsp;<img src="dist/img/sue.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Ekaterimburgo</p> <p class="rightalign">Mie 27 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/cor.png" height="25px">&nbsp;&nbsp; Corea del Sur <input type="text" name="" id="cor-ale-1" class="results"> - <input type="text" name="" id="cor-ale-2" class="results"> Alemania &nbsp;&nbsp;<img src="dist/img/ale.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Kazán</p> <p class="rightalign">Mie 27 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			              </div>
+			            </div>
+			        </div>
+			    </div>
+
+			    <div class="row">
+			    	<div class="col-lg-6">
+			            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+			              <div class="card-body">
+			                <h5 class="card-title" style="background: rgba(184,137,106,0.9);">Grupo G</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica <input type="text" name="" id="bel-pan-1" class="results"> - <input type="text" name="" id="bel-pan-2" class="results"> Panamá &nbsp;&nbsp;<img src="dist/img/pan.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Sochi</p> <p class="rightalign">Lun 18 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/tun.png" height="25px">&nbsp;&nbsp; Túnez <input type="text" name="" id="tun-ing-1" class="results"> - <input type="text" name="" id="tun-ing-2" class="results"> Inglaterra &nbsp;&nbsp;<img src="dist/img/ing.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Volgogrado</p> <p class="rightalign">Lun 18 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica <input type="text" name="" id="bel-tun-1" class="results"> - <input type="text" name="" id="bel-tun-2" class="results"> Túnez &nbsp;&nbsp;<img src="dist/img/tun.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Sab 23 Jun 8:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/ing.png" height="25px">&nbsp;&nbsp; Inglaterra <input type="text" name="" id="ing-pan-1" class="results"> - <input type="text" name="" id="ing-pan-2" class="results"> Panamá &nbsp;&nbsp;<img src="dist/img/pan.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Dom 24 Jun 8:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/pan.png" height="25px">&nbsp;&nbsp; Panamá <input type="text" name="" id="pan-tun-1" class="results"> - <input type="text" name="" id="pan-tun-2" class="results"> Túnez &nbsp;&nbsp;<img src="dist/img/tun.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Saransk</p> <p class="rightalign">Jue 28 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/ing.png" height="25px">&nbsp;&nbsp; Inglaterra <input type="text" name="" id="ing-bel-1" class="results"> - <input type="text" name="" id="ing-bel-2" class="results"> Bélgica &nbsp;&nbsp;<img src="dist/img/bel.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Kaliningrado</p> <p class="rightalign">Jue 28 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			              </div>
+			            </div>
+			        </div>
+
+			        <div class="col-lg-6">
+			            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+			              <div class="card-body">
+			                <h5 class="card-title" style="background: rgba(0,126,126,0.9);">Grupo H</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/pol.png" height="25px">&nbsp;&nbsp; Polonia <input type="text" name="" id="pol-sen-1" class="results"> - <input type="text" name="" id="pol-sen-2" class="results"> Senegal &nbsp;&nbsp;<img src="dist/img/sen.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Mar 19 Jun 8:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/col.png" height="25px">&nbsp;&nbsp; Colombia <input type="text" name="" id="col-jap-1" class="results"> - <input type="text" name="" id="col-jap-2" class="results"> Japón &nbsp;&nbsp;<img src="dist/img/jap.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Saransk</p> <p class="rightalign">Mar 19 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/jap.png" height="25px">&nbsp;&nbsp; Japón <input type="text" name="" id="jap-sen-1" class="results"> - <input type="text" name="" id="jap-sen-2" class="results"> Senegal &nbsp;&nbsp;<img src="dist/img/sen.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Ekaterimburgo</p> <p class="rightalign">Dom 24 Jun 11:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/pol.png" height="25px">&nbsp;&nbsp; Polonia <input type="text" name="" id="pol-col-1" class="results"> - <input type="text" name="" id="pol-col-2" class="results"> Colombia &nbsp;&nbsp;<img src="dist/img/col.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Kazán</p> <p class="rightalign">Dom 24 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/sen.png" height="25px">&nbsp;&nbsp; Senegal <input type="text" name="" id="sen-col-1" class="results"> - <input type="text" name="" id="sen-col-2" class="results"> Colombia &nbsp;&nbsp;<img src="dist/img/col.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Samara</p> <p class="rightalign">Jue 28 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 
+			                				<div>
+			                					<img src="dist/img/jap.png" height="25px">&nbsp;&nbsp; Japón <input type="text" name="" id="jap-pol-1" class="results"> - <input type="text" name="" id="jap-pol-2" class="results"> Polonia &nbsp;&nbsp;<img src="dist/img/pol.png" height="25px">
+			                				</div>
+			                				<div>
+			                					<p class="leftalign">Volgogrado</p> <p class="rightalign">Jue 28 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			              </div>
+			            </div>
+			          </div>
+			        </div>
+		        </div>
+		    </div>
+			<br>
+			<div>
+				<button id="save" class="btn btn-block btn-success" type="button" onclick="app.groups()">Guardar</button>	
+			</div>
+			<br>
+		    <!-- /.content -->
+	  </div>
+	  <div id="eliminatoria" style="display:none;">
+	  	 <!-- Content Header (Page header) -->
+		    <div class="content-header">
+		      <div class="container-fluid">
+				<div style="margin-top:7px;">
+					<button class="btn btn-block btn-primary" type="button" onclick="app.atras();" id="atras">Atrás</button>
+				</div>
+				<div style="text-align:center;">
+					<h5>Fase Eliminatoria</h5>
+				</div>
+		      </div><!-- /.container-fluid -->
+		    </div>
+		    <!-- /.content-header -->
+
+		    <!-- Main content -->
+		    <div class="content">
+		      <div class="container-fluid">
+		        <div class="row">
+		          <div class="col-lg-6">
+
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		              	<div style="">
+			                <h5 class="card-title" style="background: rgba(47,47,47,0.9);">Octavos de Final</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 1
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo C</p> <p class="rightalign">2° Grupo D</p>
+			                				</div>
+			                				<div>
+			                					<input type="text" name="" id="1c" class=""> - <input type="text" name="" id="2d" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Kazán</p> <p class="rightalign">Sab 30 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td>2
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo A</p> <p class="rightalign">2° Grupo B</p>
+			                				</div>
+			                				<div>
+			                					<input type="text" name="" id="1a" class=""> - <input type="text" name="" id="2b" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Sochi</p> <p class="rightalign">Sab 30 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 3
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo B</p> <p class="rightalign">2° Grupo A</p>
+			                				</div>
+			                				<div>
+			                					<input type="text" name="" id="1b" class=""> - <input type="text" name="" id="2a" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Dom 1 Jul 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 4
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo D</p> <p class="rightalign">2° Grupo C</p>
+			                				</div>
+			                				<div>
+			                					<input type="text" name="" id="1d" class=""> - <input type="text" name="" id="2c" class=""> 
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Dom 1 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 5
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo E</p> <p class="rightalign">2° Grupo F</p>
+			                				</div>
+			                				<div>
+			                					<input type="text" name="" id="1e" class=""> - <input type="text" name="" id="2f" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Samara</p> <p class="rightalign">Lun 2 Jul 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 6
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo G</p> <p class="rightalign">2° Grupo H</p>
+			                				</div>
+			                				<div> 
+			                					<input type="text" name="" id="1g" class=""> - <input type="text" name="" id="2h" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Lun 2 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 7
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo F</p> <p class="rightalign">2° Grupo E</p>
+			                				</div>
+			                				<div> 
+			                					<input type="text" name="" id="1f" class=""> - <input type="text" name="" id="2e" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Mar 3 Jul 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 8
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo H</p> <p class="rightalign">2° Grupo G</p>
+			                				</div>
+			                				<div> 
+			                					<input type="text" name="" id="1h" class=""> - <input type="text" name="" id="2g" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Mar 3 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			            </div>
+		              </div>
+		            </div>
+		          </div>
+
+		          <div class="col-lg-6">
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Cuartos de Final</h5>
+
+		                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+		                	<tbody>
+		                		<tr align="center">
+		                			<td>A
+		                				<div class="fecha">
+		                					<p class="leftalign">Ganador 2</p> <p class="rightalign">Ganador 1</p>
+		                				</div> 
+		                				<div>
+		                					<input type="text" name="" id="" class=""> - <input type="text" name="" id="" class="">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Vie 6 Jul 10:00 am</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td>B
+		                				<div class="fecha">
+		                					<p class="leftalign">Ganador 5</p> <p class="rightalign">Ganador 6</p>
+		                				</div>  
+		                				<div>
+		                					<input type="text" name="" id="" class=""> - <input type="text" name="" id="" class="">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Kazán</p> <p class="rightalign">Vie 6 Jul 2:00 pm</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td>C
+		                				<div class="fecha">
+		                					<p class="leftalign">Ganador 7</p> <p class="rightalign">Ganador 8</p>
+		                				</div> 
+		                				<div>
+		                					<input type="text" name="" id="" class=""> - <input type="text" name="" id="" class="">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Samara</p> <p class="rightalign">Sab 7 Jul 10:00 am</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td>D
+		                				<div class="fecha">
+		                					<p class="leftalign">Ganador 3</p> <p class="rightalign">Ganador 4</p>
+		                				</div> 
+		                				<div>
+		                					<input type="text" name="" id="" class=""> - <input type="text" name="" id="" class="">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Sochi</p> <p class="rightalign">Sab 7 Jul 2:00 pm</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                	</tbody>
+		                </table>
+		              </div>
+		            </div>
+
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		              	<div style="">
+			                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Semi Final</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> I
+			                				<div class="fecha">
+			                					<p class="leftalign">Ganador A</p> <p class="rightalign">Ganador B</p>
+			                				</div>
+			                				<div>
+			                					<input type="text" name="" id="" class=""> - <input type="text" name="" id="" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Mar 10 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> II
+			                				<div class="fecha">
+			                					<p class="leftalign">Ganador D</p> <p class="rightalign">Ganador C</p>
+			                				</div>
+			                				<div>
+			                					<input type="text" name="" id="" class=""> - <input type="text" name="" id="" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Mie 11 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			            </div>
+		              </div>
+		            </div>
+		          </div>
+
+		        </div>
+		        <!-- /.row -->
+
+		        <div class="row">
+
+		          <div class="col-lg-6">
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Tercer Puesto</h5>
+
+		                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+		                	<tbody>
+		                		<tr align="center">
+		                			<td> 
+			                				<div class="fecha">
+			                					<p class="leftalign">Perdedor I</p> <p class="rightalign">Perdedor II</p>
+			                				</div>
+		                				<div>
+		                					<input type="text" name="" id="" class=""> - <input type="text" name="" id="" class="">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Sab 14 Jul 10:00 am</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                	</tbody>
+		                </table>
+		              </div>
+		            </div>
+		          </div>
+
+		          <div class="col-lg-6">
+
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		              	<div style="">
+			                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Final</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td>
+			                				<div class="fecha">
+			                					<p class="leftalign">Ganador I</p> <p class="rightalign">Ganador II</p>
+			                				</div> 
+			                				<div>
+			                					<input type="text" name="" id="" class=""> - <input type="text" name="" id="" class="">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Dom 15 Jul 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			            </div>
+		              </div>
+		            </div>
+		          </div>
+
+		        </div>
+		        <!-- /.row -->
+
+
+
+		        <div class="row">
+
+		          <div class="col-lg-6">
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Cuadro</h5>
+
+		                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+		                	<tbody>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					Campeón
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="campeon" class="">
+		                				</div>
+		                				<div>
+		                					Subcampeón
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="subcampeon" class="">
+		                				</div>
+		                				<div>
+		                					Tercer Puesto
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="tercerpuesto" class="">
+		                				</div>
+		                				<div>
+		                					Cuarto Puesto
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="cuartopuesto" class="">
+		                				</div>
+		                			</td>
+		                			<td></td>
+		                			<td> 
+		                				<div>
+		                					Goleador
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="gol" class="">
+		                				</div>
+		                			</td>
+		                		</tr>
+		                	</tbody>
+		                </table>
+		              </div>
+		            </div>
+		          </div>
+
+		          <div class="col-lg-6">
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Datos</h5>
+
+		                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+		                	<tbody>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					Participante
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="user" class="">
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td> 
+		                				<button id="save" class="btn btn-block btn-success" type="button" data-toggle="modal" data-target="#myModal3">Enviar</button>
+		                			</td>
+		                		</tr>
+		                	</tbody>
+		                </table>
+		              </div>
+		            </div>
+		          </div>
+
+		        </div>
+		        <!-- /.row -->
+		    </div>
 		</div>
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
+	  </div>
+	  <div id="posiciones" style="display:none;">
+		  	<div class="content-header">
+			      <div class="container-fluid">
+					<div style="margin-top:7px;">
+						<button class="btn btn-block btn-primary" type="button" onclick="app.atras();" id="atras">Atrás</button>
+					</div>
+					<div style="text-align: center;">
+						<h5>Posiciones</h5>
+					</div>
+			      </div><!-- /.container-fluid -->
+			    </div>
 
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-lg-6">
-
-            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
-              <div class="card-body">
-              	<div style="">
-	                <h5 class="card-title" style="background: rgba(19,73,150,0.9);">Grupo A</h5>
-
-	                <table class="table table-bordered" style="margin:0px;background: rgba(255,255,255,0.7);">
-	                	<tbody>
-	                		<tr align="center">
-	                			<td> Rusia <input type="text" name="" id="rus-ars-1" class="results"> - <input type="text" name="" id="rus-ars-2" class="results"> Arabia Saudita </td>
-	                		</tr>
-	                		<tr align="center">
-	                			<td> Egipto <input type="text" name="" id="egi-uru-1" class="results"> - <input type="text" name="" id="egi-uru-2" class="results"> Uruguay </td>
-	                		</tr>
-	                		<tr align="center">
-	                			<td> Rusia <input type="text" name="" id="rus-egi-1" class="results"> - <input type="text" name="" id="rus-egi-2" class="results"> Egipto </td>
-	                		</tr>
-	                		<tr align="center">
-	                			<td> Uruguay <input type="text" name="" id="uru-ars-1" class="results"> - <input type="text" name="" id="uru-ars-2" class="results"> Arabia Saudita </td>
-	                		</tr>
-	                		<tr align="center">
-	                			<td> Arabia Saudita <input type="text" name="" id="ars-egi-1" class="results"> - <input type="text" name="" id="ars-egi-2" class="results"> Egipto </td>
-	                		</tr>
-	                		<tr align="center">
-	                			<td> Uruguay <input type="text" name="" style="width:5%" id="uru-rus-1" class="results"> - <input type="text" name="" id="uru-rus-2" class="results"> Rusia </td>
-	                		</tr>
-	                	</tbody>
-	                </table>
-	            </div>
-              </div>
-            </div>
-
-            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
-              <div class="card-body">
-                <h5 class="card-title" style="background: rgba(116,54,156,0.9);">Grupo B</h5>
-
-                <table class="table table-bordered" style="margin:0px;background: rgba(255,255,255,0.7);">
-                	<tbody>
-                		<tr align="center">
-                			<td> Marruecos <input type="text" name="" id="mar-ira-1" class="results"> - <input type="text" name="" id="mar-ira-2" class="results"> Irán </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Portugal <input type="text" name="" id="por-esp-1" class="results"> - <input type="text" name="" id="por-esp-2" class="results"> España </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Portugal <input type="text" name="" id="por-mar-1" class="results"> - <input type="text" name="" id="por-mar-2" class="results"> Marruecos </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Irán <input type="text" name="" id="ira-esp-1" class="results"> - <input type="text" name="" id="ira-esp-2" class="results"> España </td>
-                		</tr>
-                		<tr align="center">
-                			<td> España <input type="text" name="" id="esp-mar-1" class="results"> - <input type="text" name="" id="esp-mar-2" class="results"> Marruecos </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Irán <input type="text" name="" id="ira-por-1" class="results"> - <input type="text" name="" id="ira-por-2" class="results"> Portugal </td>
-                		</tr>
-                	</tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
-              <div class="card-body">
-                <h5 class="card-title" style="background: rgba(230,31,46,0.9);">Grupo C</h5>
-
-                <table class="table table-bordered" style="margin:0px;background: rgba(255,255,255,0.7);">
-                	<tbody>
-                		<tr align="center">
-                			<td> Francia <input type="text" name="" id="fra-aus-1" class="results"> - <input type="text" name="" id="fra-aus-2" class="results"> Australia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Perú <input type="text" name="" id="per-din-1" class="results"> - <input type="text" name="" id="per-din-2" class="results"> Dinamarca </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Francia <input type="text" name="" id="fra-per-1" class="results"> - <input type="text" name="" id="fra-per-2" class="results"> Perú </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Dinamarca <input type="text" name="" id="din-aus-1" class="results"> - <input type="text" name="" id="din-aus-2" class="results"> Australia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Australia <input type="text" name="" id="aus-per-1" class="results"> - <input type="text" name="" id="aus-per-2" class="results"> Perú </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Dinamarca <input type="text" name="" id="din-fra-1" class="results"> - <input type="text" name="" id="din-fra-2" class="results"> Francia </td>
-                		</tr>
-                	</tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
-              <div class="card-body">
-                <h5 class="card-title" style="background: rgba(236,168,3,0.9);">Grupo D</h5>
-
-                <table class="table table-bordered" style="margin:0px;background: rgba(255,255,255,0.7);">
-                	<tbody>
-                		<tr align="center">
-                			<td> Argentina <input type="text" name="" id="arg-isl-1" class="results"> - <input type="text" name="" id="arg-isl-2" class="results"> Islandia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Croacia <input type="text" name="" id="cro-nig-1" class="results"> - <input type="text" name="" id="cro-nig-2" class="results"> Nigeria </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Argentina <input type="text" name="" id="arg-cro-1" class="results"> - <input type="text" name="" id="arg-cro-2" class="results"> Croacia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Nigeria <input type="text" name="" id="nig-isl-1" class="results"> - <input type="text" name="" id="nig-isl-2" class="results"> Islandia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Islandia <input type="text" name="" id="isl-cro-1" class="results"> - <input type="text" name="" id="isl-cro-2" class="results"> Croacia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Nigeria <input type="text" name="" id="nig-arg-1" class="results"> - <input type="text" name="" id="nig-arg-2" class="results"> Argentina </td>
-                		</tr>
-                	</tbody>
-                </table>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- /.col-md-5 -->
-          <div class="col-lg-6">
-            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
-              <div class="card-body">
-                <h5 class="card-title" style="background: rgba(2,134,103,0.9);">Grupo E</h5>
-
-                <table class="table table-bordered" style="margin:0px;background: rgba(255,255,255,0.7);">
-                	<tbody>
-                		<tr align="center">
-                			<td> Costa Rica <input type="text" name="" id="cos-ser-1" class="results"> - <input type="text" name="" style="width:5%"> Serbia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Brasil <input type="text" name="" id="bra-sui-1" class="results"> - <input type="text" name="" style="width:5%"> Suiza </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Brasil <input type="text" name="" id="bra-cos-1" class="results"> - <input type="text" name="" style="width:5%"> Costa Rica </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Serbia <input type="text" name="" id="ser-sui-1" class="results"> - <input type="text" name="" style="width:5%"> Suiza </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Suiza <input type="text" name="" id="sui-cos-1" class="results"> - <input type="text" name="" style="width:5%"> Costa Rica </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Serbia <input type="text" name="" id="ser-bra-1" class="results"> - <input type="text" name="" style="width:5%"> Brasil </td>
-                		</tr>
-                	</tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
-              <div class="card-body">
-                <h5 class="card-title" style="background: rgba(255,91,52,0.9);">Grupo F</h5>
-
-                <table class="table table-bordered" style="margin:0px;background: rgba(255,255,255,0.7);">
-                	<tbody>
-                		<tr align="center">
-                			<td> Alemania <input type="text" name="" id="ale-mex-1" class="results"> - <input type="text" name="" style="width:5%"> México </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Suecia <input type="text" name="" id="sue-cor-1" class="results"> - <input type="text" name="" style="width:5%"> Corea del Sur </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Alemania <input type="text" name="" id="ale-sue-1" class="results"> - <input type="text" name="" style="width:5%">Suecia  </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Corea del Sur <input type="text" name="" id="cor-mex-1" class="results"> - <input type="text" name="" style="width:5%"> México </td>
-                		</tr>
-                		<tr align="center">
-                			<td> México <input type="text" name="" id="mex-sue-1" class="results"> - <input type="text" name="" style="width:5%"> Suecia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Corea del Sur <input type="text" name="" id="cor-ale-1" class="results"> - <input type="text" name="" style="width:5%"> Alemania </td>
-                		</tr>
-                	</tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
-              <div class="card-body">
-                <h5 class="card-title" style="background: rgba(184,137,106,0.9);">Grupo G</h5>
-
-                <table class="table table-bordered" style="margin:0px;background: rgba(255,255,255,0.7);">
-                	<tbody>
-                		<tr align="center">
-                			<td> Bélgica <input type="text" name="" id="bel-pan-1" class="results"> - <input type="text" name="" style="width:5%" id="bel-pan-2" class="results"> Panamá </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Túnez <input type="text" name="" id="tun-ing-1" class="results"> - <input type="text" name="" style="width:5%"> Inglaterra </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Bélgica <input type="text" name="" id="bel-tun-1" class="results"> - <input type="text" name="" style="width:5%"> Túnez </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Inglaterra <input type="text" name="" id="ing-pan-1" class="results"> - <input type="text" name="" style="width:5%"> Panamá </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Panamá <input type="text" name="" id="pan-tun-1" class="results"> - <input type="text" name="" style="width:5%"> Túnez </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Inglaterra <input type="text" name="" id="ing-bel-1" class="results"> - <input type="text" name="" style="width:5%"> Bélgica </td>
-                		</tr>
-                	</tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
-              <div class="card-body">
-                <h5 class="card-title" style="background: rgba(0,126,126,0.9);">Grupo H</h5>
-
-                <table class="table table-bordered" style="margin:0px;background: rgba(255,255,255,0.7);">
-                	<tbody>
-                		<tr align="center">
-                			<td> Polonia <input type="text" name="" id="pol-sen-1" class="results"> - <input type="text" name="" style="width:5%"> Senegal </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Colombia <input type="text" name="" id="col-jap-1" class="results"> - <input type="text" name="" style="width:5%"> Japón </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Japón <input type="text" name="" id="jap-sen-1" class="results"> - <input type="text" name="" style="width:5%"> Senegal </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Polonia <input type="text" name="" id="pol-col-1" class="results"> - <input type="text" name="" style="width:5%"> Colombia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Senegal <input type="text" name="" id="sen-col-1" class="results"> - <input type="text" name="" style="width:5%"> Colombia </td>
-                		</tr>
-                		<tr align="center">
-                			<td> Japón <input type="text" name="" id="jap-pol-1" class="results"> - <input type="text" name="" style="width:5%"> Polonia </td>
-                		</tr>
-                	</tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <!-- /.col-md-5 -->
-        </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-	<br>
-	<div>
-		<button class="btn btn-block btn-success" type="button" style="width:300px;margin:0 auto;">Guardar</button>	
-	</div>
-	<br>
-    <!-- /.content -->
+			    <div class="card card-primary" style="background:rgba(255,255,255,0.95);border-color:blue;">
+	              <div class="card-body">
+	              	<div id="">
+		         		<table id="example1" class="table table-bordered table-striped nowrap" style="width:100%">
+		                    
+		                </table>
+		            </div>
+	              </div>
+			   </div>
+			  <br>
+	  </div>
   </div>
   <!-- /.content-wrapper -->
 </div>
 <!-- ./wrapper -->
 
+<!-- ###################################################################################################### -->
+<!-- #################################  Modal Llenar Completo ############################################# -->
+<!-- ###################################################################################################### -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+      </div>
+      <div class="modal-body">
+        Debe rellenar correctamente todos los recuadros.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ###################################################################################################### -->
+<!-- ###################################################################################################### -->
+
+<!-- ###################################################################################################### -->
+<!-- #####################################  Modal Completo ################################################ -->
+<!-- ###################################################################################################### -->
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+      </div>
+      <div class="modal-body">
+        Nombre de participante ya existente.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ###################################################################################################### -->
+<!-- ###################################################################################################### -->
+
+<!-- ###################################################################################################### -->
+<!-- #####################################  Modal Completo ################################################ -->
+<!-- ###################################################################################################### -->
+<div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Enviar Quiniela</h5>
+      </div>
+      <div class="modal-body">
+        ¿Está seguro de sus resultados? Luego no podrá modificarlos.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-dismiss="modal" onclick="app.sendata();">Sí</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">No, espera</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ###################################################################################################### -->
+<!-- ###################################################################################################### -->
+
+<!-- ###################################################################################################### -->
+<!-- #####################################  Modal Completo ################################################ -->
+<!-- ###################################################################################################### -->
+<div class="modal fade" id="myModal4" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Quiniela Completada exitosamente</h5>
+      </div>
+      <div class="modal-body">
+        ¡Muchas gracias por participar y mucha suerte <span id="usuario"></span>!.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ###################################################################################################### -->
+<!-- ###################################################################################################### -->
+
+<!-- ###################################################################################################### -->
+<!-- #####################################  Modal Completo ################################################ -->
+<!-- ###################################################################################################### -->
+<div class="modal fade" id="myModal5" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reglas del Juego</h5>
+      </div>
+      <div class="modal-body" style="text-align:left;">
+      	<ol>
+      		<li> El ganador de la quiniela será el que acumule la mayor cantidad de puntos. Se obtienen puntos con los marcadores de los juegos de la primera ronda; con el cuadro de los cuatro finalistas y con el nombre del goleador del mundial.</li>
+      		<li> Si aciertas el score final del partido ganas 5 puntos.</li>
+      		<li> Si aciertas el ganador o el empate pero no el marcador exacto, ganas 3 puntos.	</li>
+      		<li> En el cuadro final por cada equipo que aciertes en la posición correcta ganas 20 puntos.</li>
+      		<li> En el cuadro final por cada equpo que aciertes pero no en la posición correcta ganas 10 puntos.</li>
+      		<li> Si aciertas al goleador del campeonato mundial ganas 20 puntos. Si hay empate igual se ganan todos los puntos.</li>
+      		<li> El valor de la participación es de 100.000 Bs.</li>
+      		<li> Del total de dinero recogido el 85% será para el ganador, 10% para el segundo lugar y 5% para el tercer lugar.</li>
+      		<li> Antes de empezar el Campeonato Mundial se hará entrega de un listado de todos los participantes con sus pronosticos.</li>
+      		<li> Responsible Carlos Scovino C.I. 9234795, carsco13@gmail.com, cta. Cte. Exterior  0115 0054 48 0540087350</li>
+      	</ol>																			
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ###################################################################################################### -->
+<!-- ###################################################################################################### -->
+
+
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables -->
+<script src="plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="plugins/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="plugins/datatables/extensions/FixedColumns/js/dataTables.fixedColumns.min.js"></script>
+
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
+
+<script src="dist/js/firebase.js"></script>
+<script src="dist/js/index.js"></script>
 </body>
 </html>
