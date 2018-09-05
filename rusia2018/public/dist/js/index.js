@@ -4108,6 +4108,18 @@ var app = {
             }
           }
           /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          if (app.model[key]['camp'] === "Bélgica") {
+            app.model[key]['camp'] = "Belgica";
+          }
+          if (app.model[key]['subcamp'] === "Bélgica") {
+            app.model[key]['subcamp'] = "Belgica";
+          }
+          if (app.model[key]['tercerpuesto'] === "Bélgica") {
+            app.model[key]['tercerpuesto'] = "Belgica";
+          }
+          if (app.model[key]['cuartopuesto'] === "Bélgica") {
+            app.model[key]['cuartopuesto'] = "Belgica";
+          }
           data.push(app.model[key]['camp']);
           if (app.model['-LE7QFSuDWcx4trbkLGQ']['camp'].toLowerCase() == app.model[key]['camp'].toLowerCase()) {
             ptos += 20;
@@ -4141,7 +4153,7 @@ var app = {
           }
           /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
           data.push(app.model[key]['gol']);
-          if (app.model[key]['gol'].toLowerCase() == app.model['-LE7QFSuDWcx4trbkLGQ']['gol'].toLowerCase()) {
+          if (app.model['-LE7QFSuDWcx4trbkLGQ']['gol'].toLowerCase().includes(app.model[key]['gol'].toLowerCase())) {
             ptos += 20;
           }
 
@@ -4180,7 +4192,7 @@ var app = {
           { "title":"Brasil "+app.model['-LE7QFSuDWcx4trbkLGQ']['e']['bra_cos']+" Costa Rica" },
           { "title":"Nigeria "+app.model['-LE7QFSuDWcx4trbkLGQ']['d']['nig_isl']+" Islandia" },
           { "title":"Serbia "+app.model['-LE7QFSuDWcx4trbkLGQ']['e']['ser_sui']+" Suiza" },
-          { "title":"Bélgica "+app.model['-LE7QFSuDWcx4trbkLGQ']['g']['rus_ars']+" Túnez" },
+          { "title":"Bélgica "+app.model['-LE7QFSuDWcx4trbkLGQ']['g']['bel_tun']+" Túnez" },
           { "title":"Alemania "+app.model['-LE7QFSuDWcx4trbkLGQ']['f']['ale_sue']+" Suecia" },
           { "title":"Corea del Sur "+app.model['-LE7QFSuDWcx4trbkLGQ']['f']['cor_mex']+" México" },
           { "title":"Inglaterra "+app.model['-LE7QFSuDWcx4trbkLGQ']['g']['ing_pan']+" Panamá" },
@@ -4236,12 +4248,14 @@ var app = {
 
 };
 
-document.getElementById('atras2').disabled = true;
+//document.getElementById('atras2').disabled = true;
 
 firebase.initializeApp(app.firebaseConfig);
 firebase.database().ref().on('value', function(snap){
   if (snap.val() !== null) {
     app.model = snap.val();
-    document.getElementById('atras2').disabled = false;
+    //document.getElementById('atras2').disabled = false;
+    //document.getElementById("posiciones").style.display = "inline";
+    app.refreshUsers();
   }
 });

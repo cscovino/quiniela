@@ -50,16 +50,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" style="margin: 0px;background-image:url(dist/img/back3.jpg);">
-	  <div id="grupos">
+	  <div id="grupos" style="display:none;">
 		    <!-- Content Header (Page header) -->
 		    <div class="content-header">
 		      <div class="container-fluid">
 		      	<div>
-		      		<button class="btn btn-block btn-primary" type="button" data-toggle="modal" data-target="#myModal5" id="atras" style="float:left;margin-right:10px">Reglas</button>
 					<button class="btn btn-block btn-primary" type="button" onclick="app.poss();" id="atras2">Posiciones</button>
 		      	</div>
 				<div style="text-align: center;">
-					<h5>Fase de Grupos</h5>
+					<h5>Calendario</h5>
 				</div>
 		      </div><!-- /.container-fluid -->
 		    </div>
@@ -81,7 +80,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/rus.png" height="25px">&nbsp;&nbsp; Rusia <input type="text" name="" id="rus-ars-1" class="results"> - <input type="text" name="" id="rus-ars-2" class="results"> Arabia Saudita &nbsp;&nbsp;<img src="dist/img/ars.png" height="25px">
+			                					<img src="dist/img/rus.png" height="25px">&nbsp;&nbsp; Rusia 5-0 Arabia Saudita &nbsp;&nbsp;<img src="dist/img/ars.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Jue 14 Jun 11:00 am</p>
@@ -91,7 +90,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td>
 			                				<div>
-			                					<img src="dist/img/egi.png" height="25px">&nbsp;&nbsp; Egipto <input type="text" name="" id="egi-uru-1" class="results"> - <input type="text" name="" id="egi-uru-2" class="results"> Uruguay &nbsp;&nbsp;<img src="dist/img/uru.png" height="25px"> 
+			                					<img src="dist/img/egi.png" height="25px">&nbsp;&nbsp; Egipto 0-1 Uruguay &nbsp;&nbsp;<img src="dist/img/uru.png" height="25px"> 
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Ekaterimburgo</p> <p class="rightalign">Vie 15 Jun 8:00 am</p>
@@ -101,7 +100,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/rus.png" height="25px">&nbsp;&nbsp; Rusia <input type="text" name="" id="rus-egi-1" class="results"> - <input type="text" name="" id="rus-egi-2" class="results"> Egipto &nbsp;&nbsp;<img src="dist/img/egi.png" height="25px">
+			                					<img src="dist/img/rus.png" height="25px">&nbsp;&nbsp; Rusia 3-1 Egipto &nbsp;&nbsp;<img src="dist/img/egi.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Mar 19 Jun 2:00 pm</p>
@@ -111,7 +110,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/uru.png" height="25px">&nbsp;&nbsp; Uruguay <input type="text" name="" id="uru-ars-1" class="results"> - <input type="text" name="" id="uru-ars-2" class="results"> Arabia Saudita &nbsp;&nbsp;<img src="dist/img/ars.png" height="25px">
+			                					<img src="dist/img/uru.png" height="25px">&nbsp;&nbsp; Uruguay 1-0 Arabia Saudita &nbsp;&nbsp;<img src="dist/img/ars.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Mie 20 Jun 11:00 am</p>
@@ -121,7 +120,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/ars.png" height="25px">&nbsp;&nbsp; Arabia Saudita <input type="text" name="" id="ars-egi-1" class="results"> - <input type="text" name="" id="ars-egi-2" class="results"> Egipto &nbsp;&nbsp;<img src="dist/img/egi.png" height="25px"> 
+			                					<img src="dist/img/ars.png" height="25px">&nbsp;&nbsp; Arabia Saudita 2-1 Egipto &nbsp;&nbsp;<img src="dist/img/egi.png" height="25px"> 
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Volgogrado</p> <p class="rightalign">Lun 25 Jun 10:00 am</p>
@@ -131,7 +130,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div> 
-			                					<img src="dist/img/uru.png" height="25px">&nbsp;&nbsp; Uruguay <input type="text" name="" id="uru-rus-1" class="results"> - <input type="text" name="" id="uru-rus-2" class="results"> Rusia &nbsp;&nbsp;<img src="dist/img/rus.png" height="25px"> 
+			                					<img src="dist/img/uru.png" height="25px">&nbsp;&nbsp; Uruguay 3-0 Rusia &nbsp;&nbsp;<img src="dist/img/rus.png" height="25px"> 
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Samara</p> <p class="rightalign">Lun 25 Jun 10:00 am</p>
@@ -155,7 +154,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		                		<tr align="center">
 		                			<td> 
 		                				<div>
-		                					<img src="dist/img/mar.png" height="25px">&nbsp;&nbsp; Marruecos <input type="text" name="" id="mar-ira-1" class="results"> - <input type="text" name="" id="mar-ira-2" class="results"> Irán &nbsp;&nbsp;<img src="dist/img/ira.png" height="25px">
+		                					<img src="dist/img/mar.png" height="25px">&nbsp;&nbsp; Marruecos 0-1 Irán &nbsp;&nbsp;<img src="dist/img/ira.png" height="25px">
 		                				</div>
 		                				<div class="fecha">
 		                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Vie 15 Jun 11:00 am</p>
@@ -165,7 +164,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		                		<tr align="center">
 		                			<td> 
 		                				<div>
-		                					<img src="dist/img/por.png" height="25px">&nbsp;&nbsp; Portugal <input type="text" name="" id="por-esp-1" class="results"> - <input type="text" name="" id="por-esp-2" class="results"> España &nbsp;&nbsp;<img src="dist/img/esp.png" height="25px"> 
+		                					<img src="dist/img/por.png" height="25px">&nbsp;&nbsp; Portugal 3-3 España &nbsp;&nbsp;<img src="dist/img/esp.png" height="25px"> 
 		                				</div>
 		                				<div class="fecha">
 		                					<p class="leftalign">Sochi</p> <p class="rightalign">Vie 15 Jun 2:00 pm</p>
@@ -175,7 +174,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		                		<tr align="center">
 		                			<td> 
 		                				<div>
-		                					<img src="dist/img/por.png" height="25px">&nbsp;&nbsp; Portugal <input type="text" name="" id="por-mar-1" class="results"> - <input type="text" name="" id="por-mar-2" class="results"> Marruecos &nbsp;&nbsp;<img src="dist/img/mar.png" height="25px"> 
+		                					<img src="dist/img/por.png" height="25px">&nbsp;&nbsp; Portugal 1-0 Marruecos &nbsp;&nbsp;<img src="dist/img/mar.png" height="25px"> 
 		                				</div>
 		                				<div class="fecha">
 		                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Mie 20 Jun 8:00 am</p>
@@ -185,7 +184,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		                		<tr align="center">
 		                			<td> 
 		                				<div>
-		                					<img src="dist/img/ira.png" height="25px">&nbsp;&nbsp; Irán <input type="text" name="" id="ira-esp-1" class="results"> - <input type="text" name="" id="ira-esp-2" class="results"> España &nbsp;&nbsp;<img src="dist/img/esp.png" height="25px"> 
+		                					<img src="dist/img/ira.png" height="25px">&nbsp;&nbsp; Irán 0-1 España &nbsp;&nbsp;<img src="dist/img/esp.png" height="25px"> 
 		                				</div>
 		                				<div class="fecha">
 		                					<p class="leftalign">Kazán</p> <p class="rightalign">Mie 20 Jun 2:00 pm</p>
@@ -195,7 +194,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		                		<tr align="center">
 		                			<td> 
 		                				<div>
-		                					<img src="dist/img/esp.png" height="25px">&nbsp;&nbsp; España <input type="text" name="" id="esp-mar-1" class="results"> - <input type="text" name="" id="esp-mar-2" class="results"> Marruecos &nbsp;&nbsp;<img src="dist/img/mar.png" height="25px"> 
+		                					<img src="dist/img/esp.png" height="25px">&nbsp;&nbsp; España 2-2 Marruecos &nbsp;&nbsp;<img src="dist/img/mar.png" height="25px"> 
 		                				</div>
 		                				<div class="fecha">
 		                					<p class="leftalign">Kaliningrado</p> <p class="rightalign">Lun 25 Jun 2:00 pm</p>
@@ -205,7 +204,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		                		<tr align="center">
 		                			<td> 
 		                				<div>
-		                					<img src="dist/img/ira.png" height="25px">&nbsp;&nbsp; Irán <input type="text" name="" id="ira-por-1" class="results"> - <input type="text" name="" id="ira-por-2" class="results"> Portugal &nbsp;&nbsp;<img src="dist/img/por.png" height="25px"> 
+		                					<img src="dist/img/ira.png" height="25px">&nbsp;&nbsp; Irán 1-1 Portugal &nbsp;&nbsp;<img src="dist/img/por.png" height="25px"> 
 		                				</div>
 		                				<div class="fecha">
 		                					<p class="leftalign">Saransk</p> <p class="rightalign">Lun 25 Jun 2:00 pm</p>
@@ -230,7 +229,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia <input type="text" name="" id="fra-aus-1" class="results"> - <input type="text" name="" id="fra-aus-2" class="results"> Australia &nbsp;&nbsp;<img src="dist/img/aus.png" height="25px">  
+			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia 2-1 Australia &nbsp;&nbsp;<img src="dist/img/aus.png" height="25px">  
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Kazán</p> <p class="rightalign">Sab 16 Jun 6:00 am</p>
@@ -240,7 +239,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/per.png" height="25px">&nbsp;&nbsp; Perú <input type="text" name="" id="per-din-1" class="results"> - <input type="text" name="" id="per-din-2" class="results"> Dinamarca &nbsp;&nbsp;<img src="dist/img/din.png" height="25px">  
+			                					<img src="dist/img/per.png" height="25px">&nbsp;&nbsp; Perú 0-1 Dinamarca &nbsp;&nbsp;<img src="dist/img/din.png" height="25px">  
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Saransk</p> <p class="rightalign">Sab 16 Jun 12:00 pm</p>
@@ -250,7 +249,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia <input type="text" name="" id="fra-per-1" class="results"> - <input type="text" name="" id="fra-per-2" class="results"> Perú &nbsp;&nbsp;<img src="dist/img/per.png" height="25px">  
+			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia 1-0 Perú &nbsp;&nbsp;<img src="dist/img/per.png" height="25px">  
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Ekaterimburgo</p> <p class="rightalign">Jue 21 Jun 8:00 am</p>
@@ -260,7 +259,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/din.png" height="25px">&nbsp;&nbsp; Dinamarca <input type="text" name="" id="din-aus-1" class="results"> - <input type="text" name="" id="din-aus-2" class="results"> Australia &nbsp;&nbsp;<img src="dist/img/aus.png" height="25px">  
+			                					<img src="dist/img/din.png" height="25px">&nbsp;&nbsp; Dinamarca 1-1 Australia &nbsp;&nbsp;<img src="dist/img/aus.png" height="25px">  
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Samara</p> <p class="rightalign">Jue 21 Jun 11:00 am</p>
@@ -270,7 +269,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/aus.png" height="25px">&nbsp;&nbsp; Australia <input type="text" name="" id="aus-per-1" class="results"> - <input type="text" name="" id="aus-per-2" class="results"> Perú &nbsp;&nbsp;<img src="dist/img/per.png" height="25px">  
+			                					<img src="dist/img/aus.png" height="25px">&nbsp;&nbsp; Australia 0-2 Perú &nbsp;&nbsp;<img src="dist/img/per.png" height="25px">  
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Sochi</p> <p class="rightalign">Mar 26 Jun 10:00 am</p>
@@ -280,7 +279,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/din.png" height="25px">&nbsp;&nbsp; Dinamarca <input type="text" name="" id="din-fra-1" class="results"> - <input type="text" name="" id="din-fra-2" class="results"> Francia &nbsp;&nbsp;<img src="dist/img/fra.png" height="25px">  
+			                					<img src="dist/img/din.png" height="25px">&nbsp;&nbsp; Dinamarca 0-0 Francia &nbsp;&nbsp;<img src="dist/img/fra.png" height="25px">  
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Mar 26 Jun 10:00 am</p>
@@ -303,7 +302,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/arg.png" height="25px">&nbsp;&nbsp; Argentina <input type="text" name="" id="arg-isl-1" class="results"> - <input type="text" name="" id="arg-isl-2" class="results"> Islandia &nbsp;&nbsp;<img src="dist/img/isl.png" height="25px">
+			                					<img src="dist/img/arg.png" height="25px">&nbsp;&nbsp; Argentina 1-1 Islandia &nbsp;&nbsp;<img src="dist/img/isl.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Sab 16 Jun 9:00 am</p>
@@ -313,7 +312,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/cro.png" height="25px">&nbsp;&nbsp; Croacia <input type="text" name="" id="cro-nig-1" class="results"> - <input type="text" name="" id="cro-nig-2" class="results"> Nigeria &nbsp;&nbsp;<img src="dist/img/nig.png" height="25px">
+			                					<img src="dist/img/cro.png" height="25px">&nbsp;&nbsp; Croacia 2-0 Nigeria &nbsp;&nbsp;<img src="dist/img/nig.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Kaliningrado</p> <p class="rightalign">Sab 16 Jun 3:00 pm</p>
@@ -323,7 +322,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/arg.png" height="25px">&nbsp;&nbsp; Argentina <input type="text" name="" id="arg-cro-1" class="results"> - <input type="text" name="" id="arg-cro-2" class="results"> Croacia &nbsp;&nbsp;<img src="dist/img/cro.png" height="25px">
+			                					<img src="dist/img/arg.png" height="25px">&nbsp;&nbsp; Argentina 0-3 Croacia &nbsp;&nbsp;<img src="dist/img/cro.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Jue 21 Jun 2:00 pm</p>
@@ -333,7 +332,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/nig.png" height="25px">&nbsp;&nbsp; Nigeria <input type="text" name="" id="nig-isl-1" class="results"> - <input type="text" name="" id="nig-isl-2" class="results"> Islandia &nbsp;&nbsp;<img src="dist/img/isl.png" height="25px">
+			                					<img src="dist/img/nig.png" height="25px">&nbsp;&nbsp; Nigeria 2-0 Islandia &nbsp;&nbsp;<img src="dist/img/isl.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Volgogrado</p> <p class="rightalign">Vie 22 Jun 11:00 am</p>
@@ -343,7 +342,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/isl.png" height="25px">&nbsp;&nbsp; Islandia <input type="text" name="" id="isl-cro-1" class="results"> - <input type="text" name="" id="isl-cro-2" class="results"> Croacia &nbsp;&nbsp;<img src="dist/img/cro.png" height="25px">
+			                					<img src="dist/img/isl.png" height="25px">&nbsp;&nbsp; Islandia 1-2 Croacia &nbsp;&nbsp;<img src="dist/img/cro.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Mar 26 Jun 2:00 pm</p>
@@ -353,7 +352,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/nig.png" height="25px">&nbsp;&nbsp; Nigeria <input type="text" name="" id="nig-arg-1" class="results"> - <input type="text" name="" id="nig-arg-2" class="results"> Argentina &nbsp;&nbsp;<img src="dist/img/arg.png" height="25px">
+			                					<img src="dist/img/nig.png" height="25px">&nbsp;&nbsp; Nigeria 1-2 Argentina &nbsp;&nbsp;<img src="dist/img/arg.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Mar 26 Jun 2:00 pm</p>
@@ -378,7 +377,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/cos.png" height="25px">&nbsp;&nbsp; Costa Rica <input type="text" name="" id="cos-ser-1" class="results"> - <input type="text" name="" id="cos-ser-2" class="results"> Serbia &nbsp;&nbsp;<img src="dist/img/ser.png" height="25px">
+			                					<img src="dist/img/cos.png" height="25px">&nbsp;&nbsp; Costa Rica 0-1 Serbia &nbsp;&nbsp;<img src="dist/img/ser.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Samara</p> <p class="rightalign">Dom 17 Jun 8:00 am</p>
@@ -388,7 +387,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/bra.png" height="25px">&nbsp;&nbsp; Brasil <input type="text" name="" id="bra-sui-1" class="results"> - <input type="text" name="" id="bra-sui-2" class="results"> Suiza &nbsp;&nbsp;<img src="dist/img/sui.png" height="25px">
+			                					<img src="dist/img/bra.png" height="25px">&nbsp;&nbsp; Brasil 1-1 Suiza &nbsp;&nbsp;<img src="dist/img/sui.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Dom 17 Jun 2:00 pm</p>
@@ -398,7 +397,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/bra.png" height="25px">&nbsp;&nbsp; Brasil <input type="text" name="" id="bra-cos-1" class="results"> - <input type="text" name="" id="bra-cos-2" class="results"> Costa Rica &nbsp;&nbsp;<img src="dist/img/cos.png" height="25px">
+			                					<img src="dist/img/bra.png" height="25px">&nbsp;&nbsp; Brasil 2-0 Costa Rica &nbsp;&nbsp;<img src="dist/img/cos.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Vie 22 Jun 8:00 am</p>
@@ -408,7 +407,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/ser.png" height="25px">&nbsp;&nbsp; Serbia <input type="text" name="" id="ser-sui-1" class="results"> - <input type="text" name="" id="ser-sui-2" class="results"> Suiza &nbsp;&nbsp;<img src="dist/img/sui.png" height="25px">
+			                					<img src="dist/img/ser.png" height="25px">&nbsp;&nbsp; Serbia 1-2 Suiza &nbsp;&nbsp;<img src="dist/img/sui.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Kaliningrado</p> <p class="rightalign">Vie 22 Jun 2:00 pm</p>
@@ -418,7 +417,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/sui.png" height="25px">&nbsp;&nbsp; Suiza <input type="text" name="" id="sui-cos-1" class="results"> - <input type="text" name="" id="sui-cos-2" class="results"> Costa Rica &nbsp;&nbsp;<img src="dist/img/cos.png" height="25px">
+			                					<img src="dist/img/sui.png" height="25px">&nbsp;&nbsp; Suiza 2-2 Costa Rica &nbsp;&nbsp;<img src="dist/img/cos.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Mie 27 Jun 2:00 pm</p>
@@ -428,7 +427,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/ser.png" height="25px">&nbsp;&nbsp; Serbia <input type="text" name="" id="ser-bra-1" class="results"> - <input type="text" name="" id="ser-bra-2" class="results"> Brasil &nbsp;&nbsp;<img src="dist/img/bra.png" height="25px">
+			                					<img src="dist/img/ser.png" height="25px">&nbsp;&nbsp; Serbia 0-2 Brasil &nbsp;&nbsp;<img src="dist/img/bra.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Mie 27 Jun 2:00 pm</p>
@@ -451,7 +450,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/ale.png" height="25px">&nbsp;&nbsp; Alemania <input type="text" name="" id="ale-mex-1" class="results"> - <input type="text" name="" id="ale-mex-2" class="results"> México &nbsp;&nbsp;<img src="dist/img/mex.png" height="25px">
+			                					<img src="dist/img/ale.png" height="25px">&nbsp;&nbsp; Alemania 0-1 México &nbsp;&nbsp;<img src="dist/img/mex.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Dom 17 Jun 11:00 am</p>
@@ -461,7 +460,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/sue.png" height="25px">&nbsp;&nbsp; Suecia <input type="text" name="" id="sue-cor-1" class="results"> - <input type="text" name="" id="sue-cor-2" class="results"> Corea del Sur &nbsp;&nbsp;<img src="dist/img/cor.png" height="25px">
+			                					<img src="dist/img/sue.png" height="25px">&nbsp;&nbsp; Suecia 1-0 Corea del Sur &nbsp;&nbsp;<img src="dist/img/cor.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Lun 18 Jun 8:00 am</p>
@@ -471,7 +470,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/ale.png" height="25px">&nbsp;&nbsp; Alemania <input type="text" name="" id="ale-sue-1" class="results"> - <input type="text" name="" id="ale-sue-2" class="results">Suecia &nbsp;&nbsp;<img src="dist/img/sue.png" height="25px">
+			                					<img src="dist/img/ale.png" height="25px">&nbsp;&nbsp; Alemania 2-1 Suecia &nbsp;&nbsp;<img src="dist/img/sue.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Sochi</p> <p class="rightalign">Sab 23 Jun 11:00 am</p>
@@ -481,7 +480,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/cor.png" height="25px">&nbsp;&nbsp; Corea del Sur <input type="text" name="" id="cor-mex-1" class="results"> - <input type="text" name="" id="cor-mex-2" class="results"> México &nbsp;&nbsp;<img src="dist/img/mex.png" height="25px">
+			                					<img src="dist/img/cor.png" height="25px">&nbsp;&nbsp; Corea del Sur 1-2 México &nbsp;&nbsp;<img src="dist/img/mex.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Sab 23 Jun 2:00 pm</p>
@@ -491,7 +490,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/mex.png" height="25px">&nbsp;&nbsp; México <input type="text" name="" id="mex-sue-1" class="results"> - <input type="text" name="" id="mex-sue-2" class="results"> Suecia &nbsp;&nbsp;<img src="dist/img/sue.png" height="25px">
+			                					<img src="dist/img/mex.png" height="25px">&nbsp;&nbsp; México 0-3 Suecia &nbsp;&nbsp;<img src="dist/img/sue.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Ekaterimburgo</p> <p class="rightalign">Mie 27 Jun 10:00 am</p>
@@ -501,7 +500,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/cor.png" height="25px">&nbsp;&nbsp; Corea del Sur <input type="text" name="" id="cor-ale-1" class="results"> - <input type="text" name="" id="cor-ale-2" class="results"> Alemania &nbsp;&nbsp;<img src="dist/img/ale.png" height="25px">
+			                					<img src="dist/img/cor.png" height="25px">&nbsp;&nbsp; Corea del Sur 2-0 Alemania &nbsp;&nbsp;<img src="dist/img/ale.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Kazán</p> <p class="rightalign">Mie 27 Jun 10:00 am</p>
@@ -526,7 +525,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica <input type="text" name="" id="bel-pan-1" class="results"> - <input type="text" name="" id="bel-pan-2" class="results"> Panamá &nbsp;&nbsp;<img src="dist/img/pan.png" height="25px">
+			                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica 3-0 Panamá &nbsp;&nbsp;<img src="dist/img/pan.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Sochi</p> <p class="rightalign">Lun 18 Jun 11:00 am</p>
@@ -536,7 +535,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/tun.png" height="25px">&nbsp;&nbsp; Túnez <input type="text" name="" id="tun-ing-1" class="results"> - <input type="text" name="" id="tun-ing-2" class="results"> Inglaterra &nbsp;&nbsp;<img src="dist/img/ing.png" height="25px">
+			                					<img src="dist/img/tun.png" height="25px">&nbsp;&nbsp; Túnez 1-2 Inglaterra &nbsp;&nbsp;<img src="dist/img/ing.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Volgogrado</p> <p class="rightalign">Lun 18 Jun 2:00 pm</p>
@@ -546,7 +545,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica <input type="text" name="" id="bel-tun-1" class="results"> - <input type="text" name="" id="bel-tun-2" class="results"> Túnez &nbsp;&nbsp;<img src="dist/img/tun.png" height="25px">
+			                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica 5-2 Túnez &nbsp;&nbsp;<img src="dist/img/tun.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Sab 23 Jun 8:00 am</p>
@@ -556,7 +555,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/ing.png" height="25px">&nbsp;&nbsp; Inglaterra <input type="text" name="" id="ing-pan-1" class="results"> - <input type="text" name="" id="ing-pan-2" class="results"> Panamá &nbsp;&nbsp;<img src="dist/img/pan.png" height="25px">
+			                					<img src="dist/img/ing.png" height="25px">&nbsp;&nbsp; Inglaterra 6-1 Panamá &nbsp;&nbsp;<img src="dist/img/pan.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Dom 24 Jun 8:00 am</p>
@@ -566,7 +565,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/pan.png" height="25px">&nbsp;&nbsp; Panamá <input type="text" name="" id="pan-tun-1" class="results"> - <input type="text" name="" id="pan-tun-2" class="results"> Túnez &nbsp;&nbsp;<img src="dist/img/tun.png" height="25px">
+			                					<img src="dist/img/pan.png" height="25px">&nbsp;&nbsp; Panamá 1-2 Túnez &nbsp;&nbsp;<img src="dist/img/tun.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Saransk</p> <p class="rightalign">Jue 28 Jun 2:00 pm</p>
@@ -576,7 +575,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/ing.png" height="25px">&nbsp;&nbsp; Inglaterra <input type="text" name="" id="ing-bel-1" class="results"> - <input type="text" name="" id="ing-bel-2" class="results"> Bélgica &nbsp;&nbsp;<img src="dist/img/bel.png" height="25px">
+			                					<img src="dist/img/ing.png" height="25px">&nbsp;&nbsp; Inglaterra 0-1 Bélgica &nbsp;&nbsp;<img src="dist/img/bel.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Kaliningrado</p> <p class="rightalign">Jue 28 Jun 2:00 pm</p>
@@ -599,7 +598,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/pol.png" height="25px">&nbsp;&nbsp; Polonia <input type="text" name="" id="pol-sen-1" class="results"> - <input type="text" name="" id="pol-sen-2" class="results"> Senegal &nbsp;&nbsp;<img src="dist/img/sen.png" height="25px">
+			                					<img src="dist/img/pol.png" height="25px">&nbsp;&nbsp; Polonia 1-2 Senegal &nbsp;&nbsp;<img src="dist/img/sen.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Mar 19 Jun 8:00 am</p>
@@ -609,7 +608,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/col.png" height="25px">&nbsp;&nbsp; Colombia <input type="text" name="" id="col-jap-1" class="results"> - <input type="text" name="" id="col-jap-2" class="results"> Japón &nbsp;&nbsp;<img src="dist/img/jap.png" height="25px">
+			                					<img src="dist/img/col.png" height="25px">&nbsp;&nbsp; Colombia 1-2 Japón &nbsp;&nbsp;<img src="dist/img/jap.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Saransk</p> <p class="rightalign">Mar 19 Jun 11:00 am</p>
@@ -619,7 +618,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/jap.png" height="25px">&nbsp;&nbsp; Japón <input type="text" name="" id="jap-sen-1" class="results"> - <input type="text" name="" id="jap-sen-2" class="results"> Senegal &nbsp;&nbsp;<img src="dist/img/sen.png" height="25px">
+			                					<img src="dist/img/jap.png" height="25px">&nbsp;&nbsp; Japón 2-2 Senegal &nbsp;&nbsp;<img src="dist/img/sen.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Ekaterimburgo</p> <p class="rightalign">Dom 24 Jun 11:00 am</p>
@@ -629,7 +628,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/pol.png" height="25px">&nbsp;&nbsp; Polonia <input type="text" name="" id="pol-col-1" class="results"> - <input type="text" name="" id="pol-col-2" class="results"> Colombia &nbsp;&nbsp;<img src="dist/img/col.png" height="25px">
+			                					<img src="dist/img/pol.png" height="25px">&nbsp;&nbsp; Polonia 0-3 Colombia &nbsp;&nbsp;<img src="dist/img/col.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Kazán</p> <p class="rightalign">Dom 24 Jun 2:00 pm</p>
@@ -639,7 +638,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/sen.png" height="25px">&nbsp;&nbsp; Senegal <input type="text" name="" id="sen-col-1" class="results"> - <input type="text" name="" id="sen-col-2" class="results"> Colombia &nbsp;&nbsp;<img src="dist/img/col.png" height="25px">
+			                					<img src="dist/img/sen.png" height="25px">&nbsp;&nbsp; Senegal 0-1 Colombia &nbsp;&nbsp;<img src="dist/img/col.png" height="25px">
 			                				</div>
 			                				<div class="fecha">
 			                					<p class="leftalign">Samara</p> <p class="rightalign">Jue 28 Jun 10:00 am</p>
@@ -649,7 +648,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			                		<tr align="center">
 			                			<td> 
 			                				<div>
-			                					<img src="dist/img/jap.png" height="25px">&nbsp;&nbsp; Japón <input type="text" name="" id="jap-pol-1" class="results"> - <input type="text" name="" id="jap-pol-2" class="results"> Polonia &nbsp;&nbsp;<img src="dist/img/pol.png" height="25px">
+			                					<img src="dist/img/jap.png" height="25px">&nbsp;&nbsp; Japón 0-1 Polonia &nbsp;&nbsp;<img src="dist/img/pol.png" height="25px">
 			                				</div>
 			                				<div>
 			                					<p class="leftalign">Volgogrado</p> <p class="rightalign">Jue 28 Jun 10:00 am</p>
@@ -661,14 +660,356 @@ scratch. This page gets rid of all links and provides the needed markup only.
 			              </div>
 			            </div>
 			          </div>
+
+			          <div class="col-lg-6">
+
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		              	<div style="">
+			                <h5 class="card-title" style="background: rgba(47,47,47,0.9);">Octavos de Final</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> 1
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo C</p> <p class="rightalign">2° Grupo D</p>
+			                				</div>
+			                				<div>
+			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia 4-3 Argentina &nbsp;&nbsp;<img src="dist/img/arg.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Kazán</p> <p class="rightalign">Sab 30 Jun 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td>2
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo A</p> <p class="rightalign">2° Grupo B</p>
+			                				</div>
+			                				<div>
+			                					<img src="dist/img/uru.png" height="25px">&nbsp;&nbsp; Uruguay 2 - 1 Portugal &nbsp;&nbsp;<img src="dist/img/por.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Sochi</p> <p class="rightalign">Sab 30 Jun 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 3
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo B</p> <p class="rightalign">2° Grupo A</p>
+			                				</div>
+			                				<div>
+			                					<img src="dist/img/esp.png" height="25px">&nbsp;&nbsp; España (3)1-1(4) Rusia &nbsp;&nbsp;<img src="dist/img/rus.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Dom 1 Jul 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 4
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo D</p> <p class="rightalign">2° Grupo C</p>
+			                				</div>
+			                				<div>
+			                					<img src="dist/img/cro.png" height="25px">&nbsp;&nbsp; Croacia (3)1-1(2) Dinamarca &nbsp;&nbsp;<img src="dist/img/din.png" height="25px"> 
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Dom 1 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 5
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo E</p> <p class="rightalign">2° Grupo F</p>
+			                				</div>
+			                				<div>
+			                					<img src="dist/img/bra.png" height="25px">&nbsp;&nbsp; Brasil 2-0 México &nbsp;&nbsp;<img src="dist/img/mex.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Samara</p> <p class="rightalign">Lun 2 Jul 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 6
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo G</p> <p class="rightalign">2° Grupo H</p>
+			                				</div>
+			                				<div> 
+			                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica 3-2 Japón &nbsp;&nbsp;<img src="dist/img/jap.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Rostov Del Don</p> <p class="rightalign">Lun 2 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 7
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo F</p> <p class="rightalign">2° Grupo E</p>
+			                				</div>
+			                				<div> 
+			                					<img src="dist/img/sue.png" height="25px">&nbsp;&nbsp; Suecia 1-0 Suiza &nbsp;&nbsp;<img src="dist/img/sui.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Mar 3 Jul 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> 8
+			                				<div class="fecha">
+			                					<p class="leftalign">1° Grupo H</p> <p class="rightalign">2° Grupo G</p>
+			                				</div>
+			                				<div> 
+			                					<img src="dist/img/col.png" height="25px">&nbsp;&nbsp; Colombia (3)1-1(4) Inglaterra &nbsp;&nbsp;<img src="dist/img/ing.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Del Spartak, Moscú</p> <p class="rightalign">Mar 3 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			            </div>
+		              </div>
+		            </div>
+		          </div>
+
+		          <div class="col-lg-6">
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Cuartos de Final</h5>
+
+		                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+		                	<tbody>
+		                		<tr align="center">
+		                			<td>A
+		                				<div class="fecha">
+		                					<p class="leftalign">Ganador 2</p> <p class="rightalign">Ganador 1</p>
+		                				</div> 
+		                				<div>
+		                					<img src="dist/img/uru.png" height="25px">&nbsp;&nbsp; Uruguay 0-2 Francia &nbsp;&nbsp;<img src="dist/img/fra.png" height="25px">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Nizhni Nóvgorod</p> <p class="rightalign">Vie 6 Jul 10:00 am</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td>B
+		                				<div class="fecha">
+		                					<p class="leftalign">Ganador 5</p> <p class="rightalign">Ganador 6</p>
+		                				</div>  
+		                				<div>
+		                					<img src="dist/img/bra.png" height="25px">&nbsp;&nbsp; Brasil 1-2 Bélgica &nbsp;&nbsp;<img src="dist/img/bel.png" height="25px">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Kazán</p> <p class="rightalign">Vie 6 Jul 2:00 pm</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td>C
+		                				<div class="fecha">
+		                					<p class="leftalign">Ganador 7</p> <p class="rightalign">Ganador 8</p>
+		                				</div> 
+		                				<div>
+		                					<img src="dist/img/sue.png" height="25px">&nbsp;&nbsp; Suecia 0-2 Inglaterra &nbsp;&nbsp;<img src="dist/img/ing.png" height="25px">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Samara</p> <p class="rightalign">Sab 7 Jul 10:00 am</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                		<tr align="center">
+		                			<td>D
+		                				<div class="fecha">
+		                					<p class="leftalign">Ganador 3</p> <p class="rightalign">Ganador 4</p>
+		                				</div> 
+		                				<div>
+		                					<img src="dist/img/rus.png" height="25px">&nbsp;&nbsp; Rusia (3)2-2(4) Croacia &nbsp;&nbsp;<img src="dist/img/cro.png" height="25px">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">Sochi</p> <p class="rightalign">Sab 7 Jul 2:00 pm</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                	</tbody>
+		                </table>
+		              </div>
+		            </div>
+
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		              	<div style="">
+			                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Semi Final</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td> I
+			                				<div class="fecha">
+			                					<p class="leftalign">Ganador A</p> <p class="rightalign">Ganador B</p>
+			                				</div>
+			                				<div>
+			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia 1-0 Bélgica &nbsp;&nbsp;<img src="dist/img/bel.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Mar 10 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                		<tr align="center">
+			                			<td> II
+			                				<div class="fecha">
+			                					<p class="leftalign">Ganador D</p> <p class="rightalign">Ganador C</p>
+			                				</div>
+			                				<div>
+			                					<img src="dist/img/cro.png" height="25px">&nbsp;&nbsp; Croacia 2-1 Inglaterra &nbsp;&nbsp;<img src="dist/img/ing.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Mie 11 Jul 2:00 pm</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			            </div>
+		              </div>
+		            </div>
+		          </div>
+
+		        </div>
+		        <!-- /.row -->
+
+		        <div class="row">
+
+		          <div class="col-lg-6">
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Tercer Puesto</h5>
+
+		                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+		                	<tbody>
+		                		<tr align="center">
+		                			<td> 
+			                				<div class="fecha">
+			                					<p class="leftalign">Perdedor I</p> <p class="rightalign">Perdedor II</p>
+			                				</div>
+		                				<div>
+		                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica 2-0 Inglaterra &nbsp;&nbsp;<img src="dist/img/ing.png" height="25px">
+		                				</div>
+		                				<div class="fecha">
+		                					<p class="leftalign">San Petersburgo</p> <p class="rightalign">Sab 14 Jul 10:00 am</p>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                	</tbody>
+		                </table>
+		              </div>
+		            </div>
+		          </div>
+
+		          <div class="col-lg-6">
+
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		              	<div style="">
+			                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Final</h5>
+
+			                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+			                	<tbody>
+			                		<tr align="center">
+			                			<td>
+			                				<div class="fecha">
+			                					<p class="leftalign">Ganador I</p> <p class="rightalign">Ganador II</p>
+			                				</div> 
+			                				<div>
+			                					<img src="dist/img/fra.png" height="25px">&nbsp;&nbsp; Francia - Croacia &nbsp;&nbsp;<img src="dist/img/cro.png" height="25px">
+			                				</div>
+			                				<div class="fecha">
+			                					<p class="leftalign">Luzhniki, Moscú</p> <p class="rightalign">Dom 15 Jul 10:00 am</p>
+			                				</div>
+			                			</td>
+			                		</tr>
+			                	</tbody>
+			                </table>
+			            </div>
+		              </div>
+		            </div>
+		          </div>
+
+		        </div>
+		        <!-- /.row -->
+
+
+
+		        <div class="row">
+
+		          <div class="col-lg-6">
+		            <div class="card card-primary" style="background-image:url(dist/img/back2.jpg);border-color:blue;">
+		              <div class="card-body">
+		                <h5 class="card-title" style="background: rgba(47,47,47,0.9)">Cuadro</h5>
+
+		                <table class="table table-bordered" style="margin:0px;background: rgba(240,240,240,0.8);">
+		                	<tbody>
+		                		<tr align="center">
+		                			<td> 
+		                				<div>
+		                					<h4>Campeón</h4>
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="campeon" class="" disabled>
+		                				</div>
+		                				<div>
+		                					<h4>Subcampeón</h4>
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="subcampeon" class="" disabled>
+		                				</div>
+		                				<div>
+		                					<h4>Tercer Puesto</h4>
+		                				</div>
+		                				<div>
+		                					<img src="dist/img/bel.png" height="25px">&nbsp;&nbsp; Bélgica
+		                				</div>
+		                				<div>
+		                					<h4>Cuarto Puesto</h4>
+		                				</div>
+		                				<div>
+		                					<img src="dist/img/ing.png" height="25px">&nbsp;&nbsp; Inglaterra
+		                				</div>
+		                			</td>
+		                			<td></td>
+		                			<td> 
+		                				<div>
+		                					Goleador
+		                				</div>
+		                				<div>
+		                					<input type="text" name="" id="gol" class="" disabled>
+		                				</div>
+		                			</td>
+		                		</tr>
+		                	</tbody>
+		                </table>
+		              </div>
+		            </div>
+		          </div>
+
 			        </div>
 		        </div>
 		    </div>
 			<br>
-			<div>
+			<!-- <div>
 				<button id="save" class="btn btn-block btn-success" type="button" onclick="app.groups()">Guardar</button>	
 			</div>
-			<br>
+			<br> -->
 		    <!-- /.content -->
 	  </div>
 	  <div id="eliminatoria" style="display:none;">
@@ -1063,11 +1404,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		    </div>
 		</div>
 	  </div>
-	  <div id="posiciones" style="display:none;">
+	  <div id="posiciones" >
 		  	<div class="content-header">
 			      <div class="container-fluid">
 					<div style="margin-top:7px;">
-						<button class="btn btn-block btn-primary" type="button" onclick="app.atras();" id="atras">Atrás</button>
+		      			<button class="btn btn-block btn-primary" type="button" data-toggle="modal" data-target="#myModal5" id="atras" style="float:left;margin-right:10px">Reglas</button>
+						<button class="btn btn-block btn-primary" type="button" onclick="app.atras();" id="atras">Calendario</button>
 					</div>
 					<div style="text-align: center;">
 						<h5>Posiciones</h5>
