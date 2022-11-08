@@ -1,0 +1,23 @@
+---
+root: true
+parserOptions:
+  project:
+    - './tsconfig.json'
+parser: '@typescript-eslint/parser'
+plugins:
+  - '@typescript-eslint'
+extends:
+  - airbnb
+  - airbnb-typescript
+  - airbnb/hooks
+rules:
+  'import/extensions':
+    - error
+    - ignorePackages
+    - '': never
+      ts: never
+      tsx: never
+  'react/react-in-jsx-scope': 'off'
+  'import/prefer-default-export': 'off'
+  'object-curly-newline': 'off'
+  'operator-linebreak': 'off'
