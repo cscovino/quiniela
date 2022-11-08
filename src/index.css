@@ -1,0 +1,26 @@
+@font-face {
+  font-family: qatar;
+  src: url('assets/fonts/Qatar2022Arabic.ttf');
+}
+
+body {
+  /* background: url('assets/background.avif') !important; */
+  /* background-repeat: no-repeat !important; */
+  /* background-size: cover !important; */
+  background-color: #720626 !important;
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh !important;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+form {
+  width: 100%;
+}
+
+#root {
+  width: 100%;
+}
