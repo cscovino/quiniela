@@ -24,6 +24,7 @@ const renderFixtures = (
   setPlayoffsTeam: (match: string, team: Countries) => void,
   setFinalPosition: (position: keyof FinalPositions, team: Countries) => void,
 ) =>
+  // eslint-disable-next-line implicit-arrow-linebreak
   matches.docs.map((match) => {
     const matchData = match.data();
     const team1 = matchData.T1.group

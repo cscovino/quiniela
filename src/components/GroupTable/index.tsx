@@ -22,13 +22,14 @@ function GroupTable(props: GroupTableProps) {
           </Tr>
         </Thead>
         <Tbody>
-          {teams.map((teamStat) =>
-            Object.keys(teamStat).map((team) => (
+          {teams.map((teamStat) => {
+            const teamsStat = Object.keys(teamStat);
+            return teamsStat.map((team) => (
               <Tr key={`tr-${team}`}>
                 <Td>
                   <Flex direction="row" gap="10px">
                     <Image src={FLAGS[team as Countries]} alt={team} height="12px" />
-                    {i18next.t<string>(`FLAGS:${team}`)}{' '}
+                    {i18next.t<string>(`FLAGS:${team}`)}
                   </Flex>
                 </Td>
                 <Td>{teamStat[team as Countries]?.pts}</Td>
@@ -36,8 +37,8 @@ function GroupTable(props: GroupTableProps) {
                 <Td>{teamStat[team as Countries]?.gf}</Td>
                 <Td>{teamStat[team as Countries]?.ga}</Td>
               </Tr>
-            )),
-          )}
+            ));
+          })}
         </Tbody>
       </Table>
     </TableContainer>
