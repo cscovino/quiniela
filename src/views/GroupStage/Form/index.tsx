@@ -3,10 +3,14 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { QuerySnapshot } from 'firebase/firestore';
 import i18next from 'i18next';
 
+import { useEffect } from 'react';
 import MatchInput from '@/components/MatchInput';
-import { GroupStageValues, GroupInfo, Countries, GroupsNames } from '@/types';
+import { useGroupsStatsStore } from '@/store/groupsStats';
+import { calculateGroup } from '@/helpers/calculations';
+import { GroupStageValues, GroupInfo, Countries, GroupsNames, Matches } from '@/types';
 
 import { FormProps } from './types';
+import { defaultGroupStageValues } from '@/store/groupsStageValues';
 
 const renderFixtures = (groups: QuerySnapshot<GroupInfo>) =>
   // eslint-disable-next-line implicit-arrow-linebreak
@@ -41,7 +45,17 @@ const renderFixtures = (groups: QuerySnapshot<GroupInfo>) =>
 
 function Form(props: FormProps) {
   const { onSubmit, data } = props;
-  const methods = useForm<GroupStageValues>();
+  const setGroupStats = useGroupsStatsStore((state) => state.setGroupStats);
+  const methods = useForm<GroupStageValues>({ defaultValues: defaultGroupStageValues });
+  const watchFields = methods.watch();
+
+  useEffect(() => {
+    Object.keys(watchFields).forEach((groupName) => {
+      const matches = data?.docs.find((doc) => doc.id === groupName)?.data().matches as Matches;
+      const groupResults = calculateGroup(groupName as GroupsNames, matches, watchFields);
+      setGroupStats(groupName as GroupsNames, groupResults);
+    });
+  }, [watchFields, data, setGroupStats]);
 
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
