@@ -5,4 +5,6 @@ i18next.addResources(LOCALES.ES, 'GROUPS', {
   TITLE: 'Fase de Grupos',
   NEXT: 'Siguiente',
   GROUP: 'Grupo',
+  BUTTON_TABLES: 'Posiciones',
+  BUTTON_PLAYOFFS: 'Octavos de final',
 });

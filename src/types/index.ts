@@ -92,7 +92,7 @@ export type GroupValues = {
 
 export type GroupStageValues = {
   [K1 in GroupsNames]: {
-    [K2 in Match]: {
+    [K2 in Match]?: {
       [K3 in Countries]?: number;
     };
   };
