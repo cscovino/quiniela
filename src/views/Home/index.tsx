@@ -4,7 +4,7 @@ import i18next from 'i18next';
 
 import './i18n';
 
-const rules = [0, 1, 2, 3];
+const rules = [0, 1, 2, 3, 4, 5, 6];
 
 function Home() {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ function Home() {
       <Text textAlign="center" fontSize="xl" fontFamily="qatar" color="white" marginTop="20px">
         {i18next.t<string>('HOME:SUBTITLE')}
       </Text>
-      <UnorderedList fontFamily="qatar" color="white" marginY="10px">
+      <UnorderedList fontFamily="qatar" color="white" marginY="10px" width="70%">
         {rules.map((item) => (
           <ListItem key={`RULE-${item}`}>{i18next.t<string>(`HOME:RULES.${item}`)}</ListItem>
         ))}

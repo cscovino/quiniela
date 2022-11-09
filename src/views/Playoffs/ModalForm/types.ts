@@ -6,6 +6,6 @@ export interface ModalFormProps {
   isOpen: boolean;
   finalPositions: FinalPositions;
   buttonIsDisabled: boolean;
-  onSubmit: SubmitHandler<{ participant: string }>;
+  onSubmit: SubmitHandler<{ participant: string; scorer: string }>;
   onClose: () => void;
 }
