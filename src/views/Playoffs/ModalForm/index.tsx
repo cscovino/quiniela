@@ -14,7 +14,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { TbTrophy, TbMedal } from 'react-icons/tb';
+import { TbTrophy, TbMedal, TbBallFootball } from 'react-icons/tb';
 import { useForm } from 'react-hook-form';
 import i18next from 'i18next';
 
@@ -24,7 +24,7 @@ import { Countries } from '@/types';
 
 function ModalForm(props: ModalFormProps) {
   const { onSubmit, isOpen, onClose, finalPositions, buttonIsDisabled } = props;
-  const { register, handleSubmit } = useForm<{ participant: string }>();
+  const { register, handleSubmit } = useForm<{ participant: string; scorer: string }>();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}>
@@ -34,8 +34,19 @@ function ModalForm(props: ModalFormProps) {
           <ModalHeader>{i18next.t<string>('PLAYOFFS:MODAL_TITLE')}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            <Input {...register('participant', { required: true })} />
+            <VStack align="start" marginBottom="20px">
+              <Text>{i18next.t<string>('PLAYOFFS:MODAL_PARTICIPANT')}</Text>
+              {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+              <Input {...register('participant', { required: true })} />
+            </VStack>
+            <VStack align="start">
+              <HStack>
+                <Icon color="gold" as={TbBallFootball} />
+                <Text>{i18next.t<string>('PLAYOFFS:MODAL_SCORER')}</Text>
+              </HStack>
+              {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+              <Input {...register('scorer', { required: true })} />
+            </VStack>
             <VStack marginTop="20px">
               <Text>{i18next.t<string>('PLAYOFFS:MODAL_SUBTITLE')}</Text>
               <HStack alignSelf="start">
