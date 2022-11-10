@@ -32,7 +32,7 @@ function FooterInfo(props: FooterInfoProps) {
       >
         {i18next.t<string>(`GROUPS:BUTTON_${showTable ? 'TABLES' : 'PLAYOFFS'}`)}
       </Button>
-      <Flex direction="row" marginTop="40px">
+      <Flex direction="row" overflow="auto" marginTop="40px">
         {showTable ? <GroupsTables /> : <PlayoffsPreview />}
       </Flex>
     </Flex>
