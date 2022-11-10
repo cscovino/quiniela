@@ -71,6 +71,10 @@ export type GroupStats = Partial<TeamsStats>;
 
 export type GroupOrdered = Array<GroupStats>;
 
+export type GroupsOrdered = {
+  [Key in GroupsNames]: GroupOrdered;
+};
+
 export type GroupsStats = {
   [Key in GroupsNames]: GroupStats;
 };
