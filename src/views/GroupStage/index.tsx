@@ -27,7 +27,7 @@ function GroupStage() {
     Object.keys(formData).forEach((groupName) => {
       setGroupResults(formData[groupName as GroupsNames]);
     });
-    navigate('/group-stage/preview');
+    navigate('/playoffs');
   };
 
   return (
