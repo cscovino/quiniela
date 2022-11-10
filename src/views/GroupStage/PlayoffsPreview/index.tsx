@@ -1,12 +1,12 @@
-import { Box, Grid } from '@chakra-ui/react';
-
 import { useEffect, useState } from 'react';
+import { Box, Grid } from '@chakra-ui/react';
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import { QueryDocumentSnapshot } from 'firebase/firestore';
+
 import PlayoffsMatchPreview from '@/components/PlayoffPreview';
-import { Countries, GroupsNames, PlayoffsInfo } from '@/types';
 import { useGroupsClasificationsStore } from '@/store/groupsClasifications';
 import { queryPlayoffs } from '@/services/queries';
+import { Countries, GroupsNames, PlayoffsInfo } from '@/types';
 
 function PlayoffsPreview() {
   const { data } = useFirestoreQuery(['playoffs'], queryPlayoffs);

@@ -1,5 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Button, Flex } from '@chakra-ui/react';
 import i18next from 'i18next';
+
+import { useGroupsStatsStore } from '@/store/groupsStats';
+import { useGroupsClasificationsStore } from '@/store/groupsClasifications';
+import { calculateOrderGroup } from '@/helpers/calculations';
+import { Countries, GroupsNames, GroupsOrdered } from '@/types';
 
 import PlayoffsPreview from '../PlayoffsPreview';
 import GroupsTables from '../GroupsTables';
@@ -8,6 +14,31 @@ import { FooterInfoProps } from './types';
 
 function FooterInfo(props: FooterInfoProps) {
   const { showTable, onClick } = props;
+  const groupsStats = useGroupsStatsStore((state) => state.groupsStats);
+  const setGroupClasification = useGroupsClasificationsStore(
+    (state) => state.setGroupClasification,
+  );
+  const [groupsOrdered, setGroupsOrdered] = useState<GroupsOrdered>({
+    A: [],
+    B: [],
+    C: [],
+    D: [],
+    E: [],
+    F: [],
+    G: [],
+    H: [],
+  });
+
+  useEffect(() => {
+    Object.keys(groupsStats).forEach((group) => {
+      const groupOrdered = calculateOrderGroup(groupsStats[group as GroupsNames]);
+      setGroupClasification(group as GroupsNames, {
+        first: Object.keys(groupOrdered[0])[0] as Countries,
+        second: Object.keys(groupOrdered[1])[0] as Countries,
+      });
+      setGroupsOrdered((prev) => ({ ...prev, [group]: groupOrdered }));
+    });
+  }, [groupsStats, setGroupsOrdered, setGroupClasification]);
 
   return (
     <Flex
@@ -33,7 +64,7 @@ function FooterInfo(props: FooterInfoProps) {
         {i18next.t<string>(`GROUPS:BUTTON_${showTable ? 'TABLES' : 'PLAYOFFS'}`)}
       </Button>
       <Flex direction="row" overflow="auto" marginTop="40px">
-        {showTable ? <GroupsTables /> : <PlayoffsPreview />}
+        {showTable ? <GroupsTables groupsOrdered={groupsOrdered} /> : <PlayoffsPreview />}
       </Flex>
     </Flex>
   );
