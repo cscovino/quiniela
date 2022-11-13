@@ -1,4 +1,4 @@
-import { Button, Flex, Image, ListItem, Text, UnorderedList } from '@chakra-ui/react';
+import { Button, Flex, Image, Link, ListItem, Text, UnorderedList } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import i18next from 'i18next';
 
@@ -28,6 +28,16 @@ function Home() {
       </UnorderedList>
       <Text textAlign="center" fontSize="lg" fontFamily="qatar" color="white">
         {i18next.t<string>('HOME:BYE')}
+      </Text>
+      <Text textAlign="center" fontSize="md" fontFamily="qatar" color="white" marginTop="20px">
+        <Link
+          href="https://firebasestorage.googleapis.com/v0/b/quiniela-mundial-d4a88.appspot.com/o/Quiniela%20Qatar%202022.xls?alt=media&token=c3ff19d9-5114-4cdb-8dcd-7118a11a2fab"
+          target="_blank"
+          color="#fa5d84"
+        >
+          {i18next.t<string>('HOME:LINK')}
+        </Link>
+        {i18next.t<string>('HOME:HELP')}
       </Text>
       <Button
         alignSelf="center"

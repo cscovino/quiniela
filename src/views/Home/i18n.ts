@@ -4,6 +4,8 @@ import { LOCALES } from '@/helpers/locales';
 i18next.addResources(LOCALES.ES, 'HOME', {
   TITLE: '¡Bienvenido a la quiniela del mundial!',
   SUBTITLE: 'Te recordamos las reglas:',
+  LINK: 'Acá',
+  HELP: ' puedes descargar un excel si lo necesitas para tener de guía.',
   RULES: [
     'El ganador de la quiniela será el que acumule la mayor cantidad de puntos. Se obtienen puntos con los marcadores de los de los juegos de la primera ronda, con el cuadro de los cuatro finalistas  y con el nombre del goleador del mundial.',
     'Si aciertas el marcador final del partido ganas 5 puntos.',
