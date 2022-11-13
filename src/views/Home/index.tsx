@@ -4,7 +4,7 @@ import i18next from 'i18next';
 
 import './i18n';
 
-const rules = [0, 1, 2, 3, 4, 5, 6];
+const rules = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
 function Home() {
   const navigate = useNavigate();
