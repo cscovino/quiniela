@@ -16,6 +16,7 @@ i18next.addResources(LOCALES.ES, 'HOME', {
     'En el cuadro final por cada equpo que aciertes pero no en la posición exacta ganas 10 puntos.',
     'Si aciertas al goleador del campeonato ganas 20 puntos. Si hay empate igual se ganan todos los puntos.',
     'Cuando comience el torneo podrás ver la tabla de participantes en esta misma página.',
+    'El costo para participar es de 2 USD. Del total recaudado la premiación es la siguiente 70% primero, 15% segundo, 10% tercero y 5% premio sorpresa.',
   ],
   BYE: '¡Te deseamos mucha suerte!',
   NEXT: 'Empezar',
