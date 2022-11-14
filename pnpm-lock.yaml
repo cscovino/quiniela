@@ -7,6 +7,7 @@ specifiers:
   '@emotion/react': ^11.10.4
   '@emotion/styled': ^11.10.4
   '@react-query-firebase/firestore': 1.0.0-dev.7
+  '@tanstack/react-table': ^8.5.22
   '@types/react': ^18.0.17
   '@types/react-dom': ^18.0.6
   '@typescript-eslint/eslint-plugin': ^5.42.1
@@ -23,6 +24,7 @@ specifiers:
   framer-motion: ^7.6.1
   husky: ^8.0.1
   i18next: ^22.0.2
+  just-clone: ^6.1.1
   lint-staged: ^13.0.3
   localforage: ^1.10.0
   match-sorter: ^6.3.1
@@ -45,9 +47,11 @@ dependencies:
   '@emotion/react': 11.10.4_gd4tregka43x4eiz452mfdbv4y
   '@emotion/styled': 11.10.4_mldqul6eeo6d4bjurrn2pmigvy
   '@react-query-firebase/firestore': 1.0.0-dev.7_7wxjyg6bdespd7po5yzmejsbd4
+  '@tanstack/react-table': 8.5.22_biqbaboplfbrettd7655fr4n2y
   firebase: 9.13.0
   framer-motion: 7.6.1_biqbaboplfbrettd7655fr4n2y
   i18next: 22.0.2
+  just-clone: 6.1.1
   localforage: 1.10.0
   match-sorter: 6.3.1
   react: 18.2.0
@@ -2430,6 +2434,23 @@ packages:
       picomatch: 2.3.1
     dev: true
 
+  /@tanstack/react-table/8.5.22_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-01XaxQTxcI+w7g+i/YRblxdAikM9G7L1S7LwqaiD/gkKmNUs+g2BXw4GfIcuzzE75Q5t0BXlyqM7MyxxBuvQXA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      '@tanstack/table-core': 8.5.22
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@tanstack/table-core/8.5.22:
+    resolution: {integrity: sha512-D3wDbVXl3Bi5PdGfle6DijhLzZxrvMyZsE1dSHH0xBsqEbu7Pkxn5EEd6CA9tGsCgXIEP1s4Yfy1cZ9xnMz1sQ==}
+    engines: {node: '>=12'}
+    dev: false
+
   /@tsconfig/node10/1.0.9:
     resolution: {integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==}
     dev: true
@@ -4579,6 +4600,10 @@ packages:
       pako: 1.0.11
       readable-stream: 2.3.7
       setimmediate: 1.0.5
+    dev: false
+
+  /just-clone/6.1.1:
+    resolution: {integrity: sha512-V24KLIid8uaG7ayOymGfheNHtxgrbpzj1UznQnF9vQZMHlKGTSLT3WWmFx62OXSQPwk1Tn+uo+H5/Xhb4bL9pA==}
     dev: false
 
   /kind-of/6.0.3:

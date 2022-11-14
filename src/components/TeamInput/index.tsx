@@ -20,7 +20,8 @@ function TeamInput(props: TeamInputProps) {
   const { fontSize = 16, flagSize = 20, reverse = false, team, inputLabel } = props;
   const arrowSize = fontSize / 2 - 2;
 
-  const { register } = useFormContext();
+  const { register, setValue } = useFormContext();
+  const handlerInput = register(inputLabel, { required: true, valueAsNumber: true });
 
   return (
     <Flex
@@ -37,14 +38,21 @@ function TeamInput(props: TeamInputProps) {
       <Box textAlign="center" fontSize={`${fontSize}px`} fontFamily="qatar" width="100px">
         {i18next.t<string>(`FLAGS:${team}`)}
       </Box>
-      <NumberInput borderRadius="5px" bg="white" min={0} width="55px" padding="0px !important">
+      <NumberInput
+        borderRadius="5px"
+        bg="white"
+        min={0}
+        width="55px"
+        padding="0px !important"
+        onChange={(_, value) => setValue(inputLabel, value)}
+      >
         <NumberInputField
           fontFamily="qatar"
           paddingTop="3px"
           paddingInline="4px"
           textAlign={reverse ? 'right' : 'left'}
           // eslint-disable-next-line react/jsx-props-no-spreading
-          {...register(inputLabel, { required: true, valueAsNumber: true })}
+          {...handlerInput}
         />
         <NumberInputStepper left={reverse ? '0' : 'auto'} right={reverse ? 'auto' : '0'}>
           <NumberIncrementStepper

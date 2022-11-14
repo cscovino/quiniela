@@ -24,6 +24,7 @@ const renderFixtures = (
   setPlayoffsTeam: (match: string, team: Countries) => void,
   setFinalPosition: (position: keyof FinalPositions, team: Countries) => void,
 ) =>
+  // eslint-disable-next-line implicit-arrow-linebreak
   matches.docs.map((match) => {
     const matchData = match.data();
     const team1 = matchData.T1.group
@@ -46,6 +47,10 @@ const renderFixtures = (
       >
         <Box color="#961e34" fontFamily="qatar" textAlign="center" paddingBottom="5px">
           {`${i18next.t<string>('PLAYOFFS:MATCH')} ${i18next.t<string>(`PLAYOFFS:${match.id}`)}`}
+        </Box>
+        <Box color="#961e34" fontFamily="qatar" textAlign="center" paddingBottom="5px">
+          {/* eslint-disable-next-line no-nested-ternary */}
+          {`${!['FINAL', 'BRONZE'].includes(match.id) ? match.id : match.id === 'FINAL' ? 64 : 63}`}
         </Box>
         <PlayoffInput
           key={match.id}

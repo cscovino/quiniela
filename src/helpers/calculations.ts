@@ -1,3 +1,5 @@
+import clone from 'just-clone';
+
 import { defaultGroupsStats } from '@/store/groupsStats';
 import {
   Countries,
@@ -15,12 +17,20 @@ export const calculateGroup = (
   matches: Matches,
   values: GroupStageValues,
 ) => {
-  const group = { ...defaultGroupsStats[groupName] };
+  const group = clone(defaultGroupsStats[groupName]);
   matches.forEach((matchInfo) => {
     const { match } = matchInfo;
     const [team1, team2] = match.split('-');
-    const scoreTeam1 = values[groupName][match][team1 as Countries] as number;
-    const scoreTeam2 = values[groupName][match][team2 as Countries] as number;
+    const scoreTeam1 = values[groupName][match]?.[team1 as Countries] as number;
+    const scoreTeam2 = values[groupName][match]?.[team2 as Countries] as number;
+    if (
+      scoreTeam1 === undefined ||
+      Number.isNaN(scoreTeam1) ||
+      scoreTeam2 === undefined ||
+      Number.isNaN(scoreTeam2)
+    ) {
+      return;
+    }
     const team1Stats = group[team1 as Countries] as Stats;
     // eslint-disable-next-line no-nested-ternary
     team1Stats.pts += scoreTeam1 > scoreTeam2 ? 3 : scoreTeam1 === scoreTeam2 ? 1 : 0;
