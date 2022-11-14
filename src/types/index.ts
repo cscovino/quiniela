@@ -71,6 +71,10 @@ export type GroupStats = Partial<TeamsStats>;
 
 export type GroupOrdered = Array<GroupStats>;
 
+export type GroupsOrdered = {
+  [Key in GroupsNames]: GroupOrdered;
+};
+
 export type GroupsStats = {
   [Key in GroupsNames]: GroupStats;
 };
@@ -92,7 +96,7 @@ export type GroupValues = {
 
 export type GroupStageValues = {
   [K1 in GroupsNames]: {
-    [K2 in Match]: {
+    [K2 in Match]?: {
       [K3 in Countries]?: number;
     };
   };

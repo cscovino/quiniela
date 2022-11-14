@@ -15,16 +15,24 @@ import { firestore } from '@/configs/firebase';
 import PlayoffsFixtures from './PlayoffsFixtures';
 import './i18n';
 import ModalForm from './ModalForm';
+import ModalSuccess from './ModalSuccess';
+import { useGroupsStatsStore } from '@/store/groupsStats';
+import { usePlayoffsMatchesStore } from '@/store/playoffsMatches';
 
 function Playoffs() {
   const navigate = useNavigate();
   const { data, isLoading } = useFirestoreQuery(['playoffs'], queryPlayoffs);
   const participantsCollection = collection(firestore, 'participants');
   const mutation = useFirestoreCollectionMutation(participantsCollection);
-  const groupsClasifications = useGroupsClasificationsStore((state) => state.groupsClasifications);
-  const finalPositions = useFinalPositionsStore((state) => state.finalPositions);
-  const groupsResults = useGroupsResultsStore((state) => state.groupsResults);
+  const { groupsClasifications, clearGroupsClasifications } = useGroupsClasificationsStore(
+    (state) => state,
+  );
+  const { finalPositions, clearFinalPositions } = useFinalPositionsStore((state) => state);
+  const { groupsResults, clearGroupsResults } = useGroupsResultsStore((state) => state);
+  const clearGroupsStats = useGroupsStatsStore((state) => state.clearGroupsStats);
+  const clearPlayoffsMatches = usePlayoffsMatchesStore((state) => state.clearPlayoffsMatches);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalSuccessOpen, setIsModalSuccessOpen] = useState(false);
 
   useEffect(() => {
     if (
@@ -43,21 +51,32 @@ function Playoffs() {
   useEffect(() => {
     if (!mutation.isLoading && mutation.isSuccess) {
       setIsModalOpen(false);
-      navigate('/');
+      setIsModalSuccessOpen(true);
     }
-  }, [mutation.isLoading, mutation.isSuccess, navigate]);
+  }, [mutation.isLoading, mutation.isSuccess]);
 
   const onPressNext = () => setIsModalOpen(true);
 
   const onClose = () => setIsModalOpen(false);
-  const onSubmit: SubmitHandler<{ participant: string }> = (formData, event) => {
+  const onSubmit: SubmitHandler<{ participant: string; scorer: string }> = (formData, event) => {
     event?.preventDefault();
     mutation.mutate({
       participant: formData.participant,
       results: groupsResults,
       finalPositions,
       groupsClasifications,
+      scorer: formData.scorer,
     });
+  };
+
+  const onCloseSuccess = () => {
+    setIsModalSuccessOpen(false);
+    clearGroupsClasifications();
+    clearFinalPositions();
+    clearGroupsResults();
+    clearGroupsStats();
+    clearPlayoffsMatches();
+    navigate(0);
   };
 
   return (
@@ -69,6 +88,7 @@ function Playoffs() {
         finalPositions={finalPositions}
         buttonIsDisabled={mutation.isLoading}
       />
+      <ModalSuccess isOpen={isModalSuccessOpen} onClose={onCloseSuccess} />
       <Box
         textAlign="center"
         fontFamily="qatar"
