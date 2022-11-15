@@ -14,7 +14,7 @@ function Home() {
 
   return (
     <Flex direction="column" alignItems="center" justify="start" width="100%" paddingTop="50px">
-      <Image src="/qatar-2022.svg" alt="FIFA-World-Cup-Qatar-2022" />
+      <Image src="/qatar-2022.svg" height="220px" alt="FIFA-World-Cup-Qatar-2022" />
       <Text textAlign="center" fontSize="5xl" fontFamily="qatar" color="white">
         {i18next.t<string>('HOME:TITLE')}
       </Text>
@@ -31,7 +31,7 @@ function Home() {
       </Text>
       <Text textAlign="center" fontSize="md" fontFamily="qatar" color="white" marginTop="20px">
         <Link
-          href="https://firebasestorage.googleapis.com/v0/b/quiniela-mundial-d4a88.appspot.com/o/Quiniela%20Qatar%202022.xls?alt=media&token=c3ff19d9-5114-4cdb-8dcd-7118a11a2fab"
+          href="https://firebasestorage.googleapis.com/v0/b/quiniela-mundial-d4a88.appspot.com/o/Quiniela%20Qatar%202022.xlsx?alt=media&token=361676b8-c508-427a-95c3-6ef6aa644911"
           target="_blank"
           color="#fa5d84"
         >
