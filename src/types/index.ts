@@ -128,3 +128,26 @@ export type FinalPositions = {
   third: Countries | undefined;
   fourth: Countries | undefined;
 };
+
+export type ParticipantResult = {
+  finalPositions: FinalPositions;
+  groupsClasifications: GroupsClasifications;
+  participant: string;
+  scorer: string;
+  results: GroupValues;
+  points: number;
+};
+
+export type ActualMatch = {
+  date: Timestamp;
+  match: {
+    [Key in Countries]?: number;
+  } & { match: Match; playoff: boolean };
+};
+
+export type ActualResults = {
+  finalPositions: FinalPositions;
+  groupsClasifications: GroupsClasifications;
+  scorer: string;
+  results: Array<ActualMatch>;
+};
