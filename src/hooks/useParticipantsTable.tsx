@@ -28,7 +28,6 @@ const createTableColumns = (rawResultsData: QuerySnapshot<ActualResults>) => {
       id: match.match.match,
       header: matchDate.toLocaleString('es-ES', {
         weekday: 'short',
-        year: '2-digit',
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
