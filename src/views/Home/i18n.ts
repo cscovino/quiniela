@@ -21,5 +21,5 @@ i18next.addResources(LOCALES.ES, 'HOME', {
   ],
   BYE: '¡Te deseamos mucha suerte!',
   NEXT: 'Empezar',
-  PARTICIPANTS: 'Posiciones',
+  PARTICIPANTS: 'Participantes',
 });
