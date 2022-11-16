@@ -1,15 +1,18 @@
-import { Button, Flex, Image, Link, ListItem, Text, UnorderedList } from '@chakra-ui/react';
+import { Button, Flex, HStack, Image, Link, ListItem, Text, UnorderedList } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import i18next from 'i18next';
 
 import './i18n';
 
-const rules = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const rules = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; // , 10];
 
 function Home() {
   const navigate = useNavigate();
   const onClick = () => {
     navigate('/group-stage');
+  };
+  const onClickParticipants = () => {
+    navigate('/participants');
   };
 
   return (
@@ -39,19 +42,34 @@ function Home() {
         </Link>
         {i18next.t<string>('HOME:HELP')}
       </Text>
-      <Button
-        alignSelf="center"
-        margin="40px"
-        height="50px"
-        fontSize="30px"
-        color="#6f0625"
-        bg="#fee1d2"
-        _hover={{ bg: '#fa5d84' }}
-        fontFamily="qatar"
-        onClick={onClick}
-      >
-        {i18next.t<string>('HOME:NEXT')}
-      </Button>
+      <HStack>
+        <Button
+          alignSelf="center"
+          margin="40px"
+          height="50px"
+          fontSize="30px"
+          color="#6f0625"
+          bg="#fee1d2"
+          _hover={{ bg: '#fa5d84' }}
+          fontFamily="qatar"
+          onClick={onClick}
+        >
+          {i18next.t<string>('HOME:NEXT')}
+        </Button>
+        <Button
+          alignSelf="center"
+          margin="40px"
+          height="50px"
+          fontSize="30px"
+          color="#6f0625"
+          bg="#fee1d2"
+          _hover={{ bg: '#fa5d84' }}
+          fontFamily="qatar"
+          onClick={onClickParticipants}
+        >
+          {i18next.t<string>('HOME:PARTICIPANTS')}
+        </Button>
+      </HStack>
     </Flex>
   );
 }

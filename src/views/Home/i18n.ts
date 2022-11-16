@@ -17,7 +17,9 @@ i18next.addResources(LOCALES.ES, 'HOME', {
     'Si aciertas al goleador del campeonato ganas 20 puntos. Si hay empate igual se ganan todos los puntos.',
     'Cuando comience el torneo podrás ver la tabla de participantes en esta misma página.',
     'El costo para participar es de 2 USD. Del total recaudado la premiación es la siguiente 70% primero, 15% segundo, 10% tercero y 5% premio sorpresa.',
+    'Para pagos en USD a través de zelle: carsco13@gmail.com. Para pagos en Bs (al cambio paralelo) a través de pago móvil: 04166460249, CI 9234795. Importante notificar el pago enviando un comprobante al correo carsco13@gmail.com indicando los participantes que están pagando.',
   ],
   BYE: '¡Te deseamos mucha suerte!',
   NEXT: 'Empezar',
+  PARTICIPANTS: 'Posiciones',
 });
