@@ -1,13 +1,14 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@chakra-ui/icons': ^2.0.12
   '@chakra-ui/react': ^2.3.6
   '@commitlint/cli': ^17.1.2
   '@commitlint/config-conventional': ^17.1.0
   '@emotion/react': ^11.10.4
   '@emotion/styled': ^11.10.4
   '@react-query-firebase/firestore': 1.0.0-dev.7
-  '@tanstack/react-table': ^8.5.22
+  '@tanstack/react-table': ^8.5.27
   '@types/react': ^18.0.17
   '@types/react-dom': ^18.0.6
   '@typescript-eslint/eslint-plugin': ^5.42.1
@@ -36,18 +37,19 @@ specifiers:
   react-query: ^3.39.2
   react-router-dom: ^6.4.2
   sort-by: ^1.2.0
-  typescript: ^4.6.4
+  typescript: ^4.8.4
   vite: ^3.1.0
   vite-plugin-eslint: ^1.8.1
   vitest: ^0.24.3
   zustand: ^4.1.3
 
 dependencies:
+  '@chakra-ui/icons': 2.0.12_react@18.2.0
   '@chakra-ui/react': 2.3.6_ij3mxrlbcdb5raw7wj6uvec5k4
   '@emotion/react': 11.10.4_gd4tregka43x4eiz452mfdbv4y
   '@emotion/styled': 11.10.4_mldqul6eeo6d4bjurrn2pmigvy
   '@react-query-firebase/firestore': 1.0.0-dev.7_7wxjyg6bdespd7po5yzmejsbd4
-  '@tanstack/react-table': 8.5.22_biqbaboplfbrettd7655fr4n2y
+  '@tanstack/react-table': 8.5.27_biqbaboplfbrettd7655fr4n2y
   firebase: 9.13.0
   framer-motion: 7.6.1_biqbaboplfbrettd7655fr4n2y
   i18next: 22.0.2
@@ -615,6 +617,26 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@chakra-ui/icon/3.0.12_react@18.2.0:
+    resolution: {integrity: sha512-VbUqgMcoZ26P1MtZdUqlxAKYDi1Bt8sSPNRID8QOwWfqyRYrbzabORVhKR3gpi6GaINjm7KRHIXHarj3u6EWdA==}
+    peerDependencies:
+      '@chakra-ui/system': '>=2.0.0'
+      react: '>=18'
+    dependencies:
+      '@chakra-ui/shared-utils': 2.0.3
+      react: 18.2.0
+    dev: false
+
+  /@chakra-ui/icons/2.0.12_react@18.2.0:
+    resolution: {integrity: sha512-lZyB96Yic5qM3gWp/QlQuD8WyS+V+19mjNxFW7IVmcn7fm+bLsnPrVPv2Qmpcs6/d4jsUyc1broyuyM+Urtg8Q==}
+    peerDependencies:
+      '@chakra-ui/system': '>=2.0.0'
+      react: '>=18'
+    dependencies:
+      '@chakra-ui/icon': 3.0.12_react@18.2.0
+      react: 18.2.0
+    dev: false
+
   /@chakra-ui/image/2.0.11_e5d2utcogkjxxdp5h2rcoxuz2u:
     resolution: {integrity: sha512-S6NqAprPcbHnck/J+2wg06r9SSol62v5A01O8Kke2PnAyjalMcS+6P59lDRO7wvPqsdxq4PPbSTZP6Dww2CvcA==}
     peerDependencies:
@@ -1139,6 +1161,10 @@ packages:
 
   /@chakra-ui/shared-utils/2.0.2:
     resolution: {integrity: sha512-wC58Fh6wCnFFQyiebVZ0NI7PFW9+Vch0QE6qN7iR+bLseOzQY9miYuzPJ1kMYiFd6QTOmPJkI39M3wHqrPYiOg==}
+    dev: false
+
+  /@chakra-ui/shared-utils/2.0.3:
+    resolution: {integrity: sha512-pCU+SUGdXzjAuUiUT8mriekL3tJVfNdwSTIaNeip7k/SWDzivrKGMwAFBxd3XVTDevtVusndkO4GJuQ3yILzDg==}
     dev: false
 
   /@chakra-ui/skeleton/2.0.17_e5d2utcogkjxxdp5h2rcoxuz2u:
@@ -2434,20 +2460,20 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /@tanstack/react-table/8.5.22_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-01XaxQTxcI+w7g+i/YRblxdAikM9G7L1S7LwqaiD/gkKmNUs+g2BXw4GfIcuzzE75Q5t0BXlyqM7MyxxBuvQXA==}
+  /@tanstack/react-table/8.5.27_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-dUl8qRGvWVaJkOk/goUxb3w675FtioY7uh6NalRG04dYBiwIpjHn8a1Jhmp9lE+Puk88GZ0OCF7svCVXIJviqQ==}
     engines: {node: '>=12'}
     peerDependencies:
       react: '>=16'
       react-dom: '>=16'
     dependencies:
-      '@tanstack/table-core': 8.5.22
+      '@tanstack/table-core': 8.5.27
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false
 
-  /@tanstack/table-core/8.5.22:
-    resolution: {integrity: sha512-D3wDbVXl3Bi5PdGfle6DijhLzZxrvMyZsE1dSHH0xBsqEbu7Pkxn5EEd6CA9tGsCgXIEP1s4Yfy1cZ9xnMz1sQ==}
+  /@tanstack/table-core/8.5.27:
+    resolution: {integrity: sha512-sxGZPV97bNYap+U/ZxYVmx3Uy872Fc/M0qjKl85PzMaqBgikosybtkOEEjLdeJlBthqG5G8VI6zN1/Pej9awWA==}
     engines: {node: '>=12'}
     dev: false
 

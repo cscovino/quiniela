@@ -13,7 +13,6 @@ function MatchInput(props: MatchProps) {
       <Box textAlign="center" fontFamily="qatar" fontSize="12px">
         {date.toDate().toLocaleString('es-ES', {
           weekday: 'short',
-          year: '2-digit',
           month: 'short',
           day: 'numeric',
           hour: '2-digit',

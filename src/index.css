@@ -22,4 +22,122 @@ form {
 
 #root {
   width: 100%;
+  height: 100%;
+}
+
+.cursor-none {
+  cursor: default !important;
+}
+
+.participants-table {
+  font-family: qatar;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.participants-table th div {
+  display: grid;
+  justify-items: center;
+}
+
+.participants-table th,
+.participants-table td {
+  padding: 8px 16px;
+  height: 65px;
+  width: 200px;
+  text-align: center;
+  border-bottom: 2px solid #fee1d2;
+  border-left: 2px solid #fee1d2;
+  color: #fee1d2;
+}
+
+.participants-table th:nth-last-child(2) {
+  width: 380px;
+}
+
+.participants-table td:nth-child(3) {
+  border-left: 0;
+}
+
+.participants-table td:last-child {
+  border-right: 2px solid #fee1d2;
+}
+
+.participants-table th {
+  position: sticky;
+  top: 0;
+  background: #fee1d2;
+  border-top: 2px solid #6f0625;
+  border-left: 2px solid #6f0625;
+  border-right: 0;
+  color: #6f0625;
+  z-index: 2;
+}
+
+.participants-table thead tr:first-child th {
+  border-top: 0;
+  border-bottom: 0;
+}
+
+.participants-table thead tr:first-child th:first-child,
+.participants-table thead tr:first-child th:nth-child(2) {
+  border: 0;
+}
+
+.participants-table thead tr:nth-child(2) th {
+  border-bottom: 0;
+}
+
+.participants-table thead tr:nth-child(2) th:first-child {
+  border-left: 0;
+  text-align: center;
+}
+
+.participants-table thead tr:nth-child(2) th:first-child,
+.participants-table thead tr:nth-child(2) th:nth-child(2) {
+  border-top: 2px solid #6f0625;
+}
+
+.participants-table td:first-child {
+  border-left: 0 !important;
+}
+
+.participants-table td:first-child,
+.participants-table td:nth-child(2) {
+  border-right: 0;
+  border-bottom: 0;
+  border-top: 2px solid #6f0625;
+  border-left: 2px solid #6f0625;
+}
+
+.participants-table td:first-child,
+.participants-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  color: #6f0625;
+  background-color: #fee1d2;
+  width: 200px;
+  text-align: left;
+}
+
+.participants-table thead tr:nth-child(2) th {
+  top: 65px;
+}
+
+.participants-table td:nth-child(2),
+.participants-table th:nth-child(2) {
+  position: sticky;
+  left: 200px;
+  width: 100px;
+  z-index: 1;
+  color: #6f0625;
+  background-color: #fee1d2;
+}
+
+.participants-table th:first-child,
+.participants-table th:nth-child(2) {
+  z-index: 3;
 }
