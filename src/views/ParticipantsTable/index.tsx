@@ -11,8 +11,14 @@ import './i18n';
 
 function ParticipantsTable() {
   const navigate = useNavigate();
-  const { data: participantsData } = useFirestoreQuery(['participants'], queryParticipantsResults);
-  const { data: resultsData } = useFirestoreQuery(['results'], queryActualResults);
+  const { data: participantsData, isLoading: isLoadingParticipants } = useFirestoreQuery(
+    ['participants'],
+    queryParticipantsResults,
+  );
+  const { data: resultsData, isLoading: isLoadingResults } = useFirestoreQuery(
+    ['results'],
+    queryActualResults,
+  );
   const { data, columns } = useParticipantsTable(resultsData, participantsData);
   const onClick = () => {
     navigate('/');
@@ -27,7 +33,17 @@ function ParticipantsTable() {
         </Text>
       </HStack>
       <Flex width="98%" maxHeight="700px" borderRadius="10px" overflowX="scroll">
-        <DataTable data={data} columns={columns} />
+        {isLoadingResults || isLoadingParticipants ? (
+          <HStack margin="0 auto">
+            <Image
+              alignSelf="center"
+              src="https://media3.giphy.com/media/BmmfETghGOPrW/giphy.gif?cid=ecf05e47sdrhl7h9ruin2ymnq3799g51xzqmvl7g1iw9c3yx&amp;rid=giphy.gif&amp;ct=g"
+              alt="Calculate Zach Galifianakis GIF"
+            />
+          </HStack>
+        ) : (
+          <DataTable data={data} columns={columns} />
+        )}
       </Flex>
       <HStack>
         <Button
