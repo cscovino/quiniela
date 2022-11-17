@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Column, FilterFn, Table } from '@tanstack/react-table';
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 
@@ -43,6 +43,8 @@ function Filter({ column, table }: { column: Column<any, unknown>; table: Table<
     [column.getFacetedUniqueValues()],
   );
 
+  const onChange = useCallback((value: string | number) => column.setFilterValue(value), [column]);
+
   return (
     <>
       <datalist id={`${column.id}list`}>
@@ -53,7 +55,7 @@ function Filter({ column, table }: { column: Column<any, unknown>; table: Table<
       <DebouncedInput
         type="text"
         value={(columnFilterValue ?? '') as string}
-        onChange={(value) => column.setFilterValue(value)}
+        onChange={onChange}
         placeholder={`${i18next.t<string>('TABLE:SEARCH')} (${
           column.getFacetedUniqueValues().size
         })`}
