@@ -8,6 +8,7 @@ specifiers:
   '@emotion/react': ^11.10.4
   '@emotion/styled': ^11.10.4
   '@react-query-firebase/firestore': 1.0.0-dev.7
+  '@tanstack/match-sorter-utils': ^8.5.14
   '@tanstack/react-table': ^8.5.27
   '@types/react': ^18.0.17
   '@types/react-dom': ^18.0.6
@@ -49,6 +50,7 @@ dependencies:
   '@emotion/react': 11.10.4_gd4tregka43x4eiz452mfdbv4y
   '@emotion/styled': 11.10.4_mldqul6eeo6d4bjurrn2pmigvy
   '@react-query-firebase/firestore': 1.0.0-dev.7_7wxjyg6bdespd7po5yzmejsbd4
+  '@tanstack/match-sorter-utils': 8.5.14
   '@tanstack/react-table': 8.5.27_biqbaboplfbrettd7655fr4n2y
   firebase: 9.13.0
   framer-motion: 7.6.1_biqbaboplfbrettd7655fr4n2y
@@ -2459,6 +2461,13 @@ packages:
       estree-walker: 2.0.2
       picomatch: 2.3.1
     dev: true
+
+  /@tanstack/match-sorter-utils/8.5.14:
+    resolution: {integrity: sha512-lVNhzTcOJ2bZ4IU+PeCPQ36vowBHvviJb2ZfdRFX5uhy7G0jM8N34zAMbmS5ZmVH8D2B7oU82OWo0e/5ZFzQrw==}
+    engines: {node: '>=12'}
+    dependencies:
+      remove-accents: 0.4.2
+    dev: false
 
   /@tanstack/react-table/8.5.27_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-dUl8qRGvWVaJkOk/goUxb3w675FtioY7uh6NalRG04dYBiwIpjHn8a1Jhmp9lE+Puk88GZ0OCF7svCVXIJviqQ==}
