@@ -58,8 +58,8 @@ const createTableColumns = (rawResultsData: QuerySnapshot<ActualResults>) => {
               resultTeam1 === match.match[teams[0] as Countries] &&
               resultTeam2 === match.match[teams[1] as Countries];
             const isDraw =
-              match.match[teams[0] as Countries] &&
-              match.match[teams[1] as Countries] &&
+              match.match[teams[0] as Countries] !== null &&
+              match.match[teams[1] as Countries] !== null &&
               match.match[teams[0] as Countries] === match.match[teams[1] as Countries] &&
               resultTeam1 === resultTeam2;
             const isTeam1 =
@@ -99,8 +99,8 @@ const createTableColumns = (rawResultsData: QuerySnapshot<ActualResults>) => {
               resultTeam1 === match.match[teams[0] as Countries] &&
               resultTeam2 === match.match[teams[1] as Countries];
             const isDraw =
-              match.match[teams[0] as Countries] &&
-              match.match[teams[1] as Countries] &&
+              match.match[teams[0] as Countries] !== null &&
+              match.match[teams[1] as Countries] !== null &&
               match.match[teams[0] as Countries] === match.match[teams[1] as Countries] &&
               resultTeam1 === resultTeam2;
             const isTeam1 =
@@ -116,7 +116,7 @@ const createTableColumns = (rawResultsData: QuerySnapshot<ActualResults>) => {
                   isExact ? '#008450' : isDraw || isTeam1 || isTeam2 ? '#EFB700' : ''
                 }
               >
-                {resultTeam1}
+                {resultTeam2}
               </Box>
             );
           },
