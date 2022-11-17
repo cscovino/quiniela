@@ -69,7 +69,7 @@ function Form(props: FormProps) {
             alignSelf="center"
             margin="40px"
             height="50px"
-            fontSize="30px"
+            fontSize="25px"
             color="#6f0625"
             bg="#fee1d2"
             _hover={{ bg: '#fa5d84' }}

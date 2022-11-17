@@ -3,6 +3,7 @@ import { LOCALES } from '@/helpers/locales';
 
 i18next.addResources(LOCALES.ES, 'TABLE', {
   TITLE: 'Tabla de posiciones',
+  SEARCH: 'Buscar',
   HOME: 'Inicio',
   PARTICIPANT: 'Participante',
   POINTS: 'Puntos',
