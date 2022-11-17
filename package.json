@@ -21,6 +21,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@react-query-firebase/firestore": "1.0.0-dev.7",
+    "@tanstack/match-sorter-utils": "^8.5.14",
     "@tanstack/react-table": "^8.5.27",
     "firebase": "^9.13.0",
     "framer-motion": "^7.6.1",

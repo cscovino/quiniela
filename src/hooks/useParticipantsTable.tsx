@@ -3,16 +3,21 @@ import { useEffect, useState } from 'react';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import i18next from 'i18next';
 import { Image, VStack, Text } from '@chakra-ui/react';
+
 import { ActualResults, Countries, GroupsNames, ParticipantResult } from '@/types';
 import { FLAGS } from '@/helpers/flags';
+import { fuzzyFilter } from '@/components/DataTable/Filter';
 
 const columnsHelper = createColumnHelper<ParticipantResult>();
 
 const createTableColumns = (rawResultsData: QuerySnapshot<ActualResults>) => {
   const participantColumns = [
     columnsHelper.accessor('participant', {
+      id: 'participant',
       header: i18next.t<string>('TABLE:PARTICIPANT'),
-      enableSorting: true,
+      enableColumnFilter: true,
+      enableSorting: false,
+      filterFn: fuzzyFilter,
     }),
     columnsHelper.accessor('points', {
       header: i18next.t<string>('TABLE:POINTS'),
