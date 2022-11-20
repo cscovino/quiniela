@@ -2,9 +2,9 @@ import { QuerySnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import i18next from 'i18next';
-import { Image, VStack, Text } from '@chakra-ui/react';
+import { Image, VStack, Text, Box } from '@chakra-ui/react';
 
-import { ActualResults, Countries, GroupsNames, ParticipantResult } from '@/types';
+import { ActualResults, Countries, GroupsNames, Match, ParticipantResult } from '@/types';
 import { FLAGS } from '@/helpers/flags';
 import { fuzzyFilter } from '@/components/DataTable/Filter';
 
@@ -49,6 +49,36 @@ const createTableColumns = (rawResultsData: QuerySnapshot<ActualResults>) => {
               </Text>
             </VStack>
           ),
+          cell: ({ row, getValue }) => {
+            const resultTeam1 = getValue() as number;
+            const resultTeam2 = row.original.results[match.match.match as Match]?.[
+              teams[1] as Countries
+            ] as number;
+            const isExact =
+              resultTeam1 === match.match[teams[0] as Countries] &&
+              resultTeam2 === match.match[teams[1] as Countries];
+            const isDraw =
+              match.match[teams[0] as Countries] !== null &&
+              match.match[teams[1] as Countries] !== null &&
+              match.match[teams[0] as Countries] === match.match[teams[1] as Countries] &&
+              resultTeam1 === resultTeam2;
+            const isTeam1 =
+              (match.match[teams[0] as Countries] as number) >
+                (match.match[teams[1] as Countries] as number) && resultTeam1 > resultTeam2;
+            const isTeam2 =
+              (match.match[teams[0] as Countries] as number) <
+                (match.match[teams[1] as Countries] as number) && resultTeam1 < resultTeam2;
+            return (
+              <Box
+                backgroundColor={
+                  // eslint-disable-next-line no-nested-ternary
+                  isExact ? '#008450' : isDraw || isTeam1 || isTeam2 ? '#EFB700' : ''
+                }
+              >
+                {resultTeam1}
+              </Box>
+            );
+          },
           enableSorting: false,
         }),
         columnsHelper.accessor(`results.${match.match.match}.${teams[1]}`, {
@@ -60,6 +90,36 @@ const createTableColumns = (rawResultsData: QuerySnapshot<ActualResults>) => {
               </Text>
             </VStack>
           ),
+          cell: ({ row, getValue }) => {
+            const resultTeam2 = getValue() as number;
+            const resultTeam1 = row.original.results[match.match.match as Match]?.[
+              teams[0] as Countries
+            ] as number;
+            const isExact =
+              resultTeam1 === match.match[teams[0] as Countries] &&
+              resultTeam2 === match.match[teams[1] as Countries];
+            const isDraw =
+              match.match[teams[0] as Countries] !== null &&
+              match.match[teams[1] as Countries] !== null &&
+              match.match[teams[0] as Countries] === match.match[teams[1] as Countries] &&
+              resultTeam1 === resultTeam2;
+            const isTeam1 =
+              (match.match[teams[0] as Countries] as number) >
+                (match.match[teams[1] as Countries] as number) && resultTeam1 > resultTeam2;
+            const isTeam2 =
+              (match.match[teams[0] as Countries] as number) <
+                (match.match[teams[1] as Countries] as number) && resultTeam1 < resultTeam2;
+            return (
+              <Box
+                backgroundColor={
+                  // eslint-disable-next-line no-nested-ternary
+                  isExact ? '#008450' : isDraw || isTeam1 || isTeam2 ? '#EFB700' : ''
+                }
+              >
+                {resultTeam2}
+              </Box>
+            );
+          },
           enableSorting: false,
         }),
       ],
