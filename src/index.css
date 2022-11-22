@@ -139,7 +139,7 @@ form {
   background-color: #fee1d2;
 }
 
-@media (max-width: 380px) {
+@media (max-width: 450px) {
   .participants-table td:first-child,
   .participants-table th:first-child {
     width: 140px;
