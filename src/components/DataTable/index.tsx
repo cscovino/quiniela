@@ -22,7 +22,7 @@ export type DataTableProps<Data extends object> = {
 
 export function DataTable<Data extends object>({ data, columns }: DataTableProps<Data>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'points', desc: true }]);
   const table = useReactTable({
     columns,
     data,
