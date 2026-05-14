@@ -1,0 +1,20 @@
+{
+  "site": {
+    "title": "Quiniela",
+    "tagline": "Predicciones de Fútbol Retro"
+  },
+  "nav": {
+    "home": "Inicio",
+    "tournaments": "Torneos",
+    "rankings": "Clasificación",
+    "profile": "Perfil"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "comingSoon": "Próximamente...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Cerrar"
+  }
+}

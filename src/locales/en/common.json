@@ -1,0 +1,20 @@
+{
+  "site": {
+    "title": "Quiniela",
+    "tagline": "Retro Football Predictions"
+  },
+  "nav": {
+    "home": "Home",
+    "tournaments": "Tournaments",
+    "rankings": "Rankings",
+    "profile": "Profile"
+  },
+  "common": {
+    "loading": "Loading...",
+    "comingSoon": "Coming Soon...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close"
+  }
+}
