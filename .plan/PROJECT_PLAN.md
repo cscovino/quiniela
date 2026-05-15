@@ -1041,7 +1041,7 @@ service cloud.firestore {
 | Phase | Description | Status | Notes |
 |-------|-------------|--------|-------|
 | Phase 1 | Design tokens & global styles | ✅ Done | Full token system with 8-bit palette, spacing scale, animations |
-| Phase 2 | Atoms (12 components) | ⬜ Not Started | |
+| Phase 2 | Atoms (12 components) | ✅ Done | Button, Input, Badge, Avatar, Icon, Typography, Spinner, Checkbox, Radio, Tooltip, Divider, ProgressBar |
 | Phase 3 | Molecules (9 components) | ⬜ Not Started | |
 | Phase 4 | Organisms (9 components) | ⬜ Not Started | |
 | Phase 5 | Templates (4 layouts) | ⬜ Not Started | |

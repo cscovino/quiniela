@@ -1,0 +1,32 @@
+.progress-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.progress-bar__track {
+  flex: 1;
+  height: 16px;
+  background: var(--bg-input);
+  border: var(--border-width-md) solid var(--border-color);
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+.progress-bar__fill--primary { background: var(--color-primary-500); }
+.progress-bar__fill--accent { background: var(--color-accent-500); }
+.progress-bar__fill--success { background: var(--color-success); }
+.progress-bar__fill--warning { background: var(--color-warning); }
+.progress-bar__fill--error { background: var(--color-error); }
+
+.progress-bar__label {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  min-width: 40px;
+  text-align: right;
+}

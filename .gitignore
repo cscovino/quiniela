@@ -29,5 +29,8 @@ pnpm-debug.log*
 # Testing
 coverage
 
+# Storybook
+storybook-static
+
 # Firebase
 .firebase-sessions

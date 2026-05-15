@@ -7,11 +7,14 @@ Retro pixel art football prediction app. Astro 6 + React 19 + Firebase.
 ```bash
 pnpm dev          # Start dev server
 pnpm build        # Production build
+pnpm preview      # Preview production build
 pnpm test         # Vitest watch mode
 pnpm test:run     # Run tests once
 pnpm lint         # ESLint check
 pnpm lint:fix     # ESLint + fix
 pnpm format       # Prettier
+pnpm storybook    # Start Storybook dev server (port 6006)
+pnpm build-storybook  # Build Storybook static
 ```
 
 **Verification order:** `lint → test:run → build`

@@ -20,7 +20,7 @@ export default [
         tsconfigRootDir: import.meta.dirname,
         ecmaFeatures: { jsx: true },
       },
-      globals: { ...globals.browser, ...globals.node },
+      globals: { ...globals.browser, ...globals.node, ...globals.vitest },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
@@ -40,6 +40,12 @@ export default [
     },
     settings: { react: { version: 'detect' } },
   },
+  {
+    files: ['**/*.test.{ts,tsx}'],
+    languageOptions: {
+      globals: globals.vitest,
+    },
+  },
   ...astroPlugin.configs.recommended,
-  { ignores: ['dist/', 'node_modules/', '.astro/'] },
+  { ignores: ['dist/', 'node_modules/', '.astro/', 'storybook-static/'] },
 ] as Linter.Config[];
