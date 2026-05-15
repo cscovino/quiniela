@@ -1,4 +1,53 @@
 ---
-// Root index - redirects to default locale (/en/)
-Astro.redirect('/en/');
+import BaseLayout from '@layouts/BaseLayout.astro';
+import es from '@locales/es/common.json';
+
+const locale = 'es';
+const translations = es;
 ---
+
+<BaseLayout locale={locale} title={translations.site.title}>
+  <main class="home">
+    <h1 class="title">{translations.site.title}</h1>
+    <p class="tagline">{translations.site.tagline}</p>
+    <div class="card">
+      <p>{translations.common.comingSoon}</p>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+
+  .title {
+    font-size: var(--heading-xl);
+    color: var(--color-accent-500);
+    text-shadow: var(--shadow-md);
+  }
+
+  .tagline {
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+  }
+
+  .card {
+    margin-top: var(--space-8);
+    padding: var(--space-6);
+    border: var(--border-pixel-md);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-md);
+  }
+
+  .card p {
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+  }
+</style>

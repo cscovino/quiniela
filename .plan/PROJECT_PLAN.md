@@ -1027,18 +1027,20 @@ service cloud.firestore {
 | Task | Status | Notes |
 |------|--------|-------|
 | Astro 6 + React 19 | ✅ Done | Islands architecture configured |
-| i18n routing (en/es) | ✅ Done | Official Astro i18n with prefix routing |
+| i18n routing (en/es) | ✅ Done | Default locale `es` at `/`, English at `/en/` |
 | TypeScript strict | ✅ Done | Path aliases configured |
-| ESLint + Prettier | ✅ Done | Flat config, astro plugin |
-| Husky + Commitlint | ✅ Done | Pre-commit + commit-msg hooks |
+| ESLint + Prettier | ✅ Done | Flat config (`.ts`), astro plugin |
+| Husky + Commitlint | ✅ Done | Pre-commit + commit-msg hooks (`.commitlintrc`) |
 | Vitest + Testing Library | ✅ Done | jsdom environment |
-| Design tokens (global.css) | ✅ Done | Retro pixel art colors, fonts, spacing |
+| Design tokens (global.css) | ✅ Done | Full token system: colors, spacing, typography, shadows, animations, z-index, breakpoints |
 | Locale files (en/es) | ✅ Done | common.json with shared strings |
+| Vite aliases | ✅ Done | `@/`, `@atoms/`, `@molecules/`, `@organisms/`, `@layouts/`, `@styles/`, etc. |
+| Base layout | ✅ Done | `BaseLayout.astro` with locale switcher |
 
 ### Design System
 | Phase | Description | Status | Notes |
 |-------|-------------|--------|-------|
-| Phase 1 | Design tokens & global styles | 🟡 Partial | Basic tokens done, needs expansion |
+| Phase 1 | Design tokens & global styles | ✅ Done | Full token system with 8-bit palette, spacing scale, animations |
 | Phase 2 | Atoms (12 components) | ⬜ Not Started | |
 | Phase 3 | Molecules (9 components) | ⬜ Not Started | |
 | Phase 4 | Organisms (9 components) | ⬜ Not Started | |
@@ -1060,6 +1062,10 @@ service cloud.firestore {
 8. **Design System:** Atomic Design methodology with retro pixel art aesthetic
 9. **CSS Variables:** Custom properties instead of Tailwind for full control
 10. **No Social Features in MVP:** Private leagues, friends, sharing deferred to future
+11. **Default Locale:** Spanish (`es`) at root `/`, English at `/en/` (no redirect needed)
+12. **i18n Structure:** Single page per locale (no `[locale]` dynamic route duplication)
+13. **Config Files:** All configs use TypeScript (`.ts`) instead of `.mjs`/`.json`
+14. **Vite Aliases:** Path aliases (`@/`, `@atoms/`, etc.) configured in both Vite and TypeScript
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
@@ -1080,4 +1086,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-14*
+*Last updated: 2026-05-15*

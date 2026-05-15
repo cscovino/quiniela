@@ -1,0 +1,61 @@
+---
+import '@styles/global.css';
+
+export interface Props {
+  locale: 'en' | 'es';
+  title: string;
+}
+
+const { locale, title } = Astro.props;
+---
+
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="locale-switcher">
+      <a href="/en" class:list={['locale-btn', locale === 'en' && 'active']}> English </a>
+      <a href="/" class:list={['locale-btn', locale === 'es' && 'active']}> Español </a>
+    </nav>
+    <slot />
+  </body>
+</html>
+
+<style>
+  .locale-switcher {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .locale-btn {
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-pixel-md);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+
+  .locale-btn:hover {
+    background: var(--bg-card-hover);
+    text-decoration: none;
+  }
+
+  .locale-btn.active {
+    background: var(--color-primary-500);
+  }
+</style>
