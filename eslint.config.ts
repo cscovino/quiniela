@@ -5,6 +5,7 @@ import astroPlugin from 'eslint-plugin-astro';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
+import type { Linter } from 'eslint';
 
 export default [
   js.configs.recommended,
@@ -16,6 +17,7 @@ export default [
       parser: tsParser,
       parserOptions: {
         project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
         ecmaFeatures: { jsx: true },
       },
       globals: { ...globals.browser, ...globals.node },
@@ -40,4 +42,4 @@ export default [
   },
   ...astroPlugin.configs.recommended,
   { ignores: ['dist/', 'node_modules/', '.astro/'] },
-];
+] as Linter.Config[];
