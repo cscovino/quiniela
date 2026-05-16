@@ -41,7 +41,7 @@ const icons: Record<IconName, string> = {
   live: '🔴',
 };
 
-export const Icon: React.FC<IconProps> = ({ name, size = 16, color, className = '' }) => {
+export const Icon: React.FC<IconProps> = ({ name, size = 24, color, className = '' }) => {
   return (
     <span
       className={`icon ${className}`}

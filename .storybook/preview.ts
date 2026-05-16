@@ -1,19 +1,6 @@
 import type { Preview } from '@storybook/react-vite';
 import '../src/styles/global.css';
 
-// Self-hosted fonts for Storybook
-const style = document.createElement('style');
-style.textContent = `
-  @font-face {
-    font-family: 'Press Start 2P';
-    src: url('/fonts/PressStart2P.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-`;
-document.head.appendChild(style);
-
 const preview: Preview = {
   parameters: {
     controls: {
@@ -34,6 +21,28 @@ const preview: Preview = {
       toc: true,
     },
   },
+  globalTypes: {
+    theme: {
+      name: 'Theme',
+      description: 'Global theme for components',
+      defaultValue: 'dark',
+      toolbar: {
+        icon: 'circlehollow',
+        items: [
+          { value: 'dark', title: 'Dark' },
+          { value: 'light', title: 'Light' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
+  decorators: [
+    (Story, context) => {
+      const theme = context.globals.theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      return Story();
+    },
+  ],
 };
 
 export default preview;

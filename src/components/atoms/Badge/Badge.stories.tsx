@@ -16,12 +16,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = { args: { children: 'Primary' } };
-export const Accent: Story = { args: { children: '⭐ Featured' } };
-export const Success: Story = { args: { children: '✓ Verified' } };
-export const Warning: Story = { args: { children: '⚠ Warning' } };
-export const Error: Story = { args: { children: '✕ Error' } };
-export const Info: Story = { args: { children: 'ℹ Info' } };
+export const Primary: Story = { args: { variant: 'primary', children: 'Primary' } };
+export const Accent: Story = { args: { variant: 'accent', children: '⭐ Featured' } };
+export const Success: Story = { args: { variant: 'success', children: '✓ Verified' } };
+export const Warning: Story = { args: { variant: 'warning', children: '⚠ Warning' } };
+export const Error: Story = { args: { variant: 'error', children: '✕ Error' } };
+export const Info: Story = { args: { variant: 'info', children: 'ℹ Info' } };
 
 export const Sizes: Story = {
   render: () => (

@@ -4,31 +4,61 @@ import '@styles/global.css';
 export interface Props {
   locale: 'en' | 'es';
   title: string;
+  theme?: 'dark' | 'light';
 }
 
-const { locale, title } = Astro.props;
+const { locale, title, theme = 'dark' } = Astro.props;
 ---
 
-<html lang={locale}>
+<html lang={locale} data-theme={theme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <link rel="preload" href="/fonts/PressStart2P.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
-    <nav class="locale-switcher">
-      <a href="/en" class:list={['locale-btn', locale === 'en' && 'active']}> English </a>
-      <a href="/" class:list={['locale-btn', locale === 'es' && 'active']}> Español </a>
+    <nav class="top-nav">
+      <div class="locale-switcher">
+        <a href="/en" class:list={['locale-btn', locale === 'en' && 'active']}> English </a>
+        <a href="/" class:list={['locale-btn', locale === 'es' && 'active']}> Español </a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="icon">🌓</span>
+      </button>
     </nav>
     <slot />
+    <script>
+      const toggle = document.getElementById('themeToggle');
+      const html = document.documentElement;
+
+      toggle.addEventListener('click', () => {
+        const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+      });
+
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        html.setAttribute('data-theme', savedTheme);
+      }
+    </script>
   </body>
 </html>
 
 <style>
-  .locale-switcher {
+  .top-nav {
     position: absolute;
     top: var(--space-4);
     right: var(--space-4);
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .locale-switcher {
     display: flex;
     gap: var(--space-2);
   }
@@ -51,5 +81,23 @@ const { locale, title } = Astro.props;
 
   .locale-btn.active {
     background: var(--color-primary-500);
+  }
+
+  .theme-toggle {
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-pixel-md);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: var(--text-lg);
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+
+  .theme-toggle:hover {
+    background: var(--bg-card-hover);
+  }
+
+  .icon {
+    display: block;
   }
 </style>
