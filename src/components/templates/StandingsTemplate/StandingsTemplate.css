@@ -1,0 +1,29 @@
+.standings-template {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.standings-template__content {
+  flex: 1;
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4);
+  width: 100%;
+}
+
+.standings-template__header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.standings-template__groups,
+.standings-template__bracket {
+  margin: var(--space-6) 0;
+}
+
+.standings-template__groups h2,
+.standings-template__bracket h2 {
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
