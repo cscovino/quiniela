@@ -17,6 +17,9 @@ const preview: Preview = {
         { name: 'light', value: '#f0f0f0' },
       ],
     },
+    docs: {
+      toc: true,
+    },
   },
 };
 
