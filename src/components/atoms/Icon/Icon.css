@@ -5,3 +5,8 @@
   line-height: 1;
   user-select: none;
 }
+
+.icon svg {
+  display: block;
+  fill: currentColor;
+}

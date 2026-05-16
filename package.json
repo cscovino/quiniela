@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "pnpm@11.1.2",
+  "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -17,7 +17,7 @@
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\" --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,astro,css,json}\"",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "storybook dev -p 6006 --no-version-updates",
     "build-storybook": "storybook build",
     "prepare": "husky"
   },
@@ -32,6 +32,8 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "astro": "^6.3.3",
+    "flag-icons": "^7.5.0",
+    "pixelarticons": "^2.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

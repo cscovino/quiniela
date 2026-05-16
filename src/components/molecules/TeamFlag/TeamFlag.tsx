@@ -1,0 +1,32 @@
+import React from 'react';
+import { getFlagClass } from '@utils/flagMapping';
+import './TeamFlag.css';
+
+export interface TeamFlagProps {
+  fifaCode: string;
+  size?: 'sm' | 'md' | 'lg';
+  showName?: boolean;
+  name?: string;
+  className?: string;
+}
+
+export const TeamFlag: React.FC<TeamFlagProps> = ({
+  fifaCode,
+  size = 'md',
+  showName = false,
+  name,
+  className = '',
+}) => {
+  const flagClass = getFlagClass(fifaCode);
+
+  return (
+    <div className={`team-flag team-flag--${size} ${className}`}>
+      <span
+        className={`flag-icon ${flagClass}`}
+        role="img"
+        aria-label={`${name || fifaCode} flag`}
+      />
+      {showName && name && <span className="team-flag__name">{name}</span>}
+    </div>
+  );
+};

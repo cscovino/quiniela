@@ -1,0 +1,34 @@
+.stat-card {
+  background: var(--bg-card);
+  border: var(--border-pixel-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.stat-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+}
+
+.stat-card__label {
+  font-family: var(--font-body);
+}
+
+.stat-card__value {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stat-card__trend--up {
+  color: var(--color-success);
+}
+
+.stat-card__trend--down {
+  color: var(--color-error);
+}

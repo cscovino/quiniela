@@ -2,23 +2,46 @@ import { render, screen } from '@testing-library/react';
 import { Icon } from './Icon';
 
 describe('Icon', () => {
-  it('renders the correct emoji', () => {
-    render(<Icon name="football" />);
-    expect(screen.getByRole('img')).toHaveTextContent('⚽');
+  it('renders icon with correct aria label', () => {
+    render(<Icon name="trophy" />);
+    const icon = screen.getByRole('img', { name: 'trophy' });
+    expect(icon).toBeInTheDocument();
   });
 
   it('applies custom size', () => {
-    render(<Icon name="trophy" size={32} />);
-    expect(screen.getByRole('img')).toHaveStyle({ fontSize: '32px' });
+    const { container } = render(<Icon name="fire" size={32} />);
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveAttribute('width', '32');
+    expect(svg).toHaveAttribute('height', '32');
   });
 
   it('applies custom color', () => {
-    render(<Icon name="star" color="#ffc107" />);
-    expect(screen.getByRole('img')).toHaveStyle({ color: '#ffc107' });
+    const { container } = render(<Icon name="target" color="#ff0000" />);
+    const span = container.firstChild;
+    expect(span).toHaveStyle({ color: '#ff0000' });
   });
 
-  it('merges custom className', () => {
-    render(<Icon name="user" className="custom" />);
-    expect(screen.getByRole('img')).toHaveClass('custom');
+  it('renders all icon types', () => {
+    const iconNames: Array<Parameters<typeof Icon>[0]['name']> = [
+      'football',
+      'trophy',
+      'star',
+      'fire',
+      'lightning',
+      'target',
+      'chart',
+      'bell',
+      'user',
+      'flag',
+      'check',
+      'x',
+      'clock',
+      'live',
+    ];
+
+    iconNames.forEach((name) => {
+      const { container } = render(<Icon name={name} />);
+      expect(container.querySelector('svg')).toBeInTheDocument();
+    });
   });
 });
