@@ -1044,7 +1044,7 @@ service cloud.firestore {
 | Phase 2 | Atoms (12 components) | ✅ Done | Button, Input, Badge, Avatar, Icon, Typography, Spinner, Checkbox, Radio, Tooltip, Divider, ProgressBar |
 | Phase 3 | Molecules (9 components) | ✅ Done | TeamFlag, MatchCard, PredictionInput, TeamSelector, StatCard, ScoreDisplay, CountdownTimer, RankingRow, GroupHeader |
 | Phase 4 | Organisms (9 components) | ✅ Done | NavBar, TournamentHeader, MatchList, PredictionForm, GroupStandings, RankingsTable, BracketView, UserProfile, NotificationPanel |
-| Phase 5 | Templates (4 layouts) | ⬜ Not Started | |
+| Phase 5 | Templates (4 layouts) | ✅ Done | HomeTemplate, PredictionTemplate, StandingsTemplate, ProfileTemplate |
 | Phase 6 | Pixel art assets | ⬜ Not Started | |
 
 ---
@@ -1070,6 +1070,7 @@ service cloud.firestore {
 16. **Flags:** flag-icons library with 211 FIFA team mappings for country flags
 17. **Theme System:** Light/dark themes via `data-theme` attribute with CSS variable switching
 18. **Storybook:** v10 with theme switcher, docs addon, and Vitest integration
+19. **Templates:** Compose organisms into full page layouts with responsive grid
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
