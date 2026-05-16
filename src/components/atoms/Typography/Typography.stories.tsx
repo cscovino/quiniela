@@ -1,14 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Typography } from './Typography';
 
-const meta: Meta<typeof Typography> = {
-  title: 'Atoms/Typography',
+const meta = {
   component: Typography,
-  tags: ['autodocs'],
-};
+  tags: ['ai-generated'],
+} satisfies Meta<typeof Typography>;
 
 export default meta;
-type Story = StoryObj<typeof Typography>;
+type Story = StoryObj<typeof meta>;
 
 export const AllVariants: Story = {
   render: () => (

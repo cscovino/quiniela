@@ -1,14 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Avatar } from './Avatar';
 
-const meta: Meta<typeof Avatar> = {
-  title: 'Atoms/Avatar',
+const meta = {
   component: Avatar,
-  tags: ['autodocs'],
-};
+  tags: ['ai-generated'],
+} satisfies Meta<typeof Avatar>;
 
 export default meta;
-type Story = StoryObj<typeof Avatar>;
+type Story = StoryObj<typeof meta>;
 
 export const WithName: Story = { args: { name: 'John Doe' } };
 export const WithImage: Story = { args: { src: 'https://i.pravatar.cc/150?img=1', alt: 'User' } };

@@ -1,14 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Checkbox } from './Checkbox';
 
-const meta: Meta<typeof Checkbox> = {
-  title: 'Atoms/Checkbox',
+const meta = {
   component: Checkbox,
-  tags: ['autodocs'],
-};
+  tags: ['ai-generated'],
+} satisfies Meta<typeof Checkbox>;
 
 export default meta;
-type Story = StoryObj<typeof Checkbox>;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = { args: { label: 'Checkbox label' } };
 export const Checked: Story = { args: { label: 'Checked', defaultChecked: true } };

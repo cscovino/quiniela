@@ -1,14 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Spinner } from './Spinner';
 
-const meta: Meta<typeof Spinner> = {
-  title: 'Atoms/Spinner',
+const meta = {
   component: Spinner,
-  tags: ['autodocs'],
-};
+  tags: ['ai-generated'],
+} satisfies Meta<typeof Spinner>;
 
 export default meta;
-type Story = StoryObj<typeof Spinner>;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 export const Small: Story = { args: { size: 'sm' } };

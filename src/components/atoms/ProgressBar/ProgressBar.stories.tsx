@@ -1,20 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ProgressBar } from './ProgressBar';
 
-const meta: Meta<typeof ProgressBar> = {
-  title: 'Atoms/ProgressBar',
+const meta = {
   component: ProgressBar,
-  tags: ['autodocs'],
+  tags: ['ai-generated'],
   argTypes: {
-    variant: {
-      control: 'select',
-      options: ['primary', 'accent', 'success', 'warning', 'error'],
-    },
+    variant: { control: 'select', options: ['primary', 'accent', 'success', 'warning', 'error'] },
   },
-};
+} satisfies Meta<typeof ProgressBar>;
 
 export default meta;
-type Story = StoryObj<typeof ProgressBar>;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = { args: { value: 65 } };
 export const WithLabel: Story = { args: { value: 75, showLabel: true } };

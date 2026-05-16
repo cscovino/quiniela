@@ -1,14 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Icon } from './Icon';
 
-const meta: Meta<typeof Icon> = {
-  title: 'Atoms/Icon',
+const meta = {
   component: Icon,
-  tags: ['autodocs'],
-};
+  tags: ['ai-generated'],
+} satisfies Meta<typeof Icon>;
 
 export default meta;
-type Story = StoryObj<typeof Icon>;
+type Story = StoryObj<typeof meta>;
 
 export const AllIcons: Story = {
   render: () => (

@@ -1,14 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Radio } from './Radio';
 
-const meta: Meta<typeof Radio> = {
-  title: 'Atoms/Radio',
+const meta = {
   component: Radio,
-  tags: ['autodocs'],
-};
+  tags: ['ai-generated'],
+} satisfies Meta<typeof Radio>;
 
 export default meta;
-type Story = StoryObj<typeof Radio>;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = { args: { label: 'Radio option', name: 'demo' } };
 export const Checked: Story = { args: { label: 'Selected', name: 'demo', defaultChecked: true } };

@@ -1,14 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Divider } from './Divider';
 
-const meta: Meta<typeof Divider> = {
-  title: 'Atoms/Divider',
+const meta = {
   component: Divider,
-  tags: ['autodocs'],
-};
+  tags: ['ai-generated'],
+} satisfies Meta<typeof Divider>;
 
 export default meta;
-type Story = StoryObj<typeof Divider>;
+type Story = StoryObj<typeof meta>;
 
 export const Horizontal: Story = { args: {} };
 
