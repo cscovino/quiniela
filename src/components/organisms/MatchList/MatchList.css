@@ -1,0 +1,19 @@
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.match-list--empty {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.match-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

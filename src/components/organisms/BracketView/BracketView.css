@@ -1,0 +1,42 @@
+.bracket-view {
+  padding: var(--space-4);
+  background: var(--bg-card);
+  border: var(--border-pixel-md);
+  box-shadow: var(--shadow-md);
+}
+
+.bracket-view--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.bracket-view__rounds {
+  display: flex;
+  gap: var(--space-6);
+  overflow-x: auto;
+  padding-bottom: var(--space-4);
+}
+
+.bracket-view__round {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 280px;
+}
+
+.bracket-view__round-title {
+  text-align: center;
+  color: var(--color-accent-500);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--border-width-sm) solid var(--border-color);
+}
+
+.bracket-view__matches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

@@ -1,0 +1,31 @@
+.tournament-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--bg-card);
+  border: var(--border-pixel-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.tournament-header__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-accent-500);
+}
+
+.tournament-header__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.tournament-header__dates,
+.tournament-header__participants {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+}

@@ -1,0 +1,47 @@
+.prediction-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--bg-card);
+  border: var(--border-pixel-md);
+  box-shadow: var(--shadow-md);
+}
+
+.prediction-form--empty {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.prediction-form__matches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.prediction-form__match {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--bg-input);
+  border: var(--border-width-sm) solid var(--border-color);
+}
+
+.prediction-form__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.prediction-form__actions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-3);
+  border-top: var(--border-width-sm) solid var(--border-color);
+}

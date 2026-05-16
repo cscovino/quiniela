@@ -1040,10 +1040,10 @@ service cloud.firestore {
 ### Design System
 | Phase | Description | Status | Notes |
 |-------|-------------|--------|-------|
-| Phase 1 | Design tokens & global styles | ✅ Done | Full token system with 8-bit palette, spacing scale, animations |
+| Phase 1 | Design tokens & global styles | ✅ Done | Full token system with light/dark themes, 8-bit palette, spacing scale, animations |
 | Phase 2 | Atoms (12 components) | ✅ Done | Button, Input, Badge, Avatar, Icon, Typography, Spinner, Checkbox, Radio, Tooltip, Divider, ProgressBar |
-| Phase 3 | Molecules (9 components) | ⬜ Not Started | |
-| Phase 4 | Organisms (9 components) | ⬜ Not Started | |
+| Phase 3 | Molecules (9 components) | ✅ Done | TeamFlag, MatchCard, PredictionInput, TeamSelector, StatCard, ScoreDisplay, CountdownTimer, RankingRow, GroupHeader |
+| Phase 4 | Organisms (9 components) | ✅ Done | NavBar, TournamentHeader, MatchList, PredictionForm, GroupStandings, RankingsTable, BracketView, UserProfile, NotificationPanel |
 | Phase 5 | Templates (4 layouts) | ⬜ Not Started | |
 | Phase 6 | Pixel art assets | ⬜ Not Started | |
 
@@ -1066,6 +1066,10 @@ service cloud.firestore {
 12. **i18n Structure:** Single page per locale (no `[locale]` dynamic route duplication)
 13. **Config Files:** All configs use TypeScript (`.ts`) instead of `.mjs`/`.json`
 14. **Vite Aliases:** Path aliases (`@/`, `@atoms/`, etc.) configured in both Vite and TypeScript
+15. **Icon System:** pixelarticons (800 pixel art SVGs) replacing emojis for retro aesthetic
+16. **Flags:** flag-icons library with 211 FIFA team mappings for country flags
+17. **Theme System:** Light/dark themes via `data-theme` attribute with CSS variable switching
+18. **Storybook:** v10 with theme switcher, docs addon, and Vitest integration
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
@@ -1086,4 +1090,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-15*
+*Last updated: 2026-05-16*
