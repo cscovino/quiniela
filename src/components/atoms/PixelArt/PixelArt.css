@@ -1,0 +1,64 @@
+/* Pixel Art SVG Assets - WC26 Tournament */
+
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.pixel-art--football {
+  color: var(--color-gold-500);
+}
+
+.pixel-art--trophy {
+  color: var(--color-gold-400);
+}
+
+.pixel-art--stadium {
+  color: var(--color-accent-500);
+}
+
+.pixel-art--whistle {
+  color: var(--color-secondary-500);
+}
+
+.pixel-art--star {
+  color: var(--color-gold-500);
+}
+
+.pixel-art--goal {
+  color: var(--color-success);
+}
+
+.pixel-art--empty {
+  color: var(--text-muted);
+}
+
+.pixel-art--medal-gold {
+  color: var(--color-gold-500);
+}
+
+.pixel-art--medal-silver {
+  color: #c0c0c0;
+}
+
+.pixel-art--medal-bronze {
+  color: #cd7f32;
+}
+
+/* Animations for pixel art */
+.pixel-art--bounce {
+  animation: pixel-bounce 0.6s ease-in-out infinite;
+}
+
+.pixel-art--pulse {
+  animation: stadium-pulse 2s ease-in-out infinite;
+}
+
+.pixel-art--glow {
+  animation: trophy-glow 2s ease-in-out infinite;
+}
+
+.pixel-art--celebrate {
+  animation: goal-celebration 0.8s ease-in-out;
+}
