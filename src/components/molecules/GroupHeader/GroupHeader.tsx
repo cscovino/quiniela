@@ -21,10 +21,18 @@ export interface GroupStanding {
 export interface GroupHeaderProps {
   name: string;
   standings?: GroupStanding[];
+  translations: {
+    qualified: string;
+  };
   className?: string;
 }
 
-export const GroupHeader: React.FC<GroupHeaderProps> = ({ name, standings, className = '' }) => {
+export const GroupHeader: React.FC<GroupHeaderProps> = ({
+  name,
+  standings,
+  translations,
+  className = '',
+}) => {
   const getQualifiedTeams = () => {
     if (!standings) return [];
     return standings.filter((s) => s.position <= 2).map((s) => s.teamName);
@@ -41,7 +49,7 @@ export const GroupHeader: React.FC<GroupHeaderProps> = ({ name, standings, class
 
       {qualified.length > 0 && (
         <div className="group-header__qualified">
-          <Typography variant="caption">Qualified:</Typography>
+          <Typography variant="caption">{translations.qualified}</Typography>
           <div className="group-header__teams">
             {qualified.map((team) => (
               <Badge key={team} variant="success" size="sm">

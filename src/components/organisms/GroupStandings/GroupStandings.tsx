@@ -8,14 +8,24 @@ export interface GroupStandingsProps {
     name: string;
     standings: GroupStanding[];
   }[];
+  translations: {
+    noGroups: string;
+    team: string;
+    pts: string;
+    qualified: string;
+  };
   className?: string;
 }
 
-export const GroupStandings: React.FC<GroupStandingsProps> = ({ groups, className = '' }) => {
+export const GroupStandings: React.FC<GroupStandingsProps> = ({
+  groups,
+  translations,
+  className = '',
+}) => {
   if (groups.length === 0) {
     return (
       <div className={`group-standings group-standings--empty ${className}`}>
-        <Typography variant="body">No groups available</Typography>
+        <Typography variant="body">{translations.noGroups}</Typography>
       </div>
     );
   }
@@ -24,17 +34,25 @@ export const GroupStandings: React.FC<GroupStandingsProps> = ({ groups, classNam
     <div className={`group-standings ${className}`}>
       {groups.map((group) => (
         <div key={group.name} className="group-standings__group">
-          <GroupHeader name={group.name} standings={group.standings} />
+          <GroupHeader
+            name={group.name}
+            standings={group.standings}
+            translations={{ qualified: translations.qualified }}
+          />
           <div className="group-standings__table">
             <div className="group-standings__header">
-              <span className="group-standings__col group-standings__col--team">Team</span>
+              <span className="group-standings__col group-standings__col--team">
+                {translations.team}
+              </span>
               <span className="group-standings__col">P</span>
               <span className="group-standings__col">W</span>
               <span className="group-standings__col">D</span>
               <span className="group-standings__col">L</span>
               <span className="group-standings__col">GF</span>
               <span className="group-standings__col">GA</span>
-              <span className="group-standings__col group-standings__col--pts">Pts</span>
+              <span className="group-standings__col group-standings__col--pts">
+                {translations.pts}
+              </span>
             </div>
             {group.standings.map((team) => (
               <div key={team.teamId} className="group-standings__row">

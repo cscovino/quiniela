@@ -10,14 +10,24 @@ export interface BracketRound {
 
 export interface BracketViewProps {
   rounds: BracketRound[];
+  translations: {
+    bracketNotAvailable: string;
+    match: MatchCardProps['translations'];
+  };
+  locale?: 'en' | 'es';
   className?: string;
 }
 
-export const BracketView: React.FC<BracketViewProps> = ({ rounds, className = '' }) => {
+export const BracketView: React.FC<BracketViewProps> = ({
+  rounds,
+  translations,
+  locale = 'en',
+  className = '',
+}) => {
   if (rounds.length === 0) {
     return (
       <div className={`bracket-view bracket-view--empty ${className}`}>
-        <Typography variant="body">Bracket not available yet</Typography>
+        <Typography variant="body">{translations.bracketNotAvailable}</Typography>
       </div>
     );
   }
@@ -35,6 +45,8 @@ export const BracketView: React.FC<BracketViewProps> = ({ rounds, className = ''
                 <MatchCard
                   key={match.homeTeam.fifaCode + match.awayTeam.fifaCode + index}
                   {...match}
+                  translations={translations.match}
+                  locale={locale}
                 />
               ))}
             </div>

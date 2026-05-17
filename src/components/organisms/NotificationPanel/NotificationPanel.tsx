@@ -19,6 +19,11 @@ export interface NotificationPanelProps {
   notifications: Notification[];
   onMarkAsRead?: (id: string) => void;
   onClearAll?: () => void;
+  translations: {
+    noNotifications: string;
+    notificationsHeader: (count: number) => string;
+    clearAll: string;
+  };
   className?: string;
 }
 
@@ -33,6 +38,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
   notifications,
   onMarkAsRead,
   onClearAll,
+  translations,
   className = '',
 }) => {
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -41,7 +47,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
     return (
       <div className={`notification-panel notification-panel--empty ${className}`}>
         <Icon name="bell" size={32} />
-        <Typography variant="body">No notifications</Typography>
+        <Typography variant="body">{translations.noNotifications}</Typography>
       </div>
     );
   }
@@ -49,10 +55,10 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({
   return (
     <div className={`notification-panel ${className}`}>
       <div className="notification-panel__header">
-        <Typography variant="h4">Notifications {unreadCount > 0 && `(${unreadCount})`}</Typography>
+        <Typography variant="h4">{translations.notificationsHeader(unreadCount)}</Typography>
         {onClearAll && notifications.length > 0 && (
           <Button variant="secondary" size="sm" onClick={onClearAll}>
-            Clear All
+            {translations.clearAll}
           </Button>
         )}
       </div>

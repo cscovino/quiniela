@@ -25,6 +25,15 @@ export interface UserProfileProps {
     rank: number;
   };
   badges: BadgeEarned[];
+  translations: {
+    totalPoints: string;
+    accuracy: string;
+    currentStreak: string;
+    bestStreak: string;
+    exactBets: string;
+    rank: string;
+    badges: string;
+  };
   className?: string;
 }
 
@@ -34,6 +43,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   favoriteTeam,
   stats,
   badges,
+  translations,
   className = '',
 }) => {
   return (
@@ -52,22 +62,26 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       </div>
 
       <div className="user-profile__stats">
-        <StatCard label="Total Points" value={stats.totalPoints} icon="star" />
-        <StatCard label="Accuracy" value={`${Math.round(stats.accuracy * 100)}%`} icon="target" />
+        <StatCard label={translations.totalPoints} value={stats.totalPoints} icon="star" />
         <StatCard
-          label="Current Streak"
+          label={translations.accuracy}
+          value={`${Math.round(stats.accuracy * 100)}%`}
+          icon="target"
+        />
+        <StatCard
+          label={translations.currentStreak}
           value={stats.currentStreak}
           icon="fire"
           trend={stats.currentStreak > 2 ? 'up' : 'neutral'}
         />
-        <StatCard label="Best Streak" value={stats.maxStreak} icon="lightning" />
-        <StatCard label="Exact Bets" value={stats.exactBets} icon="trophy" />
-        <StatCard label="Rank" value={`#${stats.rank}`} icon="award" />
+        <StatCard label={translations.bestStreak} value={stats.maxStreak} icon="lightning" />
+        <StatCard label={translations.exactBets} value={stats.exactBets} icon="trophy" />
+        <StatCard label={translations.rank} value={`#${stats.rank}`} icon="award" />
       </div>
 
       {badges.length > 0 && (
         <div className="user-profile__badges">
-          <Typography variant="h4">Badges</Typography>
+          <Typography variant="h4">{translations.badges}</Typography>
           <div className="user-profile__badges-list">
             {badges.map((badge) => (
               <div

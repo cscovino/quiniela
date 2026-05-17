@@ -25,19 +25,38 @@ export interface MatchCardProps {
   result?: MatchResult;
   stadium?: string;
   phase?: string;
+  translations: {
+    scheduled: string;
+    live: string;
+    finished: string;
+    postponed: string;
+    cancelled: string;
+    vs: string;
+  };
+  locale?: 'en' | 'es';
   className?: string;
   onClick?: () => void;
 }
 
-const statusConfig: Record<
-  MatchStatus,
-  { variant: 'info' | 'warning' | 'success' | 'error' | 'accent'; label: string; icon?: IconName }
-> = {
-  scheduled: { variant: 'info', label: 'Scheduled' },
-  live: { variant: 'warning', label: 'LIVE', icon: 'live' },
-  finished: { variant: 'success', label: 'Finished' },
-  postponed: { variant: 'accent', label: 'Postponed' },
-  cancelled: { variant: 'error', label: 'Cancelled' },
+const getStatusConfig = (
+  status: MatchStatus,
+  translations: MatchCardProps['translations'],
+): {
+  variant: 'info' | 'warning' | 'success' | 'error' | 'accent';
+  label: string;
+  icon?: IconName;
+} => {
+  const config: Record<
+    MatchStatus,
+    { variant: 'info' | 'warning' | 'success' | 'error' | 'accent'; label: string; icon?: IconName }
+  > = {
+    scheduled: { variant: 'info', label: translations.scheduled },
+    live: { variant: 'warning', label: translations.live, icon: 'live' },
+    finished: { variant: 'success', label: translations.finished },
+    postponed: { variant: 'accent', label: translations.postponed },
+    cancelled: { variant: 'error', label: translations.cancelled },
+  };
+  return config[status];
 };
 
 export const MatchCard: React.FC<MatchCardProps> = ({
@@ -48,16 +67,19 @@ export const MatchCard: React.FC<MatchCardProps> = ({
   result,
   stadium,
   phase,
+  translations,
+  locale = 'en',
   className = '',
   onClick,
 }) => {
-  const config = statusConfig[status];
-  const formattedDate = date.toLocaleDateString('en-US', {
+  const config = getStatusConfig(status, translations);
+  const localeCode = locale === 'en' ? 'en-US' : 'es-ES';
+  const formattedDate = date.toLocaleDateString(localeCode, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
-  const formattedTime = date.toLocaleTimeString('en-US', {
+  const formattedTime = date.toLocaleTimeString(localeCode, {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -86,7 +108,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
         </div>
 
         <div className="match-card__vs">
-          <Typography variant="caption">VS</Typography>
+          <Typography variant="caption">{translations.vs}</Typography>
         </div>
 
         <div className="match-card__team match-card__team--away">

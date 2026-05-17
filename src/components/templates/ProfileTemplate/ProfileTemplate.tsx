@@ -8,8 +8,14 @@ import { Typography } from '@atoms/Typography/Typography';
 import './ProfileTemplate.css';
 
 export interface ProfileTemplateProps {
-  userProfile: UserProfileProps;
+  userProfile: Omit<UserProfileProps, 'translations'>;
   notifications?: NotificationPanelProps['notifications'];
+  translations: {
+    title: string;
+    notificationsTitle: (count: number) => string;
+    userProfile: UserProfileProps['translations'];
+    notifications: NotificationPanelProps['translations'];
+  };
   onNotificationDismiss?: (id: string) => void;
   className?: string;
 }
@@ -17,6 +23,7 @@ export interface ProfileTemplateProps {
 export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
   userProfile,
   notifications = [],
+  translations,
   onNotificationDismiss,
   className = '',
 }) => {
@@ -24,17 +31,23 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
     <div className={`profile-template ${className}`}>
       <main className="profile-template__content">
         <header className="profile-template__header">
-          <Typography variant="h1">My Profile</Typography>
+          <Typography variant="h1">{translations.title}</Typography>
         </header>
 
         <section className="profile-template__user">
-          <UserProfile {...userProfile} />
+          <UserProfile {...userProfile} translations={translations.userProfile} />
         </section>
 
         {notifications.length > 0 && (
           <section className="profile-template__notifications">
-            <Typography variant="h2">Notifications ({notifications.length})</Typography>
-            <NotificationPanel notifications={notifications} onMarkAsRead={onNotificationDismiss} />
+            <Typography variant="h2">
+              {translations.notificationsTitle(notifications.length)}
+            </Typography>
+            <NotificationPanel
+              notifications={notifications}
+              onMarkAsRead={onNotificationDismiss}
+              translations={translations.notifications}
+            />
           </section>
         )}
       </main>

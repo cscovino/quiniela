@@ -7,6 +7,30 @@ export interface Props {
 
 const { locale } = Astro.props;
 
+const translations = {
+  title: locale === 'en' ? 'Tournament Standings' : 'Clasificación del Torneo',
+  groupStageTitle: locale === 'en' ? 'Group Stage' : 'Fase de Grupos',
+  knockoutTitle: locale === 'en' ? 'Knockout Stage' : 'Fase Eliminatoria',
+  standings: {
+    noGroups: locale === 'en' ? 'No groups available' : 'No hay grupos disponibles',
+    team: locale === 'en' ? 'Team' : 'Equipo',
+    pts: locale === 'en' ? 'Pts' : 'Pts',
+    qualified: locale === 'en' ? 'Qualified:' : 'Clasificados:',
+  },
+  bracket: {
+    bracketNotAvailable:
+      locale === 'en' ? 'Bracket not available yet' : 'El cuadro aún no está disponible',
+    match: {
+      scheduled: locale === 'en' ? 'Scheduled' : 'Programado',
+      live: locale === 'en' ? 'LIVE' : 'EN VIVO',
+      finished: locale === 'en' ? 'Finished' : 'Finalizado',
+      postponed: locale === 'en' ? 'Postponed' : 'Pospuesto',
+      cancelled: locale === 'en' ? 'Cancelled' : 'Cancelado',
+      vs: locale === 'en' ? 'VS' : 'VS',
+    },
+  },
+};
+
 const mockGroups = [
   {
     name: locale === 'en' ? 'Group A' : 'Grupo A',
@@ -85,6 +109,8 @@ const mockBracketRounds = [
 const templateProps = {
   groups: mockGroups,
   bracketRounds: mockBracketRounds,
+  translations,
+  locale,
 };
 ---
 

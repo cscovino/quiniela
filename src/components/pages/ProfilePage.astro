@@ -7,6 +7,27 @@ export interface Props {
 
 const { locale } = Astro.props;
 
+const translations = {
+  title: locale === 'en' ? 'My Profile' : 'Mi Perfil',
+  notificationsTitle: (count: number) =>
+    locale === 'en' ? `Notifications (${count})` : `Notificaciones (${count})`,
+  userProfile: {
+    totalPoints: locale === 'en' ? 'Total Points' : 'Puntos Totales',
+    accuracy: locale === 'en' ? 'Accuracy' : 'Precisión',
+    currentStreak: locale === 'en' ? 'Current Streak' : 'Racha Actual',
+    bestStreak: locale === 'en' ? 'Best Streak' : 'Mejor Racha',
+    exactBets: locale === 'en' ? 'Exact Bets' : 'Apuestas Exactas',
+    rank: locale === 'en' ? 'Rank' : 'Posición',
+    badges: locale === 'en' ? 'Badges' : 'Insignias',
+  },
+  notifications: {
+    noNotifications: locale === 'en' ? 'No notifications' : 'Sin notificaciones',
+    notificationsHeader: (count: number) =>
+      locale === 'en' ? `Notifications (${count})` : `Notificaciones (${count})`,
+    clearAll: locale === 'en' ? 'Clear All' : 'Limpiar Todo',
+  },
+};
+
 const mockUserProfile = {
   displayName: 'Carlos',
   avatarUrl: undefined,
@@ -43,6 +64,7 @@ const mockNotifications = [
 const templateProps = {
   userProfile: mockUserProfile,
   notifications: mockNotifications,
+  translations,
   onNotificationDismiss: () => {},
 };
 ---

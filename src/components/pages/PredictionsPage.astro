@@ -7,6 +7,11 @@ export interface Props {
 
 const { locale } = Astro.props;
 
+const translations = {
+  title: locale === 'en' ? 'Matchday Predictions' : 'Predicciones de la Jornada',
+  timeRemaining: locale === 'en' ? 'Time remaining:' : 'Tiempo restante:',
+};
+
 const mockMatches = [
   {
     matchId: 'match-1',
@@ -29,6 +34,7 @@ const templateProps = {
     matches: mockMatches,
   },
   deadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  translations,
   onSubmit: () => {},
 };
 ---

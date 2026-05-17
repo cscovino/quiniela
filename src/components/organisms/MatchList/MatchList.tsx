@@ -8,6 +8,8 @@ export interface MatchListProps {
   title?: string;
   emptyMessage?: string;
   onMatchClick?: (match: MatchCardProps) => void;
+  translations: MatchCardProps['translations'];
+  locale?: 'en' | 'es';
   className?: string;
 }
 
@@ -16,6 +18,8 @@ export const MatchList: React.FC<MatchListProps> = ({
   title,
   emptyMessage = 'No matches available',
   onMatchClick,
+  translations,
+  locale = 'en',
   className = '',
 }) => {
   if (matches.length === 0) {
@@ -35,6 +39,8 @@ export const MatchList: React.FC<MatchListProps> = ({
           <MatchCard
             key={match.homeTeam.fifaCode + match.awayTeam.fifaCode + index}
             {...match}
+            translations={translations}
+            locale={locale}
             onClick={onMatchClick ? () => onMatchClick(match) : undefined}
           />
         ))}

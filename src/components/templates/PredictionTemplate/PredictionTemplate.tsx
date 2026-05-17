@@ -7,6 +7,10 @@ import './PredictionTemplate.css';
 export interface PredictionTemplateProps {
   formProps: PredictionFormProps;
   deadline?: Date;
+  translations: {
+    title: string;
+    timeRemaining: string;
+  };
   onSubmit?: (predictions: PredictionFormProps['matches']) => void;
   className?: string;
 }
@@ -14,6 +18,7 @@ export interface PredictionTemplateProps {
 export const PredictionTemplate: React.FC<PredictionTemplateProps> = ({
   formProps,
   deadline,
+  translations,
   onSubmit,
   className = '',
 }) => {
@@ -21,10 +26,10 @@ export const PredictionTemplate: React.FC<PredictionTemplateProps> = ({
     <div className={`prediction-template ${className}`}>
       <main className="prediction-template__content">
         <header className="prediction-template__header">
-          <Typography variant="h1">Matchday Predictions</Typography>
+          <Typography variant="h1">{translations.title}</Typography>
           {deadline && (
             <div className="prediction-template__countdown">
-              <Typography variant="small">Time remaining:</Typography>
+              <Typography variant="small">{translations.timeRemaining}</Typography>
               <CountdownTimer targetDate={deadline} />
             </div>
           )}

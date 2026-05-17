@@ -13,6 +13,16 @@ export interface HomeTemplateProps {
   tournamentProps: TournamentHeaderProps;
   matches: MatchListProps['matches'];
   rankings: RankingsTableProps['rankings'];
+  translations: {
+    heroTitle: string;
+    heroSubtitle: string;
+    ctaPredictions: string;
+    ctaStandings: string;
+    matchesTitle: string;
+    rankingsTitle: string;
+    matchList: MatchListProps['translations'];
+  };
+  locale?: 'en' | 'es';
   onPredictionsClick?: () => void;
   onStandingsClick?: () => void;
   className?: string;
@@ -22,6 +32,8 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
   tournamentProps,
   matches,
   rankings,
+  translations,
+  locale = 'en',
   onPredictionsClick,
   onStandingsClick,
   className = '',
@@ -32,26 +44,29 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
         <TournamentHeader {...tournamentProps} />
 
         <section className="home-template__hero">
-          <Typography variant="h2">Predict. Compet. Win.</Typography>
-          <Typography variant="body">
-            Make your predictions for every match and climb the leaderboard!
-          </Typography>
+          <Typography variant="h2">{translations.heroTitle}</Typography>
+          <Typography variant="body">{translations.heroSubtitle}</Typography>
           <div className="home-template__actions">
             <Button variant="primary" size="lg" onClick={onPredictionsClick}>
-              Make Predictions
+              {translations.ctaPredictions}
             </Button>
             <Button variant="secondary" size="lg" onClick={onStandingsClick}>
-              View Standings
+              {translations.ctaStandings}
             </Button>
           </div>
         </section>
 
         <section className="home-template__matches">
-          <MatchList matches={matches} title="Upcoming Matches" />
+          <MatchList
+            matches={matches}
+            title={translations.matchesTitle}
+            translations={translations.matchList}
+            locale={locale}
+          />
         </section>
 
         <section className="home-template__rankings">
-          <RankingsTable rankings={rankings} title="Top Players" />
+          <RankingsTable rankings={rankings} title={translations.rankingsTitle} />
         </section>
       </main>
     </div>
