@@ -13,17 +13,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const mockNavProps = {
-  links: [
-    { href: '/', label: 'Inicio', active: true },
-    { href: '/predicciones', label: 'Predicciones', active: false },
-    { href: '/clasificacion', label: 'Clasificación', active: false },
-    { href: '/perfil', label: 'Perfil', active: false },
-  ],
-  locale: 'es' as const,
-  notificationCount: 2,
-};
-
 const mockTournamentProps = {
   name: 'FIFA World Cup 2026',
   status: 'active' as const,
@@ -50,40 +39,23 @@ const mockMatches = [
 ];
 
 const mockRankings = [
-  { userId: 'user-1', displayName: 'Carlos', points: 120, accuracy: 75, streak: 3 },
-  { userId: 'user-2', displayName: 'Maria', points: 115, accuracy: 72, streak: 2 },
-  { userId: 'user-3', displayName: 'Juan', points: 98, accuracy: 68, streak: 1 },
+  { position: 1, user: 'Carlos', points: 150, streak: 5 },
+  { position: 2, user: 'Maria', points: 142, streak: 3 },
+  { position: 3, user: 'Juan', points: 138, streak: 4 },
 ];
 
 export const Default: Story = {
   args: {
-    navProps: mockNavProps,
     tournamentProps: mockTournamentProps,
     matches: mockMatches,
     rankings: mockRankings,
   },
 };
 
-export const NotLoggedIn: Story = {
+export const EmptyState: Story = {
   args: {
-    navProps: {
-      ...mockNavProps,
-      isLoggedIn: false,
-    },
     tournamentProps: mockTournamentProps,
-    matches: mockMatches,
-    rankings: mockRankings,
-  },
-};
-
-export const DarkMode: Story = {
-  args: {
-    navProps: {
-      ...mockNavProps,
-      theme: 'dark' as const,
-    },
-    tournamentProps: mockTournamentProps,
-    matches: mockMatches,
-    rankings: mockRankings,
+    matches: [],
+    rankings: [],
   },
 };

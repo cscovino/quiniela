@@ -35,15 +35,6 @@ const mockNotifications = [
 ];
 
 const templateProps = {
-  navProps: {
-    links: [
-      { href: '/', label: translations.nav.home, active: false },
-      { href: '/predicciones', label: translations.nav.predictions, active: false },
-      { href: '/clasificacion', label: translations.nav.standings, active: false },
-      { href: '/perfil', label: translations.nav.profile, active: true },
-    ],
-    locale: 'es' as const,
-  },
   userProfile: mockUserProfile,
   notifications: mockNotifications,
   onNotificationDismiss: () => {},

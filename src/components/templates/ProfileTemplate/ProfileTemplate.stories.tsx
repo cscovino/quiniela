@@ -13,27 +13,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const mockNavProps = {
-  links: [
-    { href: '/en', label: 'Home', active: false },
-    { href: '/en/predictions', label: 'Predictions', active: false },
-    { href: '/en/standings', label: 'Standings', active: false },
-    { href: '/en/profile', label: 'Profile', active: true },
-  ],
-  locale: 'en' as const,
-};
-
 const mockUserProfile = {
   displayName: 'Carlos',
-  avatarUrl: '/avatars/carlos.png',
+  avatarUrl: undefined,
   favoriteTeam: 'Argentina',
   stats: {
     totalPoints: 480,
     exactBets: 12,
     accuracy: 67,
-    currentStreak: 3,
-    maxStreak: 5,
-    rank: 3,
+    currentStreak: 5,
+    maxStreak: 8,
+    rank: 5,
   },
   badges: [
     { id: 'badge-1', name: 'First Prediction', icon: 'star', earnedAt: new Date('2026-06-11') },
@@ -46,43 +36,22 @@ const mockNotifications = [
   {
     id: 'notif-1',
     type: 'badge_earned' as const,
-    title: 'Badge Earned',
+    title: 'New Badge',
     message: 'You earned 10 points!',
     read: false,
-    createdAt: new Date('2026-06-15T10:00:00Z'),
-  },
-  {
-    id: 'notif-2',
-    type: 'match_start' as const,
-    title: 'Match Starting',
-    message: 'New matchday available!',
-    read: true,
-    createdAt: new Date('2026-06-16T08:00:00Z'),
+    createdAt: new Date(Date.now() - 60 * 60 * 1000),
   },
 ];
 
 export const Default: Story = {
   args: {
-    navProps: mockNavProps,
-    userProfile: mockUserProfile,
-  },
-};
-
-export const WithNotifications: Story = {
-  args: {
-    navProps: mockNavProps,
     userProfile: mockUserProfile,
     notifications: mockNotifications,
   },
 };
 
-export const DarkMode: Story = {
+export const WithoutNotifications: Story = {
   args: {
-    navProps: {
-      ...mockNavProps,
-      theme: 'dark' as const,
-    },
     userProfile: mockUserProfile,
-    notifications: mockNotifications,
   },
 };

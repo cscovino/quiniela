@@ -24,15 +24,6 @@ const mockMatches = [
 ];
 
 const templateProps = {
-  navProps: {
-    links: [
-      { href: '/', label: translations.nav.home, active: false },
-      { href: '/predicciones', label: translations.nav.predictions, active: true },
-      { href: '/clasificacion', label: translations.nav.standings, active: false },
-      { href: '/perfil', label: translations.nav.profile, active: false },
-    ],
-    locale: 'es' as const,
-  },
   formProps: {
     matches: mockMatches,
   },

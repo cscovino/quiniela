@@ -30,15 +30,6 @@ const mockRankings = [
 ];
 
 const templateProps = {
-  navProps: {
-    links: [
-      { href: '/', label: translations.nav.home, active: true },
-      { href: '/predicciones', label: translations.nav.predictions, active: false },
-      { href: '/clasificacion', label: translations.nav.standings, active: false },
-      { href: '/perfil', label: translations.nav.profile, active: false },
-    ],
-    locale: 'es' as const,
-  },
   tournamentProps: {
     name: 'Copa Mundial FIFA 2026',
     status: 'active' as const,

@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavBar, type NavBarProps } from '@organisms/NavBar/NavBar';
 import {
   TournamentHeader,
   type TournamentHeaderProps,
@@ -11,7 +10,6 @@ import { Typography } from '@atoms/Typography/Typography';
 import './HomeTemplate.css';
 
 export interface HomeTemplateProps {
-  navProps: NavBarProps;
   tournamentProps: TournamentHeaderProps;
   matches: MatchListProps['matches'];
   rankings: RankingsTableProps['rankings'];
@@ -21,7 +19,6 @@ export interface HomeTemplateProps {
 }
 
 export const HomeTemplate: React.FC<HomeTemplateProps> = ({
-  navProps,
   tournamentProps,
   matches,
   rankings,
@@ -31,8 +28,6 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
 }) => {
   return (
     <div className={`home-template ${className}`}>
-      <NavBar {...navProps} />
-
       <main className="home-template__content">
         <TournamentHeader {...tournamentProps} />
 

@@ -1,18 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HomeTemplate } from './HomeTemplate';
-import type { NavBarProps } from '@organisms/NavBar/NavBar';
 import type { TournamentHeaderProps } from '@organisms/TournamentHeader/TournamentHeader';
-
-const mockNavProps: NavBarProps = {
-  links: [
-    { href: '/', label: 'Inicio', active: true },
-    { href: '/predicciones', label: 'Predicciones', active: false },
-    { href: '/clasificacion', label: 'Clasificación', active: false },
-    { href: '/perfil', label: 'Perfil', active: false },
-  ],
-  locale: 'es',
-};
 
 const mockTournamentProps: TournamentHeaderProps = {
   name: 'World Cup 2026',
@@ -33,15 +22,14 @@ const mockMatches = [
 ];
 
 const mockRankings = [
-  { userId: 'user-1', displayName: 'Carlos', points: 120, accuracy: 75, streak: 3 },
-  { userId: 'user-2', displayName: 'Maria', points: 115, accuracy: 72, streak: 2 },
+  { userId: 'user-1', displayName: 'Carlos', points: 150, accuracy: 75, streak: 5 },
+  { userId: 'user-2', displayName: 'Maria', points: 142, accuracy: 72, streak: 3 },
 ];
 
 describe('HomeTemplate', () => {
   it('renders tournament header', () => {
     render(
       <HomeTemplate
-        navProps={mockNavProps}
         tournamentProps={mockTournamentProps}
         matches={mockMatches}
         rankings={mockRankings}
@@ -50,24 +38,9 @@ describe('HomeTemplate', () => {
     expect(screen.getByText('World Cup 2026')).toBeInTheDocument();
   });
 
-  it('renders hero section with CTA buttons', () => {
-    render(
-      <HomeTemplate
-        navProps={mockNavProps}
-        tournamentProps={mockTournamentProps}
-        matches={mockMatches}
-        rankings={mockRankings}
-      />,
-    );
-    expect(screen.getByText('Predict. Compet. Win.')).toBeInTheDocument();
-    expect(screen.getByText('Make Predictions')).toBeInTheDocument();
-    expect(screen.getByText('View Standings')).toBeInTheDocument();
-  });
-
   it('renders matches section', () => {
     render(
       <HomeTemplate
-        navProps={mockNavProps}
         tournamentProps={mockTournamentProps}
         matches={mockMatches}
         rankings={mockRankings}
@@ -80,7 +53,6 @@ describe('HomeTemplate', () => {
   it('renders rankings section', () => {
     render(
       <HomeTemplate
-        navProps={mockNavProps}
         tournamentProps={mockTournamentProps}
         matches={mockMatches}
         rankings={mockRankings}

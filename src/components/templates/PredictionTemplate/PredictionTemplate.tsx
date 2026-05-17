@@ -1,12 +1,10 @@
 import React from 'react';
-import { NavBar, type NavBarProps } from '@organisms/NavBar/NavBar';
 import { PredictionForm, type PredictionFormProps } from '@organisms/PredictionForm/PredictionForm';
 import { CountdownTimer } from '@molecules/CountdownTimer/CountdownTimer';
 import { Typography } from '@atoms/Typography/Typography';
 import './PredictionTemplate.css';
 
 export interface PredictionTemplateProps {
-  navProps: NavBarProps;
   formProps: PredictionFormProps;
   deadline?: Date;
   onSubmit?: (predictions: PredictionFormProps['matches']) => void;
@@ -14,7 +12,6 @@ export interface PredictionTemplateProps {
 }
 
 export const PredictionTemplate: React.FC<PredictionTemplateProps> = ({
-  navProps,
   formProps,
   deadline,
   onSubmit,
@@ -22,8 +19,6 @@ export const PredictionTemplate: React.FC<PredictionTemplateProps> = ({
 }) => {
   return (
     <div className={`prediction-template ${className}`}>
-      <NavBar {...navProps} />
-
       <main className="prediction-template__content">
         <header className="prediction-template__header">
           <Typography variant="h1">Matchday Predictions</Typography>

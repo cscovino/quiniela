@@ -13,16 +13,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const mockNavProps = {
-  links: [
-    { href: '/', label: 'Inicio', active: false },
-    { href: '/predicciones', label: 'Predicciones', active: false },
-    { href: '/clasificacion', label: 'Clasificación', active: true },
-    { href: '/perfil', label: 'Perfil', active: false },
-  ],
-  locale: 'es' as const,
-};
-
 const mockGroups = [
   {
     name: 'Group A',
@@ -50,110 +40,22 @@ const mockGroups = [
         drawn: 1,
         lost: 1,
         goalsFor: 3,
-        goalsAgainst: 3,
+        goalsAgainst: 2,
         points: 4,
-      },
-      {
-        teamId: 'aus',
-        teamName: 'Australia',
-        fifaCode: 'AUS',
-        position: 3,
-        played: 3,
-        won: 1,
-        drawn: 0,
-        lost: 2,
-        goalsFor: 2,
-        goalsAgainst: 4,
-        points: 3,
-      },
-      {
-        teamId: 'per',
-        teamName: 'Peru',
-        fifaCode: 'PER',
-        position: 4,
-        played: 3,
-        won: 0,
-        drawn: 2,
-        lost: 1,
-        goalsFor: 1,
-        goalsAgainst: 3,
-        points: 2,
-      },
-    ],
-  },
-  {
-    name: 'Group B',
-    standings: [
-      {
-        teamId: 'bra',
-        teamName: 'Brazil',
-        fifaCode: 'BRA',
-        position: 1,
-        played: 3,
-        won: 3,
-        drawn: 0,
-        lost: 0,
-        goalsFor: 7,
-        goalsAgainst: 1,
-        points: 9,
-      },
-      {
-        teamId: 'ger',
-        teamName: 'Germany',
-        fifaCode: 'GER',
-        position: 2,
-        played: 3,
-        won: 2,
-        drawn: 0,
-        lost: 1,
-        goalsFor: 5,
-        goalsAgainst: 3,
-        points: 6,
-      },
-      {
-        teamId: 'jpn',
-        teamName: 'Japan',
-        fifaCode: 'JPN',
-        position: 3,
-        played: 3,
-        won: 1,
-        drawn: 0,
-        lost: 2,
-        goalsFor: 2,
-        goalsAgainst: 4,
-        points: 3,
-      },
-      {
-        teamId: 'can',
-        teamName: 'Canada',
-        fifaCode: 'CAN',
-        position: 4,
-        played: 3,
-        won: 0,
-        drawn: 0,
-        lost: 3,
-        goalsFor: 1,
-        goalsAgainst: 7,
-        points: 0,
       },
     ],
   },
 ];
 
-const mockRounds = [
+const mockBracketRounds = [
   {
-    name: 'Round of 16',
+    name: 'Round of 32',
     matches: [
       {
+        matchId: 'ko-1',
         homeTeam: { fifaCode: 'ARG', name: 'Argentina' },
-        awayTeam: { fifaCode: 'AUS', name: 'Australia' },
-        date: new Date('2026-07-01'),
-        status: 'scheduled' as const,
-      },
-      {
-        homeTeam: { fifaCode: 'BRA', name: 'Brazil' },
-        awayTeam: { fifaCode: 'JPN', name: 'Japan' },
-        date: new Date('2026-07-01'),
+        awayTeam: { fifaCode: 'FRA', name: 'France' },
+        date: new Date('2026-07-01T18:00:00Z'),
         status: 'scheduled' as const,
       },
     ],
@@ -162,26 +64,13 @@ const mockRounds = [
 
 export const Default: Story = {
   args: {
-    navProps: mockNavProps,
     groups: mockGroups,
+    bracketRounds: mockBracketRounds,
   },
 };
 
-export const WithKnockout: Story = {
+export const GroupsOnly: Story = {
   args: {
-    navProps: mockNavProps,
     groups: mockGroups,
-    bracketRounds: mockRounds,
-  },
-};
-
-export const DarkMode: Story = {
-  args: {
-    navProps: {
-      ...mockNavProps,
-      theme: 'dark' as const,
-    },
-    groups: mockGroups,
-    bracketRounds: mockRounds,
   },
 };

@@ -13,16 +13,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const mockNavProps = {
-  links: [
-    { href: '/en', label: 'Home', active: false },
-    { href: '/en/predictions', label: 'Predictions', active: true },
-    { href: '/en/standings', label: 'Standings', active: false },
-    { href: '/en/profile', label: 'Profile', active: false },
-  ],
-  locale: 'en' as const,
-};
-
 const mockFormProps = {
   matches: [
     {
@@ -39,38 +29,18 @@ const mockFormProps = {
       phase: 'group' as const,
       predictionDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
-    {
-      matchId: 'match-3',
-      homeTeam: { fifaCode: 'ESP', name: 'Spain' },
-      awayTeam: { fifaCode: 'ITA', name: 'Italy' },
-      phase: 'group' as const,
-      predictionDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    },
   ],
-  onSubmit: () => {},
 };
 
 export const Default: Story = {
   args: {
-    navProps: mockNavProps,
     formProps: mockFormProps,
+    deadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
   },
 };
 
-export const WithCountdown: Story = {
+export const WithoutCountdown: Story = {
   args: {
-    navProps: mockNavProps,
-    formProps: mockFormProps,
-    deadline: new Date(Date.now() + 2 * 60 * 60 * 1000),
-  },
-};
-
-export const DarkMode: Story = {
-  args: {
-    navProps: {
-      ...mockNavProps,
-      theme: 'dark' as const,
-    },
     formProps: mockFormProps,
   },
 };
