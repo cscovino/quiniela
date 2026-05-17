@@ -1,0 +1,46 @@
+---
+import { HomeTemplate } from '@templates/HomeTemplate/HomeTemplate';
+
+export interface Props {
+  locale: 'en' | 'es';
+}
+
+const { locale } = Astro.props;
+
+const mockMatches = [
+  {
+    homeTeam: { fifaCode: 'ARG', name: locale === 'en' ? 'Argentina' : 'Argentina' },
+    awayTeam: { fifaCode: 'FRA', name: locale === 'en' ? 'France' : 'Francia' },
+    date: new Date('2026-06-15T18:00:00Z'),
+    status: 'scheduled' as const,
+    stadium: locale === 'en' ? 'Lusail Stadium' : 'Estadio Lusail',
+  },
+  {
+    homeTeam: { fifaCode: 'BRA', name: locale === 'en' ? 'Brazil' : 'Brasil' },
+    awayTeam: { fifaCode: 'GER', name: locale === 'en' ? 'Germany' : 'Alemania' },
+    date: new Date('2026-06-16T20:00:00Z'),
+    status: 'scheduled' as const,
+    stadium: locale === 'en' ? 'Maracana' : 'Maracana',
+  },
+];
+
+const mockRankings = [
+  { userId: 'user-1', displayName: 'Carlos', points: 150, accuracy: 75, streak: 5 },
+  { userId: 'user-2', displayName: 'Maria', points: 142, accuracy: 72, streak: 3 },
+  { userId: 'user-3', displayName: 'Juan', points: 138, accuracy: 68, streak: 4 },
+];
+
+const templateProps = {
+  tournamentProps: {
+    name: locale === 'en' ? 'FIFA World Cup 2026' : 'Copa Mundial FIFA 2026',
+    status: 'active' as const,
+    startDate: new Date('2026-06-11'),
+    endDate: new Date('2026-07-19'),
+    participantCount: 48,
+  },
+  matches: mockMatches,
+  rankings: mockRankings,
+};
+---
+
+<HomeTemplate {...templateProps} client:load />

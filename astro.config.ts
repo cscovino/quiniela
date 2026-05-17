@@ -20,6 +20,7 @@ export default defineConfig({
         '@molecules': path.resolve('./src/components/molecules'),
         '@organisms': path.resolve('./src/components/organisms'),
         '@templates': path.resolve('./src/components/templates'),
+        '@pages': path.resolve('./src/components/pages'),
         '@layouts': path.resolve('./src/layouts'),
         '@styles': path.resolve('./src/styles'),
         '@utils': path.resolve('./src/utils'),

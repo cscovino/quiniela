@@ -1,44 +1,10 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { ProfileTemplate } from '@templates/ProfileTemplate/ProfileTemplate';
+import ProfilePage from '@pages/ProfilePage.astro';
 import en from '@locales/en/common.json';
 
 const locale = 'en';
 const translations = en;
-
-const mockUserProfile = {
-  displayName: 'Carlos',
-  avatarUrl: undefined,
-  favoriteTeam: 'Argentina',
-  stats: {
-    totalPoints: 480,
-    exactBets: 12,
-    accuracy: 67,
-    currentStreak: 5,
-    maxStreak: 8,
-    rank: 5,
-  },
-  badges: [
-    { id: 'badge-1', name: 'First Prediction', icon: 'star', earnedAt: new Date('2026-06-11') },
-  ],
-};
-
-const mockNotifications = [
-  {
-    id: 'notif-1',
-    type: 'badge_earned' as const,
-    title: 'New Badge',
-    message: 'You earned 10 points!',
-    read: false,
-    createdAt: new Date(Date.now() - 60 * 60 * 1000),
-  },
-];
-
-const templateProps = {
-  userProfile: mockUserProfile,
-  notifications: mockNotifications,
-  onNotificationDismiss: () => {},
-};
 ---
 
 <BaseLayout
@@ -47,5 +13,5 @@ const templateProps = {
   description={translations.pages.profile.description}
   activeNav="profile"
 >
-  <ProfileTemplate {...templateProps} client:load />
+  <ProfilePage locale={locale} />
 </BaseLayout>

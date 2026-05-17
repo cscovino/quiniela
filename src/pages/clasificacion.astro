@@ -1,90 +1,10 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { StandingsTemplate } from '@templates/StandingsTemplate/StandingsTemplate';
+import StandingsPage from '@pages/StandingsPage.astro';
 import es from '@locales/es/common.json';
 
 const locale = 'es';
 const translations = es;
-
-const mockGroups = [
-  {
-    name: 'Grupo A',
-    standings: [
-      {
-        teamId: 'arg',
-        teamName: 'Argentina',
-        fifaCode: 'ARG',
-        position: 1,
-        played: 2,
-        won: 2,
-        drawn: 0,
-        lost: 0,
-        goalsFor: 5,
-        goalsAgainst: 1,
-        points: 6,
-      },
-      {
-        teamId: 'fra',
-        teamName: 'Francia',
-        fifaCode: 'FRA',
-        position: 2,
-        played: 2,
-        won: 1,
-        drawn: 0,
-        lost: 1,
-        goalsFor: 3,
-        goalsAgainst: 2,
-        points: 3,
-      },
-      {
-        teamId: 'jpn',
-        teamName: 'Japon',
-        fifaCode: 'JPN',
-        position: 3,
-        played: 2,
-        won: 0,
-        drawn: 1,
-        lost: 1,
-        goalsFor: 1,
-        goalsAgainst: 3,
-        points: 1,
-      },
-      {
-        teamId: 'aus',
-        teamName: 'Australia',
-        fifaCode: 'AUS',
-        position: 4,
-        played: 2,
-        won: 0,
-        drawn: 1,
-        lost: 1,
-        goalsFor: 1,
-        goalsAgainst: 4,
-        points: 1,
-      },
-    ],
-  },
-];
-
-const mockBracketRounds = [
-  {
-    name: 'Octavos de Final',
-    matches: [
-      {
-        matchId: 'ko-1',
-        homeTeam: { fifaCode: 'ARG', name: 'Argentina' },
-        awayTeam: { fifaCode: 'FRA', name: 'Francia' },
-        date: new Date('2026-07-01T18:00:00Z'),
-        status: 'scheduled' as const,
-      },
-    ],
-  },
-];
-
-const templateProps = {
-  groups: mockGroups,
-  bracketRounds: mockBracketRounds,
-};
 ---
 
 <BaseLayout
@@ -93,5 +13,5 @@ const templateProps = {
   description={translations.pages.standings.description}
   activeNav="standings"
 >
-  <StandingsTemplate {...templateProps} client:load />
+  <StandingsPage locale={locale} />
 </BaseLayout>

@@ -1,0 +1,50 @@
+---
+import { ProfileTemplate } from '@templates/ProfileTemplate/ProfileTemplate';
+
+export interface Props {
+  locale: 'en' | 'es';
+}
+
+const { locale } = Astro.props;
+
+const mockUserProfile = {
+  displayName: 'Carlos',
+  avatarUrl: undefined,
+  favoriteTeam: 'Argentina',
+  stats: {
+    totalPoints: 480,
+    exactBets: 12,
+    accuracy: 67,
+    currentStreak: 5,
+    maxStreak: 8,
+    rank: 5,
+  },
+  badges: [
+    {
+      id: 'badge-1',
+      name: locale === 'en' ? 'First Prediction' : 'Primera Prediccion',
+      icon: 'star',
+      earnedAt: new Date('2026-06-11'),
+    },
+  ],
+};
+
+const mockNotifications = [
+  {
+    id: 'notif-1',
+    type: 'badge_earned' as const,
+    title: locale === 'en' ? 'New Badge' : 'Nueva Insignia',
+    message: locale === 'en' ? 'You earned 10 points!' : 'Has ganado 10 puntos!',
+    read: false,
+    createdAt: new Date(Date.now() - 60 * 60 * 1000),
+  },
+];
+
+const templateProps = {
+  userProfile: mockUserProfile,
+  notifications: mockNotifications,
+  onNotificationDismiss: () => {},
+};
+---
+
+<ProfileTemplate {...templateProps} client:load />
