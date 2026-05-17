@@ -1071,6 +1071,7 @@ service cloud.firestore {
 17. **Theme System:** Light/dark themes via `data-theme` attribute with CSS variable switching
 18. **Storybook:** v10 with theme switcher, docs addon, and Vitest integration
 19. **Templates:** Compose organisms into full page layouts with responsive grid
+20. **WC26 Branding:** Official FIFA World Cup 2026 color palette - black primary, electric blue (#00BFFF), magenta (#FF1493), orange (#FF6B35), gold (#FFD700) with pixel art aesthetic
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?

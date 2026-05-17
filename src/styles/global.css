@@ -1,6 +1,10 @@
 @import 'flag-icons/css/flag-icons.min.css';
 
-/* Design Tokens - Retro Pixel Art */
+/* Design Tokens - FIFA World Cup 2026 Pixel Art
+   Official brand palette: Black primary + vibrant accents
+   Host nations: Canada, Mexico, USA
+   Tournament dates: June 11 - July 19, 2026
+   ============================================ */
 
 /* ============================================
    FONTS (Self-hosted)
@@ -48,107 +52,175 @@
 
 /* ============================================
    COLORS - DARK THEME (Default)
+   WC26 Brand: Black primary, vibrant accents
    ============================================ */
 
 :root,
 [data-theme='dark'] {
-  /* Primary (Green) */
-  --color-primary-100: #c8f7c5;
-  --color-primary-200: #93e98a;
-  --color-primary-300: #5edb4f;
-  --color-primary-400: #34b334;
-  --color-primary-500: #2d8a2d;
-  --color-primary-600: #236b23;
-  --color-primary-700: #1a4d1a;
-  --color-primary-800: #113311;
-  --color-primary-900: #0a1f0a;
+  /* Primary (Black - WC26 official primary brand color) */
+  --color-primary-100: #2a2a2a;
+  --color-primary-200: #222222;
+  --color-primary-300: #1a1a1a;
+  --color-primary-400: #111111;
+  --color-primary-500: #0a0a0a;
+  --color-primary-600: #050505;
+  --color-primary-700: #030303;
+  --color-primary-800: #020202;
+  --color-primary-900: #000000;
 
-  /* Accent (Gold/Yellow) */
-  --color-accent-100: #fff8e1;
-  --color-accent-200: #ffecb3;
-  --color-accent-300: #ffd54f;
-  --color-accent-400: #ffca28;
-  --color-accent-500: #ffc107;
-  --color-accent-600: #ffb300;
-  --color-accent-700: #ff8f00;
-  --color-accent-800: #ff6f00;
-  --color-accent-900: #e65100;
+  /* Accent (Electric Blue - WC26 energy color) */
+  --color-accent-100: #e0f7ff;
+  --color-accent-200: #b3ecff;
+  --color-accent-300: #66d9ff;
+  --color-accent-400: #33ccff;
+  --color-accent-500: #00bfff;
+  --color-accent-600: #0099cc;
+  --color-accent-700: #007399;
+  --color-accent-800: #004d66;
+  --color-accent-900: #002633;
 
-  /* Semantic - Success */
-  --color-success: #4caf50;
-  --color-success-bg: #1b3a1b;
-  --color-success-border: #2d8a2d;
+  /* Secondary (Magenta - WC26 passion color) */
+  --color-secondary-100: #ffe0f0;
+  --color-secondary-200: #ffb3d9;
+  --color-secondary-300: #ff66b3;
+  --color-secondary-400: #ff3399;
+  --color-secondary-500: #ff1493;
+  --color-secondary-600: #cc1075;
+  --color-secondary-700: #990c58;
+  --color-secondary-800: #66083a;
+  --color-secondary-900: #33041d;
 
-  /* Semantic - Error */
-  --color-error: #f44336;
-  --color-error-bg: #3a1b1b;
-  --color-error-border: #c62828;
+  /* Tertiary (Orange - WC26 warmth color) */
+  --color-tertiary-100: #fff0e0;
+  --color-tertiary-200: #ffd9b3;
+  --color-tertiary-300: #ffb366;
+  --color-tertiary-400: #ff9933;
+  --color-tertiary-500: #ff6b35;
+  --color-tertiary-600: #cc562a;
+  --color-tertiary-700: #994020;
+  --color-tertiary-800: #662b15;
+  --color-tertiary-900: #33150a;
 
-  /* Semantic - Warning */
+  /* Gold (WC26 trophy/victory color) */
+  --color-gold-100: #fff9e0;
+  --color-gold-200: #fff0b3;
+  --color-gold-300: #ffe066;
+  --color-gold-400: #ffd733;
+  --color-gold-500: #ffd700;
+  --color-gold-600: #ccac00;
+  --color-gold-700: #998100;
+  --color-gold-800: #665600;
+  --color-gold-900: #332b00;
+
+  /* Semantic - Success (Green for correct predictions) */
+  --color-success: #00e676;
+  --color-success-bg: #0a2e1a;
+  --color-success-border: #00c853;
+
+  /* Semantic - Error (Red for wrong predictions) */
+  --color-error: #ff5252;
+  --color-error-bg: #2e0a0a;
+  --color-error-border: #d32f2f;
+
+  /* Semantic - Warning (Orange for deadlines) */
   --color-warning: #ff9800;
-  --color-warning-bg: #3a2e1b;
+  --color-warning-bg: #2e1f0a;
   --color-warning-border: #e65100;
 
-  /* Semantic - Info */
-  --color-info: #2196f3;
-  --color-info-bg: #1b2a3a;
-  --color-info-border: #1565c0;
+  /* Semantic - Info (Electric Blue) */
+  --color-info: var(--color-accent-500);
+  --color-info-bg: #0a1f2e;
+  --color-info-border: var(--color-accent-600);
 
-  /* Backgrounds */
-  --bg-dark: #1a1a2e;
-  --bg-card: #16213e;
-  --bg-card-hover: #1a2744;
-  --bg-input: #0f1629;
-  --bg-overlay: rgba(0, 0, 0, 0.7);
+  /* Backgrounds (Dark stadium atmosphere) */
+  --bg-dark: #0a0a0f;
+  --bg-card: #12121a;
+  --bg-card-hover: #1a1a25;
+  --bg-input: #0d0d14;
+  --bg-overlay: rgba(0, 0, 0, 0.85);
 
   /* Text */
-  --text-primary: #e8e8e8;
-  --text-secondary: #a0a0b0;
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b5;
   --text-muted: #6b6b80;
-  --text-inverse: #1a1a2e;
+  --text-inverse: #000000;
 
   /* Borders */
-  --border-color: #2a2a4a;
-  --border-color-light: #3a3a5a;
+  --border-color: #2a2a3a;
+  --border-color-light: #3a3a4a;
   --border-color-focus: var(--color-accent-500);
 }
 
 /* ============================================
    COLORS - LIGHT THEME
+   WC26 Brand: Clean white with vibrant accents
    ============================================ */
 
 [data-theme='light'] {
-  /* Primary (Green) */
-  --color-primary-100: #0a1f0a;
-  --color-primary-200: #113311;
-  --color-primary-300: #1a4d1a;
-  --color-primary-400: #236b23;
-  --color-primary-500: #2d8a2d;
-  --color-primary-600: #34b334;
-  --color-primary-700: #5edb4f;
-  --color-primary-800: #93e98a;
-  --color-primary-900: #c8f7c5;
+  /* Primary (Black - inverted for contrast) */
+  --color-primary-100: #333333;
+  --color-primary-200: #4a4a4a;
+  --color-primary-300: #666666;
+  --color-primary-400: #808080;
+  --color-primary-500: #999999;
+  --color-primary-600: #b3b3b3;
+  --color-primary-700: #cccccc;
+  --color-primary-800: #e6e6e6;
+  --color-primary-900: #f5f5f5;
 
-  /* Accent (Gold/Yellow) */
-  --color-accent-100: #e65100;
-  --color-accent-200: #ff6f00;
-  --color-accent-300: #ff8f00;
-  --color-accent-400: #ffb300;
-  --color-accent-500: #ffc107;
-  --color-accent-600: #ffca28;
-  --color-accent-700: #ffd54f;
-  --color-accent-800: #ffecb3;
-  --color-accent-900: #fff8e1;
+  /* Accent (Electric Blue) */
+  --color-accent-100: #002633;
+  --color-accent-200: #004d66;
+  --color-accent-300: #007399;
+  --color-accent-400: #0099cc;
+  --color-accent-500: #00bfff;
+  --color-accent-600: #33ccff;
+  --color-accent-700: #66d9ff;
+  --color-accent-800: #b3ecff;
+  --color-accent-900: #e0f7ff;
+
+  /* Secondary (Magenta) */
+  --color-secondary-100: #33041d;
+  --color-secondary-200: #66083a;
+  --color-secondary-300: #990c58;
+  --color-secondary-400: #cc1075;
+  --color-secondary-500: #ff1493;
+  --color-secondary-600: #ff3399;
+  --color-secondary-700: #ff66b3;
+  --color-secondary-800: #ffb3d9;
+  --color-secondary-900: #ffe0f0;
+
+  /* Tertiary (Orange) */
+  --color-tertiary-100: #33150a;
+  --color-tertiary-200: #662b15;
+  --color-tertiary-300: #994020;
+  --color-tertiary-400: #cc562a;
+  --color-tertiary-500: #ff6b35;
+  --color-tertiary-600: #ff9933;
+  --color-tertiary-700: #ffb366;
+  --color-tertiary-800: #ffd9b3;
+  --color-tertiary-900: #fff0e0;
+
+  /* Gold */
+  --color-gold-100: #332b00;
+  --color-gold-200: #665600;
+  --color-gold-300: #998100;
+  --color-gold-400: #ccac00;
+  --color-gold-500: #ffd700;
+  --color-gold-600: #ffd733;
+  --color-gold-700: #ffe066;
+  --color-gold-800: #fff0b3;
+  --color-gold-900: #fff9e0;
 
   /* Semantic - Success */
-  --color-success: #2e7d32;
+  --color-success: #00c853;
   --color-success-bg: #e8f5e9;
-  --color-success-border: #4caf50;
+  --color-success-border: #00e676;
 
   /* Semantic - Error */
-  --color-error: #c62828;
+  --color-error: #d32f2f;
   --color-error-bg: #ffebee;
-  --color-error-border: #f44336;
+  --color-error-border: #ff5252;
 
   /* Semantic - Warning */
   --color-warning: #e65100;
@@ -156,19 +228,19 @@
   --color-warning-border: #ff9800;
 
   /* Semantic - Info */
-  --color-info: #1565c0;
-  --color-info-bg: #e3f2fd;
-  --color-info-border: #2196f3;
+  --color-info: var(--color-accent-600);
+  --color-info-bg: #e0f7ff;
+  --color-info-border: var(--color-accent-500);
 
-  /* Backgrounds */
-  --bg-dark: #f0f0f0;
+  /* Backgrounds (Clean stadium day) */
+  --bg-dark: #f5f5f7;
   --bg-card: #ffffff;
-  --bg-card-hover: #f5f5f5;
+  --bg-card-hover: #f0f0f5;
   --bg-input: #ffffff;
-  --bg-overlay: rgba(255, 255, 255, 0.7);
+  --bg-overlay: rgba(255, 255, 255, 0.9);
 
   /* Text */
-  --text-primary: #1a1a2e;
+  --text-primary: #0a0a0f;
   --text-secondary: #4a4a5a;
   --text-muted: #808090;
   --text-inverse: #ffffff;
@@ -176,7 +248,7 @@
   /* Borders */
   --border-color: #d0d0e0;
   --border-color-light: #e0e0f0;
-  --border-color-focus: var(--color-primary-500);
+  --border-color-focus: var(--color-accent-500);
 }
 
 /* ============================================
@@ -245,7 +317,7 @@
 }
 
 /* ============================================
-   BORDERS
+   BORDERS (WC26 Pixel Art Style)
    ============================================ */
 
 :root {
@@ -255,11 +327,11 @@
   --border-width-lg: 6px;
   --border-width-xl: 8px;
 
-  /* Border Styles */
+  /* Border Styles - WC26 accent colors */
   --border-pixel-sm: var(--border-width-sm) solid var(--border-color);
-  --border-pixel-md: var(--border-width-md) solid var(--color-primary-500);
-  --border-pixel-lg: var(--border-width-lg) solid var(--color-primary-500);
-  --border-pixel-xl: var(--border-width-xl) solid var(--color-accent-500);
+  --border-pixel-md: var(--border-width-md) solid var(--color-accent-500);
+  --border-pixel-lg: var(--border-width-lg) solid var(--color-accent-500);
+  --border-pixel-xl: var(--border-width-xl) solid var(--color-gold-500);
 
   /* Corner Radius (Sharp by default, minimal for specific cases) */
   --radius-none: 0;
@@ -268,25 +340,28 @@
 }
 
 /* ============================================
-   SHADOWS (Blocky, no blur)
+   SHADOWS (Blocky, no blur - WC26 Pixel Art)
    ============================================ */
 
 :root,
 [data-theme='dark'] {
   --shadow-none: none;
-  --shadow-sm: 2px 2px 0px rgba(0, 0, 0, 0.2);
-  --shadow-md: 4px 4px 0px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 6px 6px 0px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 8px 8px 0px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 2px 2px 0px rgba(0, 0, 0, 0.3);
+  --shadow-md: 4px 4px 0px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 6px 6px 0px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 8px 8px 0px rgba(0, 0, 0, 0.6);
 
-  /* Colored Shadows */
-  --shadow-primary: 4px 4px 0px var(--color-primary-600);
+  /* Colored Shadows - WC26 palette */
+  --shadow-primary: 4px 4px 0px var(--color-primary-700);
   --shadow-accent: 4px 4px 0px var(--color-accent-600);
+  --shadow-secondary: 4px 4px 0px var(--color-secondary-600);
+  --shadow-tertiary: 4px 4px 0px var(--color-tertiary-600);
+  --shadow-gold: 4px 4px 0px var(--color-gold-600);
   --shadow-error: 4px 4px 0px var(--color-error);
 
   /* Inset Shadows */
-  --shadow-inset: inset 2px 2px 0px rgba(0, 0, 0, 0.2);
-  --shadow-inset-sm: inset 1px 1px 0px rgba(0, 0, 0, 0.3);
+  --shadow-inset: inset 2px 2px 0px rgba(0, 0, 0, 0.3);
+  --shadow-inset-sm: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme='light'] {
@@ -296,9 +371,12 @@
   --shadow-lg: 6px 6px 0px rgba(0, 0, 0, 0.2);
   --shadow-xl: 8px 8px 0px rgba(0, 0, 0, 0.25);
 
-  /* Colored Shadows */
-  --shadow-primary: 4px 4px 0px var(--color-primary-700);
-  --shadow-accent: 4px 4px 0px var(--color-accent-700);
+  /* Colored Shadows - WC26 palette */
+  --shadow-primary: 4px 4px 0px var(--color-primary-300);
+  --shadow-accent: 4px 4px 0px var(--color-accent-400);
+  --shadow-secondary: 4px 4px 0px var(--color-secondary-400);
+  --shadow-tertiary: 4px 4px 0px var(--color-tertiary-400);
+  --shadow-gold: 4px 4px 0px var(--color-gold-400);
   --shadow-error: 4px 4px 0px var(--color-error);
 
   /* Inset Shadows */
@@ -307,7 +385,7 @@
 }
 
 /* ============================================
-   ANIMATIONS
+   ANIMATIONS (WC26 Tournament Energy)
    ============================================ */
 
 :root {
@@ -346,6 +424,27 @@
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* WC26 Goal Celebration */
+@keyframes goal-celebration {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.2) rotate(-5deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+  75% { transform: scale(1.15) rotate(-3deg); }
+  100% { transform: scale(1); }
+}
+
+/* WC26 Trophy Glow */
+@keyframes trophy-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--color-gold-500)); }
+  50% { filter: drop-shadow(0 0 12px var(--color-gold-400)); }
+}
+
+/* WC26 Stadium Lights Pulse */
+@keyframes stadium-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
 /* ============================================
    Z-INDEX SCALE
    ============================================ */
@@ -358,6 +457,19 @@
   --z-popover: 500;
   --z-tooltip: 600;
   --z-toast: 700;
+}
+
+/* ============================================
+   WC26 GRADIENTS (Tournament Energy)
+   ============================================ */
+
+:root {
+  /* WC26 Official Brand Gradients */
+  --gradient-wc26-primary: linear-gradient(135deg, var(--color-accent-500), var(--color-secondary-500));
+  --gradient-wc26-energy: linear-gradient(135deg, var(--color-accent-500), var(--color-tertiary-500));
+  --gradient-wc26-trophy: linear-gradient(135deg, var(--color-gold-500), var(--color-tertiary-400));
+  --gradient-wc26-stadium: linear-gradient(180deg, var(--bg-dark), var(--bg-card));
+  --gradient-wc26-celebration: linear-gradient(135deg, var(--color-gold-500), var(--color-secondary-500), var(--color-accent-500));
 }
 
 /* ============================================
