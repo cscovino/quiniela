@@ -1,7 +1,7 @@
 import React from 'react';
 import './Button.css';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'danger' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'gold' | 'danger' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

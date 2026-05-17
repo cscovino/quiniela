@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   background: var(--bg-card);
-  border: var(--border-width-md) solid var(--color-primary-500);
+  border: var(--border-width-md) solid var(--color-accent-500);
   box-shadow: var(--shadow-md);
   overflow: hidden;
 }
@@ -16,7 +16,7 @@
 
 .avatar span {
   font-family: var(--font-pixel);
-  color: var(--color-accent-500);
+  color: var(--color-gold-500);
 }
 
 .avatar--xs span { font-size: 0.5rem; }
