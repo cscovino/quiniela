@@ -1,13 +1,32 @@
 {
   "site": {
     "title": "Quiniela",
-    "tagline": "Retro Football Predictions"
+    "tagline": "Retro Football Predictions",
+    "description": "Make your predictions for the FIFA World Cup 2026"
   },
   "nav": {
     "home": "Home",
-    "tournaments": "Tournaments",
-    "rankings": "Rankings",
+    "predictions": "Predictions",
+    "standings": "Standings",
     "profile": "Profile"
+  },
+  "pages": {
+    "home": {
+      "title": "Home - Quiniela",
+      "description": "Welcome to Quiniela - FIFA World Cup 2026 Predictions"
+    },
+    "predictions": {
+      "title": "Predictions - Quiniela",
+      "description": "Make your predictions for FIFA World Cup 2026 matches"
+    },
+    "standings": {
+      "title": "Standings - Quiniela",
+      "description": "FIFA World Cup 2026 standings and rankings"
+    },
+    "profile": {
+      "title": "Profile - Quiniela",
+      "description": "Your prediction profile and statistics"
+    }
   },
   "common": {
     "loading": "Loading...",

@@ -4,11 +4,13 @@ import { ProfileTemplate } from './ProfileTemplate';
 import type { NavBarProps } from '@organisms/NavBar/NavBar';
 
 const mockNavProps: NavBarProps = {
+  links: [
+    { href: '/en', label: 'Home', active: false },
+    { href: '/en/predictions', label: 'Predictions', active: false },
+    { href: '/en/standings', label: 'Standings', active: false },
+    { href: '/en/profile', label: 'Profile', active: true },
+  ],
   locale: 'en',
-  theme: 'light',
-  onLocaleChange: () => {},
-  onThemeChange: () => {},
-  isLoggedIn: true,
 };
 
 const mockUserProfile = {

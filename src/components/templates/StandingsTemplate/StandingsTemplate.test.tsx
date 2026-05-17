@@ -4,10 +4,13 @@ import { StandingsTemplate } from './StandingsTemplate';
 import type { NavBarProps } from '@organisms/NavBar/NavBar';
 
 const mockNavProps: NavBarProps = {
+  links: [
+    { href: '/', label: 'Inicio', active: false },
+    { href: '/predicciones', label: 'Predicciones', active: false },
+    { href: '/clasificacion', label: 'Clasificación', active: true },
+    { href: '/perfil', label: 'Perfil', active: false },
+  ],
   locale: 'es',
-  theme: 'light',
-  onLocaleChange: () => {},
-  onThemeChange: () => {},
 };
 
 const mockGroups = [

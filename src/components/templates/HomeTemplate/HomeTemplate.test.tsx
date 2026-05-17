@@ -5,11 +5,13 @@ import type { NavBarProps } from '@organisms/NavBar/NavBar';
 import type { TournamentHeaderProps } from '@organisms/TournamentHeader/TournamentHeader';
 
 const mockNavProps: NavBarProps = {
+  links: [
+    { href: '/', label: 'Inicio', active: true },
+    { href: '/predicciones', label: 'Predicciones', active: false },
+    { href: '/clasificacion', label: 'Clasificación', active: false },
+    { href: '/perfil', label: 'Perfil', active: false },
+  ],
   locale: 'es',
-  theme: 'light',
-  onLocaleChange: () => {},
-  onThemeChange: () => {},
-  isLoggedIn: true,
 };
 
 const mockTournamentProps: TournamentHeaderProps = {

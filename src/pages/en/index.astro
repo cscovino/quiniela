@@ -1,53 +1,61 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import { HomeTemplate } from '@templates/HomeTemplate/HomeTemplate';
 import en from '@locales/en/common.json';
 
 const locale = 'en';
 const translations = en;
+
+const mockMatches = [
+  {
+    homeTeam: { fifaCode: 'ARG', name: 'Argentina' },
+    awayTeam: { fifaCode: 'FRA', name: 'France' },
+    date: new Date('2026-06-15T18:00:00Z'),
+    status: 'scheduled' as const,
+    stadium: 'Lusail Stadium',
+  },
+  {
+    homeTeam: { fifaCode: 'BRA', name: 'Brazil' },
+    awayTeam: { fifaCode: 'GER', name: 'Germany' },
+    date: new Date('2026-06-16T20:00:00Z'),
+    status: 'scheduled' as const,
+    stadium: 'Maracana',
+  },
+];
+
+const mockRankings = [
+  { position: 1, user: 'Carlos', points: 150, streak: 5 },
+  { position: 2, user: 'Maria', points: 142, streak: 3 },
+  { position: 3, user: 'Juan', points: 138, streak: 4 },
+];
+
+const templateProps = {
+  navProps: {
+    links: [
+      { href: '/en', label: translations.nav.home, active: true },
+      { href: '/en/predictions', label: translations.nav.predictions, active: false },
+      { href: '/en/standings', label: translations.nav.standings, active: false },
+      { href: '/en/profile', label: translations.nav.profile, active: false },
+    ],
+    locale: 'en' as const,
+  },
+  tournamentProps: {
+    name: 'FIFA World Cup 2026',
+    status: 'active' as const,
+    startDate: new Date('2026-06-11'),
+    endDate: new Date('2026-07-19'),
+    participantCount: 48,
+  },
+  matches: mockMatches,
+  rankings: mockRankings,
+};
 ---
 
-<BaseLayout locale={locale} title={translations.site.title}>
-  <main class="home">
-    <h1 class="title">{translations.site.title}</h1>
-    <p class="tagline">{translations.site.tagline}</p>
-    <div class="card">
-      <p>{translations.common.comingSoon}</p>
-    </div>
-  </main>
+<BaseLayout
+  locale={locale}
+  title={translations.pages.home.title}
+  description={translations.pages.home.description}
+  activeNav="home"
+>
+  <HomeTemplate {...templateProps} client:load />
 </BaseLayout>
-
-<style>
-  .home {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-4);
-  }
-
-  .title {
-    font-size: var(--heading-xl);
-    color: var(--color-accent-500);
-    text-shadow: var(--shadow-md);
-  }
-
-  .tagline {
-    font-family: var(--font-pixel);
-    font-size: var(--text-xs);
-    color: var(--text-secondary);
-  }
-
-  .card {
-    margin-top: var(--space-8);
-    padding: var(--space-6);
-    border: var(--border-pixel-md);
-    background: var(--bg-card);
-    box-shadow: var(--shadow-md);
-  }
-
-  .card p {
-    font-size: var(--text-sm);
-    color: var(--text-primary);
-  }
-</style>

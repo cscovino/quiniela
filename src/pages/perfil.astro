@@ -1,0 +1,60 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { ProfileTemplate } from '@templates/ProfileTemplate/ProfileTemplate';
+import es from '@locales/es/common.json';
+
+const locale = 'es';
+const translations = es;
+
+const mockUserProfile = {
+  displayName: 'Carlos',
+  avatarUrl: undefined,
+  favoriteTeam: 'Argentina',
+  stats: {
+    totalPoints: 480,
+    exactBets: 12,
+    accuracy: 67,
+    currentStreak: 5,
+    maxStreak: 8,
+    rank: 5,
+  },
+  badges: [
+    { id: 'badge-1', name: 'Primera Prediccion', icon: 'star', earnedAt: new Date('2026-06-11') },
+  ],
+};
+
+const mockNotifications = [
+  {
+    id: 'notif-1',
+    type: 'badge_earned' as const,
+    title: 'Nueva Insignia',
+    message: 'Has ganado 10 puntos!',
+    read: false,
+    createdAt: new Date(Date.now() - 60 * 60 * 1000),
+  },
+];
+
+const templateProps = {
+  navProps: {
+    links: [
+      { href: '/', label: translations.nav.home, active: false },
+      { href: '/predicciones', label: translations.nav.predictions, active: false },
+      { href: '/clasificacion', label: translations.nav.standings, active: false },
+      { href: '/perfil', label: translations.nav.profile, active: true },
+    ],
+    locale: 'es' as const,
+  },
+  userProfile: mockUserProfile,
+  notifications: mockNotifications,
+  onNotificationDismiss: () => {},
+};
+---
+
+<BaseLayout
+  locale={locale}
+  title={translations.pages.profile.title}
+  description={translations.pages.profile.description}
+  activeNav="profile"
+>
+  <ProfileTemplate {...templateProps} client:load />
+</BaseLayout>

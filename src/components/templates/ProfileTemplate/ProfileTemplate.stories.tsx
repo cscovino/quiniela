@@ -14,11 +14,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const mockNavProps = {
+  links: [
+    { href: '/en', label: 'Home', active: false },
+    { href: '/en/predictions', label: 'Predictions', active: false },
+    { href: '/en/standings', label: 'Standings', active: false },
+    { href: '/en/profile', label: 'Profile', active: true },
+  ],
   locale: 'en' as const,
-  theme: 'light' as const,
-  onLocaleChange: () => {},
-  onThemeChange: () => {},
-  isLoggedIn: true,
 };
 
 const mockUserProfile = {

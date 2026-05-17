@@ -1,21 +1,19 @@
 import React from 'react';
-import {
-  Trophy,
-  Fire,
-  Zap,
-  Target,
-  Chart,
-  Bell,
-  User,
-  Flag,
-  Check,
-  Clock,
-  Radio,
-  SectionX,
-  Gamepad,
-  Sparkle,
-  Crown,
-} from 'pixelarticons/react';
+import { Trophy } from 'pixelarticons/react/Trophy';
+import { Fire } from 'pixelarticons/react/Fire';
+import { Zap } from 'pixelarticons/react/Zap';
+import { Target } from 'pixelarticons/react/Target';
+import { Chart } from 'pixelarticons/react/Chart';
+import { Bell } from 'pixelarticons/react/Bell';
+import { User } from 'pixelarticons/react/User';
+import { Flag } from 'pixelarticons/react/Flag';
+import { Check } from 'pixelarticons/react/Check';
+import { Clock } from 'pixelarticons/react/Clock';
+import { Radio } from 'pixelarticons/react/Radio';
+import { SectionX } from 'pixelarticons/react/SectionX';
+import { Gamepad } from 'pixelarticons/react/Gamepad';
+import { Sparkle } from 'pixelarticons/react/Sparkle';
+import { Crown } from 'pixelarticons/react/Crown';
 import './Icon.css';
 
 export type IconName =

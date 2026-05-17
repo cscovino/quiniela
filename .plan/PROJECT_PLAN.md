@@ -1073,6 +1073,8 @@ service cloud.firestore {
 19. **Templates:** Compose organisms into full page layouts with responsive grid
 20. **WC26 Branding:** Official FIFA World Cup 2026 color palette - black primary, electric blue (#00BFFF), magenta (#FF1493), orange (#FF6B35), gold (#FFD700) with pixel art aesthetic
 21. **Pixel Art System:** Inline SVG sprites with `image-rendering: pixelated`, 13 sprites (football, trophy, stadium, medals, crowd, etc.), CSS animations (bounce, glow, celebrate, pulse)
+22. **Pages & Routing:** 8 Astro pages (4 ES + 4 EN) with BaseLayout, NavBar integration, i18n translations, SEO meta tags
+23. **Security:** pnpm `minimum-release-age=72` to prevent supply chain attacks from newly published packages
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?

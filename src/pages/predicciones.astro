@@ -1,0 +1,51 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { PredictionTemplate } from '@templates/PredictionTemplate/PredictionTemplate';
+import es from '@locales/es/common.json';
+
+const locale = 'es';
+const translations = es;
+
+const mockMatches = [
+  {
+    matchId: 'match-1',
+    homeTeam: { fifaCode: 'ARG', name: 'Argentina' },
+    awayTeam: { fifaCode: 'FRA', name: 'Francia' },
+    phase: 'group' as const,
+    predictionDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  },
+  {
+    matchId: 'match-2',
+    homeTeam: { fifaCode: 'BRA', name: 'Brasil' },
+    awayTeam: { fifaCode: 'GER', name: 'Alemania' },
+    phase: 'group' as const,
+    predictionDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  },
+];
+
+const templateProps = {
+  navProps: {
+    links: [
+      { href: '/', label: translations.nav.home, active: false },
+      { href: '/predicciones', label: translations.nav.predictions, active: true },
+      { href: '/clasificacion', label: translations.nav.standings, active: false },
+      { href: '/perfil', label: translations.nav.profile, active: false },
+    ],
+    locale: 'es' as const,
+  },
+  formProps: {
+    matches: mockMatches,
+  },
+  deadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  onSubmit: () => {},
+};
+---
+
+<BaseLayout
+  locale={locale}
+  title={translations.pages.predictions.title}
+  description={translations.pages.predictions.description}
+  activeNav="predictions"
+>
+  <PredictionTemplate {...templateProps} client:load />
+</BaseLayout>

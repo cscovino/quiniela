@@ -4,11 +4,13 @@ import { PredictionTemplate } from './PredictionTemplate';
 import type { NavBarProps } from '@organisms/NavBar/NavBar';
 
 const mockNavProps: NavBarProps = {
+  links: [
+    { href: '/en', label: 'Home', active: false },
+    { href: '/en/predictions', label: 'Predictions', active: true },
+    { href: '/en/standings', label: 'Standings', active: false },
+    { href: '/en/profile', label: 'Profile', active: false },
+  ],
   locale: 'en',
-  theme: 'dark',
-  onLocaleChange: () => {},
-  onThemeChange: () => {},
-  isLoggedIn: true,
 };
 
 const mockFormProps = {

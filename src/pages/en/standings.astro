@@ -1,0 +1,106 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { StandingsTemplate } from '@templates/StandingsTemplate/StandingsTemplate';
+import en from '@locales/en/common.json';
+
+const locale = 'en';
+const translations = en;
+
+const mockGroups = [
+  {
+    name: 'Group A',
+    standings: [
+      {
+        teamId: 'arg',
+        teamName: 'Argentina',
+        fifaCode: 'ARG',
+        position: 1,
+        played: 2,
+        won: 2,
+        drawn: 0,
+        lost: 0,
+        goalsFor: 5,
+        goalsAgainst: 1,
+        points: 6,
+      },
+      {
+        teamId: 'fra',
+        teamName: 'France',
+        fifaCode: 'FRA',
+        position: 2,
+        played: 2,
+        won: 1,
+        drawn: 0,
+        lost: 1,
+        goalsFor: 3,
+        goalsAgainst: 2,
+        points: 3,
+      },
+      {
+        teamId: 'jpn',
+        teamName: 'Japan',
+        fifaCode: 'JPN',
+        position: 3,
+        played: 2,
+        won: 0,
+        drawn: 1,
+        lost: 1,
+        goalsFor: 1,
+        goalsAgainst: 3,
+        points: 1,
+      },
+      {
+        teamId: 'aus',
+        teamName: 'Australia',
+        fifaCode: 'AUS',
+        position: 4,
+        played: 2,
+        won: 0,
+        drawn: 1,
+        lost: 1,
+        goalsFor: 1,
+        goalsAgainst: 4,
+        points: 1,
+      },
+    ],
+  },
+];
+
+const mockBracketRounds = [
+  {
+    name: 'Round of 32',
+    matches: [
+      {
+        matchId: 'ko-1',
+        homeTeam: { fifaCode: 'ARG', name: 'Argentina' },
+        awayTeam: { fifaCode: 'FRA', name: 'France' },
+        date: new Date('2026-07-01T18:00:00Z'),
+        status: 'scheduled' as const,
+      },
+    ],
+  },
+];
+
+const templateProps = {
+  navProps: {
+    links: [
+      { href: '/en', label: translations.nav.home, active: false },
+      { href: '/en/predictions', label: translations.nav.predictions, active: false },
+      { href: '/en/standings', label: translations.nav.standings, active: true },
+      { href: '/en/profile', label: translations.nav.profile, active: false },
+    ],
+    locale: 'en' as const,
+  },
+  groups: mockGroups,
+  bracketRounds: mockBracketRounds,
+};
+---
+
+<BaseLayout
+  locale={locale}
+  title={translations.pages.standings.title}
+  description={translations.pages.standings.description}
+  activeNav="standings"
+>
+  <StandingsTemplate {...templateProps} client:load />
+</BaseLayout>
