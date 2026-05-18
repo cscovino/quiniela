@@ -4,6 +4,14 @@ import { MatchCard } from './MatchCard';
 const mockHomeTeam = { fifaCode: 'ARG', name: 'Argentina' };
 const mockAwayTeam = { fifaCode: 'FRA', name: 'France' };
 const mockDate = new Date('2026-06-20T16:00:00Z');
+const translations = {
+  scheduled: 'Scheduled',
+  live: 'LIVE',
+  finished: 'Finished',
+  postponed: 'Postponed',
+  cancelled: 'Cancelled',
+  vs: 'VS',
+};
 
 describe('MatchCard', () => {
   it('renders home and away teams', () => {
@@ -13,6 +21,7 @@ describe('MatchCard', () => {
         awayTeam={mockAwayTeam}
         date={mockDate}
         status="scheduled"
+        translations={translations}
       />,
     );
     expect(screen.getByText('Argentina')).toBeInTheDocument();
@@ -27,6 +36,7 @@ describe('MatchCard', () => {
         date={mockDate}
         status="finished"
         result={{ home: 2, away: 1 }}
+        translations={translations}
       />,
     );
     expect(screen.getByText('2')).toBeInTheDocument();
@@ -35,7 +45,13 @@ describe('MatchCard', () => {
 
   it('shows status badge', () => {
     render(
-      <MatchCard homeTeam={mockHomeTeam} awayTeam={mockAwayTeam} date={mockDate} status="live" />,
+      <MatchCard
+        homeTeam={mockHomeTeam}
+        awayTeam={mockAwayTeam}
+        date={mockDate}
+        status="live"
+        translations={translations}
+      />,
     );
     expect(screen.getByText('LIVE')).toBeInTheDocument();
   });
@@ -48,6 +64,7 @@ describe('MatchCard', () => {
         date={mockDate}
         status="scheduled"
         phase="Group A"
+        translations={translations}
       />,
     );
     expect(screen.getByText('GROUP A')).toBeInTheDocument();
@@ -61,6 +78,7 @@ describe('MatchCard', () => {
         date={mockDate}
         status="scheduled"
         stadium="Azteca Stadium"
+        translations={translations}
       />,
     );
     expect(screen.getByText('Azteca Stadium')).toBeInTheDocument();
@@ -75,6 +93,7 @@ describe('MatchCard', () => {
         date={mockDate}
         status="scheduled"
         onClick={handleClick}
+        translations={translations}
       />,
     );
     const card = screen.getByRole('button');

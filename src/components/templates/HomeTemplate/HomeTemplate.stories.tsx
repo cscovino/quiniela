@@ -1,6 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { HomeTemplate } from './HomeTemplate';
 
+const matchTranslations = {
+  scheduled: 'Scheduled',
+  live: 'LIVE',
+  finished: 'Finished',
+  postponed: 'Postponed',
+  cancelled: 'Cancelled',
+  vs: 'VS',
+};
+
+const translations = {
+  heroTitle: 'FIFA World Cup 2026',
+  heroSubtitle: 'Make your predictions and compete for the top spot!',
+  ctaPredictions: 'Make Predictions',
+  ctaStandings: 'View Standings',
+  matchesTitle: 'Upcoming Matches',
+  rankingsTitle: 'Top Rankings',
+  matchList: matchTranslations,
+};
+
 const meta = {
   title: 'Templates/HomeTemplate',
   component: HomeTemplate,
@@ -49,6 +68,7 @@ export const Default: Story = {
     tournamentProps: mockTournamentProps,
     matches: mockMatches,
     rankings: mockRankings,
+    translations,
   },
 };
 
@@ -57,5 +77,6 @@ export const EmptyState: Story = {
     tournamentProps: mockTournamentProps,
     matches: [],
     rankings: [],
+    translations,
   },
 };

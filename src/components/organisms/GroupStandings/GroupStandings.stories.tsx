@@ -1,6 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { GroupStandings } from './GroupStandings';
 
+const translations = {
+  noGroups: 'No groups available',
+  team: 'Team',
+  pts: 'Pts',
+  qualified: 'Qualified',
+};
+
 const meta = {
   component: GroupStandings,
   tags: ['ai-generated'],
@@ -127,9 +134,9 @@ const mockGroups = [
 ];
 
 export const Default: Story = {
-  args: { groups: mockGroups },
+  args: { groups: mockGroups, translations },
 };
 
 export const Empty: Story = {
-  args: { groups: [] },
+  args: { groups: [], translations },
 };

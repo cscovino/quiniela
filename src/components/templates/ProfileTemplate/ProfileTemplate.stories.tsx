@@ -1,6 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ProfileTemplate } from './ProfileTemplate';
 
+const translations = {
+  title: 'My Profile',
+  notificationsTitle: (count: number) => `${count} Notifications`,
+  userProfile: {
+    totalPoints: 'Total Points',
+    accuracy: 'Accuracy',
+    currentStreak: 'Current Streak',
+    bestStreak: 'Best Streak',
+    exactBets: 'Exact Bets',
+    rank: 'Rank',
+    badges: 'Badges',
+  },
+  notifications: {
+    noNotifications: 'No notifications yet',
+    notificationsHeader: (count: number) => `${count} Unread`,
+    clearAll: 'Clear All',
+  },
+};
+
 const meta = {
   title: 'Templates/ProfileTemplate',
   component: ProfileTemplate,
@@ -47,11 +66,13 @@ export const Default: Story = {
   args: {
     userProfile: mockUserProfile,
     notifications: mockNotifications,
+    translations,
   },
 };
 
 export const WithoutNotifications: Story = {
   args: {
     userProfile: mockUserProfile,
+    translations,
   },
 };

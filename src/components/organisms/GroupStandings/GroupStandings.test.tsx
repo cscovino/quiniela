@@ -1,6 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { GroupStandings } from './GroupStandings';
 
+const translations = {
+  noGroups: 'No groups available',
+  team: 'Team',
+  pts: 'Pts',
+  qualified: 'Qualified',
+};
+
 const mockGroups = [
   {
     name: 'Group A',
@@ -63,25 +70,25 @@ const mockGroups = [
 
 describe('GroupStandings', () => {
   it('renders group name', () => {
-    render(<GroupStandings groups={mockGroups} />);
+    render(<GroupStandings groups={mockGroups} translations={translations} />);
     expect(screen.getByText('Group A')).toBeInTheDocument();
   });
 
   it('renders team names', () => {
-    render(<GroupStandings groups={mockGroups} />);
+    render(<GroupStandings groups={mockGroups} translations={translations} />);
     const teamNames = screen.getAllByText('Argentina');
     expect(teamNames.length).toBeGreaterThan(0);
   });
 
   it('renders stats columns', () => {
-    render(<GroupStandings groups={mockGroups} />);
+    render(<GroupStandings groups={mockGroups} translations={translations} />);
     expect(screen.getByText('P')).toBeInTheDocument();
     expect(screen.getByText('W')).toBeInTheDocument();
     expect(screen.getByText('Pts')).toBeInTheDocument();
   });
 
   it('shows empty state when no groups', () => {
-    render(<GroupStandings groups={[]} />);
+    render(<GroupStandings groups={[]} translations={translations} />);
     expect(screen.getByText('No groups available')).toBeInTheDocument();
   });
 });

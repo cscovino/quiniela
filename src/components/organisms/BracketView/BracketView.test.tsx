@@ -1,6 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import { BracketView } from './BracketView';
 
+const translations = {
+  bracketNotAvailable: 'Bracket not available yet',
+  match: {
+    scheduled: 'Scheduled',
+    live: 'LIVE',
+    finished: 'Finished',
+    postponed: 'Postponed',
+    cancelled: 'Cancelled',
+    vs: 'VS',
+  },
+};
+
 const mockRounds = [
   {
     name: 'Round of 16',
@@ -34,19 +46,19 @@ const mockRounds = [
 
 describe('BracketView', () => {
   it('renders round names', () => {
-    render(<BracketView rounds={mockRounds} />);
+    render(<BracketView rounds={mockRounds} translations={translations} />);
     expect(screen.getByText('Round of 16')).toBeInTheDocument();
     expect(screen.getByText('Quarterfinals')).toBeInTheDocument();
   });
 
   it('renders matches', () => {
-    render(<BracketView rounds={mockRounds} />);
+    render(<BracketView rounds={mockRounds} translations={translations} />);
     const argentinaElements = screen.getAllByText('Argentina');
     expect(argentinaElements.length).toBeGreaterThan(0);
   });
 
   it('shows empty state when no rounds', () => {
-    render(<BracketView rounds={[]} />);
+    render(<BracketView rounds={[]} translations={translations} />);
     expect(screen.getByText('Bracket not available yet')).toBeInTheDocument();
   });
 });

@@ -3,6 +3,25 @@ import { render, screen } from '@testing-library/react';
 import { HomeTemplate } from './HomeTemplate';
 import type { TournamentHeaderProps } from '@organisms/TournamentHeader/TournamentHeader';
 
+const matchTranslations = {
+  scheduled: 'Scheduled',
+  live: 'LIVE',
+  finished: 'Finished',
+  postponed: 'Postponed',
+  cancelled: 'Cancelled',
+  vs: 'VS',
+};
+
+const translations = {
+  heroTitle: 'Welcome to World Cup 2026',
+  heroSubtitle: 'Make your predictions and compete!',
+  ctaPredictions: 'Make Predictions',
+  ctaStandings: 'View Standings',
+  matchesTitle: 'Upcoming Matches',
+  rankingsTitle: 'Top Players',
+  matchList: matchTranslations,
+};
+
 const mockTournamentProps: TournamentHeaderProps = {
   name: 'World Cup 2026',
   status: 'active',
@@ -33,6 +52,7 @@ describe('HomeTemplate', () => {
         tournamentProps={mockTournamentProps}
         matches={mockMatches}
         rankings={mockRankings}
+        translations={translations}
       />,
     );
     expect(screen.getByText('World Cup 2026')).toBeInTheDocument();
@@ -44,6 +64,7 @@ describe('HomeTemplate', () => {
         tournamentProps={mockTournamentProps}
         matches={mockMatches}
         rankings={mockRankings}
+        translations={translations}
       />,
     );
     expect(screen.getByText('Upcoming Matches')).toBeInTheDocument();
@@ -56,6 +77,7 @@ describe('HomeTemplate', () => {
         tournamentProps={mockTournamentProps}
         matches={mockMatches}
         rankings={mockRankings}
+        translations={translations}
       />,
     );
     expect(screen.getByText('Top Players')).toBeInTheDocument();

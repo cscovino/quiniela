@@ -1,6 +1,31 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { StandingsTemplate } from './StandingsTemplate';
 
+const matchTranslations = {
+  scheduled: 'Scheduled',
+  live: 'LIVE',
+  finished: 'Finished',
+  postponed: 'Postponed',
+  cancelled: 'Cancelled',
+  vs: 'VS',
+};
+
+const translations = {
+  title: 'Standings',
+  groupStageTitle: 'Group Stage',
+  knockoutTitle: 'Knockout Stage',
+  standings: {
+    noGroups: 'No groups available',
+    team: 'Team',
+    pts: 'Pts',
+    qualified: 'Qualified',
+  },
+  bracket: {
+    bracketNotAvailable: 'Bracket not available yet',
+    match: matchTranslations,
+  },
+};
+
 const meta = {
   title: 'Templates/StandingsTemplate',
   component: StandingsTemplate,
@@ -66,11 +91,13 @@ export const Default: Story = {
   args: {
     groups: mockGroups,
     bracketRounds: mockBracketRounds,
+    translations,
   },
 };
 
 export const GroupsOnly: Story = {
   args: {
     groups: mockGroups,
+    translations,
   },
 };

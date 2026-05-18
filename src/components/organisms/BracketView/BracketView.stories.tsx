@@ -1,6 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BracketView } from './BracketView';
 
+const translations = {
+  bracketNotAvailable: 'Bracket not available yet',
+  match: {
+    scheduled: 'Scheduled',
+    live: 'LIVE',
+    finished: 'Finished',
+    postponed: 'Postponed',
+    cancelled: 'Cancelled',
+    vs: 'VS',
+  },
+};
+
 const meta = {
   component: BracketView,
   tags: ['ai-generated'],
@@ -81,9 +93,9 @@ const mockRounds = [
 ];
 
 export const Default: Story = {
-  args: { rounds: mockRounds },
+  args: { rounds: mockRounds, translations },
 };
 
 export const Empty: Story = {
-  args: { rounds: [] },
+  args: { rounds: [], translations },
 };

@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { PredictionTemplate } from './PredictionTemplate';
 
+const translations = {
+  title: 'Make Your Predictions',
+  timeRemaining: 'Time remaining to submit predictions:',
+};
+
 const meta = {
   title: 'Templates/PredictionTemplate',
   component: PredictionTemplate,
@@ -36,11 +41,13 @@ export const Default: Story = {
   args: {
     formProps: mockFormProps,
     deadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    translations,
   },
 };
 
 export const WithoutCountdown: Story = {
   args: {
     formProps: mockFormProps,
+    translations,
   },
 };

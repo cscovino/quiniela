@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { GroupHeader } from './GroupHeader';
 
+const translations = {
+  qualified: 'Qualified',
+};
+
 const meta = {
   component: GroupHeader,
   tags: ['ai-generated'],
@@ -68,12 +72,14 @@ export const WithStandings: Story = {
   args: {
     name: 'Group A',
     standings: mockStandings,
+    translations,
   },
 };
 
 export const WithoutStandings: Story = {
   args: {
     name: 'Group B',
+    translations,
   },
 };
 
@@ -86,10 +92,10 @@ export const AllGroups: Story = {
         gap: '16px',
       }}
     >
-      <GroupHeader name="Group A" standings={mockStandings} />
-      <GroupHeader name="Group B" standings={mockStandings} />
-      <GroupHeader name="Group C" />
-      <GroupHeader name="Group D" />
+      <GroupHeader name="Group A" standings={mockStandings} translations={translations} />
+      <GroupHeader name="Group B" standings={mockStandings} translations={translations} />
+      <GroupHeader name="Group C" translations={translations} />
+      <GroupHeader name="Group D" translations={translations} />
     </div>
   ),
 };

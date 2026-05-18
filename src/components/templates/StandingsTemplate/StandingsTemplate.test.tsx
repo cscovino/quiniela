@@ -2,6 +2,31 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { StandingsTemplate } from './StandingsTemplate';
 
+const matchTranslations = {
+  scheduled: 'Scheduled',
+  live: 'LIVE',
+  finished: 'Finished',
+  postponed: 'Postponed',
+  cancelled: 'Cancelled',
+  vs: 'VS',
+};
+
+const translations = {
+  title: 'Tournament Standings',
+  groupStageTitle: 'Group Stage',
+  knockoutTitle: 'Knockout Stage',
+  standings: {
+    noGroups: 'No groups available',
+    team: 'Team',
+    pts: 'Pts',
+    qualified: 'Qualified',
+  },
+  bracket: {
+    bracketNotAvailable: 'Bracket not available yet',
+    match: matchTranslations,
+  },
+};
+
 const mockGroups = [
   {
     name: 'Group A',
@@ -25,7 +50,7 @@ const mockGroups = [
 
 describe('StandingsTemplate', () => {
   it('renders group standings', () => {
-    render(<StandingsTemplate groups={mockGroups} />);
+    render(<StandingsTemplate groups={mockGroups} translations={translations} />);
     expect(screen.getByText('Tournament Standings')).toBeInTheDocument();
     expect(screen.getByText('Group Stage')).toBeInTheDocument();
     expect(screen.getAllByText('Argentina').length).toBeGreaterThan(0);
@@ -46,7 +71,13 @@ describe('StandingsTemplate', () => {
         ],
       },
     ];
-    render(<StandingsTemplate groups={mockGroups} bracketRounds={mockBracketRounds} />);
+    render(
+      <StandingsTemplate
+        groups={mockGroups}
+        bracketRounds={mockBracketRounds}
+        translations={translations}
+      />,
+    );
     expect(screen.getByText('Knockout Stage')).toBeInTheDocument();
   });
 });

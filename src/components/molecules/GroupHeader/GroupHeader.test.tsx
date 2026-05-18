@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { GroupHeader } from './GroupHeader';
 
+const translations = {
+  qualified: 'Qualified',
+};
+
 const mockStandings = [
   {
     teamId: 'arg',
@@ -58,19 +62,19 @@ const mockStandings = [
 
 describe('GroupHeader', () => {
   it('renders group name', () => {
-    render(<GroupHeader name="Group A" />);
+    render(<GroupHeader name="Group A" translations={translations} />);
     expect(screen.getByText('Group A')).toBeInTheDocument();
   });
 
   it('shows qualified teams', () => {
-    render(<GroupHeader name="Group A" standings={mockStandings} />);
-    expect(screen.getByText('Qualified:')).toBeInTheDocument();
+    render(<GroupHeader name="Group A" standings={mockStandings} translations={translations} />);
+    expect(screen.getByText('Qualified')).toBeInTheDocument();
     expect(screen.getByText('Argentina')).toBeInTheDocument();
     expect(screen.getByText('France')).toBeInTheDocument();
   });
 
   it('hides qualified section when no standings', () => {
-    render(<GroupHeader name="Group A" />);
-    expect(screen.queryByText('Qualified:')).not.toBeInTheDocument();
+    render(<GroupHeader name="Group A" translations={translations} />);
+    expect(screen.queryByText('Qualified')).not.toBeInTheDocument();
   });
 });

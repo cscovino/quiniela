@@ -1,6 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MatchCard } from './MatchCard';
 
+const translations = {
+  scheduled: 'Scheduled',
+  live: 'LIVE',
+  finished: 'Finished',
+  postponed: 'Postponed',
+  cancelled: 'Cancelled',
+  vs: 'VS',
+};
+
 const meta = {
   component: MatchCard,
   tags: ['ai-generated'],
@@ -21,6 +30,7 @@ const args = {
   date: new Date('2026-06-20T16:00:00Z'),
   stadium: 'Azteca Stadium',
   phase: 'Group A',
+  translations,
 };
 
 export const Scheduled: Story = { args: { ...args, status: 'scheduled' } };

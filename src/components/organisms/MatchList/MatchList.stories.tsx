@@ -1,6 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MatchList } from './MatchList';
 
+const translations = {
+  scheduled: 'Scheduled',
+  live: 'LIVE',
+  finished: 'Finished',
+  postponed: 'Postponed',
+  cancelled: 'Cancelled',
+  vs: 'VS',
+};
+
 const meta = {
   component: MatchList,
   tags: ['ai-generated'],
@@ -42,6 +51,7 @@ export const WithMatches: Story = {
   args: {
     matches: mockMatches,
     title: 'Upcoming Matches',
+    translations,
   },
 };
 
@@ -50,6 +60,7 @@ export const Empty: Story = {
     matches: [],
     title: 'Upcoming Matches',
     emptyMessage: 'No matches scheduled yet',
+    translations,
   },
 };
 
@@ -57,5 +68,6 @@ export const Interactive: Story = {
   args: {
     matches: mockMatches,
     title: 'Click a match',
+    translations,
   },
 };

@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NotificationPanel } from './NotificationPanel';
 
+const translations = {
+  noNotifications: 'No notifications yet',
+  notificationsHeader: (count: number) => `${count} Unread`,
+  clearAll: 'Clear All',
+};
+
 const meta = {
   component: NotificationPanel,
   tags: ['ai-generated'],
@@ -47,17 +53,20 @@ const mockNotifications = [
 export const Default: Story = {
   args: {
     notifications: mockNotifications,
+    translations,
   },
 };
 
 export const Empty: Story = {
   args: {
     notifications: [],
+    translations,
   },
 };
 
 export const AllRead: Story = {
   args: {
     notifications: mockNotifications.map((n) => ({ ...n, read: true })),
+    translations,
   },
 };

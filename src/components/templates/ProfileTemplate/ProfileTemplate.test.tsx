@@ -2,6 +2,25 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ProfileTemplate } from './ProfileTemplate';
 
+const translations = {
+  title: 'My Profile',
+  notificationsTitle: (count: number) => `${count} Notifications`,
+  userProfile: {
+    totalPoints: 'Total Points',
+    accuracy: 'Accuracy',
+    currentStreak: 'Current Streak',
+    bestStreak: 'Best Streak',
+    exactBets: 'Exact Bets',
+    rank: 'Rank',
+    badges: 'Badges',
+  },
+  notifications: {
+    noNotifications: 'No notifications yet',
+    notificationsHeader: (count: number) => `${count} Unread`,
+    clearAll: 'Clear All',
+  },
+};
+
 const mockUserProfile = {
   displayName: 'Carlos',
   avatarUrl: '/avatars/carlos.png',
@@ -32,13 +51,19 @@ const mockNotifications = [
 
 describe('ProfileTemplate', () => {
   it('renders user profile', () => {
-    render(<ProfileTemplate userProfile={mockUserProfile} />);
+    render(<ProfileTemplate userProfile={mockUserProfile} translations={translations} />);
     expect(screen.getByText('My Profile')).toBeInTheDocument();
     expect(screen.getByText('Carlos')).toBeInTheDocument();
   });
 
   it('renders notifications section when provided', () => {
-    render(<ProfileTemplate userProfile={mockUserProfile} notifications={mockNotifications} />);
+    render(
+      <ProfileTemplate
+        userProfile={mockUserProfile}
+        notifications={mockNotifications}
+        translations={translations}
+      />,
+    );
     expect(screen.getAllByText(/Notifications/).length).toBeGreaterThan(0);
     expect(screen.getByText('You earned 10 points!')).toBeInTheDocument();
   });

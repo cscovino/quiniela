@@ -1,6 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import { UserProfile } from './UserProfile';
 
+const translations = {
+  totalPoints: 'Total Points',
+  accuracy: 'Accuracy',
+  currentStreak: 'Current Streak',
+  bestStreak: 'Best Streak',
+  exactBets: 'Exact Bets',
+  rank: 'Rank',
+  badges: 'Badges',
+};
+
 const mockProps = {
   displayName: 'Carlos Enrique',
   avatarUrl: undefined,
@@ -17,6 +27,7 @@ const mockProps = {
     { id: '1', name: 'On Fire', icon: 'fire', earnedAt: new Date('2026-06-20') },
     { id: '2', name: 'First Blood', icon: 'trophy', earnedAt: new Date('2026-06-19') },
   ],
+  translations,
 };
 
 describe('UserProfile', () => {
