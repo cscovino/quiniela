@@ -1,0 +1,11 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import AuthPage from '@pages/AuthPage.astro';
+import en from '@locales/en/auth.json';
+
+const locale = 'en';
+---
+
+<BaseLayout locale={locale} title={en.auth.login.title} description={en.auth.login.subtitle}>
+  <AuthPage locale={locale} initialMode="login" />
+</BaseLayout>

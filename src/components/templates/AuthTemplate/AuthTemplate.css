@@ -1,0 +1,60 @@
+.auth-template {
+  min-height: calc(100vh - var(--space-16));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-template__decorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-template__sprite {
+  position: absolute;
+  opacity: 0.1;
+  animation: auth-float 6s ease-in-out infinite;
+}
+
+.auth-template__sprite--football {
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.auth-template__sprite--trophy {
+  top: 20%;
+  right: 15%;
+  animation-delay: 2s;
+}
+
+.auth-template__sprite--stadium {
+  bottom: 15%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+@keyframes auth-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+.auth-template__card {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-card);
+  border: var(--border-pixel);
+  box-shadow: var(--shadow-pixel);
+  padding: var(--space-8);
+  width: 100%;
+  max-width: 480px;
+}

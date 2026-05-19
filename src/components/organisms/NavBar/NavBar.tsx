@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@atoms/Button/Button';
 import { Icon } from '@atoms/Icon/Icon';
 import { Typography } from '@atoms/Typography/Typography';
+import { useAuthStore } from '@store/auth-store';
 import './NavBar.css';
 
 export interface NavLinks {
@@ -13,7 +14,6 @@ export interface NavLinks {
 export interface NavBarProps {
   links: NavLinks[];
   locale: 'en' | 'es';
-  isLoggedIn?: boolean;
   notificationCount?: number;
   className?: string;
 }
@@ -21,7 +21,6 @@ export interface NavBarProps {
 export const NavBar: React.FC<NavBarProps> = ({
   links,
   locale,
-  isLoggedIn = false,
   notificationCount = 0,
   className = '',
 }) => {
@@ -32,6 +31,12 @@ export const NavBar: React.FC<NavBarProps> = ({
     return 'dark';
   });
 
+  const { user, logout, initAuth } = useAuthStore();
+
+  React.useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
   const handleThemeToggle = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
@@ -39,9 +44,18 @@ export const NavBar: React.FC<NavBarProps> = ({
     localStorage.setItem('theme', newTheme);
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch {
+      // Error handled by store
+    }
+  };
+
   const otherLocale = locale === 'en' ? 'es' : 'en';
   const otherLocaleLabel = locale === 'en' ? 'ES' : 'EN';
   const otherLocaleHref = locale === 'en' ? '/' : '/en';
+  const loginHref = locale === 'en' ? '/en/login' : '/login';
 
   return (
     <nav className={`nav-bar ${className}`} data-theme={theme}>
@@ -89,17 +103,22 @@ export const NavBar: React.FC<NavBarProps> = ({
           </button>
         )}
 
-        {isLoggedIn ? (
+        {user ? (
           <div className="nav-bar__group">
             <Icon name="user" size={18} />
-            <Button variant="secondary" size="sm">
+            <Typography variant="small" className="nav-bar__username">
+              {user.displayName}
+            </Typography>
+            <Button variant="secondary" size="sm" onClick={handleLogout}>
               Logout
             </Button>
           </div>
         ) : (
-          <Button variant="primary" size="sm">
-            Login
-          </Button>
+          <a href={loginHref}>
+            <Button variant="primary" size="sm">
+              Login
+            </Button>
+          </a>
         )}
       </div>
     </nav>

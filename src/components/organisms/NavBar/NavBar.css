@@ -57,6 +57,12 @@
   gap: var(--space-2);
 }
 
+.nav-bar__username {
+  color: var(--text-primary);
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+}
+
 .nav-bar__btn {
   padding: var(--space-1) var(--space-2);
   background: var(--bg-input);

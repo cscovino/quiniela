@@ -1,12 +1,30 @@
 import { render, screen } from '@testing-library/react';
 import { NavBar } from './NavBar';
+import { useAuthStore } from '@store/auth-store';
+
+vi.mock('@store/auth-store', () => ({
+  useAuthStore: vi.fn(),
+}));
 
 const mockLinks = [
   { href: '/', label: 'Home', active: true },
   { href: '/predictions', label: 'Predictions', active: false },
 ];
 
+const mockAuthState = {
+  user: null,
+  isLoading: false,
+  error: null,
+  logout: vi.fn(),
+  initAuth: vi.fn(),
+  clearError: vi.fn(),
+};
+
 describe('NavBar', () => {
+  beforeEach(() => {
+    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockAuthState);
+  });
+
   it('renders brand name', () => {
     render(<NavBar links={mockLinks} locale="en" />);
     expect(screen.getByText('QUINIELA')).toBeInTheDocument();
@@ -32,12 +50,21 @@ describe('NavBar', () => {
   });
 
   it('shows login button when not logged in', () => {
-    render(<NavBar links={mockLinks} locale="en" isLoggedIn={false} />);
+    render(<NavBar links={mockLinks} locale="en" />);
     expect(screen.getByText('Login')).toBeInTheDocument();
   });
 
   it('shows logout button when logged in', () => {
-    render(<NavBar links={mockLinks} locale="en" isLoggedIn />);
+    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      ...mockAuthState,
+      user: {
+        uid: 'user-1',
+        displayName: 'Carlos',
+        email: 'carlos@test.com',
+        role: 'user' as const,
+      },
+    });
+    render(<NavBar links={mockLinks} locale="en" />);
     expect(screen.getByText('Logout')).toBeInTheDocument();
   });
 

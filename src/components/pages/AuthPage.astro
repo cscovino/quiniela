@@ -1,0 +1,70 @@
+---
+import { AuthTemplate } from '@templates/AuthTemplate/AuthTemplate';
+
+export interface Props {
+  locale: 'en' | 'es';
+  initialMode?: 'login' | 'register';
+}
+
+const { locale, initialMode = 'login' } = Astro.props;
+
+const translations = {
+  login: {
+    title: locale === 'en' ? 'Login' : 'Iniciar Sesión',
+    subtitle: locale === 'en' ? 'Welcome back' : 'Bienvenido de vuelta',
+    email: locale === 'en' ? 'Email' : 'Correo electrónico',
+    password: locale === 'en' ? 'Password' : 'Contraseña',
+    submit: locale === 'en' ? 'Login' : 'Iniciar Sesión',
+    forgotPassword: locale === 'en' ? 'Forgot your password?' : '¿Olvidaste tu contraseña?',
+    noAccount: locale === 'en' ? "Don't have an account?" : '¿No tienes cuenta?',
+    registerLink: locale === 'en' ? 'Sign up' : 'Regístrate',
+    googleLogin: locale === 'en' ? 'Continue with Google' : 'Continuar con Google',
+    or: locale === 'en' ? 'or' : 'o',
+    errors: {
+      invalidEmail: locale === 'en' ? 'Invalid email address' : 'Correo electrónico inválido',
+      invalidPassword:
+        locale === 'en'
+          ? 'Password must be at least 6 characters'
+          : 'La contraseña debe tener al menos 6 caracteres',
+      wrongPassword: locale === 'en' ? 'Incorrect password' : 'Contraseña incorrecta',
+      userNotFound: locale === 'en' ? 'User not found' : 'Usuario no encontrado',
+      tooManyRequests:
+        locale === 'en'
+          ? 'Too many attempts. Try again later'
+          : 'Demasiados intentos. Intenta de nuevo más tarde',
+      generic: locale === 'en' ? 'Failed to login' : 'Error al iniciar sesión',
+    },
+    success: {
+      resetEmail: locale === 'en' ? 'Password reset email sent' : 'Correo de recuperación enviado',
+    },
+  },
+  register: {
+    title: locale === 'en' ? 'Create Account' : 'Crear Cuenta',
+    subtitle: locale === 'en' ? 'Join the Quiniela' : 'Únete a la Quiniela',
+    displayName: locale === 'en' ? 'Display name' : 'Nombre de usuario',
+    email: locale === 'en' ? 'Email' : 'Correo electrónico',
+    password: locale === 'en' ? 'Password' : 'Contraseña',
+    confirmPassword: locale === 'en' ? 'Confirm password' : 'Confirmar contraseña',
+    submit: locale === 'en' ? 'Create Account' : 'Crear Cuenta',
+    hasAccount: locale === 'en' ? 'Already have an account?' : '¿Ya tienes cuenta?',
+    loginLink: locale === 'en' ? 'Login' : 'Inicia sesión',
+    googleLogin: locale === 'en' ? 'Continue with Google' : 'Continuar con Google',
+    or: locale === 'en' ? 'or' : 'o',
+    errors: {
+      invalidEmail: locale === 'en' ? 'Invalid email address' : 'Correo electrónico inválido',
+      weakPassword:
+        locale === 'en'
+          ? 'Password must be at least 6 characters'
+          : 'La contraseña debe tener al menos 6 caracteres',
+      emailInUse:
+        locale === 'en' ? 'This email is already registered' : 'Este correo ya está registrado',
+      passwordMismatch: locale === 'en' ? 'Passwords do not match' : 'Las contraseñas no coinciden',
+      displayNameRequired:
+        locale === 'en' ? 'Display name is required' : 'El nombre es obligatorio',
+      generic: locale === 'en' ? 'Failed to create account' : 'Error al crear la cuenta',
+    },
+  },
+};
+---
+
+<AuthTemplate {...{ translations, initialMode }} client:load />

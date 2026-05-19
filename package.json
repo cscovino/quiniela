@@ -36,7 +36,8 @@
     "flag-icons": "^7.5.0",
     "pixelarticons": "^2.1.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",

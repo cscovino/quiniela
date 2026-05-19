@@ -1033,8 +1033,8 @@ service cloud.firestore {
 | US-003 | Add Teams | ⬜ Not Started | |
 | US-004 | Create Matches | ⬜ Not Started | |
 | US-005 | Update Match Results | ⬜ Not Started | |
-| US-006 | User Registration & Login | ⬜ Not Started | |
-| US-006b | Manage Predictors | ⬜ Not Started | |
+| US-006 | User Registration & Login | ✅ Done | Zustand store, login/register forms, auth pages ES+EN, NavBar integration |
+| US-006b | Manage Predictors | ⬜ Not Started | Schema ready, default predictor auto-created |
 | US-007 | Predict Match Score | ⬜ Not Started | |
 | US-008 | Predict Group Standings | ⬜ Not Started | |
 | US-009 | Predict Knockout Winner | ⬜ Not Started | |
@@ -1074,8 +1074,13 @@ service cloud.firestore {
 | ESLint + Prettier | ✅ Done | Flat config (`.ts`), astro plugin |
 | Husky + Commitlint | ✅ Done | Pre-commit + commit-msg hooks (`.commitlintrc`) |
 | Vitest + Testing Library | ✅ Done | jsdom environment |
+| Zustand state management | ✅ Done | Auth store with Firebase integration |
+| Firebase SDK | ✅ Done | Initialized with Firestore + Auth + Storage |
+| Firestore security rules | ✅ Done | Deployed with predictor-based access control |
+| Predictor system | ✅ Done | Schema updated, default predictor auto-created on signup |
+| Auth pages | ✅ Done | Login/Register forms (ES + EN), NavBar integration |
 | Design tokens (global.css) | ✅ Done | Full token system: colors, spacing, typography, shadows, animations, z-index, breakpoints |
-| Locale files (en/es) | ✅ Done | common.json with shared strings |
+| Locale files (en/es) | ✅ Done | common.json + auth.json with shared strings |
 | Vite aliases | ✅ Done | `@/`, `@atoms/`, `@molecules/`, `@organisms/`, `@layouts/`, `@styles/`, etc. |
 | Base layout | ✅ Done | `BaseLayout.astro` with locale switcher |
 
