@@ -411,35 +411,48 @@ src/components/
   - [ ] Password reset via email
   - [ ] Session persistence
   - [ ] Data stored in `users/{uid}`
+  - [ ] Auto-create default predictor on registration
   - [ ] Rate limit registration attempts
 
-#### US-007: Predict Match Score
-**As a** user, **I want** to predict the score of a match, **so that** I can earn points if I'm correct.
+#### US-006b: Manage Predictors
+**As a** user, **I want** to create and manage multiple predictors, **so that** I can submit predictions under different names.
 
 - **Priority:** High | **Effort:** 3
 - **Acceptance Criteria:**
-  - [ ] Users predict: `homeScore`, `awayScore` (0-15)
-  - [ ] Stored in `tournaments/{tournamentId}/bets/{betId}`
-  - [ ] **Block if:** match is `live`/`finished`/`postponed`/`cancelled`, current time > `predictionDeadline`, user already bet
-  - [ ] **Allow edit if:** match not started and user owns bet
+  - [ ] Create predictor with: `name`, `avatarUrl` (optional)
+  - [ ] Edit predictor name/avatar
+  - [ ] Delete predictor (only if no bets made)
+  - [ ] Switch active predictor before making predictions
+  - [ ] Stored in `users/{userId}/predictors/{predictorId}`
+  - [ ] Each predictor has independent stats and rankings
+
+#### US-007: Predict Match Score
+**As a** predictor, **I want** to predict the score of a match, **so that** I can earn points if I'm correct.
+
+- **Priority:** High | **Effort:** 3
+- **Acceptance Criteria:**
+  - [ ] Predictors predict: `homeScore`, `awayScore` (0-15)
+  - [ ] Stored in `tournaments/{tournamentId}/bets/{betId}` with `userId` + `predictorId`
+  - [ ] **Block if:** match is `live`/`finished`/`postponed`/`cancelled`, current time > `predictionDeadline`, predictor already bet
+  - [ ] **Allow edit if:** match not started and predictor owns bet
 
 #### US-008: Predict Group Standings
-**As a** user, **I want** to predict the final standings of a group, **so that** I can earn bonus points.
+**As a** predictor, **I want** to predict the final standings of a group, **so that** I can earn bonus points.
 
 - **Priority:** Medium | **Effort:** 3
 - **Acceptance Criteria:**
-  - [ ] Users rank all teams in group (1st to 4th)
-  - [ ] Stored in `tournaments/{tournamentId}/group_bets/{betId}`
+  - [ ] Predictors rank all teams in group (1st to 4th)
+  - [ ] Stored in `tournaments/{tournamentId}/group_bets/{betId}` with `userId` + `predictorId`
   - [ ] **Block if:** any match in group has started
   - [ ] Validate all teams included exactly once
 
 #### US-009: Predict Knockout Winner
-**As a** user, **I want** to predict the winner of a knockout match, **so that** I can earn points.
+**As a** predictor, **I want** to predict the winner of a knockout match, **so that** I can earn points.
 
 - **Priority:** Medium | **Effort:** 2
 - **Acceptance Criteria:**
-  - [ ] Users select winner (`homeTeamId` or `awayTeamId`)
-  - [ ] Stored in `tournaments/{tournamentId}/knockout_bets/{betId}`
+  - [ ] Predictors select winner (`homeTeamId` or `awayTeamId`)
+  - [ ] Stored in `tournaments/{tournamentId}/knockout_bets/{betId}` with `userId` + `predictorId`
   - [ ] **Block if:** teams are TBD or match has started
 
 ---
@@ -467,23 +480,23 @@ src/components/
   - [ ] Store in `tournaments/{tournamentId}/group_standings/{groupId}`
   - [ ] Recompute from scratch (idempotent)
 
-#### US-012: Update User Statistics
-**As a** system, **I want** to update user statistics after points calculation, **so that** performance is reflected in rankings.
+#### US-012: Update Predictor Statistics
+**As a** system, **I want** to update predictor statistics after points calculation, **so that** performance is reflected in rankings.
 
 - **Priority:** High | **Effort:** 4
 - **Acceptance Criteria:**
-  - [ ] Update `users/{userId}/stats/{tournamentId}` with: `totalPoints`, `exactBets`, `winnerBets`, `totalBets`, `accuracy`, `currentStreak`, `maxStreak`, `pointsHistory`
+  - [ ] Update `users/{userId}/predictors/{predictorId}/stats/{tournamentId}` with: `totalPoints`, `exactBets`, `winnerBets`, `totalBets`, `accuracy`, `currentStreak`, `maxStreak`, `pointsHistory`
   - [ ] Use Firestore transaction
-  - [ ] Handle edge case: user has no bets yet
+  - [ ] Handle edge case: predictor has no bets yet
 
-#### US-013: Display User Ranking
-**As a** user, **I want** to see the ranking of all participants, **so that** I can compare my performance.
+#### US-013: Display Predictor Ranking
+**As a** user, **I want** to see the ranking of all predictors, **so that** I can compare my performance.
 
 - **Priority:** High | **Effort:** 3
 - **Acceptance Criteria:**
   - [ ] Table sorted by `totalPoints` ↓, then `accuracy` (tiebreaker)
-  - [ ] Columns: Position, Avatar, Name, Points, Accuracy, Streak, Badges
-  - [ ] Highlight current user
+  - [ ] Columns: Position, Avatar, Predictor Name, Owner, Points, Accuracy, Streak, Badges
+  - [ ] Highlight current user's predictors
   - [ ] Paginate (20 per page)
   - [ ] Cache ranking data for 5 minutes
 
@@ -673,9 +686,10 @@ tournaments/
         }
     
     bets/                                  # Subcollection - Match predictions
-      {betId}/                             # Document ID = "{userId}-{matchId}"
+      {betId}/                             # Document ID = "{predictorId}-{matchId}"
         {
           userId: "user-uid",
+          predictorId: "user-uid-default",
           matchId: "match-1",
           homeScore: 2,
           awayScore: 1,
@@ -687,9 +701,10 @@ tournaments/
         }
     
     group_bets/                            # Subcollection - Group standings predictions
-      {betId}/                             # Document ID = "{userId}-{groupId}"
+      {betId}/                             # Document ID = "{predictorId}-{groupId}"
         {
           userId: "user-uid",
+          predictorId: "user-uid-default",
           groupId: "group-a",
           positions: ["arg", "mex", "pol", "ksa"],
           points: 0,
@@ -698,9 +713,10 @@ tournaments/
         }
     
     knockout_bets/                         # Subcollection - Knockout predictions
-      {betId}/                             # Document ID = "{userId}-{matchId}"
+      {betId}/                             # Document ID = "{predictorId}-{matchId}"
         {
           userId: "user-uid",
+          predictorId: "user-uid-default",
           matchId: "match-r16-1",
           predictedWinner: "arg",
           points: 0,
@@ -735,28 +751,39 @@ users/                                     # Top-level collection
       createdAt: "...",
       lastLoginAt: "...",
       
-      stats/                               # Subcollection
-        {tournamentId}/                    # Document ID = tournament slug
+      predictors/                          # Subcollection - User's predictors
+        {predictorId}/                     # Document ID = "{userId}-{slug}" (e.g., "user123-default")
           {
-            tournamentId: "world-cup-2026",
-            totalPoints: 45,
-            exactBets: 8,
-            winnerBets: 12,
-            totalBets: 30,
-            accuracy: 0.67,
-            currentStreak: 3,
-            maxStreak: 5,
-            pointsHistory: [
-              { timestamp: "...", points: 3, matchId: "match-1" }
-            ],
-            badgesAwarded: {
-              "on-fire": "2026-06-20T...",
-              "first-blood": "2026-06-19T..."
-            },
-            lastUpdated: "..."
+            id: "user123-default",
+            userId: "user123",
+            name: "Carlos Enrique",
+            avatarUrl: "/avatars/predictor-1.png",
+            createdAt: "..."
           }
+          
+          stats/                           # Subcollection - Predictor stats per tournament
+            {tournamentId}/                # Document ID = tournament slug
+              {
+                predictorId: "user123-default",
+                tournamentId: "world-cup-2026",
+                totalPoints: 45,
+                exactBets: 8,
+                winnerBets: 12,
+                totalBets: 30,
+                accuracy: 0.67,
+                currentStreak: 3,
+                maxStreak: 5,
+                pointsHistory: [
+                  { timestamp: "...", points: 3, matchId: "match-1" }
+                ],
+                badgesAwarded: {
+                  "on-fire": "2026-06-20T...",
+                  "first-blood": "2026-06-19T..."
+                },
+                lastUpdated: "..."
+              }
         
-        notifications/                     # Subcollection
+        notifications/                     # Subcollection - User notifications
           {notificationId}/
             {
               type: "badge_earned",
@@ -790,6 +817,11 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == request.resource.data.userId;
     }
     
+    function isPredictorOwner(predictorId) {
+      return request.auth != null && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)/predictors/$(predictorId)).exists();
+    }
+    
     // Users - read own profile, admin reads all
     match /users/{userId} {
       allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
@@ -797,10 +829,18 @@ service cloud.firestore {
       allow update: if request.auth.uid == userId || isAdmin();
       allow delete: if isAdmin();
       
-      // User stats - read own, admin reads all
-      match /stats/{tournamentId} {
-        allow read: if request.auth.uid == userId || isAdmin();
-        allow write: if false; // Only Cloud Functions can write
+      // Predictors - user manages their own predictors
+      match /predictors/{predictorId} {
+        allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+        allow create: if request.auth != null && request.auth.uid == userId;
+        allow update: if request.auth.uid == userId;
+        allow delete: if request.auth.uid == userId;
+        
+        // Predictor stats - read own, Cloud Functions write
+        match /stats/{tournamentId} {
+          allow read: if request.auth.uid == userId || isAdmin();
+          allow write: if false; // Only Cloud Functions can write
+        }
       }
       
       // Notifications
@@ -833,27 +873,27 @@ service cloud.firestore {
         allow write: if isAdmin();
       }
       
-      // Bets - user owns their bets
+      // Bets - predictor owns their bets
       match /bets/{betId} {
         allow read: if request.auth != null;
-        allow create: if isOwnerNew();
-        allow update: if isOwner();
+        allow create: if isOwnerNew() && isPredictorOwner(request.resource.data.predictorId);
+        allow update: if isOwner() && isPredictorOwner(resource.data.predictorId);
         allow delete: if isOwner() || isAdmin();
       }
       
       // Group bets
       match /group_bets/{betId} {
         allow read: if request.auth != null;
-        allow create: if isOwnerNew();
-        allow update: if isOwner();
+        allow create: if isOwnerNew() && isPredictorOwner(request.resource.data.predictorId);
+        allow update: if isOwner() && isPredictorOwner(resource.data.predictorId);
         allow delete: if isOwner() || isAdmin();
       }
       
       // Knockout bets
       match /knockout_bets/{betId} {
         allow read: if request.auth != null;
-        allow create: if isOwnerNew();
-        allow update: if isOwner();
+        allow create: if isOwnerNew() && isPredictorOwner(request.resource.data.predictorId);
+        allow update: if isOwner() && isPredictorOwner(resource.data.predictorId);
         allow delete: if isOwner() || isAdmin();
       }
       
@@ -877,8 +917,8 @@ service cloud.firestore {
 |----------|---------|-------------|
 | `calculateMatchPoints` | `matches/{matchId}` update (status → finished) | Calculate points for all bets on a match |
 | `updateGroupStandings` | `matches/{matchId}` update (status → finished) | Recompute group standings from scratch |
-| `updateUserStats` | `bets/{betId}` update (points changed) | Update user statistics and streaks |
-| `checkAndAwardBadges` | `users/{userId}/stats/{tournamentId}` update | Check badge conditions and award if met |
+| `updatePredictorStats` | `bets/{betId}` update (points changed) | Update predictor statistics and streaks |
+| `checkAndAwardBadges` | `users/{userId}/predictors/{predictorId}/stats/{tournamentId}` update | Check badge conditions and award if met |
 | `createNotification` | Various triggers | Create in-app notifications for users |
 | `sendMatchReminder` | Scheduled (every 15 min) | Send notifications for matches starting soon |
 
@@ -910,24 +950,24 @@ service cloud.firestore {
 // 5. Recompute from scratch (idempotent)
 ```
 
-#### `updateUserStats`
+#### `updatePredictorStats`
 ```javascript
 // Trigger: bets/{betId} onUpdate (when points change)
 // Logic:
-// 1. Get all bets for user in tournament
+// 1. Get all bets for predictor in tournament
 // 2. Calculate: totalPoints, exactBets, winnerBets, totalBets, accuracy
 // 3. Calculate currentStreak and maxStreak
 // 4. Add to pointsHistory
-// 5. Write to users/{userId}/stats/{tournamentId}
+// 5. Write to users/{userId}/predictors/{predictorId}/stats/{tournamentId}
 ```
 
 #### `checkAndAwardBadges`
 ```javascript
-// Trigger: users/{userId}/stats/{tournamentId} onUpdate
+// Trigger: users/{userId}/predictors/{predictorId}/stats/{tournamentId} onUpdate
 // Logic:
 // 1. Check each badge condition:
 //    - "on-fire": currentStreak >= 3
-//    - "top-10": position <= totalUsers * 0.1
+//    - "top-10": position <= totalPredictors * 0.1
 //    - "perfect-group": all group bets correct
 //    - "clairvoyant": predicted winner from group stage
 //    - "first-blood": totalBets >= 1
@@ -939,13 +979,14 @@ service cloud.firestore {
 
 ## 🗺 Roadmap & Sprints
 
-### Sprint 1: Foundation & Core (Effort: 26)
+### Sprint 1: Foundation & Core (Effort: 29)
 - [ ] US-001: Create a Tournament
 - [ ] US-002: Create Groups
 - [ ] US-003: Add Teams
 - [ ] US-004: Create Matches
 - [ ] US-005: Update Match Results
 - [ ] US-006: User Registration & Login
+- [ ] US-006b: Manage Predictors
 - [ ] US-007: Predict Match Score
 - [ ] US-008: Predict Group Standings
 - [ ] US-009: Predict Knockout Winner
@@ -993,6 +1034,7 @@ service cloud.firestore {
 | US-004 | Create Matches | ⬜ Not Started | |
 | US-005 | Update Match Results | ⬜ Not Started | |
 | US-006 | User Registration & Login | ⬜ Not Started | |
+| US-006b | Manage Predictors | ⬜ Not Started | |
 | US-007 | Predict Match Score | ⬜ Not Started | |
 | US-008 | Predict Group Standings | ⬜ Not Started | |
 | US-009 | Predict Knockout Winner | ⬜ Not Started | |
@@ -1075,6 +1117,7 @@ service cloud.firestore {
 21. **Pixel Art System:** Inline SVG sprites with `image-rendering: pixelated`, 13 sprites (football, trophy, stadium, medals, crowd, etc.), CSS animations (bounce, glow, celebrate, pulse)
 22. **Pages & Routing:** 8 Astro pages (4 ES + 4 EN) with BaseLayout, NavBar integration, i18n translations, SEO meta tags
 23. **Security:** pnpm `minimum-release-age=72` to prevent supply chain attacks from newly published packages
+24. **Predictor System:** Users can create multiple predictors with independent stats/rankings; each bet tied to `userId` + `predictorId`
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
