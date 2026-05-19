@@ -34,3 +34,4 @@ storybook-static
 
 # Firebase
 .firebase-sessions
+functions/lib/

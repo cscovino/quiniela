@@ -43,6 +43,7 @@ export interface Match {
   result: { home: number | null; away: number | null };
   status: MatchStatus;
   predictionDeadline: Timestamp;
+  pointsCalculated?: boolean;
   createdAt: Timestamp;
 }
 

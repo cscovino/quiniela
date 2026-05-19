@@ -911,16 +911,16 @@ service cloud.firestore {
 
 ## ⚙️ Cloud Functions
 
-### Function List
+### Cloud Functions
 
-| Function | Trigger | Description |
-|----------|---------|-------------|
-| `calculateMatchPoints` | `matches/{matchId}` update (status → finished) | Calculate points for all bets on a match |
-| `updateGroupStandings` | `matches/{matchId}` update (status → finished) | Recompute group standings from scratch |
-| `updatePredictorStats` | `bets/{betId}` update (points changed) | Update predictor statistics and streaks |
-| `checkAndAwardBadges` | `users/{userId}/predictors/{predictorId}/stats/{tournamentId}` update | Check badge conditions and award if met |
-| `createNotification` | Various triggers | Create in-app notifications for users |
-| `sendMatchReminder` | Scheduled (every 15 min) | Send notifications for matches starting soon |
+| Function | Trigger | Status | Description |
+|----------|---------|--------|-------------|
+| `calculateMatchResult` | `matches/{matchId}` update (status → finished) | ✅ Done | Calculate points for all bets on a match (+3 exact, +1 correct outcome) |
+| `updateGroupStandings` | `matches/{matchId}` update (pointsCalculated → true) | ✅ Done | Recompute group standings from scratch |
+| `updatePredictorStats` | `bets/{betId}` update (points changed) | ✅ Done | Update predictor statistics and streaks |
+| `checkAndAwardBadges` | `users/{userId}/predictors/{predictorId}/stats/{tournamentId}` update | ✅ Done | Check badge conditions and award if met |
+| `createNotification` | Various triggers | ⬜ Not Started | Create in-app notifications for users |
+| `sendMatchReminder` | Scheduled (every 15 min) | ⬜ Not Started | Send notifications for matches starting soon |
 
 ### Function Details
 
@@ -1028,13 +1028,13 @@ service cloud.firestore {
 ### Sprint 1: Foundation & Core
 | US | Story | Status | Notes |
 |----|-------|--------|-------|
-| US-001 | Create a Tournament | ⬜ Not Started | |
-| US-002 | Create Groups | ⬜ Not Started | |
-| US-003 | Add Teams | ⬜ Not Started | |
-| US-004 | Create Matches | ⬜ Not Started | |
-| US-005 | Update Match Results | ⬜ Not Started | |
+| US-001 | Create a Tournament | ✅ Done | Seeded via `scripts/seed-tournament.ts` |
+| US-002 | Create Groups | ✅ Done | Seeded via `scripts/seed-tournament.ts` |
+| US-003 | Add Teams | ✅ Done | Seeded via `scripts/seed-tournament.ts` |
+| US-004 | Create Matches | ✅ Done | Seeded via `scripts/seed-tournament.ts` (72 group + 32 knockout) |
+| US-005 | Update Match Results | ✅ Done | Cloud Functions: calculateMatchResult, updateGroupStandings, updatePredictorStats, checkAndAwardBadges |
 | US-006 | User Registration & Login | ✅ Done | Zustand store, login/register forms, auth pages ES+EN, NavBar integration |
-| US-006b | Manage Predictors | ⬜ Not Started | Schema ready, default predictor auto-created |
+| US-006b | Manage Predictors | ✅ Done | Schema ready, default predictor auto-created |
 | US-007 | Predict Match Score | ⬜ Not Started | |
 | US-008 | Predict Group Standings | ⬜ Not Started | |
 | US-009 | Predict Knockout Winner | ⬜ Not Started | |
@@ -1062,7 +1062,7 @@ service cloud.firestore {
 ### Sprint 4: Administration
 | US | Story | Status | Notes |
 |----|-------|--------|-------|
-| US-022 | Admin Dashboard | ⬜ Not Started | |
+| US-022 | Admin Dashboard | ✅ Done | Admin-only `/en/admin/matches` page, match result form, role guard, NavBar link |
 | US-023 | Import/Export Data | ⬜ Not Started | |
 
 ### Project Setup ✅
@@ -1083,6 +1083,10 @@ service cloud.firestore {
 | Locale files (en/es) | ✅ Done | common.json + auth.json with shared strings |
 | Vite aliases | ✅ Done | `@/`, `@atoms/`, `@molecules/`, `@organisms/`, `@layouts/`, `@styles/`, etc. |
 | Base layout | ✅ Done | `BaseLayout.astro` with locale switcher |
+| Cloud Functions | ✅ Done | 4 functions: calculateMatchResult, updateGroupStandings, updatePredictorStats, checkAndAwardBadges |
+| Admin Dashboard | ✅ Done | `/en/admin/matches` with role guard, match result form, NavBar link |
+| Seed script | ✅ Done | `pnpm seed` populates 165 documents (tournament, groups, teams, matches) |
+| Admin role script | ✅ Done | `pnpm set-admin <user-id>` promotes user to admin |
 
 ### Design System
 | Phase | Description | Status | Notes |
@@ -1123,6 +1127,9 @@ service cloud.firestore {
 22. **Pages & Routing:** 8 Astro pages (4 ES + 4 EN) with BaseLayout, NavBar integration, i18n translations, SEO meta tags
 23. **Security:** pnpm `minimum-release-age=72` to prevent supply chain attacks from newly published packages
 24. **Predictor System:** Users can create multiple predictors with independent stats/rankings; each bet tied to `userId` + `predictorId`
+25. **Cloud Functions:** Automated point calculation, standings updates, predictor stats, and badge awards on match result changes
+26. **Admin Dashboard:** English-only admin page at `/en/admin/matches` for updating match results and status
+27. **Seed Script:** `pnpm seed` populates complete WC26 data (48 teams, 12 groups, 104 matches) idempotently
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
@@ -1143,4 +1150,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-16*
+*Last updated: 2026-05-19*

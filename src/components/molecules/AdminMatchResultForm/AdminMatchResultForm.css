@@ -1,0 +1,56 @@
+.admin-match-result-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 2px solid var(--color-accent-500);
+  background: var(--bg-dark);
+  min-width: 300px;
+}
+
+.admin-match-result-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.admin-match-result-form__status label,
+.admin-match-result-form__scores label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.admin-match-result-form__scores {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.admin-match-result-form__scores label {
+  flex: 1;
+}
+
+.admin-match-result-form__input,
+.admin-match-result-form__select {
+  padding: var(--space-2);
+  border: 2px solid var(--color-primary-500);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+}
+
+.admin-match-result-form__input:focus,
+.admin-match-result-form__select:focus {
+  outline: none;
+  border-color: var(--color-accent-500);
+}
+
+.admin-match-result-form__error {
+  color: var(--color-error);
+}
+
+.admin-match-result-form__actions {
+  display: flex;
+  gap: var(--space-2);
+}

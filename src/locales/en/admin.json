@@ -1,0 +1,14 @@
+{
+  "admin": {
+    "title": "Admin Dashboard",
+    "matches": "Manage Matches",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "status": "Status",
+    "result": "Result",
+    "pointsCalculated": "Points calculated",
+    "loading": "Loading matches...",
+    "error": "Error"
+  }
+}

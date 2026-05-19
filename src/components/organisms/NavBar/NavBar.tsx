@@ -105,6 +105,11 @@ export const NavBar: React.FC<NavBarProps> = ({
 
         {user ? (
           <div className="nav-bar__group">
+            {user.role === 'admin' && (
+              <a href="/en/admin/matches" className="nav-bar__link">
+                Admin
+              </a>
+            )}
             <Icon name="user" size={18} />
             <Typography variant="small" className="nav-bar__username">
               {user.displayName}

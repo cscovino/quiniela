@@ -19,6 +19,8 @@
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,astro,css,json}\"",
     "storybook": "storybook dev -p 6006 --no-version-updates",
     "build-storybook": "storybook build",
+    "seed": "tsx --env-file=.env scripts/seed-tournament.ts",
+    "set-admin": "tsx --env-file=.env scripts/set-admin-role.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -65,6 +67,7 @@
     "prettier": "^3.4.0",
     "prettier-plugin-astro": "^0.14.1",
     "storybook": "^10.4.0",
+    "tsx": "^4.22.1",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   }
