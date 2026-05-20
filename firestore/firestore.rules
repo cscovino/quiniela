@@ -8,10 +8,6 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
-    function isOwner() {
-      return request.auth != null && request.auth.uid == resource.data.userId;
-    }
-    
     function isOwnerNew() {
       return request.auth != null && request.auth.uid == request.resource.data.userId;
     }
@@ -40,11 +36,6 @@ service cloud.firestore {
     function canPredictOnMatch(tournamentId, matchId) {
       let matchData = getMatch(tournamentId, matchId);
       return isMatchOpen(matchData) && isDeadlineNotPassed(matchData);
-    }
-    
-    function canPredictOnGroup(tournamentId, groupId) {
-      let matches = get(/databases/$(database)/documents/tournaments/$(tournamentId)/matches).data;
-      return true;
     }
     
     // Users - read own profile, admin reads all
