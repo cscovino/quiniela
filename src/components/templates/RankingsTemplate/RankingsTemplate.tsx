@@ -11,11 +11,6 @@ export interface RankingsTemplateProps {
     title: string;
     noRankings: string;
     loading: string;
-    position: string;
-    predictor: string;
-    points: string;
-    accuracy: string;
-    streak: string;
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -39,14 +34,13 @@ export const RankingsTemplate: React.FC<RankingsTemplateProps> = ({
         if (cancelled) return;
 
         const mapped = stats.map(
-          (stat: PredictorStats & { userId: string; predictorId: string }, index: number) => ({
-            position: index + 1,
-            predictorName: stat.predictorId.split('-').slice(1).join('-') || stat.predictorId,
-            ownerName: stat.userId.substring(0, 8),
+          (stat: PredictorStats & { userId: string; predictorId: string }) => ({
+            userId: stat.userId,
+            predictorId: stat.predictorId,
+            displayName: stat.predictorId.split('-').slice(1).join('-') || stat.predictorId,
             points: stat.totalPoints,
             accuracy: stat.accuracy,
             streak: stat.currentStreak,
-            badges: Object.keys(stat.badgesAwarded || {}),
           }),
         );
 
@@ -102,13 +96,8 @@ export const RankingsTemplate: React.FC<RankingsTemplateProps> = ({
           ) : (
             <RankingsTable
               rankings={rankings}
-              translations={{
-                position: translations.position,
-                predictor: translations.predictor,
-                points: translations.points,
-                accuracy: translations.accuracy,
-                streak: translations.streak,
-              }}
+              title={translations.title}
+              emptyMessage={translations.noRankings}
             />
           )}
         </section>
