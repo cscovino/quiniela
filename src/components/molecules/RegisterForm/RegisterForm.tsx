@@ -56,6 +56,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       await register(email, password, displayName);
+      window.location.href = '/';
     } catch {
       // Error handled by store
     }
@@ -65,6 +66,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     clearError();
     try {
       await loginWithGoogle();
+      window.location.href = '/';
     } catch {
       // Error handled by store
     }

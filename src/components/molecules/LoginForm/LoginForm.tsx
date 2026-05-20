@@ -49,6 +49,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     clearError();
     try {
       await login(email, password);
+      window.location.href = '/';
     } catch {
       // Error handled by store
     }
@@ -58,6 +59,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     clearError();
     try {
       await loginWithGoogle();
+      window.location.href = '/';
     } catch {
       // Error handled by store
     }
