@@ -1,5 +1,5 @@
 ---
-import { PredictionTemplate } from '@templates/PredictionTemplate/PredictionTemplate';
+import { PredictionsTemplate } from '@templates/PredictionsTemplate/PredictionsTemplate';
 
 export interface Props {
   locale: 'en' | 'es';
@@ -9,34 +9,25 @@ const { locale } = Astro.props;
 
 const translations = {
   title: locale === 'en' ? 'Matchday Predictions' : 'Predicciones de la Jornada',
-  timeRemaining: locale === 'en' ? 'Time remaining:' : 'Tiempo restante:',
+  noMatches:
+    locale === 'en'
+      ? 'No matches available for prediction'
+      : 'No hay partidos disponibles para predecir',
+  submitSuccess: locale === 'en' ? 'Predictions submitted!' : '¡Predicciones enviadas!',
+  submitError:
+    locale === 'en' ? 'Failed to submit predictions' : 'Error al enviar las predicciones',
+  loginRequired:
+    locale === 'en'
+      ? 'You need to login to make predictions'
+      : 'Necesitas iniciar sesión para hacer predicciones',
+  loginButton: locale === 'en' ? 'Login' : 'Iniciar Sesión',
+  loading: locale === 'en' ? 'Loading matches...' : 'Cargando partidos...',
 };
 
-const mockMatches = [
-  {
-    matchId: 'match-1',
-    homeTeam: { fifaCode: 'ARG', name: locale === 'en' ? 'Argentina' : 'Argentina' },
-    awayTeam: { fifaCode: 'FRA', name: locale === 'en' ? 'France' : 'Francia' },
-    phase: 'group' as const,
-    predictionDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  },
-  {
-    matchId: 'match-2',
-    homeTeam: { fifaCode: 'BRA', name: locale === 'en' ? 'Brazil' : 'Brasil' },
-    awayTeam: { fifaCode: 'GER', name: locale === 'en' ? 'Germany' : 'Alemania' },
-    phase: 'group' as const,
-    predictionDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  },
-];
-
 const templateProps = {
-  formProps: {
-    matches: mockMatches,
-  },
-  deadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
   translations,
-  onSubmit: () => {},
+  locale,
 };
 ---
 
-<PredictionTemplate {...templateProps} client:load />
+<PredictionsTemplate {...templateProps} client:load />

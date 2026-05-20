@@ -1,0 +1,61 @@
+.predictions-template {
+  width: 100%;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+.predictions-template__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.predictions-template__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.predictions-template__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 300px;
+}
+
+.predictions-template__auth-required {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  min-height: 300px;
+  text-align: center;
+}
+
+.predictions-template__feedback {
+  padding: var(--space-4);
+  border: var(--border-pixel);
+}
+
+.predictions-template__feedback--success {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--text-primary);
+}
+
+.predictions-template__feedback--error {
+  background-color: var(--color-error);
+  border-color: var(--color-error);
+  color: var(--text-primary);
+}
+
+.predictions-template__empty {
+  padding: var(--space-8);
+  text-align: center;
+  border: var(--border-pixel);
+  background-color: var(--bg-card);
+}
