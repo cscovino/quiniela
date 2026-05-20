@@ -52,7 +52,7 @@ const mockTeams: Team[] = [
     fifaCode: 'ARG',
     name: 'Argentina',
     groupId: 'A',
-    flagEmoji: '🇦🇷',
+    flagEmoji: 'AR',
     createdAt: mockTimestamp,
   },
   {
@@ -60,7 +60,7 @@ const mockTeams: Team[] = [
     fifaCode: 'FRA',
     name: 'France',
     groupId: 'A',
-    flagEmoji: '🇫🇷',
+    flagEmoji: 'FR',
     createdAt: mockTimestamp,
   },
 ];
@@ -113,7 +113,7 @@ describe('HomeTemplate', () => {
     vi.clearAllMocks();
   });
 
-  it('renders tournament header', async () => {
+  it('renders hero section immediately while data loads', async () => {
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
     vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue([]);
@@ -127,12 +127,12 @@ describe('HomeTemplate', () => {
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('World Cup 2026')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Welcome to World Cup 2026')).toBeInTheDocument();
+    expect(screen.getByText('Make Predictions')).toBeInTheDocument();
+    expect(screen.getByText('View Standings')).toBeInTheDocument();
   });
 
-  it('renders matches section', async () => {
+  it('renders matches section after data loads', async () => {
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(mockMatches);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
     vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue([]);
@@ -152,7 +152,7 @@ describe('HomeTemplate', () => {
     });
   });
 
-  it('renders rankings section', async () => {
+  it('renders rankings section after data loads', async () => {
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
     vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue(
@@ -172,5 +172,66 @@ describe('HomeTemplate', () => {
       expect(screen.getByText('Top Players')).toBeInTheDocument();
     });
     expect(screen.getByText('150')).toBeInTheDocument();
+  });
+
+  it('shows loading spinner for matches while fetching', () => {
+    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(
+      new Promise(() => {}),
+    );
+    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue([]);
+
+    render(
+      <HomeTemplate
+        tournamentProps={mockTournamentProps}
+        matches={[]}
+        rankings={[]}
+        translations={translations}
+      />,
+    );
+
+    expect(screen.getByText('Loading matches...')).toBeInTheDocument();
+  });
+
+  it('shows loading spinner for rankings while fetching', () => {
+    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
+    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue(
+      new Promise(() => {}),
+    );
+
+    render(
+      <HomeTemplate
+        tournamentProps={mockTournamentProps}
+        matches={[]}
+        rankings={[]}
+        translations={translations}
+      />,
+    );
+
+    expect(screen.getByText('Loading rankings...')).toBeInTheDocument();
+  });
+
+  it('handles partial failures gracefully', async () => {
+    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(mockMatches);
+    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockRejectedValue(
+      new Error('Stats failed'),
+    );
+
+    render(
+      <HomeTemplate
+        tournamentProps={mockTournamentProps}
+        matches={[]}
+        rankings={[]}
+        translations={translations}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Upcoming Matches')).toBeInTheDocument();
+      expect(screen.getByText('Argentina')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Failed to load rankings')).toBeInTheDocument();
   });
 });

@@ -7,6 +7,7 @@ import { MatchList, type MatchListProps } from '@organisms/MatchList/MatchList';
 import { RankingsTable, type RankingsTableProps } from '@organisms/RankingsTable/RankingsTable';
 import { Button } from '@atoms/Button/Button';
 import { Typography } from '@atoms/Typography/Typography';
+import { Spinner } from '@atoms/Spinner/Spinner';
 import { tournamentService } from '@services/tournament-service';
 import type { Match, PredictorStats } from '@types/firestore';
 import './HomeTemplate.css';
@@ -30,12 +31,16 @@ export interface HomeTemplateProps {
   className?: string;
 }
 
-interface HomeData {
+interface SectionState {
   matches: MatchListProps['matches'];
   rankings: RankingsTableProps['rankings'];
-  isLoading: boolean;
-  error: string | null;
+  matchesLoading: boolean;
+  rankingsLoading: boolean;
+  matchesError: string | null;
+  rankingsError: string | null;
 }
+
+const LOAD_TIMEOUT = 8000;
 
 const mapMatchToCard = (
   match: Match & { id: string },
@@ -86,70 +91,81 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
   onStandingsClick,
   className = '',
 }) => {
-  const [data, setData] = useState<HomeData>({
+  const [state, setState] = useState<SectionState>({
     matches: [],
     rankings: [],
-    isLoading: true,
-    error: null,
+    matchesLoading: true,
+    rankingsLoading: true,
+    matchesError: null,
+    rankingsError: null,
   });
 
   useEffect(() => {
+    let cancelled = false;
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        setState((prev) => ({
+          ...prev,
+          matchesLoading: false,
+          rankingsLoading: false,
+          matchesError: prev.matches.length === 0 ? 'Request timed out' : null,
+          rankingsError: prev.rankings.length === 0 ? 'Request timed out' : null,
+        }));
+      }
+    }, LOAD_TIMEOUT);
+
     const fetchData = async () => {
       try {
-        const [matches, teams, stats] = await Promise.all([
+        const [matches, teams, stats] = await Promise.allSettled([
           tournamentService.getMatches({ status: 'scheduled' }),
           tournamentService.getTeams(),
           tournamentService.getAllPredictorStats(),
         ]);
 
-        const teamsMap = teams.reduce<Record<string, { fifaCode: string; name: string }>>(
-          (acc, t) => {
-            acc[t.fifaCode.toLowerCase()] = { fifaCode: t.fifaCode, name: t.name };
-            return acc;
-          },
-          {},
-        );
+        if (cancelled) return;
 
-        setData({
-          matches: matches.slice(0, 5).map((m) => mapMatchToCard(m, teamsMap)),
-          rankings: stats.slice(0, 10).map(mapStatsToRanking),
-          isLoading: false,
-          error: null,
+        const teamsMap: Record<string, { fifaCode: string; name: string }> = {};
+        if (teams.status === 'fulfilled') {
+          teams.value.forEach((t) => {
+            teamsMap[t.fifaCode.toLowerCase()] = { fifaCode: t.fifaCode, name: t.name };
+          });
+        }
+
+        const newMatches: MatchListProps['matches'] =
+          matches.status === 'fulfilled'
+            ? matches.value.slice(0, 5).map((m) => mapMatchToCard(m, teamsMap))
+            : [];
+
+        const newRankings: RankingsTableProps['rankings'] =
+          stats.status === 'fulfilled' ? stats.value.slice(0, 10).map(mapStatsToRanking) : [];
+
+        setState({
+          matches: newMatches,
+          rankings: newRankings,
+          matchesLoading: false,
+          rankingsLoading: false,
+          matchesError: matches.status === 'rejected' ? 'Failed to load matches' : null,
+          rankingsError: stats.status === 'rejected' ? 'Failed to load rankings' : null,
         });
-      } catch (err) {
-        setData({
-          matches: [],
-          rankings: [],
-          isLoading: false,
-          error: err instanceof Error ? err.message : 'Failed to load data',
-        });
+      } catch {
+        if (!cancelled) {
+          setState((prev) => ({
+            ...prev,
+            matchesLoading: false,
+            rankingsLoading: false,
+            matchesError: 'Failed to load data',
+            rankingsError: 'Failed to load data',
+          }));
+        }
       }
     };
 
     fetchData();
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
   }, []);
-
-  if (data.isLoading) {
-    return (
-      <div className={`home-template ${className}`}>
-        <main className="home-template__content">
-          <Typography variant="body">{locale === 'en' ? 'Loading...' : 'Cargando...'}</Typography>
-        </main>
-      </div>
-    );
-  }
-
-  if (data.error) {
-    return (
-      <div className={`home-template ${className}`}>
-        <main className="home-template__content">
-          <Typography variant="body" style={{ color: 'var(--color-error)' }}>
-            Error: {data.error}
-          </Typography>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className={`home-template ${className}`}>
@@ -170,21 +186,45 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
         </section>
 
         <section className="home-template__matches">
-          <MatchList
-            matches={data.matches}
-            title={translations.matchesTitle}
-            translations={translations.matchList}
-            locale={locale}
-            emptyMessage={locale === 'en' ? 'No upcoming matches' : 'No hay partidos próximos'}
-          />
+          {state.matchesLoading ? (
+            <div className="home-template__loading">
+              <Spinner size="lg" />
+              <Typography variant="body">
+                {locale === 'en' ? 'Loading matches...' : 'Cargando partidos...'}
+              </Typography>
+            </div>
+          ) : (
+            <MatchList
+              matches={state.matches}
+              title={translations.matchesTitle}
+              translations={translations.matchList}
+              locale={locale}
+              emptyMessage={
+                state.matchesError ||
+                (locale === 'en' ? 'No upcoming matches' : 'No hay partidos próximos')
+              }
+            />
+          )}
         </section>
 
         <section className="home-template__rankings">
-          <RankingsTable
-            rankings={data.rankings}
-            title={translations.rankingsTitle}
-            emptyMessage={locale === 'en' ? 'No rankings yet' : 'Aún no hay clasificación'}
-          />
+          {state.rankingsLoading ? (
+            <div className="home-template__loading">
+              <Spinner size="lg" />
+              <Typography variant="body">
+                {locale === 'en' ? 'Loading rankings...' : 'Cargando clasificación...'}
+              </Typography>
+            </div>
+          ) : (
+            <RankingsTable
+              rankings={state.rankings}
+              title={translations.rankingsTitle}
+              emptyMessage={
+                state.rankingsError ||
+                (locale === 'en' ? 'No rankings yet' : 'Aún no hay clasificación')
+              }
+            />
+          )}
         </section>
       </main>
     </div>
