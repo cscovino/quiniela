@@ -9,6 +9,7 @@ import { Button } from '@atoms/Button/Button';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
 import { tournamentService } from '@services/tournament-service';
+import { useAuthStore } from '@store/auth-store';
 import type { Match, PredictorStats } from '@types/firestore';
 import './HomeTemplate.css';
 
@@ -24,6 +25,8 @@ export interface HomeTemplateProps {
     matchesTitle: string;
     rankingsTitle: string;
     matchList: MatchListProps['translations'];
+    loginToPredict: string;
+    loginToRankings: string;
   };
   locale?: 'en' | 'es';
   onPredictionsClick?: () => void;
@@ -91,6 +94,7 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
   onStandingsClick,
   className = '',
 }) => {
+  const user = useAuthStore((state) => state.user);
   const [state, setState] = useState<SectionState>({
     matches: [],
     rankings: [],
@@ -99,6 +103,28 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
     matchesError: null,
     rankingsError: null,
   });
+
+  const loginUrl = locale === 'en' ? '/en/login' : '/login';
+
+  const handleLogin = () => {
+    window.location.href = loginUrl;
+  };
+
+  const handlePredictionsClick = () => {
+    if (!user) {
+      handleLogin();
+    } else {
+      onPredictionsClick?.();
+    }
+  };
+
+  const handleStandingsClick = () => {
+    if (!user) {
+      handleLogin();
+    } else {
+      onStandingsClick?.();
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -119,7 +145,7 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
         const [matches, teams, stats] = await Promise.allSettled([
           tournamentService.getMatches({ status: 'scheduled' }),
           tournamentService.getTeams(),
-          tournamentService.getAllPredictorStats(),
+          user ? tournamentService.getAllPredictorStats() : Promise.resolve([]),
         ]);
 
         if (cancelled) return;
@@ -165,7 +191,7 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, []);
+  }, [user]);
 
   return (
     <div className={`home-template ${className}`}>
@@ -176,10 +202,10 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
           <Typography variant="h2">{translations.heroTitle}</Typography>
           <Typography variant="body">{translations.heroSubtitle}</Typography>
           <div className="home-template__actions">
-            <Button variant="primary" size="lg" onClick={onPredictionsClick}>
+            <Button variant="primary" size="lg" onClick={handlePredictionsClick}>
               {translations.ctaPredictions}
             </Button>
-            <Button variant="secondary" size="lg" onClick={onStandingsClick}>
+            <Button variant="secondary" size="lg" onClick={handleStandingsClick}>
               {translations.ctaStandings}
             </Button>
           </div>
@@ -208,7 +234,14 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
         </section>
 
         <section className="home-template__rankings">
-          {state.rankingsLoading ? (
+          {!user ? (
+            <div className="home-template__auth-required">
+              <Typography variant="body">{translations.loginToRankings}</Typography>
+              <Button variant="primary" size="sm" onClick={handleLogin}>
+                {locale === 'en' ? 'Login' : 'Iniciar Sesión'}
+              </Button>
+            </div>
+          ) : state.rankingsLoading ? (
             <div className="home-template__loading">
               <Spinner size="lg" />
               <Typography variant="body">

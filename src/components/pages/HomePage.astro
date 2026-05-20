@@ -8,7 +8,7 @@ export interface Props {
 const { locale } = Astro.props;
 
 const translations = {
-  heroTitle: locale === 'en' ? 'Predict. Compet. Win.' : 'Predice. Compite. Gana.',
+  heroTitle: locale === 'en' ? 'Predict. Compete. Win.' : 'Predice. Compite. Gana.',
   heroSubtitle:
     locale === 'en'
       ? 'Make your predictions for every match and climb the leaderboard!'
@@ -17,6 +17,12 @@ const translations = {
   ctaStandings: locale === 'en' ? 'View Standings' : 'Ver Clasificación',
   matchesTitle: locale === 'en' ? 'Upcoming Matches' : 'Próximos Partidos',
   rankingsTitle: locale === 'en' ? 'Top Players' : 'Mejores Jugadores',
+  loginToPredict:
+    locale === 'en'
+      ? 'Login to make predictions and compete!'
+      : 'Inicia sesión para hacer predicciones y competir!',
+  loginToRankings:
+    locale === 'en' ? 'Login to see the rankings' : 'Inicia sesión para ver la clasificación',
   matchList: {
     scheduled: locale === 'en' ? 'Scheduled' : 'Programado',
     live: locale === 'en' ? 'LIVE' : 'EN VIVO',

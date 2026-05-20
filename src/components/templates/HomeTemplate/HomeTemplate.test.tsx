@@ -3,7 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { HomeTemplate } from './HomeTemplate';
 import type { TournamentHeaderProps } from '@organisms/TournamentHeader/TournamentHeader';
 import * as tournamentService from '@services/tournament-service';
-import type { Match, Team, PredictorStats } from '@types/firestore';
+import * as authStore from '@store/auth-store';
+import type { Match, Team, PredictorStats, User } from '@types/firestore';
 import type { Timestamp } from 'firebase/firestore';
 
 vi.mock('@services/tournament-service', () => ({
@@ -12,6 +13,10 @@ vi.mock('@services/tournament-service', () => ({
     getTeams: vi.fn(),
     getAllPredictorStats: vi.fn(),
   },
+}));
+
+vi.mock('@store/auth-store', () => ({
+  useAuthStore: vi.fn(),
 }));
 
 const matchTranslations = {
@@ -31,6 +36,8 @@ const translations = {
   matchesTitle: 'Upcoming Matches',
   rankingsTitle: 'Top Players',
   matchList: matchTranslations,
+  loginToPredict: 'Login to make predictions and compete!',
+  loginToRankings: 'Login to see the rankings',
 };
 
 const mockTournamentProps: TournamentHeaderProps = {
@@ -111,6 +118,7 @@ const mockRankings: (PredictorStats & { userId: string; predictorId: string })[]
 describe('HomeTemplate', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(authStore.useAuthStore).mockReturnValue(null);
   });
 
   it('renders hero section immediately while data loads', async () => {
@@ -152,7 +160,35 @@ describe('HomeTemplate', () => {
     });
   });
 
-  it('renders rankings section after data loads', async () => {
+  it('shows login prompt for rankings when not authenticated', async () => {
+    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
+    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+
+    render(
+      <HomeTemplate
+        tournamentProps={mockTournamentProps}
+        matches={[]}
+        rankings={[]}
+        translations={translations}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Login to see the rankings')).toBeInTheDocument();
+      expect(screen.getByText('Login')).toBeInTheDocument();
+    });
+  });
+
+  it('renders rankings when authenticated', async () => {
+    const mockUser: User = {
+      uid: 'user-1',
+      email: 'test@example.com',
+      displayName: 'Test User',
+      role: 'user',
+      createdAt: mockTimestamp,
+      lastLoginAt: mockTimestamp,
+    };
+    vi.mocked(authStore.useAuthStore).mockReturnValue(mockUser);
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
     vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue(
@@ -174,12 +210,31 @@ describe('HomeTemplate', () => {
     expect(screen.getByText('150')).toBeInTheDocument();
   });
 
+  it('skips fetching rankings when not authenticated', async () => {
+    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(mockMatches);
+    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+
+    render(
+      <HomeTemplate
+        tournamentProps={mockTournamentProps}
+        matches={[]}
+        rankings={[]}
+        translations={translations}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Upcoming Matches')).toBeInTheDocument();
+    });
+
+    expect(tournamentService.tournamentService.getAllPredictorStats).not.toHaveBeenCalled();
+  });
+
   it('shows loading spinner for matches while fetching', () => {
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(
       new Promise(() => {}),
     );
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
-    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue([]);
 
     render(
       <HomeTemplate
@@ -193,26 +248,16 @@ describe('HomeTemplate', () => {
     expect(screen.getByText('Loading matches...')).toBeInTheDocument();
   });
 
-  it('shows loading spinner for rankings while fetching', () => {
-    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
-    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
-    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue(
-      new Promise(() => {}),
-    );
-
-    render(
-      <HomeTemplate
-        tournamentProps={mockTournamentProps}
-        matches={[]}
-        rankings={[]}
-        translations={translations}
-      />,
-    );
-
-    expect(screen.getByText('Loading rankings...')).toBeInTheDocument();
-  });
-
   it('handles partial failures gracefully', async () => {
+    const mockUser: User = {
+      uid: 'user-1',
+      email: 'test@example.com',
+      displayName: 'Test User',
+      role: 'user',
+      createdAt: mockTimestamp,
+      lastLoginAt: mockTimestamp,
+    };
+    vi.mocked(authStore.useAuthStore).mockReturnValue(mockUser);
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(mockMatches);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
     vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockRejectedValue(
