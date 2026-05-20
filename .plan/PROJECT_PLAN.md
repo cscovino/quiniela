@@ -980,31 +980,31 @@ service cloud.firestore {
 ## 🗺 Roadmap & Sprints
 
 ### Sprint 1: Foundation & Core (Effort: 29)
-- [ ] US-001: Create a Tournament
-- [ ] US-002: Create Groups
-- [ ] US-003: Add Teams
-- [ ] US-004: Create Matches
-- [ ] US-005: Update Match Results
-- [ ] US-006: User Registration & Login
-- [ ] US-006b: Manage Predictors
-- [ ] US-007: Predict Match Score
-- [ ] US-008: Predict Group Standings
-- [ ] US-009: Predict Knockout Winner
+- [x] US-001: Create a Tournament
+- [x] US-002: Create Groups
+- [x] US-003: Add Teams
+- [x] US-004: Create Matches
+- [x] US-005: Update Match Results
+- [x] US-006: User Registration & Login
+- [x] US-006b: Manage Predictors
+- [x] US-007: Predict Match Score
+- [x] US-008: Predict Group Standings
+- [x] US-009: Predict Knockout Winner
 
 ### Sprint 2: Rankings & Gamification (Effort: 22)
-- [ ] US-010: Calculate Prediction Points
-- [ ] US-011: Update Group Standings
-- [ ] US-012: Update User Statistics
-- [ ] US-013: Display User Ranking
+- [x] US-010: Calculate Prediction Points
+- [x] US-011: Update Group Standings
+- [x] US-012: Update User Statistics
+- [x] US-013: Display User Ranking
 - [ ] US-014: Display Points Evolution Graph
-- [ ] US-015: Auto-Assign Badges
+- [x] US-015: Auto-Assign Badges
 - [ ] US-016: Display Badges on Profile
 
 ### Sprint 3: UI/UX Polish (Effort: 15)
-- [ ] US-017: Display Tournament List
-- [ ] US-018: Display Tournament Details
-- [ ] US-019: Display Group Matches
-- [ ] US-020: Prediction Form
+- [x] US-017: Display Tournament List
+- [x] US-018: Display Tournament Details
+- [x] US-019: Display Group Matches
+- [x] US-020: Prediction Form
 - [ ] US-021: Real-Time Notifications
 
 ### Design System Parallel Track
@@ -1016,6 +1016,8 @@ service cloud.firestore {
 - [ ] Phase 6: Pixel art assets
 
 **Total Effort: 66 points**
+
+**Completed: 56/66 points (85%)**
 
 ---
 
@@ -1031,9 +1033,9 @@ service cloud.firestore {
 | US-005 | Update Match Results | ✅ Done | Cloud Functions: calculateMatchResult, updateGroupStandings, updatePredictorStats, checkAndAwardBadges |
 | US-006 | User Registration & Login | ✅ Done | Zustand store, login/register forms, auth pages ES+EN, NavBar integration |
 | US-006b | Manage Predictors | ✅ Done | Schema ready, default predictor auto-created |
-| US-007 | Predict Match Score | ⬜ Not Started | |
-| US-008 | Predict Group Standings | ⬜ Not Started | |
-| US-009 | Predict Knockout Winner | ⬜ Not Started | |
+| US-007 | Predict Match Score | ✅ Done | Full prediction flow with match scores, group standings, bracket |
+| US-008 | Predict Group Standings | ✅ Done | GroupPredictionForm: rank all 4 teams per group (1st-4th) |
+| US-009 | Predict Knockout Winner | ✅ Done | KnockoutBracketForm: pick winners for all knockout phases |
 
 ### Sprint 2: Rankings & Gamification
 | US | Story | Status | Notes |
@@ -1041,7 +1043,7 @@ service cloud.firestore {
 | US-010 | Calculate Prediction Points | ✅ Done | Cloud Function `calculateMatchResult` (+3 exact, +1 outcome) |
 | US-011 | Update Group Standings | ✅ Done | Cloud Function `updateGroupStandings` (recomputes from scratch) |
 | US-012 | Update User Statistics | ✅ Done | Cloud Function `updatePredictorStats` (points, accuracy, streaks) |
-| US-013 | Display User Ranking | ⬜ Not Started | Components built, needs Firestore connection |
+| US-013 | Display User Ranking | ✅ Done | RankingsTemplate with real Firestore data, /rankings + /en/rankings |
 | US-014 | Display Points Evolution Graph | ⬜ Not Started | |
 | US-015 | Auto-Assign Badges | ✅ Done | Cloud Function `checkAndAwardBadges` (first-blood, on-fire, consistent, perfect-group) |
 | US-016 | Display Badges on Profile | ⬜ Not Started | |
@@ -1085,7 +1087,7 @@ service cloud.firestore {
 | Phase 2 | Atoms (12 components) | ✅ Done | Button, Input, Badge, Avatar, Icon, Typography, Spinner, Checkbox, Radio, Tooltip, Divider, ProgressBar |
 | Phase 3 | Molecules (9 components) | ✅ Done | TeamFlag, MatchCard, PredictionInput, TeamSelector, StatCard, ScoreDisplay, CountdownTimer, RankingRow, GroupHeader |
 | Phase 4 | Organisms (9 components) | ✅ Done | NavBar, TournamentHeader, MatchList, PredictionForm, GroupStandings, RankingsTable, BracketView, UserProfile, NotificationPanel |
-| Phase 5 | Templates (5 layouts) | ✅ Done | HomeTemplate, PredictionTemplate, StandingsTemplate, ProfileTemplate, TournamentTemplate |
+| Phase 5 | Templates (6 layouts) | ✅ Done | HomeTemplate, PredictionTemplate, StandingsTemplate, ProfileTemplate, TournamentTemplate, RankingsTemplate |
 | Phase 6 | Pixel art assets | ✅ Done | PixelArt component with 13 SVG sprites (football, trophy, stadium, medals, crowd, etc.) + animations |
 
 ---
