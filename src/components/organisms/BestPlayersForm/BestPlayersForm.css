@@ -24,23 +24,22 @@
   color: var(--text-muted);
 }
 
-.best-players-form__select {
+.best-players-form__input {
   padding: var(--space-3) var(--space-4);
   background: var(--bg-input);
   border: var(--border-pixel-sm);
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: var(--text-base);
-  cursor: pointer;
   transition: border-color var(--duration-fast) var(--ease-out);
 }
 
-.best-players-form__select:focus {
+.best-players-form__input:focus {
   outline: none;
   border-color: var(--color-accent-500);
 }
 
-.best-players-form__select:disabled {
+.best-players-form__input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

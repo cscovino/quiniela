@@ -1,0 +1,127 @@
+import React, { useState } from 'react';
+import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
+import { Button } from '@atoms/Button/Button';
+import { Typography } from '@atoms/Typography/Typography';
+import './FinalPhaseForm.css';
+
+export interface FinalPhaseFormProps {
+  teams: { fifaCode: string; name: string }[];
+  onSubmit: (data: { first?: string; second?: string; third?: string; fourth?: string }) => void;
+  existingPrediction?: { first?: string; second?: string; third?: string; fourth?: string };
+  isDisabled?: boolean;
+  className?: string;
+}
+
+const POSITION_LABELS = ['1st Place', '2nd Place', '3rd Place', '4th Place'];
+const POSITION_KEYS: ('first' | 'second' | 'third' | 'fourth')[] = [
+  'first',
+  'second',
+  'third',
+  'fourth',
+];
+
+export const FinalPhaseForm: React.FC<FinalPhaseFormProps> = ({
+  teams,
+  onSubmit,
+  existingPrediction,
+  isDisabled = false,
+  className = '',
+}) => {
+  const [selections, setSelections] = useState({
+    first: existingPrediction?.first || '',
+    second: existingPrediction?.second || '',
+    third: existingPrediction?.third || '',
+    fourth: existingPrediction?.fourth || '',
+  });
+
+  const handlePositionChange = (position: string, fifaCode: string) => {
+    setSelections((prev) => ({ ...prev, [position]: fifaCode }));
+  };
+
+  const handleSubmit = () => {
+    const { first, second, third, fourth } = selections;
+    if (!first && !second && !third && !fourth) return;
+
+    onSubmit({
+      ...(first && { first }),
+      ...(second && { second }),
+      ...(third && { third }),
+      ...(fourth && { fourth }),
+    });
+  };
+
+  const sortedTeams = [...teams].sort((a, b) => a.name.localeCompare(b.name));
+
+  const selectedTeams = new Set(Object.values(selections).filter(Boolean));
+
+  const isComplete = selections.first && selections.second && selections.third && selections.fourth;
+  const isUnique =
+    new Set(
+      [selections.first, selections.second, selections.third, selections.fourth].filter(Boolean),
+    ).size ===
+    [selections.first, selections.second, selections.third, selections.fourth].filter(Boolean)
+      .length;
+
+  return (
+    <div className={`final-phase-form ${className}`}>
+      <div className="final-phase-form__positions">
+        {POSITION_KEYS.map((key, index) => (
+          <div key={key} className="final-phase-form__position">
+            <div className="final-phase-form__position-header">
+              <span className={`final-phase-form__badge final-phase-form__badge--${index + 1}`}>
+                #{index + 1}
+              </span>
+              <Typography variant="h3">{POSITION_LABELS[index]}</Typography>
+            </div>
+            <select
+              className="final-phase-form__select"
+              value={selections[key]}
+              onChange={(e) => handlePositionChange(key, e.target.value)}
+              disabled={isDisabled}
+            >
+              <option value="">Select team...</option>
+              {sortedTeams.map((team) => {
+                const isSelectedElsewhere =
+                  selectedTeams.has(team.fifaCode) && selections[key] !== team.fifaCode;
+                return (
+                  <option
+                    key={`${key}-${team.fifaCode}`}
+                    value={team.fifaCode}
+                    disabled={isSelectedElsewhere}
+                  >
+                    {team.name}
+                  </option>
+                );
+              })}
+            </select>
+            {selections[key] && (
+              <div className="final-phase-form__selected">
+                <TeamFlag fifaCode={selections[key]} size="md" />
+                <Typography variant="small">
+                  {teams.find((t) => t.fifaCode === selections[key])?.name}
+                </Typography>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {!isUnique && (
+        <div className="final-phase-form__warning">
+          <Typography variant="small">Each team can only be selected once</Typography>
+        </div>
+      )}
+
+      <div className="final-phase-form__actions">
+        <Button
+          variant="primary"
+          size="md"
+          onClick={handleSubmit}
+          disabled={isDisabled || !isComplete || !isUnique}
+        >
+          Submit Final Phase
+        </Button>
+      </div>
+    </div>
+  );
+};

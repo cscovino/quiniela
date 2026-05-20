@@ -4,7 +4,6 @@ import { Typography } from '@atoms/Typography/Typography';
 import './BestPlayersForm.css';
 
 export interface BestPlayersFormProps {
-  teams: { fifaCode: string; name: string }[];
   onSubmit: (data: { bestGoalkeeper?: string; bestScorer?: string }) => void;
   existingPrediction?: { bestGoalkeeper?: string; bestScorer?: string };
   isDisabled?: boolean;
@@ -12,7 +11,6 @@ export interface BestPlayersFormProps {
 }
 
 export const BestPlayersForm: React.FC<BestPlayersFormProps> = ({
-  teams,
   onSubmit,
   existingPrediction,
   isDisabled = false,
@@ -30,49 +28,37 @@ export const BestPlayersForm: React.FC<BestPlayersFormProps> = ({
     });
   };
 
-  const sortedTeams = [...teams].sort((a, b) => a.name.localeCompare(b.name));
-
   return (
     <div className={`best-players-form ${className}`}>
       <div className="best-players-form__fields">
         <div className="best-players-form__field">
           <Typography variant="h3">Best Goalkeeper</Typography>
           <Typography variant="small" className="best-players-form__hint">
-            Who will be the best goalkeeper of the tournament?
+            Enter the name of the player you think will be the best goalkeeper
           </Typography>
-          <select
-            className="best-players-form__select"
+          <input
+            type="text"
+            className="best-players-form__input"
+            placeholder="e.g. Emiliano Martinez"
             value={bestGoalkeeper}
             onChange={(e) => setBestGoalkeeper(e.target.value)}
             disabled={isDisabled}
-          >
-            <option value="">Select goalkeeper...</option>
-            {sortedTeams.map((team) => (
-              <option key={`gk-${team.fifaCode}`} value={team.fifaCode}>
-                {team.name}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         <div className="best-players-form__field">
           <Typography variant="h3">Best Scorer</Typography>
           <Typography variant="small" className="best-players-form__hint">
-            Who will be the top scorer of the tournament?
+            Enter the name of the player you think will be the top scorer
           </Typography>
-          <select
-            className="best-players-form__select"
+          <input
+            type="text"
+            className="best-players-form__input"
+            placeholder="e.g. Kylian Mbappe"
             value={bestScorer}
             onChange={(e) => setBestScorer(e.target.value)}
             disabled={isDisabled}
-          >
-            <option value="">Select scorer...</option>
-            {sortedTeams.map((team) => (
-              <option key={`sc-${team.fifaCode}`} value={team.fifaCode}>
-                {team.name}
-              </option>
-            ))}
-          </select>
+          />
         </div>
       </div>
 

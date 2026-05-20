@@ -1,0 +1,107 @@
+.final-phase-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  background: var(--bg-card);
+  border: var(--border-pixel-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.final-phase-form__positions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-6);
+}
+
+.final-phase-form__position {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.final-phase-form__position-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.final-phase-form__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  border: var(--border-pixel-sm);
+}
+
+.final-phase-form__badge--1 {
+  background: var(--color-gold-500);
+  color: var(--text-inverse);
+  border-color: var(--color-gold-600);
+}
+
+.final-phase-form__badge--2 {
+  background: var(--color-accent-500);
+  color: var(--text-inverse);
+  border-color: var(--color-accent-600);
+}
+
+.final-phase-form__badge--3 {
+  background: var(--color-tertiary-500);
+  color: var(--text-inverse);
+  border-color: var(--color-tertiary-600);
+}
+
+.final-phase-form__badge--4 {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.final-phase-form__select {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-input);
+  border: var(--border-pixel-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.final-phase-form__select:focus {
+  outline: none;
+  border-color: var(--color-accent-500);
+}
+
+.final-phase-form__select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.final-phase-form__selected {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--bg-card-hover);
+  border: var(--border-pixel-sm);
+}
+
+.final-phase-form__warning {
+  padding: var(--space-3);
+  background: var(--color-warning-bg);
+  border: var(--border-pixel-sm);
+  border-color: var(--color-warning-border);
+  color: var(--color-warning);
+  text-align: center;
+}
+
+.final-phase-form__actions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-4);
+}
