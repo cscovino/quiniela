@@ -19,6 +19,9 @@ export interface PredictionFormProps {
   onSubmit: (
     predictions: Record<string, { home?: number; away?: number; winner?: string }>,
   ) => void;
+  onPredictionsChange?: (
+    predictions: Record<string, { home?: number; away?: number; winner?: string }>,
+  ) => void;
   isDisabled?: boolean;
   className?: string;
 }
@@ -26,6 +29,7 @@ export interface PredictionFormProps {
 export const PredictionForm: React.FC<PredictionFormProps> = ({
   matches,
   onSubmit,
+  onPredictionsChange,
   isDisabled = false,
   className = '',
 }) => {
@@ -34,17 +38,19 @@ export const PredictionForm: React.FC<PredictionFormProps> = ({
   >({});
 
   const handleGroupPrediction = (matchId: string, home: number, away: number) => {
-    setPredictions((prev) => ({
-      ...prev,
-      [matchId]: { home, away },
-    }));
+    setPredictions((prev) => {
+      const next = { ...prev, [matchId]: { home, away } };
+      onPredictionsChange?.(next);
+      return next;
+    });
   };
 
   const handleKnockoutPrediction = (matchId: string, winner: string) => {
-    setPredictions((prev) => ({
-      ...prev,
-      [matchId]: { winner },
-    }));
+    setPredictions((prev) => {
+      const next = { ...prev, [matchId]: { winner } };
+      onPredictionsChange?.(next);
+      return next;
+    });
   };
 
   const handleSubmit = () => {

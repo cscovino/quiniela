@@ -38,9 +38,26 @@ export interface PredictionsTemplateProps {
     buttonBack: string;
     buttonSubmit: string;
     stepXofY: string;
+    submitToAdvance: string;
+    predictedStandings: string;
+    team: string;
+    pts: string;
   };
   locale?: 'en' | 'es';
   className?: string;
+}
+
+interface PredictedStanding {
+  teamId: string;
+  fifaCode: string;
+  name: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  points: number;
 }
 
 const mapMatchToPrediction = (
@@ -69,6 +86,78 @@ const mapMatchToPrediction = (
   };
 };
 
+const calculatePredictedStandings = (
+  matches: (Match & { id: string })[],
+  predictions: Record<string, { home?: number; away?: number }>,
+  teamsMap: Record<string, { fifaCode: string; name: string }>,
+): Record<string, PredictedStanding[]> => {
+  const groupStandings: Record<string, Record<string, PredictedStanding>> = {};
+
+  for (const match of matches) {
+    const pred = predictions[match.id];
+    if (!pred || pred.home == null || pred.away == null) continue;
+    if (!match.homeTeamId || !match.awayTeamId) continue;
+
+    const groupId = match.groupId || 'unknown';
+    if (!groupStandings[groupId]) groupStandings[groupId] = {};
+
+    const initTeam = (teamId: string) => {
+      if (!groupStandings[groupId][teamId]) {
+        const team = teamsMap[teamId] || { fifaCode: teamId.toUpperCase(), name: teamId };
+        groupStandings[groupId][teamId] = {
+          teamId,
+          fifaCode: team.fifaCode,
+          name: team.name,
+          played: 0,
+          won: 0,
+          drawn: 0,
+          lost: 0,
+          goalsFor: 0,
+          goalsAgainst: 0,
+          points: 0,
+        };
+      }
+    };
+
+    initTeam(match.homeTeamId);
+    initTeam(match.awayTeamId);
+
+    const home = groupStandings[groupId][match.homeTeamId];
+    const away = groupStandings[groupId][match.awayTeamId];
+
+    home.played++;
+    away.played++;
+    home.goalsFor += pred.home;
+    home.goalsAgainst += pred.away;
+    away.goalsFor += pred.away;
+    away.goalsAgainst += pred.home;
+
+    if (pred.home > pred.away) {
+      home.won++;
+      home.points += 3;
+      away.lost++;
+    } else if (pred.home < pred.away) {
+      away.won++;
+      away.points += 3;
+      home.lost++;
+    } else {
+      home.drawn++;
+      away.drawn++;
+      home.points += 1;
+      away.points += 1;
+    }
+  }
+
+  const result: Record<string, PredictedStanding[]> = {};
+  for (const [groupId, teams] of Object.entries(groupStandings)) {
+    result[groupId] = Object.values(teams).sort(
+      (a, b) => b.points - a.points || b.goalsFor - b.goalsAgainst - (a.goalsFor - a.goalsAgainst),
+    );
+  }
+
+  return result;
+};
+
 export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   translations,
   locale = 'en',
@@ -85,10 +174,16 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   const [predictorsLoading, setPredictorsLoading] = useState(true);
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [submittedSteps, setSubmittedSteps] = useState<Set<number>>(new Set());
+  const [matchPredictions, setMatchPredictions] = useState<
+    Record<string, { home?: number; away?: number }>
+  >({});
+
   const [matches, setMatches] = useState<MatchPrediction[]>([]);
   const [firestoreMatches, setFirestoreMatches] = useState<(Match & { id: string })[]>([]);
   const [groups, setGroups] = useState<GroupForPrediction[]>([]);
   const [allTeams, setAllTeams] = useState<{ fifaCode: string; name: string }[]>([]);
+  const [teamsMap, setTeamsMap] = useState<Record<string, { fifaCode: string; name: string }>>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
@@ -153,16 +248,17 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
         if (cancelled) return;
 
-        const teamsMap: Record<string, { fifaCode: string; name: string }> = {};
+        const tMap: Record<string, { fifaCode: string; name: string }> = {};
         const teamsList: { fifaCode: string; name: string }[] = [];
         if (teamsResult.status === 'fulfilled') {
           teamsResult.value.forEach((t) => {
-            teamsMap[t.fifaCode.toLowerCase()] = { fifaCode: t.fifaCode, name: t.name };
-            teamsMap[t.fifaCode] = { fifaCode: t.fifaCode, name: t.name };
+            tMap[t.fifaCode.toLowerCase()] = { fifaCode: t.fifaCode, name: t.name };
+            tMap[t.fifaCode] = { fifaCode: t.fifaCode, name: t.name };
             teamsList.push({ fifaCode: t.fifaCode, name: t.name });
           });
         }
         setAllTeams(teamsList);
+        setTeamsMap(tMap);
 
         const allMatches =
           matchesResult.status === 'fulfilled'
@@ -172,7 +268,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         const groupMatches = allMatches.filter((m) => m.phase === 'group');
 
         setFirestoreMatches(groupMatches);
-        setMatches(groupMatches.map((m) => mapMatchToPrediction(m, teamsMap)));
+        setMatches(groupMatches.map((m) => mapMatchToPrediction(m, tMap)));
 
         if (groupsResult.status === 'fulfilled' && teamsResult.status === 'fulfilled') {
           const sortedGroups = [...groupsResult.value].sort((a, b) => a.order - b.order);
@@ -234,6 +330,19 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     };
   }, [user, selectedPredictorId]);
 
+  const handleMatchPredictionsChange = useCallback(
+    (predictions: Record<string, { home?: number; away?: number; winner?: string }>) => {
+      const cleaned: Record<string, { home?: number; away?: number }> = {};
+      for (const [key, val] of Object.entries(predictions)) {
+        if (val.home != null && val.away != null) {
+          cleaned[key] = { home: val.home, away: val.away };
+        }
+      }
+      setMatchPredictions(cleaned);
+    },
+    [],
+  );
+
   const handleMatchSubmit = useCallback(
     async (predictions: Record<string, { home?: number; away?: number; winner?: string }>) => {
       if (!user || !selectedPredictorId) return;
@@ -262,6 +371,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         const newBetIds = new Set(existingMatchBets);
         Object.keys(predictions).forEach((id) => newBetIds.add(id));
         setExistingMatchBets(newBetIds);
+        setSubmittedSteps((prev) => new Set(prev).add(0));
       }
 
       if (result.errors.length > 0) {
@@ -303,6 +413,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         const newBetIds = new Set(existingGroupBets);
         Object.keys(predictions).forEach((id) => newBetIds.add(id));
         setExistingGroupBets(newBetIds);
+        setSubmittedSteps((prev) => new Set(prev).add(1));
       }
 
       if (result.errors.length > 0) {
@@ -326,6 +437,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
       try {
         setExistingFinalPhase(data);
+        setSubmittedSteps((prev) => new Set(prev).add(2));
         setFeedback({
           type: 'success',
           message:
@@ -358,6 +470,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
       try {
         setExistingBestPlayers(data);
+        setSubmittedSteps((prev) => new Set(prev).add(3));
         setFeedback({
           type: 'success',
           message:
@@ -387,6 +500,18 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     const newPredictor = await predictorService.createPredictor(user.uid, name);
     setPredictors((prev) => [...prev, newPredictor]);
     setSelectedPredictorId(newPredictor.id);
+  };
+
+  const handleNext = () => {
+    if (currentStep < TOTAL_STEPS - 1) {
+      setCurrentStep((prev) => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+    }
   };
 
   if (loading || isAuthLoading || predictorsLoading) {
@@ -448,6 +573,11 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   }
 
   const availableMatches = matches.filter((m) => !existingMatchBets.has(m.matchId));
+  const predictedStandings = calculatePredictedStandings(
+    firestoreMatches,
+    matchPredictions,
+    teamsMap,
+  );
 
   const stepLabels = [
     translations.stepMatches,
@@ -455,6 +585,15 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     translations.stepFinalPhase,
     translations.stepBestPlayers,
   ];
+
+  const canAdvance =
+    currentStep === 0
+      ? Object.keys(matchPredictions).length > 0
+      : currentStep === 1
+        ? true
+        : currentStep === 2
+          ? true
+          : true;
 
   return (
     <div className={`predictions-template ${className}`}>
@@ -467,9 +606,11 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           {stepLabels.map((label, index) => (
             <div
               key={label}
-              className={`predictions-template__progress-step ${index === currentStep ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}
+              className={`predictions-template__progress-step ${index === currentStep ? 'active' : ''} ${submittedSteps.has(index) ? 'completed' : ''}`}
             >
-              <span className="predictions-template__progress-number">{index + 1}</span>
+              <span className="predictions-template__progress-number">
+                {submittedSteps.has(index) ? '✓' : index + 1}
+              </span>
               <span className="predictions-template__progress-label">{label}</span>
             </div>
           ))}
@@ -507,6 +648,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
               <PredictionForm
                 matches={availableMatches}
                 onSubmit={handleMatchSubmit}
+                onPredictionsChange={handleMatchPredictionsChange}
                 isDisabled={submitting}
               />
             )}
@@ -519,6 +661,50 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
               <Typography variant="h2">{translations.stepGroups}</Typography>
               <Typography variant="body">{translations.stepGroupsDesc}</Typography>
             </div>
+
+            {Object.keys(predictedStandings).length > 0 && (
+              <div className="predictions-template__predicted-standings">
+                <Typography variant="h3">{translations.predictedStandings}</Typography>
+                {Object.entries(predictedStandings).map(([groupId, standings]) => (
+                  <div key={groupId} className="predictions-template__predicted-group">
+                    <Typography variant="small" className="predictions-template__group-name">
+                      {groups.find((g) => g.slug === groupId)?.name || groupId}
+                    </Typography>
+                    <table className="predictions-template__predicted-table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>{translations.team}</th>
+                          <th>P</th>
+                          <th>W</th>
+                          <th>D</th>
+                          <th>L</th>
+                          <th>GF</th>
+                          <th>GA</th>
+                          <th>{translations.pts}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {standings.map((s, i) => (
+                          <tr key={s.teamId}>
+                            <td>{i + 1}</td>
+                            <td className="predictions-template__team-cell">{s.fifaCode}</td>
+                            <td>{s.played}</td>
+                            <td>{s.won}</td>
+                            <td>{s.drawn}</td>
+                            <td>{s.lost}</td>
+                            <td>{s.goalsFor}</td>
+                            <td>{s.goalsAgainst}</td>
+                            <td className="predictions-template__pts-cell">{s.points}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {groups.length > 0 ? (
               <GroupPredictionForm
                 groups={groups}
@@ -578,24 +764,21 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         )}
 
         <div className="predictions-template__navigation">
-          <Button
-            variant="secondary"
-            size="md"
-            onClick={() => setCurrentStep((prev) => Math.max(0, prev - 1))}
-            disabled={currentStep === 0}
-          >
+          <Button variant="secondary" size="md" onClick={handleBack} disabled={currentStep === 0}>
             {translations.buttonBack}
           </Button>
           {currentStep < TOTAL_STEPS - 1 && (
-            <Button
-              variant="primary"
-              size="md"
-              onClick={() => setCurrentStep((prev) => Math.min(TOTAL_STEPS - 1, prev + 1))}
-            >
+            <Button variant="primary" size="md" onClick={handleNext} disabled={!canAdvance}>
               {translations.buttonNext}
             </Button>
           )}
         </div>
+
+        {!submittedSteps.has(currentStep) && (
+          <div className="predictions-template__hint">
+            <Typography variant="small">{translations.submitToAdvance}</Typography>
+          </div>
+        )}
       </main>
     </div>
   );

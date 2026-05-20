@@ -29,8 +29,6 @@ export interface HomeTemplateProps {
     loginToRankings: string;
   };
   locale?: 'en' | 'es';
-  onPredictionsClick?: () => void;
-  onStandingsClick?: () => void;
   className?: string;
 }
 
@@ -90,8 +88,6 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
   tournamentProps,
   translations,
   locale = 'en',
-  onPredictionsClick,
-  onStandingsClick,
   className = '',
 }) => {
   const user = useAuthStore((state) => state.user);
@@ -120,7 +116,8 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
     if (!user) {
       handleLogin();
     } else {
-      onPredictionsClick?.();
+      const predictionsUrl = locale === 'en' ? '/en/predictions' : '/predicciones';
+      window.location.href = predictionsUrl;
     }
   };
 
@@ -128,7 +125,8 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
     if (!user) {
       handleLogin();
     } else {
-      onStandingsClick?.();
+      const rankingsUrl = locale === 'en' ? '/en/rankings' : '/clasificacion';
+      window.location.href = rankingsUrl;
     }
   };
 
