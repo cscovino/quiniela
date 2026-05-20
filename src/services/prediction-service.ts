@@ -314,6 +314,52 @@ export const predictionService = {
     }
   },
 
+  submitBatchGroupBets: async (
+    userId: string,
+    predictorId: string,
+    predictions: Record<string, string[]>,
+  ): Promise<{ successCount: number; errorCount: number; errors: string[] }> => {
+    const errors: string[] = [];
+    let successCount = 0;
+
+    const batch = writeBatch(db);
+
+    for (const [groupId, positions] of Object.entries(predictions)) {
+      if (!positions || positions.length !== 4) {
+        errors.push(`Group ${groupId} must have exactly 4 teams ranked`);
+        continue;
+      }
+
+      const betId = `${predictorId}-${groupId}`;
+      const betRef = doc(db, 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
+
+      batch.set(betRef, {
+        userId,
+        predictorId,
+        groupId,
+        positions,
+        points: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      successCount++;
+    }
+
+    try {
+      if (successCount > 0) {
+        await batch.commit();
+      }
+      return { successCount, errorCount: errors.length, errors };
+    } catch (err) {
+      return {
+        successCount: 0,
+        errorCount: Object.keys(predictions).length,
+        errors: [err instanceof Error ? err.message : 'Failed to submit group predictions'],
+      };
+    }
+  },
+
   getExistingBets: async (
     userId: string,
     predictorId: string,

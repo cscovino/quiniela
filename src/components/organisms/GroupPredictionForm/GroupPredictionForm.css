@@ -1,0 +1,102 @@
+.group-prediction-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.group-prediction-form--empty {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  text-align: center;
+  color: var(--text-muted);
+  border: var(--border-pixel);
+  background-color: var(--bg-card);
+}
+
+.group-prediction-form__groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.group-prediction-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-pixel);
+  background-color: var(--bg-card);
+}
+
+.group-prediction-form__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.group-prediction-form__error {
+  padding: var(--space-2);
+  background-color: var(--color-error);
+  border: 2px solid var(--color-error);
+}
+
+.group-prediction-form__teams {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.group-prediction-form__row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) 0;
+}
+
+.group-prediction-form__row--header {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: var(--space-2);
+}
+
+.group-prediction-form__col {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.group-prediction-form__col.team {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+}
+
+.group-prediction-form__col.position {
+  justify-content: center;
+}
+
+.group-prediction-form__select {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  width: 100%;
+  max-width: 120px;
+}
+
+.group-prediction-form__select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.group-prediction-form__actions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-4);
+}

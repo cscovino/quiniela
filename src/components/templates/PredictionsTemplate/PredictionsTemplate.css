@@ -59,3 +59,38 @@
   border: var(--border-pixel);
   background-color: var(--bg-card);
 }
+
+.predictions-template__tabs {
+  display: flex;
+  gap: var(--space-2);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: var(--space-2);
+}
+
+.predictions-template__tab {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.predictions-template__tab:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+}
+
+.predictions-template__tab.active {
+  color: var(--color-accent-500);
+  border-color: var(--color-accent-500);
+  background-color: var(--bg-card);
+}
+
+.predictions-template__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}

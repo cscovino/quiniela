@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { PredictionForm, type MatchPrediction } from '@organisms/PredictionForm/PredictionForm';
+import {
+  GroupPredictionForm,
+  type GroupForPrediction,
+} from '@organisms/GroupPredictionForm/GroupPredictionForm';
+import {
+  KnockoutBracketForm,
+  type KnockoutMatch,
+} from '@organisms/KnockoutBracketForm/KnockoutBracketForm';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
 import { Button } from '@atoms/Button/Button';
@@ -8,6 +16,17 @@ import { predictionService } from '@services/prediction-service';
 import { useAuthStore } from '@store/auth-store';
 import type { Match } from '@types/firestore';
 import './PredictionsTemplate.css';
+
+type PredictionTab = 'matches' | 'groups' | 'bracket';
+
+const PHASE_LABELS: Record<string, { en: string; es: string }> = {
+  'round-of-32': { en: 'Round of 32', es: 'Treintaidosavos' },
+  'round-of-16': { en: 'Round of 16', es: 'Octavos de Final' },
+  quarterfinals: { en: 'Quarterfinals', es: 'Cuartos de Final' },
+  semifinals: { en: 'Semifinals', es: 'Semifinales' },
+  'third-place': { en: 'Third Place', es: 'Tercer Lugar' },
+  final: { en: 'Final', es: 'Final' },
+};
 
 export interface PredictionsTemplateProps {
   translations: {
@@ -18,6 +37,9 @@ export interface PredictionsTemplateProps {
     loginRequired: string;
     loginButton: string;
     loading: string;
+    tabMatches: string;
+    tabGroups: string;
+    tabBracket: string;
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -60,23 +82,29 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     initAuth();
   }, [initAuth]);
 
+  const [activeTab, setActiveTab] = useState<PredictionTab>('matches');
   const [matches, setMatches] = useState<MatchPrediction[]>([]);
   const [firestoreMatches, setFirestoreMatches] = useState<(Match & { id: string })[]>([]);
+  const [groups, setGroups] = useState<GroupForPrediction[]>([]);
+  const [knockoutMatches, setKnockoutMatches] = useState<KnockoutMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
     null,
   );
-  const [existingBets, setExistingBets] = useState<Set<string>>(new Set());
+  const [existingMatchBets, setExistingMatchBets] = useState<Set<string>>(new Set());
+  const [existingGroupBets, setExistingGroupBets] = useState<Set<string>>(new Set());
+  const [existingKnockoutBets, setExistingKnockoutBets] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
 
     const fetchData = async () => {
       try {
-        const [matchesResult, teamsResult] = await Promise.allSettled([
-          tournamentService.getMatches({ status: 'scheduled' }),
+        const [matchesResult, teamsResult, groupsResult] = await Promise.allSettled([
+          tournamentService.getMatches(),
           tournamentService.getTeams(),
+          tournamentService.getGroups(),
         ]);
 
         if (cancelled) return;
@@ -89,13 +117,38 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           });
         }
 
-        const scheduledMatches =
+        const allMatches =
           matchesResult.status === 'fulfilled'
             ? matchesResult.value.map((m) => ({ ...m, id: m.slug }))
             : [];
 
-        setFirestoreMatches(scheduledMatches);
-        setMatches(scheduledMatches.map((m) => mapMatchToPrediction(m, teamsMap)));
+        const groupMatches = allMatches.filter((m) => m.phase === 'group');
+        const knockoutMatchesData = allMatches.filter((m) => m.phase !== 'group');
+
+        setFirestoreMatches(groupMatches);
+        setMatches(groupMatches.map((m) => mapMatchToPrediction(m, teamsMap)));
+
+        const knockoutMapped: KnockoutMatch[] = knockoutMatchesData.map((m) => ({
+          slug: m.id,
+          phase: m.phase,
+          phaseLabel: PHASE_LABELS[m.phase]?.[locale === 'en' ? 'en' : 'es'] || m.phase,
+          homeTeam: m.homeTeamId ? teamsMap[m.homeTeamId] || null : null,
+          awayTeam: m.awayTeamId ? teamsMap[m.awayTeamId] || null : null,
+          predictionDeadline: m.predictionDeadline.toDate(),
+        }));
+        setKnockoutMatches(knockoutMapped);
+
+        if (groupsResult.status === 'fulfilled' && teamsResult.status === 'fulfilled') {
+          const sortedGroups = [...groupsResult.value].sort((a, b) => a.order - b.order);
+          const groupsForPrediction: GroupForPrediction[] = sortedGroups.map((group) => ({
+            slug: group.slug,
+            name: group.name,
+            teams: teamsResult.value
+              .filter((t) => t.groupId === group.slug)
+              .map((t) => ({ fifaCode: t.fifaCode, name: t.name })),
+          }));
+          setGroups(groupsForPrediction);
+        }
       } catch {
         if (!cancelled) {
           setMatches([]);
@@ -111,7 +164,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     if (!user) return;
@@ -121,19 +174,26 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
     const fetchExistingBets = async () => {
       try {
-        const { matchBets, knockoutBets } = await predictionService.getExistingBets(
+        const { matchBets, knockoutBets, groupBets } = await predictionService.getExistingBets(
           user.uid,
           predictorId,
         );
 
         if (cancelled) return;
 
-        const betMatchIds = new Set<string>();
-        matchBets.forEach((_, matchId) => betMatchIds.add(matchId));
-        knockoutBets.forEach((_, matchId) => betMatchIds.add(matchId));
-        setExistingBets(betMatchIds);
+        const matchBetIds = new Set<string>();
+        matchBets.forEach((_, matchId) => matchBetIds.add(matchId));
+        setExistingMatchBets(matchBetIds);
+
+        const knockoutBetIds = new Set<string>();
+        knockoutBets.forEach((_, matchId) => knockoutBetIds.add(matchId));
+        setExistingKnockoutBets(knockoutBetIds);
+
+        const groupBetIds = new Set<string>();
+        groupBets.forEach((_, groupId) => groupBetIds.add(groupId));
+        setExistingGroupBets(groupBetIds);
       } catch {
-        // Silently fail - existing bets are optional
+        // Silently fail
       }
     };
 
@@ -143,7 +203,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     };
   }, [user]);
 
-  const handleSubmit = useCallback(
+  const handleMatchSubmit = useCallback(
     async (predictions: Record<string, { home?: number; away?: number; winner?: string }>) => {
       if (!user) return;
 
@@ -165,13 +225,13 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           type: 'success',
           message:
             locale === 'en'
-              ? `${result.successCount} prediction(s) submitted!`
-              : `¡${result.successCount} predicción(es) enviadas!`,
+              ? `${result.successCount} match prediction(s) submitted!`
+              : `¡${result.successCount} predicción(es) de partidos enviadas!`,
         });
 
-        const newBetIds = new Set(existingBets);
+        const newBetIds = new Set(existingMatchBets);
         Object.keys(predictions).forEach((id) => newBetIds.add(id));
-        setExistingBets(newBetIds);
+        setExistingMatchBets(newBetIds);
       }
 
       if (result.errors.length > 0) {
@@ -183,7 +243,94 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, firestoreMatches, locale, existingBets],
+    [user, firestoreMatches, locale, existingMatchBets],
+  );
+
+  const handleGroupSubmit = useCallback(
+    async (predictions: Record<string, string[]>) => {
+      if (!user) return;
+
+      const predictorId = `${user.uid}-default`;
+      setSubmitting(true);
+      setFeedback(null);
+
+      const result = await predictionService.submitBatchGroupBets(
+        user.uid,
+        predictorId,
+        predictions,
+      );
+
+      setSubmitting(false);
+
+      if (result.successCount > 0) {
+        setFeedback({
+          type: 'success',
+          message:
+            locale === 'en'
+              ? `${result.successCount} group prediction(s) submitted!`
+              : `¡${result.successCount} predicción(es) de grupos enviadas!`,
+        });
+
+        const newBetIds = new Set(existingGroupBets);
+        Object.keys(predictions).forEach((id) => newBetIds.add(id));
+        setExistingGroupBets(newBetIds);
+      }
+
+      if (result.errors.length > 0) {
+        setFeedback({
+          type: 'error',
+          message: result.errors[0],
+        });
+      }
+
+      setTimeout(() => setFeedback(null), 5000);
+    },
+    [user, locale, existingGroupBets],
+  );
+
+  const handleKnockoutSubmit = useCallback(
+    async (predictions: Record<string, string>) => {
+      if (!user) return;
+
+      const predictorId = `${user.uid}-default`;
+      setSubmitting(true);
+      setFeedback(null);
+
+      const results = await Promise.all(
+        Object.entries(predictions).map(async ([matchId, winner]) => {
+          return predictionService.submitKnockoutBet(user.uid, predictorId, matchId, winner);
+        }),
+      );
+
+      setSubmitting(false);
+
+      const successCount = results.filter((r) => r.success).length;
+      const firstError = results.find((r) => !r.success)?.error;
+
+      if (successCount > 0) {
+        setFeedback({
+          type: 'success',
+          message:
+            locale === 'en'
+              ? `${successCount} bracket prediction(s) submitted!`
+              : `¡${successCount} predicción(es) de bracket enviadas!`,
+        });
+
+        const newBetIds = new Set(existingKnockoutBets);
+        Object.keys(predictions).forEach((id) => newBetIds.add(id));
+        setExistingKnockoutBets(newBetIds);
+      }
+
+      if (firstError) {
+        setFeedback({
+          type: 'error',
+          message: firstError,
+        });
+      }
+
+      setTimeout(() => setFeedback(null), 5000);
+    },
+    [user, locale, existingKnockoutBets],
   );
 
   if (loading || isAuthLoading) {
@@ -213,7 +360,9 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     );
   }
 
-  const availableMatches = matches.filter((m) => !existingBets.has(m.matchId));
+  const availableMatches = matches.filter((m) => !existingMatchBets.has(m.matchId));
+  const showGroupsTab = groups.length > 0;
+  const showBracketTab = knockoutMatches.length > 0;
 
   return (
     <div className={`predictions-template ${className}`}>
@@ -221,6 +370,31 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         <header className="predictions-template__header">
           <Typography variant="h1">{translations.title}</Typography>
         </header>
+
+        <div className="predictions-template__tabs">
+          <button
+            className={`predictions-template__tab ${activeTab === 'matches' ? 'active' : ''}`}
+            onClick={() => setActiveTab('matches')}
+          >
+            {translations.tabMatches}
+          </button>
+          {showGroupsTab && (
+            <button
+              className={`predictions-template__tab ${activeTab === 'groups' ? 'active' : ''}`}
+              onClick={() => setActiveTab('groups')}
+            >
+              {translations.tabGroups}
+            </button>
+          )}
+          {showBracketTab && (
+            <button
+              className={`predictions-template__tab ${activeTab === 'bracket' ? 'active' : ''}`}
+              onClick={() => setActiveTab('bracket')}
+            >
+              {translations.tabBracket}
+            </button>
+          )}
+        </div>
 
         {feedback && (
           <div
@@ -230,20 +404,46 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           </div>
         )}
 
-        {availableMatches.length === 0 ? (
-          <div className="predictions-template__empty">
-            <Typography variant="body">
-              {locale === 'en'
-                ? 'No matches available for prediction. All scheduled matches have been predicted or deadlines have passed.'
-                : 'No hay partidos disponibles para predecir. Todos los partidos programados han sido pronosticados o los plazos han pasado.'}
-            </Typography>
-          </div>
-        ) : (
-          <PredictionForm
-            matches={availableMatches}
-            onSubmit={handleSubmit}
-            isDisabled={submitting}
-          />
+        {activeTab === 'matches' && (
+          <section className="predictions-template__section">
+            {availableMatches.length === 0 ? (
+              <div className="predictions-template__empty">
+                <Typography variant="body">
+                  {locale === 'en'
+                    ? 'No matches available for prediction. All scheduled matches have been predicted or deadlines have passed.'
+                    : 'No hay partidos disponibles para predecir. Todos los partidos programados han sido pronosticados o los plazos han pasado.'}
+                </Typography>
+              </div>
+            ) : (
+              <PredictionForm
+                matches={availableMatches}
+                onSubmit={handleMatchSubmit}
+                isDisabled={submitting}
+              />
+            )}
+          </section>
+        )}
+
+        {activeTab === 'groups' && showGroupsTab && (
+          <section className="predictions-template__section">
+            <GroupPredictionForm
+              groups={groups}
+              onSubmit={handleGroupSubmit}
+              existingBets={existingGroupBets}
+              isDisabled={submitting}
+            />
+          </section>
+        )}
+
+        {activeTab === 'bracket' && showBracketTab && (
+          <section className="predictions-template__section">
+            <KnockoutBracketForm
+              matches={knockoutMatches}
+              onSubmit={handleKnockoutSubmit}
+              existingBets={existingKnockoutBets}
+              isDisabled={submitting}
+            />
+          </section>
         )}
       </main>
     </div>

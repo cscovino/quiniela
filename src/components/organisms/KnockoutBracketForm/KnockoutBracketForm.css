@@ -1,0 +1,57 @@
+.knockout-bracket-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.knockout-bracket-form--empty {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  text-align: center;
+  color: var(--text-muted);
+  border: var(--border-pixel);
+  background-color: var(--bg-card);
+}
+
+.knockout-bracket-form__phase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.knockout-bracket-form__matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.knockout-bracket-form__match {
+  padding: var(--space-4);
+  border: var(--border-pixel);
+  background-color: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.knockout-bracket-form__match--disabled {
+  opacity: 0.6;
+}
+
+.knockout-bracket-form__match-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.knockout-bracket-form__tbd {
+  color: var(--color-warning);
+  font-family: var(--font-pixel);
+}
+
+.knockout-bracket-form__actions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-4);
+}
