@@ -19,9 +19,9 @@
       "title": "Predictions - Quiniela",
       "description": "Make your predictions for FIFA World Cup 2026 matches"
     },
-    "standings": {
-      "title": "Standings - Quiniela",
-      "description": "FIFA World Cup 2026 standings and rankings"
+    "rankings": {
+      "title": "Rankings - Quiniela",
+      "description": "Predictor rankings and leaderboard"
     },
     "profile": {
       "title": "Profile - Quiniela",

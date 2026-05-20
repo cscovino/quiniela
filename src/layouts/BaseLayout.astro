@@ -8,7 +8,7 @@ export interface Props {
   title: string;
   description?: string;
   theme?: 'dark' | 'light';
-  activeNav?: 'home' | 'predictions' | 'standings' | 'profile' | 'tournament' | 'admin';
+  activeNav?: 'home' | 'predictions' | 'rankings' | 'profile' | 'tournament' | 'admin';
   isLoggedIn?: boolean;
   notificationCount?: number;
 }
@@ -29,14 +29,14 @@ const navLinks: NavLinks[] =
         { href: '/en', label: 'Home', active: activeNav === 'home' },
         { href: '/en/tournament', label: 'Tournament', active: activeNav === 'tournament' },
         { href: '/en/predictions', label: 'Predictions', active: activeNav === 'predictions' },
-        { href: '/en/standings', label: 'Standings', active: activeNav === 'standings' },
+        { href: '/en/rankings', label: 'Rankings', active: activeNav === 'rankings' },
         { href: '/en/profile', label: 'Profile', active: activeNav === 'profile' },
       ]
     : [
         { href: '/', label: 'Inicio', active: activeNav === 'home' },
         { href: '/torneo', label: 'Torneo', active: activeNav === 'tournament' },
         { href: '/predicciones', label: 'Predicciones', active: activeNav === 'predictions' },
-        { href: '/clasificacion', label: 'Clasificación', active: activeNav === 'standings' },
+        { href: '/rankings', label: 'Clasificación', active: activeNav === 'rankings' },
         { href: '/perfil', label: 'Perfil', active: activeNav === 'profile' },
       ];
 ---

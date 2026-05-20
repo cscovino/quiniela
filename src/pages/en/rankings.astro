@@ -1,0 +1,17 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import RankingsPage from '@pages/RankingsPage.astro';
+import en from '@locales/en/common.json';
+
+const locale = 'en';
+const translations = en;
+---
+
+<BaseLayout
+  locale={locale}
+  title={translations.pages.rankings.title}
+  description={translations.pages.rankings.description}
+  activeNav="rankings"
+>
+  <RankingsPage locale={locale} />
+</BaseLayout>

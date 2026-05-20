@@ -1,0 +1,42 @@
+.rankings-template {
+  width: 100%;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+.rankings-template__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.rankings-template__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rankings-template__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 300px;
+}
+
+.rankings-template__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  color: var(--color-error);
+}
+
+.rankings-template__table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}

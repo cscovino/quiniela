@@ -1,0 +1,30 @@
+---
+import { RankingsTemplate } from '@templates/RankingsTemplate/RankingsTemplate';
+
+export interface Props {
+  locale: 'en' | 'es';
+}
+
+const { locale } = Astro.props;
+
+const translations = {
+  title: locale === 'en' ? 'Predictor Rankings' : 'Clasificación de Pronosticadores',
+  noRankings:
+    locale === 'en'
+      ? 'No rankings available yet. Make predictions to appear here!'
+      : '¡Aún no hay clasificación. ¡Haz predicciones para aparecer aquí!',
+  loading: locale === 'en' ? 'Loading rankings...' : 'Cargando clasificación...',
+  position: locale === 'en' ? '#' : '#',
+  predictor: locale === 'en' ? 'Predictor' : 'Pronosticador',
+  points: locale === 'en' ? 'Pts' : 'Pts',
+  accuracy: locale === 'en' ? 'Accuracy' : 'Precisión',
+  streak: locale === 'en' ? 'Streak' : 'Racha',
+};
+
+const templateProps = {
+  translations,
+  locale,
+};
+---
+
+<RankingsTemplate {...templateProps} client:load />
