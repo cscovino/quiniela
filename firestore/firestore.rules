@@ -18,7 +18,7 @@ service cloud.firestore {
     
     function isPredictorOwner(predictorId) {
       return request.auth != null && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)/predictors/$(predictorId)).exists();
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)/predictors/$(predictorId));
     }
     
     // Users - read own profile, admin reads all

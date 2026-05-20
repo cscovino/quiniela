@@ -60,8 +60,15 @@ export const userSubcollections = {
 };
 
 export const predictorSubcollections = {
-  stats: (predictorId: string) =>
-    collection(db, 'predictors', predictorId, 'stats') as CollectionReference<PredictorStats>,
+  stats: (userId: string, predictorId: string) =>
+    collection(
+      db,
+      'users',
+      userId,
+      'predictors',
+      predictorId,
+      'stats',
+    ) as CollectionReference<PredictorStats>,
 };
 
 export const refs = {
