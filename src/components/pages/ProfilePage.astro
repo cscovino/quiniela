@@ -9,63 +9,24 @@ const { locale } = Astro.props;
 
 const translations = {
   title: locale === 'en' ? 'My Profile' : 'Mi Perfil',
-  notificationsTitle: (count: number) =>
-    locale === 'en' ? `Notifications (${count})` : `Notificaciones (${count})`,
-  userProfile: {
-    totalPoints: locale === 'en' ? 'Total Points' : 'Puntos Totales',
-    accuracy: locale === 'en' ? 'Accuracy' : 'Precisión',
-    currentStreak: locale === 'en' ? 'Current Streak' : 'Racha Actual',
-    bestStreak: locale === 'en' ? 'Best Streak' : 'Mejor Racha',
-    exactBets: locale === 'en' ? 'Exact Bets' : 'Apuestas Exactas',
-    rank: locale === 'en' ? 'Rank' : 'Posición',
-    badges: locale === 'en' ? 'Badges' : 'Insignias',
-  },
-  notifications: {
-    noNotifications: locale === 'en' ? 'No notifications' : 'Sin notificaciones',
-    notificationsHeader: (count: number) =>
-      locale === 'en' ? `Notifications (${count})` : `Notificaciones (${count})`,
-    clearAll: locale === 'en' ? 'Clear All' : 'Limpiar Todo',
-  },
+  loading: locale === 'en' ? 'Loading profile...' : 'Cargando perfil...',
+  loginRequired:
+    locale === 'en'
+      ? 'You need to login to view your profile'
+      : 'Necesitas iniciar sesión para ver tu perfil',
+  loginButton: locale === 'en' ? 'Login' : 'Iniciar Sesión',
+  totalPoints: locale === 'en' ? 'Total Points' : 'Puntos Totales',
+  accuracy: locale === 'en' ? 'Accuracy' : 'Precisión',
+  currentStreak: locale === 'en' ? 'Current Streak' : 'Racha Actual',
+  bestStreak: locale === 'en' ? 'Best Streak' : 'Mejor Racha',
+  exactBets: locale === 'en' ? 'Exact Bets' : 'Apuestas Exactas',
+  rank: locale === 'en' ? 'Rank' : 'Posición',
+  badges: locale === 'en' ? 'Badges' : 'Insignias',
 };
-
-const mockUserProfile = {
-  displayName: 'Carlos',
-  avatarUrl: undefined,
-  favoriteTeam: 'Argentina',
-  stats: {
-    totalPoints: 480,
-    exactBets: 12,
-    accuracy: 67,
-    currentStreak: 5,
-    maxStreak: 8,
-    rank: 5,
-  },
-  badges: [
-    {
-      id: 'badge-1',
-      name: locale === 'en' ? 'First Prediction' : 'Primera Prediccion',
-      icon: 'star',
-      earnedAt: new Date('2026-06-11'),
-    },
-  ],
-};
-
-const mockNotifications = [
-  {
-    id: 'notif-1',
-    type: 'badge_earned' as const,
-    title: locale === 'en' ? 'New Badge' : 'Nueva Insignia',
-    message: locale === 'en' ? 'You earned 10 points!' : 'Has ganado 10 puntos!',
-    read: false,
-    createdAt: new Date(Date.now() - 60 * 60 * 1000),
-  },
-];
 
 const templateProps = {
-  userProfile: mockUserProfile,
-  notifications: mockNotifications,
   translations,
-  onNotificationDismiss: () => {},
+  locale,
 };
 ---
 
