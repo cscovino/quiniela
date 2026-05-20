@@ -4,7 +4,7 @@ import {
   type TournamentHeaderProps,
 } from '@organisms/TournamentHeader/TournamentHeader';
 import { MatchList, type MatchListProps } from '@organisms/MatchList/MatchList';
-import { RankingsTable, type RankingsTableProps } from '@organisms/RankingsTable/RankingsTable';
+import { type RankingsTableProps } from '@organisms/RankingsTable/RankingsTable';
 import { Button } from '@atoms/Button/Button';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
@@ -46,7 +46,7 @@ interface SectionState {
 const LOAD_TIMEOUT = 8000;
 
 const mapMatchToCard = (
-  match: Match & { id: string },
+  match: Match,
   teams: Record<string, { fifaCode: string; name: string }>,
 ): MatchListProps['matches'][0] => {
   const homeTeam = match.homeTeamId
@@ -95,6 +95,12 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
   className = '',
 }) => {
   const user = useAuthStore((state) => state.user);
+  const initAuth = useAuthStore((state) => state.initAuth);
+
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
   const [state, setState] = useState<SectionState>({
     matches: [],
     rankings: [],
@@ -143,7 +149,7 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
     const fetchData = async () => {
       try {
         const [matches, teams, stats] = await Promise.allSettled([
-          tournamentService.getMatches({ status: 'scheduled' }),
+          tournamentService.getMatches(),
           tournamentService.getTeams(),
           user ? tournamentService.getAllPredictorStats() : Promise.resolve([]),
         ]);
@@ -157,10 +163,29 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
           });
         }
 
-        const newMatches: MatchListProps['matches'] =
-          matches.status === 'fulfilled'
-            ? matches.value.slice(0, 5).map((m) => mapMatchToCard(m, teamsMap))
-            : [];
+        const allMatches =
+          matches.status === 'fulfilled' ? matches.value.map((m) => ({ ...m, id: m.slug })) : [];
+
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const todayEnd = new Date(todayStart);
+        todayEnd.setDate(todayEnd.getDate() + 1);
+
+        const todayMatches = allMatches.filter((m) => {
+          const matchDate = m.date.toDate();
+          return matchDate >= todayStart && matchDate < todayEnd;
+        });
+
+        const upcomingMatches = allMatches
+          .filter((m) => m.date.toDate() >= now && m.status === 'scheduled')
+          .sort((a, b) => a.date.toMillis() - b.date.toMillis())
+          .slice(0, 5);
+
+        const displayMatches = todayMatches.length > 0 ? todayMatches : upcomingMatches;
+
+        const newMatches: MatchListProps['matches'] = displayMatches
+          .slice(0, 5)
+          .map((m) => mapMatchToCard(m, teamsMap));
 
         const newRankings: RankingsTableProps['rankings'] =
           stats.status === 'fulfilled' ? stats.value.slice(0, 10).map(mapStatsToRanking) : [];
@@ -228,33 +253,6 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
               emptyMessage={
                 state.matchesError ||
                 (locale === 'en' ? 'No upcoming matches' : 'No hay partidos próximos')
-              }
-            />
-          )}
-        </section>
-
-        <section className="home-template__rankings">
-          {!user ? (
-            <div className="home-template__auth-required">
-              <Typography variant="body">{translations.loginToRankings}</Typography>
-              <Button variant="primary" size="sm" onClick={handleLogin}>
-                {locale === 'en' ? 'Login' : 'Iniciar Sesión'}
-              </Button>
-            </div>
-          ) : state.rankingsLoading ? (
-            <div className="home-template__loading">
-              <Spinner size="lg" />
-              <Typography variant="body">
-                {locale === 'en' ? 'Loading rankings...' : 'Cargando clasificación...'}
-              </Typography>
-            </div>
-          ) : (
-            <RankingsTable
-              rankings={state.rankings}
-              title={translations.rankingsTitle}
-              emptyMessage={
-                state.rankingsError ||
-                (locale === 'en' ? 'No rankings yet' : 'Aún no hay clasificación')
               }
             />
           )}

@@ -3,8 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { HomeTemplate } from './HomeTemplate';
 import type { TournamentHeaderProps } from '@organisms/TournamentHeader/TournamentHeader';
 import * as tournamentService from '@services/tournament-service';
-import * as authStore from '@store/auth-store';
-import type { Match, Team, PredictorStats, User } from '@types/firestore';
+import type { Match, Team, User } from '@types/firestore';
 import type { Timestamp } from 'firebase/firestore';
 
 vi.mock('@services/tournament-service', () => ({
@@ -16,7 +15,17 @@ vi.mock('@services/tournament-service', () => ({
 }));
 
 vi.mock('@store/auth-store', () => ({
-  useAuthStore: vi.fn(),
+  useAuthStore: vi.fn((selector: (state: Record<string, unknown>) => unknown) => {
+    const mockState: Record<string, unknown> = {
+      user: null as User | null,
+      isAuthLoading: false,
+      initAuth: vi.fn(),
+    };
+    Object.defineProperty(mockState, 'user', {
+      get: () => (globalThis as Record<string, unknown>).__mockUser ?? null,
+    });
+    return typeof selector === 'function' ? selector(mockState) : mockState;
+  }),
 }));
 
 const matchTranslations = {
@@ -90,35 +99,10 @@ const mockMatches: (Match & { id: string })[] = [
   },
 ];
 
-const mockRankings: (PredictorStats & { userId: string; predictorId: string })[] = [
-  {
-    id: 'stats-1',
-    userId: 'user-1',
-    predictorId: 'predictor-1',
-    totalPoints: 150,
-    accuracy: 0.75,
-    currentStreak: 5,
-    correctPredictions: 10,
-    totalPredictions: 15,
-    exactResults: 2,
-  },
-  {
-    id: 'stats-2',
-    userId: 'user-2',
-    predictorId: 'predictor-2',
-    totalPoints: 142,
-    accuracy: 0.72,
-    currentStreak: 3,
-    correctPredictions: 9,
-    totalPredictions: 14,
-    exactResults: 1,
-  },
-];
-
 describe('HomeTemplate', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(authStore.useAuthStore).mockReturnValue(null);
+    (globalThis as Record<string, unknown>).__mockUser = null;
   });
 
   it('renders hero section immediately while data loads', async () => {
@@ -160,7 +144,7 @@ describe('HomeTemplate', () => {
     });
   });
 
-  it('shows login prompt for rankings when not authenticated', async () => {
+  it('redirects to login for rankings CTA when not authenticated', async () => {
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
 
@@ -174,40 +158,8 @@ describe('HomeTemplate', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Login to see the rankings')).toBeInTheDocument();
-      expect(screen.getByText('Login')).toBeInTheDocument();
+      expect(screen.getByText('View Standings')).toBeInTheDocument();
     });
-  });
-
-  it('renders rankings when authenticated', async () => {
-    const mockUser: User = {
-      uid: 'user-1',
-      email: 'test@example.com',
-      displayName: 'Test User',
-      role: 'user',
-      createdAt: mockTimestamp,
-      lastLoginAt: mockTimestamp,
-    };
-    vi.mocked(authStore.useAuthStore).mockReturnValue(mockUser);
-    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
-    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
-    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue(
-      mockRankings,
-    );
-
-    render(
-      <HomeTemplate
-        tournamentProps={mockTournamentProps}
-        matches={[]}
-        rankings={[]}
-        translations={translations}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Top Players')).toBeInTheDocument();
-    });
-    expect(screen.getByText('150')).toBeInTheDocument();
   });
 
   it('skips fetching rankings when not authenticated', async () => {
@@ -249,7 +201,7 @@ describe('HomeTemplate', () => {
   });
 
   it('handles partial failures gracefully', async () => {
-    const mockUser: User = {
+    const testUser: User = {
       uid: 'user-1',
       email: 'test@example.com',
       displayName: 'Test User',
@@ -257,7 +209,7 @@ describe('HomeTemplate', () => {
       createdAt: mockTimestamp,
       lastLoginAt: mockTimestamp,
     };
-    vi.mocked(authStore.useAuthStore).mockReturnValue(mockUser);
+    (globalThis as Record<string, unknown>).__mockUser = testUser;
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(mockMatches);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
     vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockRejectedValue(
@@ -277,6 +229,5 @@ describe('HomeTemplate', () => {
       expect(screen.getByText('Upcoming Matches')).toBeInTheDocument();
       expect(screen.getByText('Argentina')).toBeInTheDocument();
     });
-    expect(screen.getByText('Failed to load rankings')).toBeInTheDocument();
   });
 });
