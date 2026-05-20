@@ -30,7 +30,7 @@ service cloud.firestore {
     
     function isDeadlineNotPassed(matchData) {
       return matchData.predictionDeadline == null || 
-             request.time < matchData.predictionDeadline.toDate();
+             request.time < matchData.predictionDeadline;
     }
     
     function canPredictOnMatch(tournamentId, matchId) {

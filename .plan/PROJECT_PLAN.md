@@ -1007,10 +1007,6 @@ service cloud.firestore {
 - [ ] US-020: Prediction Form
 - [ ] US-021: Real-Time Notifications
 
-### Sprint 4: Administration (Effort: 8)
-- [ ] US-022: Admin Dashboard
-- [ ] US-023: Import/Export Data
-
 ### Design System Parallel Track
 - [ ] Phase 1: Design tokens & global styles
 - [ ] Phase 2: Atoms (12 components)
@@ -1019,7 +1015,7 @@ service cloud.firestore {
 - [ ] Phase 5: Templates (4 layouts)
 - [ ] Phase 6: Pixel art assets
 
-**Total Effort: 71 points**
+**Total Effort: 66 points**
 
 ---
 
@@ -1056,14 +1052,8 @@ service cloud.firestore {
 | US-017 | Display Tournament List | ✅ Done | HomeTemplate shows today's matches or next 5 upcoming, real Firestore data |
 | US-018 | Display Tournament Details | ✅ Done | TournamentTemplate with tabs (Standings + Matches), real Firestore data, /torneo + /en/tournament |
 | US-019 | Display Group Matches | ✅ Done | MatchList wired to Firestore, all 104 matches visible on tournament page |
-| US-020 | Prediction Form | 🔄 In Progress | PredictionForm built, needs Firestore write |
+| US-020 | Prediction Form | ✅ Done | Full prediction flow: matches, group standings, bracket predictions |
 | US-021 | Real-Time Notifications | ⬜ Not Started | |
-
-### Sprint 4: Administration
-| US | Story | Status | Notes |
-|----|-------|--------|-------|
-| US-022 | Admin Dashboard | ✅ Done | Admin-only `/en/admin/matches` page, match result form, role guard, NavBar link |
-| US-023 | Import/Export Data | ⬜ Not Started | |
 
 ### Project Setup ✅
 | Task | Status | Notes |
