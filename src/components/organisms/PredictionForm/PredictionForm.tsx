@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { PredictionInput } from '@molecules/PredictionInput/PredictionInput';
 import { TeamSelector } from '@molecules/TeamSelector/TeamSelector';
+import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
 import { Button } from '@atoms/Button/Button';
 import { Typography } from '@atoms/Typography/Typography';
-import { CountdownTimer } from '@molecules/CountdownTimer/CountdownTimer';
 import './PredictionForm.css';
 
 export interface MatchPrediction {
@@ -61,28 +61,31 @@ export const PredictionForm: React.FC<PredictionFormProps> = ({
 
   return (
     <div className={`prediction-form ${className}`}>
-      <div className="prediction-form__matches">
+      <div className="prediction-form__grid">
         {matches.map((match) => (
-          <div key={match.matchId} className="prediction-form__match">
-            <div className="prediction-form__header">
-              <Typography variant="small">
-                {match.homeTeam.name} vs {match.awayTeam.name}
+          <div key={match.matchId} className="prediction-form__card">
+            <div className="prediction-form__teams">
+              <div className="prediction-form__team">
+                <TeamFlag fifaCode={match.homeTeam.fifaCode} size="md" />
+                <Typography variant="small">{match.homeTeam.name}</Typography>
+              </div>
+              <Typography variant="caption" className="prediction-form__vs">
+                VS
               </Typography>
-              <CountdownTimer
-                targetDate={match.predictionDeadline}
-                label="Deadline"
-                expiredText="Closed"
-              />
+              <div className="prediction-form__team">
+                <TeamFlag fifaCode={match.awayTeam.fifaCode} size="md" />
+                <Typography variant="small">{match.awayTeam.name}</Typography>
+              </div>
             </div>
 
             {match.phase === 'group' ? (
               <PredictionInput
-                homeTeamName={match.homeTeam.name}
-                awayTeamName={match.awayTeam.name}
+                homeTeamName=""
+                awayTeamName=""
                 homeScore={predictions[match.matchId]?.home}
                 awayScore={predictions[match.matchId]?.away}
                 onChange={(home, away) => handleGroupPrediction(match.matchId, home, away)}
-                disabled={isDisabled || match.predictionDeadline.getTime() <= Date.now()}
+                disabled={isDisabled}
               />
             ) : (
               <TeamSelector
@@ -90,7 +93,7 @@ export const PredictionForm: React.FC<PredictionFormProps> = ({
                 value={predictions[match.matchId]?.winner}
                 onChange={(winner) => handleKnockoutPrediction(match.matchId, winner)}
                 label="Pick the winner"
-                disabled={isDisabled || match.predictionDeadline.getTime() <= Date.now()}
+                disabled={isDisabled}
               />
             )}
           </div>

@@ -1,11 +1,7 @@
 .prediction-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  background: var(--bg-card);
-  border: var(--border-pixel-md);
-  box-shadow: var(--shadow-md);
+  gap: var(--space-6);
 }
 
 .prediction-form--empty {
@@ -14,34 +10,48 @@
   padding: var(--space-12);
   text-align: center;
   color: var(--text-muted);
+  border: var(--border-pixel);
+  background-color: var(--bg-card);
 }
 
-.prediction-form__matches {
-  display: flex;
-  flex-direction: column;
+.prediction-form__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-4);
 }
 
-.prediction-form__match {
+.prediction-form__card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  background: var(--bg-input);
-  border: var(--border-width-sm) solid var(--border-color);
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: var(--border-pixel);
+  background-color: var(--bg-card);
 }
 
-.prediction-form__header {
+.prediction-form__teams {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.prediction-form__team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.prediction-form__vs {
+  font-family: var(--font-pixel);
+  color: var(--text-muted);
+  padding: 0 var(--space-2);
 }
 
 .prediction-form__actions {
   display: flex;
   justify-content: center;
-  padding-top: var(--space-3);
-  border-top: var(--border-width-sm) solid var(--border-color);
+  padding-top: var(--space-4);
 }
