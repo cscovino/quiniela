@@ -1,0 +1,38 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { TournamentTemplate } from '@templates/TournamentTemplate/TournamentTemplate';
+import es from '@locales/es/common.json';
+
+const locale = 'es';
+const translations = es;
+---
+
+<BaseLayout
+  locale={locale}
+  title={translations.pages.tournament?.title || 'Torneo - Quiniela'}
+  description={translations.pages.tournament?.description ||
+    'Clasificación de grupos y partidos del torneo'}
+  activeNav="tournament"
+>
+  <TournamentTemplate
+    client:load
+    locale={locale}
+    translations={{
+      title: 'Torneo',
+      standingsTab: 'Clasificación',
+      matchesTab: 'Partidos',
+      groupStageTitle: 'Fase de Grupos',
+      allMatchesTitle: 'Todos los Partidos',
+      noStandings: 'No hay clasificación disponible',
+      noMatches: 'No hay partidos disponibles',
+      matchList: {
+        scheduled: 'Programado',
+        live: 'EN VIVO',
+        finished: 'Finalizado',
+        postponed: 'Pospuesto',
+        cancelled: 'Cancelado',
+        vs: 'VS',
+      },
+    }}
+  />
+</BaseLayout>

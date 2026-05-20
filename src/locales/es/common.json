@@ -26,6 +26,10 @@
     "profile": {
       "title": "Perfil - Quiniela",
       "description": "Tu perfil y estadísticas de predicciones"
+    },
+    "tournament": {
+      "title": "Torneo - Quiniela",
+      "description": "Clasificación de grupos y partidos del torneo"
     }
   },
   "common": {

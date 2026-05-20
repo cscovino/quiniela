@@ -31,5 +31,8 @@ export default defineConfig({
         '@locales': path.resolve('./src/locales'),
       },
     },
+    optimizeDeps: {
+      include: ['react-dom/client'],
+    },
   },
 });

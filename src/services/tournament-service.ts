@@ -46,10 +46,13 @@ export const tournamentService = {
     const constraints: QueryConstraint[] = [orderBy('date')];
     if (filters?.phase) constraints.push(where('phase', '==', filters.phase));
     if (filters?.groupId) constraints.push(where('groupId', '==', filters.groupId));
-    if (filters?.status) constraints.push(where('status', '==', filters.status));
     const q = query(collection(db, 'tournaments', TOURNAMENT_ID, 'matches'), ...constraints);
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((d) => ({ ...d.data(), id: d.id }) as Match & { id: string });
+    const matches = snapshot.docs.map((d) => ({ ...d.data(), id: d.id }) as Match & { id: string });
+    if (filters?.status) {
+      return matches.filter((m) => m.status === filters.status);
+    }
+    return matches;
   },
 
   getGroupStandings: async (): Promise<GroupStandings[]> => {

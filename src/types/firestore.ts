@@ -3,7 +3,14 @@ import type { Timestamp } from 'firebase/firestore';
 export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'cancelled';
 export type TournamentStatus = 'draft' | 'active' | 'finished';
 export type UserRole = 'user' | 'admin';
-export type PhaseType = 'group' | 'round-of-16' | 'quarterfinals' | 'semifinals' | 'final';
+export type PhaseType =
+  | 'group'
+  | 'round-of-32'
+  | 'round-of-16'
+  | 'quarterfinals'
+  | 'semifinals'
+  | 'third-place'
+  | 'final';
 
 export interface Tournament {
   slug: string;

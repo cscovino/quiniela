@@ -1,5 +1,6 @@
 import React from 'react';
 import { GroupHeader, type GroupStanding } from '@molecules/GroupHeader/GroupHeader';
+import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
 import { Typography } from '@atoms/Typography/Typography';
 import './GroupStandings.css';
 
@@ -57,6 +58,7 @@ export const GroupStandings: React.FC<GroupStandingsProps> = ({
             {group.standings.map((team) => (
               <div key={team.teamId} className="group-standings__row">
                 <span className="group-standings__col group-standings__col--team">
+                  <TeamFlag fifaCode={team.fifaCode} size="sm" />
                   {team.teamName}
                 </span>
                 <span className="group-standings__col">{team.played}</span>

@@ -26,6 +26,10 @@
     "profile": {
       "title": "Profile - Quiniela",
       "description": "Your prediction profile and statistics"
+    },
+    "tournament": {
+      "title": "Tournament - Quiniela",
+      "description": "Group standings and tournament matches"
     }
   },
   "common": {
