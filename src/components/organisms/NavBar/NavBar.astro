@@ -1,0 +1,21 @@
+---
+import { NavBar as NavBarClient } from '@organisms/NavBar/NavBar';
+import type { NavLinks } from '@organisms/NavBar/NavBar';
+
+export interface Props {
+  links: NavLinks[];
+  locale: 'en' | 'es';
+  notificationCount?: number;
+  className?: string;
+}
+
+const { links, locale, notificationCount = 0, className = '' } = Astro.props;
+---
+
+<NavBarClient
+  links={links}
+  locale={locale}
+  notificationCount={notificationCount}
+  className={className}
+  client:load
+/>
