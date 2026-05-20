@@ -1,0 +1,52 @@
+.best-players-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  background: var(--bg-card);
+  border: var(--border-pixel-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.best-players-form__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+}
+
+.best-players-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.best-players-form__hint {
+  color: var(--text-muted);
+}
+
+.best-players-form__select {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-input);
+  border: var(--border-pixel-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.best-players-form__select:focus {
+  outline: none;
+  border-color: var(--color-accent-500);
+}
+
+.best-players-form__select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.best-players-form__actions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-4);
+}

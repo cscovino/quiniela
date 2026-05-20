@@ -8,6 +8,7 @@ import {
   KnockoutBracketForm,
   type KnockoutMatch,
 } from '@organisms/KnockoutBracketForm/KnockoutBracketForm';
+import { BestPlayersForm } from '@organisms/BestPlayersForm/BestPlayersForm';
 import { PredictorSelector } from '@molecules/PredictorSelector/PredictorSelector';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
@@ -19,8 +20,6 @@ import { useAuthStore } from '@store/auth-store';
 import type { Match, Predictor } from '@types/firestore';
 import './PredictionsTemplate.css';
 
-type PredictionTab = 'matches' | 'groups' | 'bracket';
-
 const PHASE_LABELS: Record<string, { en: string; es: string }> = {
   'round-of-32': { en: 'Round of 32', es: 'Treintaidosavos' },
   'round-of-16': { en: 'Round of 16', es: 'Octavos de Final' },
@@ -29,6 +28,8 @@ const PHASE_LABELS: Record<string, { en: string; es: string }> = {
   'third-place': { en: 'Third Place', es: 'Tercer Lugar' },
   final: { en: 'Final', es: 'Final' },
 };
+
+const FINAL_FOUR_PHASES = ['semifinals', 'third-place', 'final'];
 
 export interface PredictionsTemplateProps {
   translations: {
@@ -39,9 +40,14 @@ export interface PredictionsTemplateProps {
     loginRequired: string;
     loginButton: string;
     loading: string;
-    tabMatches: string;
-    tabGroups: string;
-    tabBracket: string;
+    sectionMatches: string;
+    sectionMatchesDesc: string;
+    sectionGroups: string;
+    sectionGroupsDesc: string;
+    sectionFinalFour: string;
+    sectionFinalFourDesc: string;
+    sectionBestPlayers: string;
+    sectionBestPlayersDesc: string;
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -88,11 +94,11 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   const [selectedPredictorId, setSelectedPredictorId] = useState<string | null>(null);
   const [predictorsLoading, setPredictorsLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState<PredictionTab>('matches');
   const [matches, setMatches] = useState<MatchPrediction[]>([]);
   const [firestoreMatches, setFirestoreMatches] = useState<(Match & { id: string })[]>([]);
   const [groups, setGroups] = useState<GroupForPrediction[]>([]);
-  const [knockoutMatches, setKnockoutMatches] = useState<KnockoutMatch[]>([]);
+  const [allTeams, setAllTeams] = useState<{ fifaCode: string; name: string }[]>([]);
+  const [finalFourMatches, setFinalFourMatches] = useState<KnockoutMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
@@ -100,7 +106,11 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   );
   const [existingMatchBets, setExistingMatchBets] = useState<Set<string>>(new Set());
   const [existingGroupBets, setExistingGroupBets] = useState<Set<string>>(new Set());
-  const [existingKnockoutBets, setExistingKnockoutBets] = useState<Set<string>>(new Set());
+  const [existingFinalFourBets, setExistingFinalFourBets] = useState<Set<string>>(new Set());
+  const [existingBestPlayers, setExistingBestPlayers] = useState<{
+    bestGoalkeeper?: string;
+    bestScorer?: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -147,12 +157,15 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         if (cancelled) return;
 
         const teamsMap: Record<string, { fifaCode: string; name: string }> = {};
+        const teamsList: { fifaCode: string; name: string }[] = [];
         if (teamsResult.status === 'fulfilled') {
           teamsResult.value.forEach((t) => {
             teamsMap[t.fifaCode.toLowerCase()] = { fifaCode: t.fifaCode, name: t.name };
             teamsMap[t.fifaCode] = { fifaCode: t.fifaCode, name: t.name };
+            teamsList.push({ fifaCode: t.fifaCode, name: t.name });
           });
         }
+        setAllTeams(teamsList);
 
         const allMatches =
           matchesResult.status === 'fulfilled'
@@ -161,11 +174,14 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
         const groupMatches = allMatches.filter((m) => m.phase === 'group');
         const knockoutMatchesData = allMatches.filter((m) => m.phase !== 'group');
+        const finalFourData = knockoutMatchesData.filter((m) =>
+          FINAL_FOUR_PHASES.includes(m.phase),
+        );
 
         setFirestoreMatches(groupMatches);
         setMatches(groupMatches.map((m) => mapMatchToPrediction(m, teamsMap)));
 
-        const knockoutMapped: KnockoutMatch[] = knockoutMatchesData.map((m) => ({
+        const finalFourMapped: KnockoutMatch[] = finalFourData.map((m) => ({
           slug: m.id,
           phase: m.phase,
           phaseLabel: PHASE_LABELS[m.phase]?.[locale === 'en' ? 'en' : 'es'] || m.phase,
@@ -173,7 +189,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           awayTeam: m.awayTeamId ? teamsMap[m.awayTeamId] || null : null,
           predictionDeadline: m.predictionDeadline.toDate(),
         }));
-        setKnockoutMatches(knockoutMapped);
+        setFinalFourMatches(finalFourMapped);
 
         if (groupsResult.status === 'fulfilled' && teamsResult.status === 'fulfilled') {
           const sortedGroups = [...groupsResult.value].sort((a, b) => a.order - b.order);
@@ -221,13 +237,16 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         matchBets.forEach((_, matchId) => matchBetIds.add(matchId));
         setExistingMatchBets(matchBetIds);
 
-        const knockoutBetIds = new Set<string>();
-        knockoutBets.forEach((_, matchId) => knockoutBetIds.add(matchId));
-        setExistingKnockoutBets(knockoutBetIds);
-
         const groupBetIds = new Set<string>();
         groupBets.forEach((_, groupId) => groupBetIds.add(groupId));
         setExistingGroupBets(groupBetIds);
+
+        const finalFourIds = new Set<string>();
+        knockoutBets.forEach((_, matchId) => {
+          const match = finalFourMatches.find((m) => m.slug === matchId);
+          if (match) finalFourIds.add(matchId);
+        });
+        setExistingFinalFourBets(finalFourIds);
       } catch {
         // Silently fail
       }
@@ -237,7 +256,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [user, selectedPredictorId]);
+  }, [user, selectedPredictorId, finalFourMatches]);
 
   const handleMatchSubmit = useCallback(
     async (predictions: Record<string, { home?: number; away?: number; winner?: string }>) => {
@@ -322,7 +341,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     [user, selectedPredictorId, locale, existingGroupBets],
   );
 
-  const handleKnockoutSubmit = useCallback(
+  const handleFinalFourSubmit = useCallback(
     async (predictions: Record<string, string>) => {
       if (!user || !selectedPredictorId) return;
 
@@ -350,13 +369,13 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           type: 'success',
           message:
             locale === 'en'
-              ? `${successCount} bracket prediction(s) submitted!`
-              : `¡${successCount} predicción(es) de bracket enviadas!`,
+              ? `${successCount} final four prediction(s) submitted!`
+              : `¡${successCount} predicción(es) de fase final enviadas!`,
         });
 
-        const newBetIds = new Set(existingKnockoutBets);
+        const newBetIds = new Set(existingFinalFourBets);
         Object.keys(predictions).forEach((id) => newBetIds.add(id));
-        setExistingKnockoutBets(newBetIds);
+        setExistingFinalFourBets(newBetIds);
       }
 
       if (firstError) {
@@ -368,7 +387,39 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, selectedPredictorId, locale, existingKnockoutBets],
+    [user, selectedPredictorId, locale, existingFinalFourBets],
+  );
+
+  const handleBestPlayersSubmit = useCallback(
+    async (data: { bestGoalkeeper?: string; bestScorer?: string }) => {
+      if (!user || !selectedPredictorId) return;
+
+      setSubmitting(true);
+      setFeedback(null);
+
+      try {
+        setExistingBestPlayers(data);
+        setFeedback({
+          type: 'success',
+          message:
+            locale === 'en'
+              ? 'Best players prediction submitted!'
+              : '¡Predicción de mejores jugadores enviada!',
+        });
+      } catch {
+        setFeedback({
+          type: 'error',
+          message:
+            locale === 'en'
+              ? 'Failed to submit best players prediction'
+              : 'Error al enviar predicción de mejores jugadores',
+        });
+      }
+
+      setSubmitting(false);
+      setTimeout(() => setFeedback(null), 5000);
+    },
+    [user, selectedPredictorId, locale],
   );
 
   const handleCreatePredictor = async (name: string) => {
@@ -438,8 +489,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   }
 
   const availableMatches = matches.filter((m) => !existingMatchBets.has(m.matchId));
-  const showGroupsTab = groups.length > 0;
-  const showBracketTab = knockoutMatches.length > 0;
+  const availableFinalFour = finalFourMatches.filter((m) => !existingFinalFourBets.has(m.slug));
 
   return (
     <div className={`predictions-template ${className}`}>
@@ -447,31 +497,6 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         <header className="predictions-template__header">
           <Typography variant="h1">{translations.title}</Typography>
         </header>
-
-        <div className="predictions-template__tabs">
-          <button
-            className={`predictions-template__tab ${activeTab === 'matches' ? 'active' : ''}`}
-            onClick={() => setActiveTab('matches')}
-          >
-            {translations.tabMatches}
-          </button>
-          {showGroupsTab && (
-            <button
-              className={`predictions-template__tab ${activeTab === 'groups' ? 'active' : ''}`}
-              onClick={() => setActiveTab('groups')}
-            >
-              {translations.tabGroups}
-            </button>
-          )}
-          {showBracketTab && (
-            <button
-              className={`predictions-template__tab ${activeTab === 'bracket' ? 'active' : ''}`}
-              onClick={() => setActiveTab('bracket')}
-            >
-              {translations.tabBracket}
-            </button>
-          )}
-        </div>
 
         {feedback && (
           <div
@@ -481,47 +506,102 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           </div>
         )}
 
-        {activeTab === 'matches' && (
-          <section className="predictions-template__section">
-            {availableMatches.length === 0 ? (
-              <div className="predictions-template__empty">
-                <Typography variant="body">
-                  {locale === 'en'
-                    ? 'No matches available for prediction. All scheduled matches have been predicted or deadlines have passed.'
-                    : 'No hay partidos disponibles para predecir. Todos los partidos programados han sido pronosticados o los plazos han pasado.'}
-                </Typography>
-              </div>
-            ) : (
-              <PredictionForm
-                matches={availableMatches}
-                onSubmit={handleMatchSubmit}
-                isDisabled={submitting}
-              />
-            )}
-          </section>
-        )}
+        <section className="predictions-template__section">
+          <div className="predictions-template__section-header">
+            <Typography variant="h2">{translations.sectionMatches}</Typography>
+            <Typography variant="body">{translations.sectionMatchesDesc}</Typography>
+          </div>
+          {availableMatches.length === 0 ? (
+            <div className="predictions-template__empty">
+              <Typography variant="body">
+                {locale === 'en'
+                  ? 'No matches available for prediction. All scheduled matches have been predicted or deadlines have passed.'
+                  : 'No hay partidos disponibles para predecir. Todos los partidos programados han sido pronosticados o los plazos han pasado.'}
+              </Typography>
+            </div>
+          ) : (
+            <PredictionForm
+              matches={availableMatches}
+              onSubmit={handleMatchSubmit}
+              isDisabled={submitting}
+            />
+          )}
+        </section>
 
-        {activeTab === 'groups' && showGroupsTab && (
-          <section className="predictions-template__section">
+        <div className="predictions-template__divider" />
+
+        <section className="predictions-template__section">
+          <div className="predictions-template__section-header">
+            <Typography variant="h2">{translations.sectionGroups}</Typography>
+            <Typography variant="body">{translations.sectionGroupsDesc}</Typography>
+          </div>
+          {groups.length > 0 ? (
             <GroupPredictionForm
               groups={groups}
               onSubmit={handleGroupSubmit}
               existingBets={existingGroupBets}
               isDisabled={submitting}
             />
-          </section>
-        )}
+          ) : (
+            <div className="predictions-template__empty">
+              <Typography variant="body">
+                {locale === 'en'
+                  ? 'Group predictions will be available once groups are confirmed.'
+                  : 'Las predicciones de grupos estarán disponibles una vez confirmados los grupos.'}
+              </Typography>
+            </div>
+          )}
+        </section>
 
-        {activeTab === 'bracket' && showBracketTab && (
-          <section className="predictions-template__section">
+        <div className="predictions-template__divider" />
+
+        <section className="predictions-template__section">
+          <div className="predictions-template__section-header">
+            <Typography variant="h2">{translations.sectionFinalFour}</Typography>
+            <Typography variant="body">{translations.sectionFinalFourDesc}</Typography>
+          </div>
+          {availableFinalFour.length > 0 ? (
             <KnockoutBracketForm
-              matches={knockoutMatches}
-              onSubmit={handleKnockoutSubmit}
-              existingBets={existingKnockoutBets}
+              matches={availableFinalFour}
+              onSubmit={handleFinalFourSubmit}
+              existingBets={existingFinalFourBets}
               isDisabled={submitting}
             />
-          </section>
-        )}
+          ) : (
+            <div className="predictions-template__empty">
+              <Typography variant="body">
+                {locale === 'en'
+                  ? 'Final four predictions will be available once teams are determined.'
+                  : 'Las predicciones de la fase final estarán disponibles una vez determinados los equipos.'}
+              </Typography>
+            </div>
+          )}
+        </section>
+
+        <div className="predictions-template__divider" />
+
+        <section className="predictions-template__section">
+          <div className="predictions-template__section-header">
+            <Typography variant="h2">{translations.sectionBestPlayers}</Typography>
+            <Typography variant="body">{translations.sectionBestPlayersDesc}</Typography>
+          </div>
+          {allTeams.length > 0 ? (
+            <BestPlayersForm
+              teams={allTeams}
+              onSubmit={handleBestPlayersSubmit}
+              existingPrediction={existingBestPlayers || undefined}
+              isDisabled={submitting}
+            />
+          ) : (
+            <div className="predictions-template__empty">
+              <Typography variant="body">
+                {locale === 'en'
+                  ? 'Teams will be available soon.'
+                  : 'Los equipos estarán disponibles pronto.'}
+              </Typography>
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );

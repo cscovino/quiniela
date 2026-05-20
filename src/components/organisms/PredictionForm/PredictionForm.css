@@ -1,7 +1,7 @@
 .prediction-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-8);
 }
 
 .prediction-form--empty {
@@ -16,42 +16,46 @@
 
 .prediction-form__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-6);
 }
 
 .prediction-form__card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  border: var(--border-pixel);
+  gap: var(--space-6);
+  padding: var(--space-6);
+  border: var(--border-pixel-md);
   background-color: var(--bg-card);
+  box-shadow: var(--shadow-md);
 }
 
 .prediction-form__teams {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: var(--space-4);
 }
 
 .prediction-form__team {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex: 1;
 }
 
 .prediction-form__vs {
   font-family: var(--font-pixel);
+  font-size: var(--text-sm);
   color: var(--text-muted);
-  padding: 0 var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-input);
+  border: var(--border-pixel-sm);
 }
 
 .prediction-form__actions {
   display: flex;
   justify-content: center;
-  padding-top: var(--space-4);
+  padding-top: var(--space-6);
 }

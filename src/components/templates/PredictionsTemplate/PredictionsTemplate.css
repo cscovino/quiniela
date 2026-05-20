@@ -8,7 +8,7 @@
 .predictions-template__content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-8);
 }
 
 .predictions-template__header {
@@ -38,59 +38,50 @@
 
 .predictions-template__feedback {
   padding: var(--space-4);
-  border: var(--border-pixel);
+  border: var(--border-pixel-md);
 }
 
 .predictions-template__feedback--success {
-  background-color: var(--color-success);
-  border-color: var(--color-success);
-  color: var(--text-primary);
+  background-color: var(--color-success-bg);
+  border-color: var(--color-success-border);
+  color: var(--color-success);
 }
 
 .predictions-template__feedback--error {
-  background-color: var(--color-error);
-  border-color: var(--color-error);
-  color: var(--text-primary);
+  background-color: var(--color-error-bg);
+  border-color: var(--color-error-border);
+  color: var(--color-error);
 }
 
 .predictions-template__empty {
   padding: var(--space-8);
   text-align: center;
-  border: var(--border-pixel);
-  background-color: var(--bg-card);
-}
-
-.predictions-template__tabs {
-  display: flex;
-  gap: var(--space-2);
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: var(--space-2);
-}
-
-.predictions-template__tab {
-  font-family: var(--font-pixel);
-  font-size: var(--text-xs);
-  padding: var(--space-2) var(--space-4);
-  background: transparent;
-  color: var(--text-secondary);
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.predictions-template__tab:hover {
-  color: var(--text-primary);
-  background-color: var(--bg-card);
-}
-
-.predictions-template__tab.active {
-  color: var(--color-accent-500);
-  border-color: var(--color-accent-500);
+  border: var(--border-pixel-sm);
   background-color: var(--bg-card);
 }
 
 .predictions-template__section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-6);
+}
+
+.predictions-template__section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  border-bottom: var(--border-pixel-sm);
+}
+
+.predictions-template__divider {
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-accent-500) 0px,
+    var(--color-accent-500) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  margin: var(--space-4) 0;
 }

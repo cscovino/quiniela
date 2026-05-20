@@ -22,9 +22,26 @@ const translations = {
       : 'Necesitas iniciar sesión para hacer predicciones',
   loginButton: locale === 'en' ? 'Login' : 'Iniciar Sesión',
   loading: locale === 'en' ? 'Loading predictions...' : 'Cargando predicciones...',
-  tabMatches: locale === 'en' ? 'Matches' : 'Partidos',
-  tabGroups: locale === 'en' ? 'Groups' : 'Grupos',
-  tabBracket: locale === 'en' ? 'Bracket' : 'Bracket',
+  sectionMatches: locale === 'en' ? '1. Match Predictions' : '1. Predicciones de Partidos',
+  sectionMatchesDesc:
+    locale === 'en'
+      ? 'Predict the exact score for each match'
+      : 'Predice el marcador exacto de cada partido',
+  sectionGroups: locale === 'en' ? '2. Group Standings' : '2. Clasificación de Grupos',
+  sectionGroupsDesc:
+    locale === 'en'
+      ? 'Rank the teams in each group from 1st to 4th place'
+      : 'Clasifica los equipos de cada grupo del 1° al 4° lugar',
+  sectionFinalFour: locale === 'en' ? '3. Final Four' : '3. Fase Final',
+  sectionFinalFourDesc:
+    locale === 'en'
+      ? 'Predict the winners of semifinals, third place, and final'
+      : 'Predice los ganadores de semifinales, tercer lugar y la final',
+  sectionBestPlayers: locale === 'en' ? '4. Best Players' : '4. Mejores Jugadores',
+  sectionBestPlayersDesc:
+    locale === 'en'
+      ? 'Pick the best goalkeeper and top scorer of the tournament'
+      : 'Elige al mejor portero y al máximo goleador del torneo',
 };
 
 const templateProps = {
