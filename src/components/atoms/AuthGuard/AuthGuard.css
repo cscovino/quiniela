@@ -1,0 +1,26 @@
+.auth-guard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: var(--space-8);
+}
+
+.auth-guard__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.auth-guard__locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+  padding: var(--space-12);
+  background: var(--bg-card);
+  border: var(--border-pixel-md);
+  box-shadow: var(--shadow-lg);
+}

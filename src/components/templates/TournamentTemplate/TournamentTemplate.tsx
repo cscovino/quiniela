@@ -3,6 +3,7 @@ import { GroupStandings, type GroupStandingsProps } from '@organisms/GroupStandi
 import { MatchList, type MatchListProps } from '@organisms/MatchList/MatchList';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
+import { AuthGuard } from '@atoms/AuthGuard/AuthGuard';
 import { tournamentService } from '@services/tournament-service';
 import type { Match, GroupStandings as FirestoreGroupStandings } from '@types/firestore';
 import './TournamentTemplate.css';
@@ -111,6 +112,22 @@ const mapMatchToCard = (
 };
 
 export const TournamentTemplate: React.FC<TournamentTemplateProps> = ({
+  translations,
+  locale = 'en',
+  className = '',
+}) => {
+  const loginUrl = locale === 'en' ? '/en/login' : '/login';
+  const message = locale === 'en' ? 'Login to view tournament' : 'Inicia sesión para ver el torneo';
+  const loadingMessage = locale === 'en' ? 'Loading...' : 'Cargando...';
+
+  return (
+    <AuthGuard loginUrl={loginUrl} message={message} loadingMessage={loadingMessage}>
+      <TournamentContent translations={translations} locale={locale} className={className} />
+    </AuthGuard>
+  );
+};
+
+const TournamentContent: React.FC<TournamentTemplateProps> = ({
   translations,
   locale = 'en',
   className = '',

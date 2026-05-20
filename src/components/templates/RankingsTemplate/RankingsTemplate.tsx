@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { RankingsTable, type RankingsTableProps } from '@organisms/RankingsTable/RankingsTable';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
+import { AuthGuard } from '@atoms/AuthGuard/AuthGuard';
 import { tournamentService } from '@services/tournament-service';
 import type { PredictorStats } from '@types/firestore';
 import './RankingsTemplate.css';
@@ -16,10 +17,10 @@ export interface RankingsTemplateProps {
   className?: string;
 }
 
-export const RankingsTemplate: React.FC<RankingsTemplateProps> = ({
-  translations,
-  className = '',
-}) => {
+const RankingsContent: React.FC<{
+  translations: RankingsTemplateProps['translations'];
+  className: string;
+}> = ({ translations, className }) => {
   const [rankings, setRankings] = useState<RankingsTableProps['rankings']>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -103,5 +104,22 @@ export const RankingsTemplate: React.FC<RankingsTemplateProps> = ({
         </section>
       </main>
     </div>
+  );
+};
+
+export const RankingsTemplate: React.FC<RankingsTemplateProps> = ({
+  translations,
+  locale = 'en',
+  className = '',
+}) => {
+  const loginUrl = locale === 'en' ? '/en/login' : '/login';
+  const message =
+    locale === 'en' ? 'Login to see rankings' : 'Inicia sesión para ver la clasificación';
+  const loadingMessage = locale === 'en' ? 'Loading...' : 'Cargando...';
+
+  return (
+    <AuthGuard loginUrl={loginUrl} message={message} loadingMessage={loadingMessage}>
+      <RankingsContent translations={translations} className={className} />
+    </AuthGuard>
   );
 };

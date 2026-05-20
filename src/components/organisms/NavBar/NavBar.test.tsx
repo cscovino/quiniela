@@ -11,6 +11,13 @@ const mockLinks = [
   { href: '/predictions', label: 'Predictions', active: false },
 ];
 
+const mockUser = {
+  uid: 'user-1',
+  displayName: 'Carlos',
+  email: 'carlos@test.com',
+  role: 'user' as const,
+};
+
 const mockAuthState = {
   user: null,
   isLoading: false,
@@ -30,13 +37,27 @@ describe('NavBar', () => {
     expect(screen.getByText('QUINIELA')).toBeInTheDocument();
   });
 
-  it('shows navigation links', () => {
+  it('shows navigation links when logged in', () => {
+    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      ...mockAuthState,
+      user: mockUser,
+    });
     render(<NavBar links={mockLinks} locale="en" />);
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Predictions')).toBeInTheDocument();
   });
 
-  it('highlights active link', () => {
+  it('hides navigation links when not logged in', () => {
+    render(<NavBar links={mockLinks} locale="en" />);
+    expect(screen.queryByText('Home')).not.toBeInTheDocument();
+    expect(screen.queryByText('Predictions')).not.toBeInTheDocument();
+  });
+
+  it('highlights active link when logged in', () => {
+    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      ...mockAuthState,
+      user: mockUser,
+    });
     render(<NavBar links={mockLinks} locale="en" />);
     const homeLink = screen.getByText('Home');
     const predictionsLink = screen.getByText('Predictions');
@@ -57,12 +78,7 @@ describe('NavBar', () => {
   it('shows logout button when logged in', () => {
     (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       ...mockAuthState,
-      user: {
-        uid: 'user-1',
-        displayName: 'Carlos',
-        email: 'carlos@test.com',
-        role: 'user' as const,
-      },
+      user: mockUser,
     });
     render(<NavBar links={mockLinks} locale="en" />);
     expect(screen.getByText('Logout')).toBeInTheDocument();
@@ -80,7 +96,7 @@ describe('NavBar', () => {
 
   it('has theme toggle button', () => {
     render(<NavBar links={mockLinks} locale="en" />);
-    const themeBtn = screen.getByRole('button', { name: /Switch to/ });
+    const themeBtn = screen.getByRole('button', { name: /Toggle theme/ });
     expect(themeBtn).toBeInTheDocument();
   });
 });

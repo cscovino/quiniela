@@ -147,6 +147,7 @@ describe('HomeTemplate', () => {
   it('redirects to login for rankings CTA when not authenticated', async () => {
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue([]);
 
     render(
       <HomeTemplate
@@ -162,9 +163,10 @@ describe('HomeTemplate', () => {
     });
   });
 
-  it('skips fetching rankings when not authenticated', async () => {
+  it('fetches rankings even when not authenticated', async () => {
     vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(mockMatches);
     vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue([]);
 
     render(
       <HomeTemplate
@@ -179,7 +181,7 @@ describe('HomeTemplate', () => {
       expect(screen.getByText('Upcoming Matches')).toBeInTheDocument();
     });
 
-    expect(tournamentService.tournamentService.getAllPredictorStats).not.toHaveBeenCalled();
+    expect(tournamentService.tournamentService.getAllPredictorStats).toHaveBeenCalled();
   });
 
   it('shows loading spinner for matches while fetching', () => {

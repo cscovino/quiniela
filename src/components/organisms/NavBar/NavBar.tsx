@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@atoms/Button/Button';
 import { Icon } from '@atoms/Icon/Icon';
 import { Typography } from '@atoms/Typography/Typography';
@@ -24,13 +24,6 @@ export const NavBar: React.FC<NavBarProps> = ({
   notificationCount = 0,
   className = '',
 }) => {
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
-    }
-    return 'dark';
-  });
-
   const { user, logout, initAuth } = useAuthStore();
 
   React.useEffect(() => {
@@ -38,8 +31,8 @@ export const NavBar: React.FC<NavBarProps> = ({
   }, [initAuth]);
 
   const handleThemeToggle = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
   };
@@ -58,22 +51,23 @@ export const NavBar: React.FC<NavBarProps> = ({
   const loginHref = locale === 'en' ? '/en/login' : '/login';
 
   return (
-    <nav className={`nav-bar ${className}`} data-theme={theme}>
+    <nav className={`nav-bar ${className}`}>
       <div className="nav-bar__brand">
         <Icon name="football" size={24} />
         <Typography variant="h3">QUINIELA</Typography>
       </div>
 
       <div className="nav-bar__links">
-        {links.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
-          >
-            {link.label}
-          </a>
-        ))}
+        {user &&
+          links.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
+            >
+              {link.label}
+            </a>
+          ))}
       </div>
 
       <div className="nav-bar__actions">
@@ -88,7 +82,7 @@ export const NavBar: React.FC<NavBarProps> = ({
         <button
           className="nav-bar__btn nav-bar__btn--icon"
           onClick={handleThemeToggle}
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          aria-label="Toggle theme"
         >
           <Icon name="star" size={18} />
         </button>

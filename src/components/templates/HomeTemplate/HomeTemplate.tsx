@@ -151,7 +151,7 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
         const [matches, teams, stats] = await Promise.allSettled([
           tournamentService.getMatches(),
           tournamentService.getTeams(),
-          user ? tournamentService.getAllPredictorStats() : Promise.resolve([]),
+          tournamentService.getAllPredictorStats(),
         ]);
 
         if (cancelled) return;

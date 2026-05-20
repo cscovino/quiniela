@@ -8,13 +8,15 @@ import {
   KnockoutBracketForm,
   type KnockoutMatch,
 } from '@organisms/KnockoutBracketForm/KnockoutBracketForm';
+import { PredictorSelector } from '@molecules/PredictorSelector/PredictorSelector';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
 import { Button } from '@atoms/Button/Button';
 import { tournamentService } from '@services/tournament-service';
 import { predictionService } from '@services/prediction-service';
+import { predictorService } from '@services/predictor-service';
 import { useAuthStore } from '@store/auth-store';
-import type { Match } from '@types/firestore';
+import type { Match, Predictor } from '@types/firestore';
 import './PredictionsTemplate.css';
 
 type PredictionTab = 'matches' | 'groups' | 'bracket';
@@ -82,6 +84,10 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     initAuth();
   }, [initAuth]);
 
+  const [predictors, setPredictors] = useState<Predictor[]>([]);
+  const [selectedPredictorId, setSelectedPredictorId] = useState<string | null>(null);
+  const [predictorsLoading, setPredictorsLoading] = useState(true);
+
   const [activeTab, setActiveTab] = useState<PredictionTab>('matches');
   const [matches, setMatches] = useState<MatchPrediction[]>([]);
   const [firestoreMatches, setFirestoreMatches] = useState<(Match & { id: string })[]>([]);
@@ -95,6 +101,37 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   const [existingMatchBets, setExistingMatchBets] = useState<Set<string>>(new Set());
   const [existingGroupBets, setExistingGroupBets] = useState<Set<string>>(new Set());
   const [existingKnockoutBets, setExistingKnockoutBets] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!user) return;
+
+    let cancelled = false;
+
+    const fetchPredictors = async () => {
+      try {
+        const userPredictors = await predictorService.getUserPredictors(user.uid);
+        if (cancelled) return;
+
+        setPredictors(userPredictors);
+
+        if (userPredictors.length > 0) {
+          const defaultPredictor = userPredictors.find((p) => p.id === `${user.uid}-default`);
+          setSelectedPredictorId(defaultPredictor?.id || userPredictors[0].id);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        if (!cancelled) {
+          setPredictorsLoading(false);
+        }
+      }
+    };
+
+    fetchPredictors();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,16 +204,15 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   }, [locale]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !selectedPredictorId) return;
 
-    const predictorId = `${user.uid}-default`;
     let cancelled = false;
 
     const fetchExistingBets = async () => {
       try {
         const { matchBets, knockoutBets, groupBets } = await predictionService.getExistingBets(
           user.uid,
-          predictorId,
+          selectedPredictorId,
         );
 
         if (cancelled) return;
@@ -201,19 +237,18 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, selectedPredictorId]);
 
   const handleMatchSubmit = useCallback(
     async (predictions: Record<string, { home?: number; away?: number; winner?: string }>) => {
-      if (!user) return;
+      if (!user || !selectedPredictorId) return;
 
-      const predictorId = `${user.uid}-default`;
       setSubmitting(true);
       setFeedback(null);
 
       const result = await predictionService.submitBatchMatchBets(
         user.uid,
-        predictorId,
+        selectedPredictorId,
         predictions,
         firestoreMatches,
       );
@@ -243,20 +278,19 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, firestoreMatches, locale, existingMatchBets],
+    [user, selectedPredictorId, firestoreMatches, locale, existingMatchBets],
   );
 
   const handleGroupSubmit = useCallback(
     async (predictions: Record<string, string[]>) => {
-      if (!user) return;
+      if (!user || !selectedPredictorId) return;
 
-      const predictorId = `${user.uid}-default`;
       setSubmitting(true);
       setFeedback(null);
 
       const result = await predictionService.submitBatchGroupBets(
         user.uid,
-        predictorId,
+        selectedPredictorId,
         predictions,
       );
 
@@ -285,20 +319,24 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, locale, existingGroupBets],
+    [user, selectedPredictorId, locale, existingGroupBets],
   );
 
   const handleKnockoutSubmit = useCallback(
     async (predictions: Record<string, string>) => {
-      if (!user) return;
+      if (!user || !selectedPredictorId) return;
 
-      const predictorId = `${user.uid}-default`;
       setSubmitting(true);
       setFeedback(null);
 
       const results = await Promise.all(
         Object.entries(predictions).map(async ([matchId, winner]) => {
-          return predictionService.submitKnockoutBet(user.uid, predictorId, matchId, winner);
+          return predictionService.submitKnockoutBet(
+            user.uid,
+            selectedPredictorId,
+            matchId,
+            winner,
+          );
         }),
       );
 
@@ -330,10 +368,18 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, locale, existingKnockoutBets],
+    [user, selectedPredictorId, locale, existingKnockoutBets],
   );
 
-  if (loading || isAuthLoading) {
+  const handleCreatePredictor = async (name: string) => {
+    if (!user) return;
+
+    const newPredictor = await predictorService.createPredictor(user.uid, name);
+    setPredictors((prev) => [...prev, newPredictor]);
+    setSelectedPredictorId(newPredictor.id);
+  };
+
+  if (loading || isAuthLoading || predictorsLoading) {
     return (
       <div className={`predictions-template ${className}`}>
         <div className="predictions-template__loading">
@@ -356,6 +402,37 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
             </Button>
           </a>
         </div>
+      </div>
+    );
+  }
+
+  if (!selectedPredictorId) {
+    const predictorTranslations = {
+      title: locale === 'en' ? 'Choose Your Predictor' : 'Elige tu Pronosticador',
+      selectPredictor:
+        locale === 'en'
+          ? 'Select or create a predictor to start'
+          : 'Selecciona o crea un pronosticador para comenzar',
+      createPredictor: locale === 'en' ? 'Create New Predictor' : 'Crear Nuevo Pronosticador',
+      createButton: locale === 'en' ? 'Create' : 'Crear',
+      namePlaceholder: locale === 'en' ? 'Predictor name...' : 'Nombre del pronosticador...',
+      loading: locale === 'en' ? 'Loading predictors...' : 'Cargando pronosticadores...',
+      noPredictors: locale === 'en' ? 'No predictors yet' : 'Aún no hay pronosticadores',
+      getStarted: locale === 'en' ? 'Get Started' : 'Comenzar',
+    };
+
+    return (
+      <div className={`predictions-template ${className}`}>
+        <main className="predictions-template__content">
+          <PredictorSelector
+            predictors={predictors}
+            selectedPredictorId={selectedPredictorId}
+            onSelectPredictor={setSelectedPredictorId}
+            onCreatePredictor={handleCreatePredictor}
+            isLoading={predictorsLoading}
+            translations={predictorTranslations}
+          />
+        </main>
       </div>
     );
   }
