@@ -1053,9 +1053,9 @@ service cloud.firestore {
 ### Sprint 3: UI/UX Polish
 | US | Story | Status | Notes |
 |----|-------|--------|-------|
-| US-017 | Display Tournament List | 🔄 In Progress | HomeTemplate built, needs real Firestore data |
-| US-018 | Display Tournament Details |  In Progress | Templates built, needs real Firestore data |
-| US-019 | Display Group Matches | 🔄 In Progress | MatchList built, needs real Firestore data |
+| US-017 | Display Tournament List | ✅ Done | HomeTemplate shows today's matches or next 5 upcoming, real Firestore data |
+| US-018 | Display Tournament Details | ✅ Done | TournamentTemplate with tabs (Standings + Matches), real Firestore data, /torneo + /en/tournament |
+| US-019 | Display Group Matches | ✅ Done | MatchList wired to Firestore, all 104 matches visible on tournament page |
 | US-020 | Prediction Form | 🔄 In Progress | PredictionForm built, needs Firestore write |
 | US-021 | Real-Time Notifications | ⬜ Not Started | |
 
@@ -1095,7 +1095,7 @@ service cloud.firestore {
 | Phase 2 | Atoms (12 components) | ✅ Done | Button, Input, Badge, Avatar, Icon, Typography, Spinner, Checkbox, Radio, Tooltip, Divider, ProgressBar |
 | Phase 3 | Molecules (9 components) | ✅ Done | TeamFlag, MatchCard, PredictionInput, TeamSelector, StatCard, ScoreDisplay, CountdownTimer, RankingRow, GroupHeader |
 | Phase 4 | Organisms (9 components) | ✅ Done | NavBar, TournamentHeader, MatchList, PredictionForm, GroupStandings, RankingsTable, BracketView, UserProfile, NotificationPanel |
-| Phase 5 | Templates (4 layouts) | ✅ Done | HomeTemplate, PredictionTemplate, StandingsTemplate, ProfileTemplate |
+| Phase 5 | Templates (5 layouts) | ✅ Done | HomeTemplate, PredictionTemplate, StandingsTemplate, ProfileTemplate, TournamentTemplate |
 | Phase 6 | Pixel art assets | ✅ Done | PixelArt component with 13 SVG sprites (football, trophy, stadium, medals, crowd, etc.) + animations |
 
 ---
