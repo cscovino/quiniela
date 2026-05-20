@@ -1,7 +1,18 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { HomeTemplate } from './HomeTemplate';
 import type { TournamentHeaderProps } from '@organisms/TournamentHeader/TournamentHeader';
+import * as tournamentService from '@services/tournament-service';
+import type { Match, Team, PredictorStats } from '@types/firestore';
+import type { Timestamp } from 'firebase/firestore';
+
+vi.mock('@services/tournament-service', () => ({
+  tournamentService: {
+    getMatches: vi.fn(),
+    getTeams: vi.fn(),
+    getAllPredictorStats: vi.fn(),
+  },
+}));
 
 const matchTranslations = {
   scheduled: 'Scheduled',
@@ -30,57 +41,136 @@ const mockTournamentProps: TournamentHeaderProps = {
   participantCount: 32,
 };
 
-const mockMatches = [
+const mockTimestamp = {
+  toDate: () => new Date('2026-06-15T18:00:00Z'),
+  toMillis: () => new Date('2026-06-15T18:00:00Z').getTime(),
+} as Timestamp;
+
+const mockTeams: Team[] = [
   {
-    homeTeam: { fifaCode: 'ARG', name: 'Argentina' },
-    awayTeam: { fifaCode: 'FRA', name: 'France' },
-    date: new Date('2026-06-15T18:00:00Z'),
-    status: 'scheduled' as const,
-    stadium: 'Lusail Stadium',
+    id: 'arg',
+    fifaCode: 'ARG',
+    name: 'Argentina',
+    groupId: 'A',
+    flagEmoji: '🇦🇷',
+    createdAt: mockTimestamp,
+  },
+  {
+    id: 'fra',
+    fifaCode: 'FRA',
+    name: 'France',
+    groupId: 'A',
+    flagEmoji: '🇫🇷',
+    createdAt: mockTimestamp,
   },
 ];
 
-const mockRankings = [
-  { userId: 'user-1', displayName: 'Carlos', points: 150, accuracy: 75, streak: 5 },
-  { userId: 'user-2', displayName: 'Maria', points: 142, accuracy: 72, streak: 3 },
+const mockMatches: (Match & { id: string })[] = [
+  {
+    id: 'match-1',
+    homeTeamId: 'arg',
+    awayTeamId: 'fra',
+    date: mockTimestamp,
+    status: 'scheduled',
+    stadium: 'Lusail Stadium',
+    groupId: 'A',
+    result: { home: null, away: null },
+    slug: 'arg-fra',
+    phase: 'group',
+    predictionDeadline: mockTimestamp,
+    createdAt: mockTimestamp,
+    updatedAt: mockTimestamp,
+  },
+];
+
+const mockRankings: (PredictorStats & { userId: string; predictorId: string })[] = [
+  {
+    id: 'stats-1',
+    userId: 'user-1',
+    predictorId: 'predictor-1',
+    totalPoints: 150,
+    accuracy: 0.75,
+    currentStreak: 5,
+    correctPredictions: 10,
+    totalPredictions: 15,
+    exactResults: 2,
+  },
+  {
+    id: 'stats-2',
+    userId: 'user-2',
+    predictorId: 'predictor-2',
+    totalPoints: 142,
+    accuracy: 0.72,
+    currentStreak: 3,
+    correctPredictions: 9,
+    totalPredictions: 14,
+    exactResults: 1,
+  },
 ];
 
 describe('HomeTemplate', () => {
-  it('renders tournament header', () => {
-    render(
-      <HomeTemplate
-        tournamentProps={mockTournamentProps}
-        matches={mockMatches}
-        rankings={mockRankings}
-        translations={translations}
-      />,
-    );
-    expect(screen.getByText('World Cup 2026')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('renders matches section', () => {
+  it('renders tournament header', async () => {
+    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
+    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue([]);
+
     render(
       <HomeTemplate
         tournamentProps={mockTournamentProps}
-        matches={mockMatches}
-        rankings={mockRankings}
+        matches={[]}
+        rankings={[]}
         translations={translations}
       />,
     );
-    expect(screen.getByText('Upcoming Matches')).toBeInTheDocument();
-    expect(screen.getByText('Argentina')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('World Cup 2026')).toBeInTheDocument();
+    });
   });
 
-  it('renders rankings section', () => {
+  it('renders matches section', async () => {
+    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue(mockMatches);
+    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue([]);
+
     render(
       <HomeTemplate
         tournamentProps={mockTournamentProps}
-        matches={mockMatches}
-        rankings={mockRankings}
+        matches={[]}
+        rankings={[]}
         translations={translations}
       />,
     );
-    expect(screen.getByText('Top Players')).toBeInTheDocument();
-    expect(screen.getByText('Carlos')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('Upcoming Matches')).toBeInTheDocument();
+      expect(screen.getByText('Argentina')).toBeInTheDocument();
+    });
+  });
+
+  it('renders rankings section', async () => {
+    vi.mocked(tournamentService.tournamentService.getMatches).mockResolvedValue([]);
+    vi.mocked(tournamentService.tournamentService.getTeams).mockResolvedValue(mockTeams);
+    vi.mocked(tournamentService.tournamentService.getAllPredictorStats).mockResolvedValue(
+      mockRankings,
+    );
+
+    render(
+      <HomeTemplate
+        tournamentProps={mockTournamentProps}
+        matches={[]}
+        rankings={[]}
+        translations={translations}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Top Players')).toBeInTheDocument();
+    });
+    expect(screen.getByText('150')).toBeInTheDocument();
   });
 });

@@ -1042,21 +1042,21 @@ service cloud.firestore {
 ### Sprint 2: Rankings & Gamification
 | US | Story | Status | Notes |
 |----|-------|--------|-------|
-| US-010 | Calculate Prediction Points | ⬜ Not Started | |
-| US-011 | Update Group Standings | ⬜ Not Started | |
-| US-012 | Update User Statistics | ⬜ Not Started | |
-| US-013 | Display User Ranking | ⬜ Not Started | |
+| US-010 | Calculate Prediction Points | ✅ Done | Cloud Function `calculateMatchResult` (+3 exact, +1 outcome) |
+| US-011 | Update Group Standings | ✅ Done | Cloud Function `updateGroupStandings` (recomputes from scratch) |
+| US-012 | Update User Statistics | ✅ Done | Cloud Function `updatePredictorStats` (points, accuracy, streaks) |
+| US-013 | Display User Ranking | ⬜ Not Started | Components built, needs Firestore connection |
 | US-014 | Display Points Evolution Graph | ⬜ Not Started | |
-| US-015 | Auto-Assign Badges | ⬜ Not Started | |
+| US-015 | Auto-Assign Badges | ✅ Done | Cloud Function `checkAndAwardBadges` (first-blood, on-fire, consistent, perfect-group) |
 | US-016 | Display Badges on Profile | ⬜ Not Started | |
 
 ### Sprint 3: UI/UX Polish
 | US | Story | Status | Notes |
 |----|-------|--------|-------|
-| US-017 | Display Tournament List | ⬜ Not Started | |
-| US-018 | Display Tournament Details | ⬜ Not Started | |
-| US-019 | Display Group Matches | ⬜ Not Started | |
-| US-020 | Prediction Form | ⬜ Not Started | |
+| US-017 | Display Tournament List | 🔄 In Progress | HomeTemplate built, needs real Firestore data |
+| US-018 | Display Tournament Details |  In Progress | Templates built, needs real Firestore data |
+| US-019 | Display Group Matches | 🔄 In Progress | MatchList built, needs real Firestore data |
+| US-020 | Prediction Form | 🔄 In Progress | PredictionForm built, needs Firestore write |
 | US-021 | Real-Time Notifications | ⬜ Not Started | |
 
 ### Sprint 4: Administration
@@ -1150,4 +1150,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-19*
+*Last updated: 2026-05-20*

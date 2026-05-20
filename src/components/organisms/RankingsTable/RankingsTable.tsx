@@ -6,6 +6,7 @@ import './RankingsTable.css';
 
 export interface RankingEntry {
   userId: string;
+  predictorId?: string;
   avatarUrl?: string;
   displayName: string;
   points: number;
@@ -20,6 +21,7 @@ export interface RankingsTableProps {
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  emptyMessage?: string;
   className?: string;
 }
 
@@ -30,12 +32,13 @@ export const RankingsTable: React.FC<RankingsTableProps> = ({
   page = 1,
   totalPages = 1,
   onPageChange,
+  emptyMessage = 'No rankings available yet',
   className = '',
 }) => {
   if (rankings.length === 0) {
     return (
       <div className={`rankings-table rankings-table--empty ${className}`}>
-        <Typography variant="body">No rankings available yet</Typography>
+        <Typography variant="body">{emptyMessage}</Typography>
       </div>
     );
   }
@@ -47,7 +50,7 @@ export const RankingsTable: React.FC<RankingsTableProps> = ({
       <div className="rankings-table__list">
         {rankings.map((entry, index) => (
           <RankingRow
-            key={entry.userId}
+            key={entry.predictorId || entry.userId}
             position={(page - 1) * 20 + index + 1}
             avatarUrl={entry.avatarUrl}
             displayName={entry.displayName}
