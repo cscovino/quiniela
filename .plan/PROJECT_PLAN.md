@@ -1088,6 +1088,9 @@ service cloud.firestore {
 | Toast notifications | ✅ Done | Global toast system with 4 types, auto-dismiss, Zustand store |
 | Points evolution chart | ✅ Done | SVG-based PointsChart component in ProfileTemplate |
 | Badge system | ✅ Done | 6 badges with definitions, earned/locked display on profile |
+| Mobile responsive | ✅ Done | Hamburger menu, stacked layouts, overflow fixes, breakpoints at 768px/480px |
+| Post-login redirect | ✅ Done | Users redirected to predictions page after login/register |
+| Service worker fix | ✅ Done | Never cache redirect responses (Safari iOS compatibility) |
 
 ### Design System
 | Phase | Description | Status | Notes |
@@ -1148,6 +1151,10 @@ service cloud.firestore {
 34. **Badge Definitions:** Centralized in `src/types/badges.ts` with icons, descriptions, and conditions
 35. **Toast System:** Global Zustand store with auto-dismiss, 4 types (success, error, info, warning)
 36. **Points Chart:** Lightweight SVG-based component (no external charting library)
+37. **Mobile Navigation:** Hamburger menu with dropdown for screens <768px, full-width stacked buttons
+38. **Overflow Prevention:** `overflow-x: hidden` on html/body, team names truncate with ellipsis
+39. **Service Worker:** Network-first for navigation, never cache redirect responses (Safari iOS fix)
+40. **Post-Login Flow:** Users redirected to predictions page (locale-aware) after auth
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
@@ -1169,4 +1176,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-21 - MVP Complete (100%)*
+*Last updated: 2026-05-21 - MVP Complete + Mobile Responsive + SW Fix*
