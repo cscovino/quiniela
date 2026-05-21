@@ -68,49 +68,82 @@
   --color-primary-800: #020202;
   --color-primary-900: #000000;
 
-  /* Accent (Electric Blue - WC26 energy color) */
-  --color-accent-100: #e0f7ff;
-  --color-accent-200: #b3ecff;
-  --color-accent-300: #66d9ff;
-  --color-accent-400: #33ccff;
-  --color-accent-500: #00bfff;
-  --color-accent-600: #0099cc;
-  --color-accent-700: #007399;
-  --color-accent-800: #004d66;
-  --color-accent-900: #002633;
+  /* Accent (Deep Blue - WC26 primary brand) */
+  --color-accent-100: #1a2a40;
+  --color-accent-200: #1f334d;
+  --color-accent-300: #243c5a;
+  --color-accent-400: #294567;
+  --color-accent-500: #1D3557;
+  --color-accent-600: #162a42;
+  --color-accent-700: #0f1f32;
+  --color-accent-800: #081422;
+  --color-accent-900: #020811;
 
-  /* Secondary (Magenta - WC26 passion color) */
-  --color-secondary-100: #ffe0f0;
-  --color-secondary-200: #ffb3d9;
-  --color-secondary-300: #ff66b3;
-  --color-secondary-400: #ff3399;
-  --color-secondary-500: #ff1493;
-  --color-secondary-600: #cc1075;
-  --color-secondary-700: #990c58;
-  --color-secondary-800: #66083a;
-  --color-secondary-900: #33041d;
+  /* Secondary (Red - WC26 Canada energy) */
+  --color-secondary-100: #f5d0d3;
+  --color-secondary-200: #eaa1a6;
+  --color-secondary-300: #df7278;
+  --color-secondary-400: #d4434b;
+  --color-secondary-500: #E63946;
+  --color-secondary-600: #b52d38;
+  --color-secondary-700: #89222a;
+  --color-secondary-800: #5e161c;
+  --color-secondary-900: #320b0e;
 
-  /* Tertiary (Orange - WC26 warmth color) */
-  --color-tertiary-100: #fff0e0;
-  --color-tertiary-200: #ffd9b3;
-  --color-tertiary-300: #ffb366;
-  --color-tertiary-400: #ff9933;
-  --color-tertiary-500: #ff6b35;
-  --color-tertiary-600: #cc562a;
-  --color-tertiary-700: #994020;
-  --color-tertiary-800: #662b15;
-  --color-tertiary-900: #33150a;
+  /* Tertiary (Green - WC26 Mexico energy) */
+  --color-tertiary-100: #c8e6d2;
+  --color-tertiary-200: #91cca5;
+  --color-tertiary-300: #5ab378;
+  --color-tertiary-400: #23994c;
+  --color-tertiary-500: #2D6A4F;
+  --color-tertiary-600: #24553f;
+  --color-tertiary-700: #1b402f;
+  --color-tertiary-800: #122a20;
+  --color-tertiary-900: #091510;
+
+  /* Quaternary (Teal - WC26 fresh energy) */
+  --color-quaternary-100: #b3f5e6;
+  --color-quaternary-200: #66eacc;
+  --color-quaternary-300: #1adfb3;
+  --color-quaternary-400: #0ad4a0;
+  --color-quaternary-500: #06D6A0;
+  --color-quaternary-600: #05ac82;
+  --color-quaternary-700: #048262;
+  --color-quaternary-800: #025941;
+  --color-quaternary-900: #012d21;
+
+  /* Vibrant (Purple - WC26 premium) */
+  --color-vibrant-100: #e0c4f0;
+  --color-vibrant-200: #c189e0;
+  --color-vibrant-300: #a14ed0;
+  --color-vibrant-400: #8113bf;
+  --color-vibrant-500: #7B2D8E;
+  --color-vibrant-600: #622572;
+  --color-vibrant-700: #4a1d56;
+  --color-vibrant-800: #31143a;
+  --color-vibrant-900: #19091d;
+
+  /* Warm (Orange - WC26 energy) */
+  --color-warm-100: #fde5d4;
+  --color-warm-200: #fbccaa;
+  --color-warm-300: #f8b380;
+  --color-warm-400: #f69a56;
+  --color-warm-500: #F4A261;
+  --color-warm-600: #c3824e;
+  --color-warm-700: #92623b;
+  --color-warm-800: #614128;
+  --color-warm-900: #312114;
 
   /* Gold (WC26 trophy/victory color) */
-  --color-gold-100: #fff9e0;
-  --color-gold-200: #fff0b3;
-  --color-gold-300: #ffe066;
-  --color-gold-400: #ffd733;
-  --color-gold-500: #ffd700;
-  --color-gold-600: #ccac00;
-  --color-gold-700: #998100;
-  --color-gold-800: #665600;
-  --color-gold-900: #332b00;
+  --color-gold-100: #fdf5d9;
+  --color-gold-200: #fbeab3;
+  --color-gold-300: #f8de8c;
+  --color-gold-400: #e6c866;
+  --color-gold-500: #D4AF37;
+  --color-gold-600: #aa8c2c;
+  --color-gold-700: #806922;
+  --color-gold-800: #554717;
+  --color-gold-900: #2b240c;
 
   /* Semantic - Success (Green for correct predictions) */
   --color-success: #00e676;
@@ -168,49 +201,82 @@
   --color-primary-800: #e6e6e6;
   --color-primary-900: #f5f5f5;
 
-  /* Accent (Electric Blue) */
-  --color-accent-100: #002633;
-  --color-accent-200: #004d66;
-  --color-accent-300: #007399;
-  --color-accent-400: #0099cc;
-  --color-accent-500: #00bfff;
-  --color-accent-600: #33ccff;
-  --color-accent-700: #66d9ff;
-  --color-accent-800: #b3ecff;
-  --color-accent-900: #e0f7ff;
+  /* Accent (Deep Blue) */
+  --color-accent-100: #020811;
+  --color-accent-200: #051020;
+  --color-accent-300: #081a30;
+  --color-accent-400: #0a2340;
+  --color-accent-500: #1D3557;
+  --color-accent-600: #294567;
+  --color-accent-700: #345478;
+  --color-accent-800: #406989;
+  --color-accent-900: #4d7d9a;
 
-  /* Secondary (Magenta) */
-  --color-secondary-100: #33041d;
-  --color-secondary-200: #66083a;
-  --color-secondary-300: #990c58;
-  --color-secondary-400: #cc1075;
-  --color-secondary-500: #ff1493;
-  --color-secondary-600: #ff3399;
-  --color-secondary-700: #ff66b3;
-  --color-secondary-800: #ffb3d9;
-  --color-secondary-900: #ffe0f0;
+  /* Secondary (Red) */
+  --color-secondary-100: #320b0e;
+  --color-secondary-200: #5e161c;
+  --color-secondary-300: #89222a;
+  --color-secondary-400: #b52d38;
+  --color-secondary-500: #E63946;
+  --color-secondary-600: #d4434b;
+  --color-secondary-700: #df7278;
+  --color-secondary-800: #eaa1a6;
+  --color-secondary-900: #f5d0d3;
 
-  /* Tertiary (Orange) */
-  --color-tertiary-100: #33150a;
-  --color-tertiary-200: #662b15;
-  --color-tertiary-300: #994020;
-  --color-tertiary-400: #cc562a;
-  --color-tertiary-500: #ff6b35;
-  --color-tertiary-600: #ff9933;
-  --color-tertiary-700: #ffb366;
-  --color-tertiary-800: #ffd9b3;
-  --color-tertiary-900: #fff0e0;
+  /* Tertiary (Green) */
+  --color-tertiary-100: #091510;
+  --color-tertiary-200: #122a20;
+  --color-tertiary-300: #1b402f;
+  --color-tertiary-400: #24553f;
+  --color-tertiary-500: #2D6A4F;
+  --color-tertiary-600: #23994c;
+  --color-tertiary-700: #5ab378;
+  --color-tertiary-800: #91cca5;
+  --color-tertiary-900: #c8e6d2;
+
+  /* Quaternary (Teal) */
+  --color-quaternary-100: #012d21;
+  --color-quaternary-200: #025941;
+  --color-quaternary-300: #048262;
+  --color-quaternary-400: #05ac82;
+  --color-quaternary-500: #06D6A0;
+  --color-quaternary-600: #0ad4a0;
+  --color-quaternary-700: #1adfb3;
+  --color-quaternary-800: #66eacc;
+  --color-quaternary-900: #b3f5e6;
+
+  /* Vibrant (Purple) */
+  --color-vibrant-100: #19091d;
+  --color-vibrant-200: #31143a;
+  --color-vibrant-300: #4a1d56;
+  --color-vibrant-400: #622572;
+  --color-vibrant-500: #7B2D8E;
+  --color-vibrant-600: #8113bf;
+  --color-vibrant-700: #a14ed0;
+  --color-vibrant-800: #c189e0;
+  --color-vibrant-900: #e0c4f0;
+
+  /* Warm (Orange) */
+  --color-warm-100: #312114;
+  --color-warm-200: #614128;
+  --color-warm-300: #92623b;
+  --color-warm-400: #c3824e;
+  --color-warm-500: #F4A261;
+  --color-warm-600: #f69a56;
+  --color-warm-700: #f8b380;
+  --color-warm-800: #fbccaa;
+  --color-warm-900: #fde5d4;
 
   /* Gold */
-  --color-gold-100: #332b00;
-  --color-gold-200: #665600;
-  --color-gold-300: #998100;
-  --color-gold-400: #ccac00;
-  --color-gold-500: #ffd700;
-  --color-gold-600: #ffd733;
-  --color-gold-700: #ffe066;
-  --color-gold-800: #fff0b3;
-  --color-gold-900: #fff9e0;
+  --color-gold-100: #2b240c;
+  --color-gold-200: #554717;
+  --color-gold-300: #806922;
+  --color-gold-400: #aa8c2c;
+  --color-gold-500: #D4AF37;
+  --color-gold-600: #e6c866;
+  --color-gold-700: #f8de8c;
+  --color-gold-800: #fbeab3;
+  --color-gold-900: #fdf5d9;
 
   /* Semantic - Success */
   --color-success: #00c853;
@@ -465,11 +531,11 @@
 
 :root {
   /* WC26 Official Brand Gradients */
-  --gradient-wc26-primary: linear-gradient(135deg, var(--color-accent-500), var(--color-secondary-500));
-  --gradient-wc26-energy: linear-gradient(135deg, var(--color-accent-500), var(--color-tertiary-500));
-  --gradient-wc26-trophy: linear-gradient(135deg, var(--color-gold-500), var(--color-tertiary-400));
+  --gradient-wc26-primary: linear-gradient(135deg, var(--color-accent-500), var(--color-vibrant-500));
+  --gradient-wc26-energy: linear-gradient(135deg, var(--color-accent-500), var(--color-warm-500));
+  --gradient-wc26-trophy: linear-gradient(135deg, var(--color-gold-500), var(--color-warm-400));
   --gradient-wc26-stadium: linear-gradient(180deg, var(--bg-dark), var(--bg-card));
-  --gradient-wc26-celebration: linear-gradient(135deg, var(--color-gold-500), var(--color-secondary-500), var(--color-accent-500));
+  --gradient-wc26-celebration: linear-gradient(135deg, var(--color-gold-500), var(--color-vibrant-500), var(--color-accent-500));
 }
 
 /* ============================================

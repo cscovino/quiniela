@@ -1,8 +1,20 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import type { Plugin } from 'vite';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const firebaseMockPlugin: Plugin = {
+  name: 'firebase-mock',
+  resolveId(source) {
+    if (source === 'firebase/app' || source === 'firebase/auth' || 
+        source === 'firebase/firestore' || source === 'firebase/messaging') {
+      return resolve(__dirname, '../src/test/firebase-mock.ts');
+    }
+    return null;
+  },
+};
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
@@ -15,6 +27,7 @@ const config: StorybookConfig = {
   viteFinal: async (config) => {
     return {
       ...config,
+      plugins: [...(config.plugins || []), firebaseMockPlugin],
       resolve: {
         ...config.resolve,
         alias: {

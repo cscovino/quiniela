@@ -1,70 +1,108 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { ProfileTemplate } from './ProfileTemplate';
+import { useAuthStore } from '@store/auth-store';
+import { tournamentService } from '@services/tournament-service';
+
+vi.mock('@store/auth-store', () => ({
+  useAuthStore: vi.fn(),
+}));
+
+vi.mock('@services/tournament-service', () => ({
+  tournamentService: {
+    getPredictorStats: vi.fn(),
+    getAllPredictorStats: vi.fn(),
+  },
+}));
+
+vi.mock('@atoms/Icon/Icon', () => ({
+  Icon: ({ name }: { name: string }) => <span data-testid={`icon-${name}`} />,
+}));
 
 const translations = {
   title: 'My Profile',
-  notificationsTitle: (count: number) => `${count} Notifications`,
-  userProfile: {
-    totalPoints: 'Total Points',
-    accuracy: 'Accuracy',
-    currentStreak: 'Current Streak',
-    bestStreak: 'Best Streak',
-    exactBets: 'Exact Bets',
-    rank: 'Rank',
-    badges: 'Badges',
-  },
-  notifications: {
-    noNotifications: 'No notifications yet',
-    notificationsHeader: (count: number) => `${count} Unread`,
-    clearAll: 'Clear All',
-  },
+  loading: 'Loading...',
+  loginRequired: 'Please log in to view your profile',
+  loginButton: 'Log In',
+  totalPoints: 'Total Points',
+  accuracy: 'Accuracy',
+  currentStreak: 'Current Streak',
+  bestStreak: 'Best Streak',
+  exactBets: 'Exact Bets',
+  rank: 'Rank',
+  badges: 'Badges',
+  lockedBadges: 'Locked Badges',
+  pointsChart: 'Points Evolution',
+  noPointsData: 'No data available',
+  points: 'Points',
+  matches: 'Matches',
 };
-
-const mockUserProfile = {
-  displayName: 'Carlos',
-  avatarUrl: '/avatars/carlos.png',
-  favoriteTeam: 'Argentina',
-  stats: {
-    totalPoints: 480,
-    exactBets: 12,
-    accuracy: 67,
-    currentStreak: 5,
-    maxStreak: 8,
-    rank: 5,
-  },
-  badges: [
-    { id: 'badge-1', name: 'First Prediction', icon: 'star', earnedAt: new Date('2026-06-11') },
-  ],
-};
-
-const mockNotifications = [
-  {
-    id: 'notif-1',
-    type: 'badge_earned' as const,
-    title: 'New Badge',
-    message: 'You earned 10 points!',
-    read: false,
-    createdAt: new Date(Date.now() - 60 * 60 * 1000),
-  },
-];
 
 describe('ProfileTemplate', () => {
-  it('renders user profile', () => {
-    render(<ProfileTemplate userProfile={mockUserProfile} translations={translations} />);
-    expect(screen.getByText('My Profile')).toBeInTheDocument();
-    expect(screen.getByText('Carlos')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('renders notifications section when provided', () => {
-    render(
-      <ProfileTemplate
-        userProfile={mockUserProfile}
-        notifications={mockNotifications}
-        translations={translations}
-      />,
-    );
-    expect(screen.getAllByText(/Notifications/).length).toBeGreaterThan(0);
-    expect(screen.getByText('You earned 10 points!')).toBeInTheDocument();
+  it('shows login required when not authenticated', () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      user: null,
+      isAuthLoading: false,
+      initAuth: vi.fn(),
+    });
+
+    render(<ProfileTemplate translations={translations} />);
+
+    expect(screen.getByText('My Profile')).toBeInTheDocument();
+    expect(screen.getByText('Please log in to view your profile')).toBeInTheDocument();
+    expect(screen.getByText('Log In')).toBeInTheDocument();
+  });
+
+  it('shows loading spinner while auth is loading', () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      user: null,
+      isAuthLoading: true,
+      initAuth: vi.fn(),
+    });
+
+    render(<ProfileTemplate translations={translations} />);
+
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  });
+
+  it('renders profile when authenticated', async () => {
+    const mockUser = {
+      uid: 'user-1',
+      displayName: 'Carlos',
+      email: 'carlos@example.com',
+      avatarUrl: '/avatars/carlos.png',
+    };
+
+    vi.mocked(useAuthStore).mockReturnValue({
+      user: mockUser,
+      isAuthLoading: false,
+      initAuth: vi.fn(),
+    });
+
+    vi.mocked(tournamentService.getPredictorStats).mockResolvedValue({
+      totalPoints: 480,
+      exactBets: 12,
+      accuracy: 0.67,
+      currentStreak: 5,
+      maxStreak: 8,
+      badgesAwarded: {},
+      pointsHistory: [],
+    } as any);
+
+    vi.mocked(tournamentService.getAllPredictorStats).mockResolvedValue([]);
+
+    render(<ProfileTemplate translations={translations} />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getByText('My Profile')).toBeInTheDocument();
+    expect(screen.getByText('Carlos')).toBeInTheDocument();
   });
 });

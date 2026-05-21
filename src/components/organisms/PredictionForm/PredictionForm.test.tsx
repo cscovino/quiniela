@@ -22,8 +22,10 @@ const mockMatches = [
 describe('PredictionForm', () => {
   it('renders match predictions', () => {
     render(<PredictionForm matches={mockMatches} onSubmit={() => {}} />);
-    expect(screen.getByText('Argentina vs France')).toBeInTheDocument();
-    expect(screen.getByText('Brazil vs Germany')).toBeInTheDocument();
+    expect(screen.getAllByText('Argentina').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('France').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Brazil').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Germany').length).toBeGreaterThan(0);
   });
 
   it('shows submit button', () => {

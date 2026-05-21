@@ -19,10 +19,18 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-if (typeof window !== 'undefined') {
-  import('firebase/messaging').then(({ getMessaging }) => {
-    messaging = getMessaging(app);
-  });
+if (typeof window !== 'undefined' && typeof ServiceWorkerRegistration !== 'undefined') {
+  import('firebase/messaging')
+    .then(({ getMessaging }) => {
+      try {
+        messaging = getMessaging(app);
+      } catch {
+        messaging = null;
+      }
+    })
+    .catch(() => {
+      messaging = null;
+    });
 }
 
 setPersistence(auth, browserLocalPersistence).catch(() => {

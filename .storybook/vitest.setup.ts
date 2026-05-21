@@ -1,7 +1,9 @@
-import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { vi, beforeAll, afterEach, afterAll, expect } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
 
-// Mock Firebase modules
+expect.extend(matchers);
+
+// Mock Firebase modules before any imports
 vi.mock('firebase/app', () => ({
   initializeApp: vi.fn(() => ({ name: '[DEFAULT]', options: {} })),
   getApp: vi.fn(() => ({ name: '[DEFAULT]', options: {} })),
@@ -36,7 +38,7 @@ vi.mock('firebase/auth', () => {
   };
 });
 
-vi.mock('firebase/firestore', () => ({
+const mockFirestore = {
   getFirestore: vi.fn(() => 'mock-firestore'),
   collection: vi.fn(() => 'mock-collection'),
   doc: vi.fn(() => 'mock-doc'),
@@ -61,7 +63,9 @@ vi.mock('firebase/firestore', () => ({
     now: vi.fn(() => new Date()),
     fromDate: vi.fn((d) => d),
   },
-}));
+};
+
+vi.mock('firebase/firestore', () => mockFirestore);
 
 vi.mock('firebase/messaging', () => ({
   getMessaging: vi.fn(() => null),
@@ -69,34 +73,58 @@ vi.mock('firebase/messaging', () => ({
   onMessage: vi.fn(() => vi.fn()),
 }));
 
-// Mock browser APIs
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn((query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
+// Mock browser APIs missing in jsdom/happy-dom
+beforeAll(() => {
+  // ServiceWorkerRegistration for Firebase messaging check
+  if (typeof globalThis.ServiceWorkerRegistration === 'undefined') {
+    globalThis.ServiceWorkerRegistration = class ServiceWorkerRegistration {};
+  }
+
+  // PushManager for Firebase messaging check
+  if (typeof globalThis.PushManager === 'undefined') {
+    globalThis.PushManager = class PushManager {};
+  }
+
+  // window.matchMedia
+  Object.defineProperty(globalThis, 'matchMedia', {
+    writable: true,
+    value: vi.fn((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+
+  // IntersectionObserver
+  globalThis.IntersectionObserver = class IntersectionObserver {
+    constructor() {}
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  };
+
+  // ResizeObserver
+  globalThis.ResizeObserver = class ResizeObserver {
+    constructor() {}
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  };
+
+  // URL.createObjectURL
+  globalThis.URL.createObjectURL = vi.fn(() => 'mock-url');
+  globalThis.URL.revokeObjectURL = vi.fn();
 });
 
-window.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  observe = vi.fn();
-  unobserve = vi.fn();
-  disconnect = vi.fn();
-};
+afterEach(() => {
+  vi.clearAllMocks();
+});
 
-window.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  observe = vi.fn();
-  unobserve = vi.fn();
-  disconnect = vi.fn();
-};
-
-URL.createObjectURL = vi.fn(() => 'mock-url');
-URL.revokeObjectURL = vi.fn();
+afterAll(() => {
+  vi.restoreAllMocks();
+});

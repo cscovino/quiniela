@@ -86,6 +86,8 @@ const mapStatsToRanking = (
 
 export const HomeTemplate: React.FC<HomeTemplateProps> = ({
   tournamentProps,
+  matches: initialMatches = [],
+  rankings: initialRankings = [],
   translations,
   locale = 'en',
   className = '',
@@ -97,11 +99,13 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
     initAuth();
   }, [initAuth]);
 
+  const hasInitialData = initialMatches.length > 0 || initialRankings.length > 0;
+
   const [state, setState] = useState<SectionState>({
-    matches: [],
-    rankings: [],
-    matchesLoading: true,
-    rankingsLoading: true,
+    matches: initialMatches,
+    rankings: initialRankings,
+    matchesLoading: !hasInitialData,
+    rankingsLoading: !hasInitialData,
     matchesError: null,
     rankingsError: null,
   });
@@ -131,6 +135,8 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
   };
 
   useEffect(() => {
+    if (hasInitialData) return;
+
     let cancelled = false;
     const timeout = setTimeout(() => {
       if (!cancelled) {
@@ -214,7 +220,7 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [user]);
+  }, [user, hasInitialData]);
 
   return (
     <div className={`home-template ${className}`}>
