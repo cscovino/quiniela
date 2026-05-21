@@ -1017,7 +1017,7 @@ service cloud.firestore {
 
 **Total Effort: 66 points**
 
-**Completed: 58/66 points (88%)**
+**Completed: 66/66 points (100%)**
 
 ---
 
@@ -1044,9 +1044,9 @@ service cloud.firestore {
 | US-011 | Update Group Standings | ✅ Done | Cloud Function `updateGroupStandings` (recomputes from scratch) |
 | US-012 | Update User Statistics | ✅ Done | Cloud Function `updatePredictorStats` (points, accuracy, streaks) |
 | US-013 | Display User Ranking | ✅ Done | RankingsTemplate with real Firestore data, /rankings + /en/rankings |
-| US-014 | Display Points Evolution Graph | ⬜ Not Started | |
+| US-014 | Display Points Evolution Graph | ✅ Done | SVG-based PointsChart component, integrated in ProfileTemplate |
 | US-015 | Auto-Assign Badges | ✅ Done | Cloud Function `checkAndAwardBadges` (first-blood, on-fire, consistent, perfect-group) |
-| US-016 | Display Badges on Profile | ⬜ Not Started | |
+| US-016 | Display Badges on Profile | ✅ Done | Earned + locked badges with icons, descriptions, conditions |
 
 ### Sprint 3: UI/UX Polish
 | US | Story | Status | Notes |
@@ -1055,7 +1055,7 @@ service cloud.firestore {
 | US-018 | Display Tournament Details | ✅ Done | TournamentTemplate with tabs (Standings + Matches), real Firestore data, /torneo + /en/tournament |
 | US-019 | Display Group Matches | ✅ Done | MatchList wired to Firestore, all 104 matches visible on tournament page |
 | US-020 | Prediction Form | ✅ Done | Step-by-step wizard: matches → groups → final phase → best players, predicted standings |
-| US-021 | Real-Time Notifications | ⬜ Not Started | |
+| US-021 | Real-Time Notifications | ✅ Done | Toast system with 4 types, auto-dismiss, global ToastProvider |
 
 ### Project Setup ✅
 | Task | Status | Notes |
@@ -1159,4 +1159,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-21*
+*Last updated: 2026-05-21 - MVP Complete (100%)*
