@@ -41,3 +41,9 @@
   flex-direction: column;
   gap: var(--space-4);
 }
+
+.profile-template__points-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}

@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { UserProfile, type BadgeEarned } from '@organisms/UserProfile/UserProfile';
+import {
+  UserProfile,
+  type BadgeEarned,
+  type BadgeLocked,
+} from '@organisms/UserProfile/UserProfile';
+import { PointsChart } from '@molecules/PointsChart/PointsChart';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
 import { Button } from '@atoms/Button/Button';
 import { tournamentService } from '@services/tournament-service';
+import { BADGE_DEFINITIONS, getBadgeName, getBadgeDescription } from '@types/badges';
 import { useAuthStore } from '@store/auth-store';
 import type { PredictorStats } from '@types/firestore';
+import type { PointEntry } from '@molecules/PointsChart/PointsChart';
 import './ProfileTemplate.css';
 
 export interface ProfileTemplateProps {
@@ -21,6 +28,11 @@ export interface ProfileTemplateProps {
     exactBets: string;
     rank: string;
     badges: string;
+    lockedBadges: string;
+    pointsChart: string;
+    noPointsData: string;
+    points: string;
+    matches: string;
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -36,6 +48,8 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
   const [stats, setStats] = useState<PredictorStats | null>(null);
   const [rank, setRank] = useState(0);
   const [badges, setBadges] = useState<BadgeEarned[]>([]);
+  const [lockedBadges, setLockedBadges] = useState<BadgeLocked[]>([]);
+  const [pointsHistory, setPointsHistory] = useState<PointEntry[]>([]);
 
   useEffect(() => {
     initAuth();
@@ -62,18 +76,34 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
         if (statsResult.status === 'fulfilled' && statsResult.value) {
           setStats(statsResult.value);
 
-          const earnedBadges: BadgeEarned[] = Object.entries(
-            statsResult.value.badgesAwarded || {},
-          ).map(([badgeId, dateStr]) => ({
+          const earnedBadgeIds = Object.keys(statsResult.value.badgesAwarded || {});
+
+          const earnedBadges: BadgeEarned[] = earnedBadgeIds.map((badgeId) => ({
             id: badgeId,
-            name: badgeId
-              .split('-')
-              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-              .join(' '),
-            icon: 'star',
-            earnedAt: new Date(dateStr),
+            name: getBadgeName(badgeId, locale),
+            icon: BADGE_DEFINITIONS.find((b) => b.id === badgeId)?.icon || 'star',
+            description: getBadgeDescription(badgeId, locale),
+            earnedAt: new Date(statsResult.value.badgesAwarded[badgeId]),
           }));
           setBadges(earnedBadges);
+
+          const history: PointEntry[] = (statsResult.value.pointsHistory || []).map((entry) => ({
+            date: entry.timestamp.toDate(),
+            points: entry.points,
+            cumulative: 0,
+            matchId: entry.matchId,
+          }));
+          setPointsHistory(history);
+
+          const lockedBadgeDefs = BADGE_DEFINITIONS.filter((b) => !earnedBadgeIds.includes(b.id));
+          const locked: BadgeLocked[] = lockedBadgeDefs.map((def) => ({
+            id: def.id,
+            name: def.name[locale],
+            icon: def.icon,
+            description: def.description[locale],
+            condition: def.condition[locale],
+          }));
+          setLockedBadges(locked);
         }
 
         if (allStatsResult.status === 'fulfilled') {
@@ -95,7 +125,7 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, locale]);
 
   if (loading || isAuthLoading) {
     return (
@@ -146,6 +176,7 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
             avatarUrl={user.avatarUrl}
             stats={displayStats}
             badges={badges}
+            lockedBadges={lockedBadges}
             translations={{
               totalPoints: translations.totalPoints,
               accuracy: translations.accuracy,
@@ -154,6 +185,19 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
               exactBets: translations.exactBets,
               rank: translations.rank,
               badges: translations.badges,
+              lockedBadges: translations.lockedBadges,
+            }}
+          />
+        </section>
+
+        <section className="profile-template__points-chart">
+          <PointsChart
+            data={pointsHistory}
+            translations={{
+              title: translations.pointsChart,
+              noData: translations.noPointsData,
+              points: translations.points,
+              matches: translations.matches,
             }}
           />
         </section>

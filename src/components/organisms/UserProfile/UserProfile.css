@@ -35,10 +35,15 @@
   gap: var(--space-3);
 }
 
-.user-profile__badges {
+.user-profile__badges,
+.user-profile__locked-badges {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+.user-profile__locked-badges {
+  opacity: 0.7;
 }
 
 .user-profile__badges-list {
@@ -49,11 +54,39 @@
 
 .user-profile__badge {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  gap: var(--space-1);
+  width: 64px;
+  height: 64px;
+  padding: var(--space-2);
+  background: var(--bg-card-hover);
+  border: var(--border-width-sm) solid var(--color-gold-500);
+  color: var(--color-gold-500);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.user-profile__badge:hover {
+  transform: scale(1.1);
+}
+
+.user-profile__badge--locked {
   background: var(--bg-input);
-  border: var(--border-width-sm) solid var(--border-color);
-  color: var(--color-accent-500);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+  filter: grayscale(100%);
+  opacity: 0.5;
+}
+
+.user-profile__badge--locked:hover {
+  filter: grayscale(50%);
+  opacity: 0.7;
+}
+
+.user-profile__badge-name {
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  text-align: center;
+  line-height: 1.2;
 }

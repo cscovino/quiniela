@@ -1,6 +1,7 @@
 ---
 import '@styles/global.css';
 import NavBar from '@organisms/NavBar/NavBar.astro';
+import { ToastProvider } from '@organisms/ToastProvider/ToastProvider';
 import type { NavLinks } from '@organisms/NavBar/NavBar';
 
 export interface Props {
@@ -55,6 +56,7 @@ const navLinks: NavLinks[] =
   <body>
     <NavBar links={navLinks} locale={locale} notificationCount={notificationCount} />
     <slot />
+    <ToastProvider client:load />
     <script>
       const html = document.documentElement;
       const savedTheme = localStorage.getItem('theme');

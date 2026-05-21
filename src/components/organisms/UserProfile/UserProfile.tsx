@@ -8,8 +8,17 @@ import './UserProfile.css';
 export interface BadgeEarned {
   id: string;
   name: string;
-  icon: string;
+  icon: IconName;
   earnedAt: Date;
+  description?: string;
+}
+
+export interface BadgeLocked {
+  id: string;
+  name: string;
+  icon: IconName;
+  description?: string;
+  condition?: string;
 }
 
 export interface UserProfileProps {
@@ -25,6 +34,7 @@ export interface UserProfileProps {
     rank: number;
   };
   badges: BadgeEarned[];
+  lockedBadges?: BadgeLocked[];
   translations: {
     totalPoints: string;
     accuracy: string;
@@ -33,6 +43,7 @@ export interface UserProfileProps {
     exactBets: string;
     rank: string;
     badges: string;
+    lockedBadges: string;
   };
   className?: string;
 }
@@ -43,6 +54,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   favoriteTeam,
   stats,
   badges,
+  lockedBadges = [],
   translations,
   className = '',
 }) => {
@@ -87,9 +99,32 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               <div
                 key={badge.id}
                 className="user-profile__badge"
-                title={`${badge.name} - earned ${badge.earnedAt.toLocaleDateString()}`}
+                title={`${badge.name}${badge.description ? ` - ${badge.description}` : ''}`}
               >
-                <Icon name={badge.icon as IconName} size={24} />
+                <Icon name={badge.icon} size={24} />
+                <Typography variant="caption" className="user-profile__badge-name">
+                  {badge.name}
+                </Typography>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {lockedBadges.length > 0 && (
+        <div className="user-profile__locked-badges">
+          <Typography variant="h4">{translations.lockedBadges}</Typography>
+          <div className="user-profile__badges-list">
+            {lockedBadges.map((badge) => (
+              <div
+                key={badge.id}
+                className="user-profile__badge user-profile__badge--locked"
+                title={`${badge.name}${badge.condition ? ` - ${badge.condition}` : ''}`}
+              >
+                <Icon name={badge.icon} size={24} />
+                <Typography variant="caption" className="user-profile__badge-name">
+                  {badge.name}
+                </Typography>
               </div>
             ))}
           </div>
