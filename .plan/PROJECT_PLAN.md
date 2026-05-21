@@ -1017,7 +1017,7 @@ service cloud.firestore {
 
 **Total Effort: 66 points**
 
-**Completed: 56/66 points (85%)**
+**Completed: 58/66 points (88%)**
 
 ---
 
@@ -1032,10 +1032,10 @@ service cloud.firestore {
 | US-004 | Create Matches | ✅ Done | Seeded via `scripts/seed-tournament.ts` (72 group + 32 knockout) |
 | US-005 | Update Match Results | ✅ Done | Cloud Functions: calculateMatchResult, updateGroupStandings, updatePredictorStats, checkAndAwardBadges |
 | US-006 | User Registration & Login | ✅ Done | Zustand store, login/register forms, auth pages ES+EN, NavBar integration |
-| US-006b | Manage Predictors | ✅ Done | Schema ready, default predictor auto-created |
-| US-007 | Predict Match Score | ✅ Done | Full prediction flow with match scores, group standings, bracket |
-| US-008 | Predict Group Standings | ✅ Done | GroupPredictionForm: rank all 4 teams per group (1st-4th) |
-| US-009 | Predict Knockout Winner | ✅ Done | KnockoutBracketForm: pick winners for all knockout phases |
+| US-006b | Manage Predictors | ✅ Done | PredictorSelector component, CRUD via predictor-service |
+| US-007 | Predict Match Score | ✅ Done | Step 1 of wizard: match predictions with score inputs |
+| US-008 | Predict Group Standings | ✅ Done | Step 2 of wizard: rank all 4 teams per group (1st-4th) |
+| US-009 | Predict Knockout Winner | ✅ Done | Step 3 of wizard: pick teams for 1st-4th overall |
 
 ### Sprint 2: Rankings & Gamification
 | US | Story | Status | Notes |
@@ -1054,7 +1054,7 @@ service cloud.firestore {
 | US-017 | Display Tournament List | ✅ Done | HomeTemplate shows today's matches or next 5 upcoming, real Firestore data |
 | US-018 | Display Tournament Details | ✅ Done | TournamentTemplate with tabs (Standings + Matches), real Firestore data, /torneo + /en/tournament |
 | US-019 | Display Group Matches | ✅ Done | MatchList wired to Firestore, all 104 matches visible on tournament page |
-| US-020 | Prediction Form | ✅ Done | Full prediction flow: matches, group standings, bracket predictions |
+| US-020 | Prediction Form | ✅ Done | Step-by-step wizard: matches → groups → final phase → best players, predicted standings |
 | US-021 | Real-Time Notifications | ⬜ Not Started | |
 
 ### Project Setup ✅
@@ -1079,6 +1079,11 @@ service cloud.firestore {
 | Admin Dashboard | ✅ Done | `/en/admin/matches` with role guard, match result form, NavBar link |
 | Seed script | ✅ Done | `pnpm seed` populates 165 documents (tournament, groups, teams, matches) |
 | Admin role script | ✅ Done | `pnpm set-admin <user-id>` promotes user to admin |
+| Auth guards | ✅ Done | AuthGuard component wraps Rankings, Tournament, Profile pages |
+| NavBar client island | ✅ Done | Reactive auth state, nav links hidden when not logged in |
+| Theme toggle fix | ✅ Done | Updates html[data-theme] directly instead of nav element |
+| Home page CTAs | ✅ Done | Navigate to predictions/rankings pages with locale-aware URLs |
+| Predicted standings | ✅ Done | Live pre-calculation of group standings based on match predictions |
 
 ### Design System
 | Phase | Description | Status | Notes |
@@ -1087,8 +1092,16 @@ service cloud.firestore {
 | Phase 2 | Atoms (12 components) | ✅ Done | Button, Input, Badge, Avatar, Icon, Typography, Spinner, Checkbox, Radio, Tooltip, Divider, ProgressBar |
 | Phase 3 | Molecules (9 components) | ✅ Done | TeamFlag, MatchCard, PredictionInput, TeamSelector, StatCard, ScoreDisplay, CountdownTimer, RankingRow, GroupHeader |
 | Phase 4 | Organisms (9 components) | ✅ Done | NavBar, TournamentHeader, MatchList, PredictionForm, GroupStandings, RankingsTable, BracketView, UserProfile, NotificationPanel |
-| Phase 5 | Templates (6 layouts) | ✅ Done | HomeTemplate, PredictionTemplate, StandingsTemplate, ProfileTemplate, TournamentTemplate, RankingsTemplate |
+| Phase 5 | Templates (6 layouts) | ✅ Done | HomeTemplate, PredictionsTemplate (step wizard), StandingsTemplate, ProfileTemplate, TournamentTemplate, RankingsTemplate |
 | Phase 6 | Pixel art assets | ✅ Done | PixelArt component with 13 SVG sprites (football, trophy, stadium, medals, crowd, etc.) + animations |
+
+### New Components Added
+| Component | Type | Description |
+|-----------|------|-------------|
+| AuthGuard | Atom | Wraps protected pages, shows login prompt if unauthenticated |
+| PredictorSelector | Molecule | Create/select predictors before making predictions |
+| FinalPhaseForm | Organism | Pick teams for 1st, 2nd, 3rd, 4th tournament positions |
+| BestPlayersForm | Organism | Text inputs for best goalkeeper and top scorer names |
 
 ---
 
@@ -1122,6 +1135,10 @@ service cloud.firestore {
 25. **Cloud Functions:** Automated point calculation, standings updates, predictor stats, and badge awards on match result changes
 26. **Admin Dashboard:** English-only admin page at `/en/admin/matches` for updating match results and status
 27. **Seed Script:** `pnpm seed` populates complete WC26 data (48 teams, 12 groups, 104 matches) idempotently
+28. **Predictions Wizard:** Step-by-step flow (matches → groups → final phase → best players) with validation
+29. **Auth Guards:** Protected pages require login, nav links hidden for unauthenticated users
+30. **Home Page Public:** Home page shows matches and rankings to all users, CTAs redirect to login if needed
+31. **Predicted Standings:** Live pre-calculation of group standings based on user's match predictions
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
@@ -1142,4 +1159,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-20*
+*Last updated: 2026-05-21*
