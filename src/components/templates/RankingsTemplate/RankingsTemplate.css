@@ -3,6 +3,7 @@
   max-width: var(--max-width-content);
   margin: 0 auto;
   padding: var(--space-8) var(--space-4);
+  overflow-x: hidden;
 }
 
 .rankings-template__content {
@@ -39,4 +40,20 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .rankings-template {
+    padding: var(--space-6) var(--space-3);
+  }
+}
+
+@media (max-width: 480px) {
+  .rankings-template {
+    padding: var(--space-4) var(--space-2);
+  }
+
+  .rankings-template__header h1 {
+    font-size: var(--heading-xs);
+  }
 }

@@ -28,12 +28,14 @@ export interface RegisterFormProps {
     };
   };
   onLoginClick: () => void;
+  redirectUrl?: string;
   className?: string;
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({
   translations,
   onLoginClick,
+  redirectUrl = '/predicciones',
   className = '',
 }) => {
   const [displayName, setDisplayName] = useState('');
@@ -56,7 +58,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       await register(email, password, displayName);
-      window.location.href = '/';
+      window.location.href = redirectUrl;
     } catch {
       // Error handled by store
     }
@@ -66,7 +68,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     clearError();
     try {
       await loginWithGoogle();
-      window.location.href = '/';
+      window.location.href = redirectUrl;
     } catch {
       // Error handled by store
     }

@@ -10,14 +10,17 @@ export interface AuthTemplateProps {
     register: RegisterFormProps['translations'];
   };
   initialMode?: 'login' | 'register';
+  locale?: 'en' | 'es';
   className?: string;
 }
 
 export const AuthTemplate: React.FC<AuthTemplateProps> = ({
   translations,
   initialMode = 'login',
+  locale = 'es',
   className = '',
 }) => {
+  const redirectUrl = locale === 'en' ? '/en/predictions' : '/predicciones';
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
 
   return (
@@ -45,11 +48,13 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({
           <LoginForm
             translations={translations.login}
             onRegisterClick={() => setMode('register')}
+            redirectUrl={redirectUrl}
           />
         ) : (
           <RegisterForm
             translations={translations.register}
             onLoginClick={() => setMode('login')}
+            redirectUrl={redirectUrl}
           />
         )}
       </div>

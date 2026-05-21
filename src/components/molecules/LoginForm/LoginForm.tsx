@@ -30,12 +30,14 @@ export interface LoginFormProps {
     };
   };
   onRegisterClick: () => void;
+  redirectUrl?: string;
   className?: string;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   translations,
   onRegisterClick,
+  redirectUrl = '/predicciones',
   className = '',
 }) => {
   const [email, setEmail] = useState('');
@@ -49,7 +51,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     clearError();
     try {
       await login(email, password);
-      window.location.href = '/';
+      window.location.href = redirectUrl;
     } catch {
       // Error handled by store
     }
@@ -59,7 +61,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     clearError();
     try {
       await loginWithGoogle();
-      window.location.href = '/';
+      window.location.href = redirectUrl;
     } catch {
       // Error handled by store
     }

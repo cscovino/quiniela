@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@atoms/Button/Button';
 import { Icon } from '@atoms/Icon/Icon';
 import { Typography } from '@atoms/Typography/Typography';
@@ -25,6 +25,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   className = '',
 }) => {
   const { user, logout, initAuth } = useAuthStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   React.useEffect(() => {
     initAuth();
@@ -40,6 +41,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   const handleLogout = async () => {
     try {
       await logout();
+      setMobileMenuOpen(false);
     } catch {
       // Error handled by store
     }
@@ -49,12 +51,15 @@ export const NavBar: React.FC<NavBarProps> = ({
   const otherLocaleLabel = locale === 'en' ? 'ES' : 'EN';
   const otherLocaleHref = locale === 'en' ? '/' : '/en';
   const loginHref = locale === 'en' ? '/en/login' : '/login';
+  const predictionsHref = locale === 'en' ? '/en/predictions' : '/predicciones';
 
   return (
     <nav className={`nav-bar ${className}`}>
       <div className="nav-bar__brand">
         <Icon name="football" size={24} />
-        <Typography variant="h3">QUINIELA</Typography>
+        <Typography variant="h3" className="nav-bar__title">
+          QUINIELA
+        </Typography>
       </div>
 
       <div className="nav-bar__links">
@@ -98,20 +103,31 @@ export const NavBar: React.FC<NavBarProps> = ({
         )}
 
         {user ? (
-          <div className="nav-bar__group">
-            {user.role === 'admin' && (
-              <a href="/en/admin/matches" className="nav-bar__link">
-                Admin
-              </a>
-            )}
-            <Icon name="user" size={18} />
-            <Typography variant="small" className="nav-bar__username">
-              {user.displayName}
-            </Typography>
-            <Button variant="secondary" size="sm" onClick={handleLogout}>
-              Logout
-            </Button>
-          </div>
+          <>
+            <div className="nav-bar__group nav-bar__group--desktop">
+              {user.role === 'admin' && (
+                <a href="/en/admin/matches" className="nav-bar__link">
+                  Admin
+                </a>
+              )}
+              <Icon name="user" size={18} />
+              <Typography variant="small" className="nav-bar__username">
+                {user.displayName}
+              </Typography>
+              <Button variant="secondary" size="sm" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+
+            <button
+              className="nav-bar__btn nav-bar__btn--icon nav-bar__hamburger"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              <Icon name={mobileMenuOpen ? 'close' : 'menu'} size={20} />
+            </button>
+          </>
         ) : (
           <a href={loginHref}>
             <Button variant="primary" size="sm">
@@ -120,6 +136,48 @@ export const NavBar: React.FC<NavBarProps> = ({
           </a>
         )}
       </div>
+
+      {user && mobileMenuOpen && (
+        <div className="nav-bar__mobile-menu">
+          <div className="nav-bar__mobile-links">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
+            {user.role === 'admin' && (
+              <a
+                href="/en/admin/matches"
+                className="nav-bar__mobile-link"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Admin
+              </a>
+            )}
+          </div>
+
+          <div className="nav-bar__mobile-user">
+            <Icon name="user" size={18} />
+            <Typography variant="small">{user.displayName}</Typography>
+            <Button variant="secondary" size="sm" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
+
+          <div className="nav-bar__mobile-cta">
+            <a href={predictionsHref} onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="primary" size="md">
+                {locale === 'en' ? 'Make Predictions' : 'Hacer Predicciones'}
+              </Button>
+            </a>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

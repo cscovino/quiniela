@@ -3,6 +3,7 @@
   max-width: var(--max-width-content);
   margin: 0 auto;
   padding: var(--space-8) var(--space-4);
+  overflow-x: hidden;
 }
 
 .predictions-template__content {
@@ -199,9 +200,65 @@
   text-align: left !important;
   font-family: var(--font-pixel);
   font-size: var(--text-xs);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .predictions-template__pts-cell {
   font-weight: 700;
   color: var(--color-accent-500);
+}
+
+@media (max-width: 768px) {
+  .predictions-template {
+    padding: var(--space-6) var(--space-3);
+  }
+
+  .predictions-template__progress {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .predictions-template__progress-step {
+    justify-content: center;
+  }
+
+  .predictions-template__navigation {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .predictions-template__navigation button {
+    width: 100%;
+  }
+
+  .predictions-template__predicted-table {
+    font-size: var(--text-xs);
+  }
+
+  .predictions-template__team-cell {
+    max-width: 80px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .predictions-template {
+    padding: var(--space-4) var(--space-2);
+  }
+
+  .predictions-template__header h1 {
+    font-size: var(--heading-xs);
+  }
+
+  .predictions-template__progress-label {
+    font-size: 9px;
+  }
+
+  .predictions-template__predicted-table th,
+  .predictions-template__predicted-table td {
+    padding: var(--space-1);
+  }
 }

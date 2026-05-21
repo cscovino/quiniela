@@ -14,6 +14,7 @@ import { SectionX } from 'pixelarticons/react/SectionX';
 import { Gamepad } from 'pixelarticons/react/Gamepad';
 import { Sparkle } from 'pixelarticons/react/Sparkle';
 import { Crown } from 'pixelarticons/react/Crown';
+import { Menu } from 'pixelarticons/react/Menu';
 import './Icon.css';
 
 export type IconName =
@@ -32,7 +33,9 @@ export type IconName =
   | 'clock'
   | 'live'
   | 'award'
-  | 'crown';
+  | 'crown'
+  | 'menu'
+  | 'close';
 
 export interface IconProps {
   name: IconName;
@@ -58,6 +61,8 @@ const iconMap: Record<IconName, React.FC<{ size?: number; color?: string; classN
   live: Radio,
   award: Crown,
   crown: Crown,
+  menu: Menu,
+  close: SectionX,
 };
 
 export const Icon: React.FC<IconProps> = ({ name, size = 24, color, className = '' }) => {
