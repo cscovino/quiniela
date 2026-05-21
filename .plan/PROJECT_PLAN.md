@@ -1084,6 +1084,10 @@ service cloud.firestore {
 | Theme toggle fix | ✅ Done | Updates html[data-theme] directly instead of nav element |
 | Home page CTAs | ✅ Done | Navigate to predictions/rankings pages with locale-aware URLs |
 | Predicted standings | ✅ Done | Live pre-calculation of group standings based on match predictions |
+| PWA support | ✅ Done | Manifest, service worker, FCM push notifications, installable app |
+| Toast notifications | ✅ Done | Global toast system with 4 types, auto-dismiss, Zustand store |
+| Points evolution chart | ✅ Done | SVG-based PointsChart component in ProfileTemplate |
+| Badge system | ✅ Done | 6 badges with definitions, earned/locked display on profile |
 
 ### Design System
 | Phase | Description | Status | Notes |
@@ -1139,6 +1143,11 @@ service cloud.firestore {
 29. **Auth Guards:** Protected pages require login, nav links hidden for unauthenticated users
 30. **Home Page Public:** Home page shows matches and rankings to all users, CTAs redirect to login if needed
 31. **Predicted Standings:** Live pre-calculation of group standings based on user's match predictions
+32. **PWA:** Installable app with service worker, offline caching, and FCM push notifications
+33. **FCM Tokens:** Stored in Firestore per user (`users/{uid}/fcm_tokens/{token}`) with platform tracking
+34. **Badge Definitions:** Centralized in `src/types/badges.ts` with icons, descriptions, and conditions
+35. **Toast System:** Global Zustand store with auto-dismiss, 4 types (success, error, info, warning)
+36. **Points Chart:** Lightweight SVG-based component (no external charting library)
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
@@ -1151,11 +1160,12 @@ service cloud.firestore {
 - Private leagues/groups
 - Friend system with head-to-head stats
 - Social sharing of predictions/results
-- Push notifications (mobile)
 - Multiple tournament support
 - Prediction confidence system
 - Historical tournament archives
 - Admin analytics dashboard
+- Browser notification preferences per user
+- Scheduled notification reminders for upcoming matches
 
 ---
 

@@ -15,6 +15,8 @@ pnpm lint:fix     # ESLint + fix
 pnpm format       # Prettier
 pnpm storybook    # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build Storybook static
+pnpm seed         # Seed Firestore with tournament data
+pnpm set-admin    # Promote user to admin
 ```
 
 **Verification order:** `lint → test:run → build`
@@ -24,8 +26,9 @@ pnpm build-storybook  # Build Storybook static
 - **i18n:** Spanish (`es`) at `/`, English at `/en/`. No redirect file needed.
 - **Routing:** One page file per locale (e.g., `src/pages/index.astro` for Spanish, `src/pages/en/index.astro` for English). Do NOT use `[locale]` dynamic routes.
 - **Components:** Atomic Design — `@atoms/`, `@molecules/`, `@organisms/`, `@templates/`
-- **State:** Zustand (not yet installed, planned)
-- **Backend:** Firebase (Auth, Firestore, Cloud Functions) — not yet configured
+- **State:** Zustand (auth store, toast store)
+- **Backend:** Firebase (Auth, Firestore, Cloud Functions, Cloud Messaging)
+- **PWA:** Service worker, web manifest, FCM push notifications
 
 ## Path Aliases
 
@@ -41,6 +44,16 @@ Retro pixel art aesthetic in `src/styles/global.css`:
 - 4px solid borders
 - CSS variables for all tokens (colors, spacing, typography, animations)
 - Press Start 2P font for headings, Inter for body
+- Light/dark themes via `data-theme` attribute
+
+## PWA
+
+The app is a Progressive Web App:
+- **Manifest:** `public/manifest.json` with icons, shortcuts, and metadata
+- **Service Worker:** `public/sw.js` for offline caching and push notifications
+- **FCM:** `public/firebase-messaging-sw.js` for background notifications
+- **Icons:** Generated via `scripts/generate-icons.mjs` using sharp
+- **Env:** Requires `VITE_FIREBASE_VAPID_PUBLIC_KEY` for push notifications
 
 ## Git Hooks
 
@@ -61,6 +74,12 @@ Retro pixel art aesthetic in `src/styles/global.css`:
 - Firestore `bets` split into 3 subcollections: `bets`, `group_bets`, `knockout_bets`
 - No social features (leagues, friends) in MVP
 - CSS variables instead of Tailwind
+- Predictions use step-by-step wizard (matches → groups → final phase → best players)
+- Auth guards on protected pages (predictions, rankings, profile, tournament)
+- Home page is public with matches and rankings
+- Firebase `browserLocalPersistence` for session persistence
+- CSP meta tag in BaseLayout for XSS mitigation
+- Zero vulnerabilities (`pnpm audit` clean)
 
 ## Project Plan
 
