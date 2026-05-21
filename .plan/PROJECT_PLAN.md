@@ -1155,6 +1155,10 @@ service cloud.firestore {
 38. **Overflow Prevention:** `overflow-x: hidden` on html/body, team names truncate with ellipsis
 39. **Service Worker:** Network-first for navigation, never cache redirect responses (Safari iOS fix)
 40. **Post-Login Flow:** Users redirected to predictions page (locale-aware) after auth
+41. **Storybook Firebase Mock:** Vite plugin intercepts Firebase imports, vitest.setup.ts provides mocks for all Firebase modules
+42. **Test Coverage:** 357 tests across 75 files, 82%+ coverage with v8 provider, thresholds at 70% for all metrics
+43. **ESLint 10:** Updated config for React 19 compatibility, disabled new strict rules (set-state-in-effect, impure-render, etc.)
+44. **App Icon:** Gamepad icon from pixelarticons matches header football icon, WC26 accent color (#1D3557) theme
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
@@ -1176,4 +1180,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-21 - MVP Complete + Mobile Responsive + SW Fix*
+*Last updated: 2026-05-21 - MVP Complete + Mobile Responsive + SW Fix + Storybook + Coverage + App Icon*
