@@ -79,12 +79,17 @@ self.addEventListener('fetch', (event) => {
 
       return fetch(event.request)
         .then((response) => {
-          if (response && response.status === 200) {
+          if (!response || response.type === 'opaqueredirect') {
+            return response;
+          }
+
+          if (response.status === 200) {
             const responseToCache = response.clone();
             caches.open(DYNAMIC_CACHE).then((cache) => {
               cache.put(event.request, responseToCache);
             });
           }
+
           return response;
         })
         .catch(() => {
