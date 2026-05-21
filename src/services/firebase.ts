@@ -1,6 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
+import type { Messaging } from 'firebase/messaging';
+
+let messaging: Messaging | null = null;
 
 const firebaseConfig = {
   apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
@@ -16,8 +19,15 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
+if (typeof window !== 'undefined') {
+  import('firebase/messaging').then(({ getMessaging }) => {
+    messaging = getMessaging(app);
+  });
+}
+
 setPersistence(auth, browserLocalPersistence).catch(() => {
   // Persistence setup failure is non-critical
 });
 
+export { messaging };
 export default app;

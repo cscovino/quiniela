@@ -1,0 +1,35 @@
+.pwa-install {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.pwa-install__btn {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent-500);
+  color: var(--text-inverse);
+  border: var(--border-pixel-sm);
+  border-color: var(--color-accent-700);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  white-space: nowrap;
+}
+
+.pwa-install__btn:hover {
+  background: var(--color-accent-400);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.pwa-install__btn--enabled {
+  background: var(--color-success);
+  border-color: var(--color-success-border);
+}
+
+.pwa-install__btn--disabled {
+  background: var(--bg-card-hover);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
