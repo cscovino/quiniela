@@ -1,6 +1,6 @@
-const CACHE_NAME = 'quiniela-v1';
-const STATIC_CACHE = 'quiniela-static-v1';
-const DYNAMIC_CACHE = 'quiniela-dynamic-v1';
+const CACHE_NAME = 'quiniela-v2';
+const STATIC_CACHE = 'quiniela-static-v2';
+const DYNAMIC_CACHE = 'quiniela-dynamic-v2';
 
 const STATIC_ASSETS = [
   '/',
