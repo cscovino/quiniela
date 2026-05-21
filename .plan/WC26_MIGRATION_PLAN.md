@@ -9,20 +9,7 @@
 
 | Task | Status |
 |------|--------|
-| T1: global.css WC26 colors | ✅ Done |
-| T2: Color touch-ups | ✅ Done (TournamentTemplate, PredictionTemplate, HomeTemplate) |
-| T4: Header title visible | ✅ Done |
-| Storybook Firebase mock | ✅ Done (`.storybook/preview.ts`) |
-
----
-
-## Remaining Tasks
-
-| Task | Status |
-|------|--------|
-| T3: App icon (match header football icon) | ✅ Done |
-| T5: Flip max-width → min-width (mobile-first) | Pending |
-| T6: Create DESIGN.md | Pending |
+| T6: Create DESIGN.md | ✅ Done |
 | T7: Update PROJECT_PLAN.md | Pending |
 
 ---

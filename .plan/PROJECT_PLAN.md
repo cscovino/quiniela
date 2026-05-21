@@ -1159,6 +1159,8 @@ service cloud.firestore {
 42. **Test Coverage:** 357 tests across 75 files, 82%+ coverage with v8 provider, thresholds at 70% for all metrics
 43. **ESLint 10:** Updated config for React 19 compatibility, disabled new strict rules (set-state-in-effect, impure-render, etc.)
 44. **App Icon:** Gamepad icon from pixelarticons matches header football icon, WC26 accent color (#1D3557) theme
+45. **Mobile-First CSS:** Flipped all max-width media queries to min-width. Base styles are mobile defaults. Added --breakpoint-sm (480px) and --breakpoint-md (768px) tokens
+46. **DESIGN.md:** Created following Google Stitch specification with YAML front matter tokens and canonical markdown sections
 
 ### Open Questions
 - [ ] Should we add a "late prediction" penalty system?
@@ -1180,4 +1182,4 @@ service cloud.firestore {
 
 ---
 
-*Last updated: 2026-05-21 - MVP Complete + Mobile Responsive + SW Fix + Storybook + Coverage + App Icon*
+*Last updated: 2026-05-21 - MVP Complete + Mobile Responsive + SW Fix + Storybook + Coverage + App Icon + Mobile-First CSS + DESIGN.md*
