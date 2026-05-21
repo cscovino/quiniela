@@ -19,8 +19,8 @@
 }
 
 .team-flag--md .flag-icon {
-  width: 32px;
-  height: 24px;
+  width: 28px;
+  height: 21px;
 }
 
 .team-flag--lg .flag-icon {
@@ -30,28 +30,29 @@
 
 .team-flag__name {
   font-family: var(--font-pixel);
-  font-size: var(--text-xs);
+  font-size: 9px;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+  max-width: 60px;
 }
 
-@media (max-width: 768px) {
+@media (min-width: var(--breakpoint-sm)) {
   .team-flag__name {
-    font-size: 9px;
     max-width: 80px;
+  }
+}
+
+@media (min-width: var(--breakpoint-md)) {
+  .team-flag__name {
+    font-size: var(--text-xs);
+    max-width: none;
   }
 
   .team-flag--md .flag-icon {
-    width: 28px;
-    height: 21px;
-  }
-}
-
-@media (max-width: 480px) {
-  .team-flag__name {
-    max-width: 60px;
+    width: 32px;
+    height: 24px;
   }
 }

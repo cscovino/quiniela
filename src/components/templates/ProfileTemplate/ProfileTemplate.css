@@ -2,7 +2,7 @@
   width: 100%;
   max-width: var(--max-width-content);
   margin: 0 auto;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-4) var(--space-2);
   overflow-x: hidden;
 }
 
@@ -49,18 +49,18 @@
   gap: var(--space-4);
 }
 
-@media (max-width: 768px) {
+@media (min-width: var(--breakpoint-sm)) {
   .profile-template {
     padding: var(--space-6) var(--space-3);
   }
-}
-
-@media (max-width: 480px) {
-  .profile-template {
-    padding: var(--space-4) var(--space-2);
-  }
 
   .profile-template__header h1 {
-    font-size: var(--heading-xs);
+    font-size: var(--heading-md);
+  }
+}
+
+@media (min-width: var(--breakpoint-md)) {
+  .profile-template {
+    padding: var(--space-8) var(--space-4);
   }
 }
