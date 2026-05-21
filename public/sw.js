@@ -5,22 +5,21 @@ const DYNAMIC_CACHE = 'quiniela-dynamic-v1';
 const STATIC_ASSETS = [
   '/',
   '/en/',
-  '/predicciones',
-  '/en/predictions',
-  '/clasificacion',
-  '/en/rankings',
-  '/perfil',
-  '/en/profile',
-  '/torneo',
-  '/en/tournament',
-  '/login',
-  '/en/login',
-  '/register',
-  '/en/register',
+  '/predicciones/',
+  '/en/predictions/',
+  '/clasificacion/',
+  '/en/rankings/',
+  '/perfil/',
+  '/en/profile/',
+  '/torneo/',
+  '/en/tournament/',
+  '/login/',
+  '/en/login/',
+  '/register/',
+  '/en/register/',
   '/manifest.json',
   '/fonts/PressStart2P.woff2',
   '/fonts/Inter-Regular.woff2',
-  '/styles/global.css',
 ];
 
 const FIREBASE_HOSTS = [
@@ -57,6 +56,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
+  // Network-first for Firebase API calls
   if (FIREBASE_HOSTS.some((host) => url.hostname.includes(host))) {
     event.respondWith(
       fetch(event.request).catch(() => {
@@ -71,31 +71,51 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
+  // Navigation requests: network-first, fallback to cache
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Don't cache redirects or errors
+          if (response.redirected || response.status >= 400) {
+            return response;
+          }
+          const responseToCache = response.clone();
+          caches.open(DYNAMIC_CACHE).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cached) => {
+            return cached || caches.match('/');
+          });
+        }),
+    );
+    return;
+  }
+
+  // Static assets: cache-first
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) return cachedResponse;
 
       return fetch(event.request)
         .then((response) => {
-          if (!response || response.type === 'opaqueredirect') {
+          // Don't cache redirects
+          if (!response || response.redirected || response.status !== 200) {
             return response;
           }
-
-          if (response.status === 200) {
-            const responseToCache = response.clone();
-            caches.open(DYNAMIC_CACHE).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-
+          const responseToCache = response.clone();
+          caches.open(DYNAMIC_CACHE).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
           return response;
         })
         .catch(() => {
-          if (event.request.destination === 'document') {
-            return caches.match('/');
-          }
           return new Response('Offline', { status: 503 });
         });
     }),
