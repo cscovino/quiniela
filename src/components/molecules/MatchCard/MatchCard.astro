@@ -1,0 +1,407 @@
+---
+import type { MatchStatus } from './types';
+
+export interface Props {
+  homeTeam: { fifaCode: string; name: string };
+  awayTeam: { fifaCode: string; name: string };
+  date: Date;
+  status: MatchStatus;
+  result?: { home: number; away: number };
+  stadium?: string;
+  phase?: string;
+  translations: {
+    scheduled: string;
+    live: string;
+    finished: string;
+    postponed: string;
+    cancelled: string;
+    vs: string;
+  };
+  locale?: 'en' | 'es';
+  className?: string;
+  compact?: boolean;
+}
+
+const {
+  homeTeam,
+  awayTeam,
+  date,
+  status,
+  result,
+  stadium,
+  phase,
+  translations,
+  locale = 'en',
+  className = '',
+  compact = false,
+} = Astro.props;
+
+const localeCode = locale === 'en' ? 'en-US' : 'es-ES';
+const formattedDate = date.toLocaleDateString(localeCode, {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
+const formattedTime = date.toLocaleTimeString(localeCode, {
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+const statusConfig: Record<MatchStatus, { variant: string; label: string; icon?: string }> = {
+  scheduled: { variant: 'info', label: translations.scheduled },
+  live: { variant: 'warning', label: translations.live, icon: 'live' },
+  finished: { variant: 'success', label: translations.finished },
+  postponed: { variant: 'accent', label: translations.postponed },
+  cancelled: { variant: 'error', label: translations.cancelled },
+};
+
+const config = statusConfig[status];
+---
+
+<div class={`match-card ${compact ? 'match-card--compact' : ''} ${className}`}>
+  {
+    phase && (
+      <div class="match-card__phase">
+        <span class="text-caption">{phase.toUpperCase()}</span>
+      </div>
+    )
+  }
+
+  <div class="match-card__teams">
+    <div class="match-card__team match-card__team--home">
+      <div class="team-flag team-flag--{compact ? 'sm' : 'md'}">
+        <span class={`fi fi-${homeTeam.fifaCode.toLowerCase()}`} aria-hidden="true"></span>
+        <span class="team-flag__name">{homeTeam.name}</span>
+      </div>
+      {
+        result && (
+          <span class={`match-card__score ${compact ? 'text-h3' : 'text-h2'}`}>{result.home}</span>
+        )
+      }
+    </div>
+
+    <div class="match-card__vs">
+      <span class="text-caption">{translations.vs}</span>
+    </div>
+
+    <div class="match-card__team match-card__team--away">
+      {
+        result && (
+          <span class={`match-card__score ${compact ? 'text-h3' : 'text-h2'}`}>{result.away}</span>
+        )
+      }
+      <div class="team-flag team-flag--{compact ? 'sm' : 'md'}">
+        <span class={`fi fi-${awayTeam.fifaCode.toLowerCase()}`} aria-hidden="true"></span>
+        <span class="team-flag__name">{awayTeam.name}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="match-card__footer">
+    <div class="match-card__meta">
+      <svg
+        class="icon"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+      <span class="text-small">
+        {formattedDate} • {formattedTime}
+      </span>
+    </div>
+    {stadium && <span class="text-small match-card__stadium">{stadium}</span>}
+    {
+      status !== 'scheduled' && (
+        <span class={`badge badge--${config.variant} badge--sm`}>
+          {config.icon && (
+            <svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="6" />
+            </svg>
+          )}
+          {config.label}
+        </span>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .match-card {
+    background: var(--bg-card);
+    border: var(--border-pixel-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    transition:
+      background var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+    min-width: 0;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .match-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-secondary-500), var(--color-vibrant-500));
+  }
+
+  .match-card:hover {
+    background: var(--bg-card-hover);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .match-card__phase {
+    text-align: center;
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-pixel-sm);
+  }
+
+  .match-card__teams {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .match-card__team {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    justify-content: center !important;
+  }
+
+  .match-card__team--home {
+    justify-content: center !important;
+  }
+
+  .match-card__team--away {
+    justify-content: center !important;
+    flex-direction: row-reverse;
+  }
+
+  .match-card__vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
+    background: var(--bg-input);
+    border: var(--border-width-sm) solid var(--border-color);
+    flex-shrink: 0;
+    order: 1;
+    margin: var(--space-1) 0;
+  }
+
+  .match-card__team--home {
+    order: 0;
+  }
+
+  .match-card__team--away {
+    order: 2;
+  }
+
+  .match-card__score {
+    font-size: var(--text-xl);
+    color: var(--color-accent-500);
+    min-width: 2ch;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .match-card__footer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: var(--border-pixel-sm);
+    flex-wrap: wrap;
+  }
+
+  .match-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-secondary);
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .match-card__stadium {
+    color: var(--text-muted);
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .team-flag {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .team-flag__name {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+  }
+
+  .text-caption {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    line-height: var(--leading-normal);
+  }
+
+  .text-small {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+
+  .text-h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+  }
+
+  .text-h3 {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    line-height: var(--leading-normal);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-pixel-sm);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  .badge--info {
+    background: var(--color-info);
+    color: white;
+  }
+
+  .badge--warning {
+    background: var(--color-warning);
+    color: var(--color-primary-900);
+  }
+
+  .badge--success {
+    background: var(--color-success);
+    color: white;
+  }
+
+  .badge--error {
+    background: var(--color-error);
+    color: white;
+  }
+
+  .badge--accent {
+    background: var(--color-accent-500);
+    color: white;
+  }
+
+  .badge--sm {
+    padding: var(--space-05) var(--space-1);
+    font-size: var(--text-xs);
+  }
+
+  .icon {
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 480px) {
+    .match-card {
+      padding: var(--space-3);
+    }
+
+    .match-card__teams {
+      gap: var(--space-2);
+    }
+
+    .match-card__team {
+      gap: var(--space-2);
+    }
+
+    .match-card__score {
+      font-size: var(--text-xl);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .match-card {
+      padding: var(--space-4);
+    }
+
+    .match-card__teams {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+
+    .match-card__team {
+      gap: var(--space-3);
+      width: auto;
+      justify-content: flex-start !important;
+    }
+
+    .match-card__team--away {
+      justify-content: flex-end !important;
+    }
+
+    .match-card__vs {
+      order: unset;
+      margin: 0;
+    }
+
+    .match-card__team--home {
+      order: unset;
+    }
+
+    .match-card__team--away {
+      order: unset;
+    }
+
+    .match-card__score {
+      font-size: var(--text-2xl);
+    }
+
+    .match-card__footer {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .match-card__meta {
+      width: auto;
+      justify-content: flex-start;
+    }
+  }
+</style>
