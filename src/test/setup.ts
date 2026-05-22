@@ -39,6 +39,7 @@ vi.mock('firebase/auth', () => {
 vi.mock('firebase/firestore', () => ({
   getFirestore: vi.fn(() => 'mock-firestore'),
   collection: vi.fn(() => 'mock-collection'),
+  collectionGroup: vi.fn(() => 'mock-collection-group'),
   doc: vi.fn(() => 'mock-doc'),
   getDoc: vi.fn(() => Promise.resolve({ exists: () => false, data: () => null })),
   getDocs: vi.fn(() => Promise.resolve({ docs: [] })),

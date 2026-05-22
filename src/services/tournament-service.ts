@@ -72,26 +72,28 @@ export const tournamentService = {
   getAllPredictorStats: async (
     tournamentId: string = TOURNAMENT_ID,
   ): Promise<(PredictorStats & { userId: string; predictorId: string })[]> => {
-    const usersSnapshot = await getDocs(collection(db, 'users'));
+    const { collectionGroup, getDocs, query, where } = await import('firebase/firestore');
+    const { db } = await import('./firebase');
+
+    const statsRef = collectionGroup(db, 'stats');
+    const q = query(statsRef, where('__name__', '==', tournamentId));
+
+    const snapshot = await getDocs(q);
+
     const allStats: (PredictorStats & { userId: string; predictorId: string })[] = [];
 
-    for (const userDoc of usersSnapshot.docs) {
-      const userId = userDoc.id;
-      const predictorsSnapshot = await getDocs(collection(db, 'users', userId, 'predictors'));
+    for (const doc of snapshot.docs) {
+      const refPath = doc.ref.path;
+      const pathParts = refPath.split('/');
 
-      for (const predictorDoc of predictorsSnapshot.docs) {
-        const predictorId = predictorDoc.id;
-        const statsRef = doc(db, 'users', userId, 'predictors', predictorId, 'stats', tournamentId);
-        const statsDoc = await getDoc(statsRef);
+      const userId = pathParts[1];
+      const predictorId = pathParts[3];
 
-        if (statsDoc.exists()) {
-          allStats.push({
-            ...(statsDoc.data() as PredictorStats),
-            userId,
-            predictorId,
-          });
-        }
-      }
+      allStats.push({
+        ...(doc.data() as PredictorStats),
+        userId,
+        predictorId,
+      });
     }
 
     return allStats.sort((a, b) => b.totalPoints - a.totalPoints);

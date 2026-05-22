@@ -220,34 +220,34 @@ describe('tournament-service', () => {
 
   describe('getAllPredictorStats', () => {
     it('returns all predictor stats sorted by points', async () => {
-      vi.mocked(firebaseFirestore.getDocs)
-        .mockResolvedValueOnce({
-          docs: [{ id: 'user-1' }, { id: 'user-2' }],
-        } as any)
-        .mockResolvedValueOnce({
-          docs: [{ id: 'user-1-default' }],
-        } as any)
-        .mockResolvedValueOnce({
-          docs: [{ id: 'user-2-default' }],
-        } as any);
-
-      vi.mocked(firebaseFirestore.getDoc)
-        .mockResolvedValueOnce({
-          exists: () => true,
-          data: () => ({ ...mockPredictorStats, totalPoints: 100 }),
-        } as any)
-        .mockResolvedValueOnce({
-          exists: () => true,
-          data: () => ({ ...mockPredictorStats, totalPoints: 150, userId: 'user-2' }),
-        } as any);
+      vi.mocked(firebaseFirestore.collectionGroup).mockReturnValue({} as any);
+      vi.mocked(firebaseFirestore.query).mockReturnValue({} as any);
+      vi.mocked(firebaseFirestore.where).mockReturnValue({} as any);
+      vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({
+        docs: [
+          {
+            ref: { path: 'users/user-1/predictors/user-1-default/stats/world-cup-2026' },
+            data: () => ({ ...mockPredictorStats, totalPoints: 150 }),
+          },
+          {
+            ref: { path: 'users/user-2/predictors/user-2-default/stats/world-cup-2026' },
+            data: () => ({ ...mockPredictorStats, totalPoints: 100 }),
+          },
+        ],
+      } as any);
 
       const result = await tournamentService.getAllPredictorStats();
 
       expect(result).toHaveLength(2);
       expect(result[0].totalPoints).toBeGreaterThanOrEqual(result[1].totalPoints);
+      expect(result[0].userId).toBe('user-1');
+      expect(result[1].userId).toBe('user-2');
     });
 
-    it('returns empty array when no users', async () => {
+    it('returns empty array when no stats', async () => {
+      vi.mocked(firebaseFirestore.collectionGroup).mockReturnValue({} as any);
+      vi.mocked(firebaseFirestore.query).mockReturnValue({} as any);
+      vi.mocked(firebaseFirestore.where).mockReturnValue({} as any);
       vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({ docs: [] } as any);
 
       const result = await tournamentService.getAllPredictorStats();
