@@ -9,6 +9,17 @@
   transition: background var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   min-width: 0;
   max-width: 100%;
+  position: relative;
+}
+
+.match-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-secondary-500), var(--color-vibrant-500));
 }
 
 .match-card:hover {
