@@ -1,0 +1,405 @@
+# Astro-First Architecture Migration Plan
+
+## Overview
+
+Migrate from React-heavy architecture to Astro-native components, leveraging the framework's full capabilities: server-side rendering, view transitions, content collections, middleware, and selective hydration.
+
+**Goal:** Zero-JS by default, React only where interactivity requires it.
+
+---
+
+## Phase 0: Foundation (Week 1)
+
+### 0.1 Enable View Transitions
+**Files:** `astro.config.ts`, `BaseLayout.astro`
+
+- Add `viewTransitions: true` to Astro config
+- Add `transition:name` to page containers
+- Add fade/slide animations for route changes
+- Test all page transitions work smoothly
+
+**Acceptance Criteria:**
+- [ ] Navigation between pages has smooth transitions
+- [ ] No flash of unstyled content
+- [ ] Back/forward browser buttons work correctly
+
+### 0.2 Add SEO Metadata to BaseLayout
+**Files:** `BaseLayout.astro`
+
+- Add Open Graph meta tags (og:title, og:description, og:image, og:url)
+- Add Twitter Card meta tags
+- Add JSON-LD structured data for SportsEvent
+- Add canonical URL handling
+- Add hreflang tags for i18n
+
+**Acceptance Criteria:**
+- [ ] Lighthouse SEO score = 100
+- [ ] Social media preview cards work (Twitter, Facebook, LinkedIn)
+- [ ] Google Rich Results test passes
+
+### 0.3 Create Astro Middleware
+**Files:** `src/middleware.ts`
+
+- Auth guard for protected routes (`/predicciones`, `/perfil`, `/admin/*`)
+- Locale detection and validation
+- Redirect unauthenticated users to `/login`
+- Set common context (user, locale, theme)
+
+**Acceptance Criteria:**
+- [ ] Unauthenticated users redirected from `/predicciones` → `/login`
+- [ ] Invalid locale returns 404
+- [ ] Admin routes blocked for non-admin users
+
+---
+
+## Phase 1: Astro Native Components (Week 1-2)
+
+### 1.1 Convert MatchCard to Astro
+**Files:** `src/components/molecules/MatchCard/`
+
+- Create `MatchCard.astro` with zero JS
+- Pass team names, scores, date, status as props
+- Use CSS variables for theming
+- Keep existing CSS, remove React-specific code
+
+**Acceptance Criteria:**
+- [ ] MatchCard renders identically to React version
+- [ ] Zero JavaScript in browser for this component
+- [ ] Storybook story still works
+
+### 1.2 Convert MatchList to Astro
+**Files:** `src/components/organisms/MatchList/`
+
+- Create `MatchList.astro` wrapper
+- Iterate over matches passed as props
+- Use `MatchCard.astro` for each item
+- Add empty state handling
+
+**Acceptance Criteria:**
+- [ ] MatchList renders 5+ matches correctly
+- [ ] Empty state shows when no matches
+- [ ] Group headers render correctly
+
+### 1.3 Convert TournamentHeader to Astro
+**Files:** `src/components/organisms/TournamentHeader/`
+
+- Create `TournamentHeader.astro`
+- Static display of tournament name, dates, team count
+- Use existing CSS variables
+
+**Acceptance Criteria:**
+- [ ] Renders tournament info correctly
+- [ ] Responsive on mobile/desktop
+- [ ] Zero JavaScript
+
+### 1.4 Convert GroupStandings to Astro
+**Files:** `src/components/organisms/GroupStandings/`
+
+- Create `GroupStandings.astro`
+- Render standings table with team positions
+- Use CSS grid or table for layout
+
+**Acceptance Criteria:**
+- [ ] All 8 groups render correctly
+- [ ] Responsive table on mobile
+- [ ] Team flags display correctly
+
+### 1.5 Convert RankingsTable to Astro
+**Files:** `src/components/organisms/RankingsTable/`
+
+- Create `RankingsTable.astro`
+- Render leaderboard table
+- Highlight current user's position
+
+**Acceptance Criteria:**
+- [ ] Top 10 predictors display correctly
+- [ ] Current user highlighted if logged in
+- [ ] Responsive on mobile
+
+### 1.6 Convert NavBar to Pure Astro
+**Files:** `src/components/organisms/NavBar/`
+
+- Remove React dependency entirely
+- Use `<script>` tag for hamburger toggle (minimal JS)
+- Use Astro props for links, locale, auth state
+- Theme toggle with vanilla JS
+
+**Acceptance Criteria:**
+- [ ] Desktop nav shows links
+- [ ] Mobile hamburger works
+- [ ] Theme toggle works
+- [ ] Total JS < 1KB for this component
+
+---
+
+## Phase 2: Server-Side Data (Week 2-3)
+
+### 2.1 Create API Routes
+**Files:** `src/pages/api/matches.ts`, `src/pages/api/rankings.ts`
+
+- `/api/matches` - Fetch matches from Firestore
+- `/api/rankings` - Fetch rankings from Firestore
+- Add `Cache-Control` headers (5 min TTL)
+- Handle errors gracefully
+
+**Acceptance Criteria:**
+- [ ] `/api/matches` returns JSON array of matches
+- [ ] `/api/rankings` returns JSON array of rankings
+- [ ] Cache headers present
+- [ ] Error responses have proper status codes
+
+### 2.2 Refactor HomeTemplate to Fetch from API
+**Files:** `src/components/templates/HomeTemplate/`
+
+- Convert to Astro component
+- Fetch data from `/api/matches` and `/api/rankings` in frontmatter
+- Pass data to child Astro components
+- Keep React only for CTA buttons if needed
+
+**Acceptance Criteria:**
+- [ ] Home page loads with server-rendered data
+- [ ] No client-side Firebase calls for initial data
+- [ ] Loading states removed (data is pre-fetched)
+
+### 2.3 Optimize getAllPredictorStats Query
+**Files:** `src/services/tournament-service.ts`, Cloud Functions
+
+- Replace N+1 query with collection group query
+- OR: Maintain flat `tournament_rankings` collection
+- Update Cloud Function `updatePredictorStats` to write to flat collection
+
+**Acceptance Criteria:**
+- [ ] Rankings query completes in < 1 second
+- [ ] Firestore read costs reduced by 80%+
+- [ ] Rankings still sorted correctly
+
+---
+
+## Phase 3: Content Collections (Week 3)
+
+### 3.1 Set Up Content Collections
+**Files:** `src/content/config.ts`
+
+- Define `teams` collection with schema (fifaCode, name, flagUrl, groupId)
+- Define `matches` collection with schema (phase, homeTeam, awayTeam, date, stadium)
+- Define `groups` collection with schema (name, order, teamCount)
+- Add tournament config collection
+
+**Acceptance Criteria:**
+- [ ] `astro check` passes with no type errors
+- [ ] Content validated on build
+- [ ] Autocomplete works in VS Code
+
+### 3.2 Migrate Tournament Data
+**Files:** `scripts/migrate-to-content.mjs`
+
+- Export current Firestore data to content files
+- Generate `.md` or `.json` files for each team, match, group
+- Update seed script to read from content files
+
+**Acceptance Criteria:**
+- [ ] All 48 teams have content files
+- [ ] All matches have content files
+- [ ] All 8 groups have content files
+- [ ] Seed script works with new format
+
+### 3.3 Centralize i18n
+**Files:** `src/locales/`, all page files
+
+- Move all hardcoded translations to locale JSON files
+- Create `getTranslations(locale)` utility
+- Update all pages to use centralized translations
+- Remove duplicate translation objects from page files
+
+**Acceptance Criteria:**
+- [ ] Zero hardcoded strings in page files
+- [ ] All translations in `@locales/en/` and `@locales/es/`
+- [ ] Missing translations caught at build time
+
+---
+
+## Phase 4: Performance Optimization (Week 3-4)
+
+### 4.1 Image Optimization
+**Files:** All components using team flags
+
+- Replace `<img>` with Astro `<Image>` component
+- Configure image service in `astro.config.ts`
+- Generate responsive `srcset` for flags
+- Add lazy loading for below-fold images
+
+**Acceptance Criteria:**
+- [ ] All flags served as WebP/AVIF
+- [ ] Lighthouse image optimization score = 100
+- [ ] No layout shift from images
+
+### 4.2 Selective Hydration Strategy
+**Files:** All React components
+
+- `client:visible` for MatchList, RankingsTable (below fold)
+- `client:idle` for PredictionForm, LoginForm (non-critical)
+- `client:media` for mobile-only components
+- Keep `client:load` only for critical interactive components
+
+**Acceptance Criteria:**
+- [ ] Initial JS bundle < 50KB
+- [ ] Time to Interactive < 2 seconds
+- [ ] No hydration errors in console
+
+### 4.3 Code Splitting & Preloading
+**Files:** `astro.config.ts`, page files
+
+- Split Firebase SDK into separate chunk
+- Add `<link rel="modulepreload">` for critical scripts
+- Lazy load heavy components (BracketView, PredictionForm)
+- Preload fonts with `rel="preload"`
+
+**Acceptance Criteria:**
+- [ ] Firebase SDK not in initial bundle
+- [ ] Critical CSS inlined
+- [ ] Non-critical JS loaded on demand
+
+---
+
+## Phase 5: SSR for Authenticated Pages (Week 4-5)
+
+### 5.1 Enable SSR Mode
+**Files:** `astro.config.ts`
+
+- Switch from `output: 'static'` to `output: 'server'`
+- Configure Firebase Admin SDK for server-side queries
+- Set up Firebase session cookie validation
+
+**Acceptance Criteria:**
+- [ ] Build succeeds in SSR mode
+- [ ] Static pages still generate (home, tournament info)
+- [ ] Dynamic pages render server-side
+
+### 5.2 Server-Side Auth Guards
+**Files:** `src/middleware.ts`, protected pages
+
+- Validate Firebase session cookie in middleware
+- Inject user data into Astro context
+- Redirect or render based on auth state
+- Remove client-side auth checks for page access
+
+**Acceptance Criteria:**
+- [ ] Protected pages inaccessible without valid session
+- [ ] User data available server-side
+- [ ] No flash of login state on page load
+
+### 5.3 Server-Side Data Fetching
+**Files:** Protected page templates
+
+- Fetch user-specific data server-side (predictions, profile)
+- Pass data to Astro components as props
+- Remove client-side loading states
+- Add error boundaries for server-side failures
+
+**Acceptance Criteria:**
+- [ ] Predictions page loads with data immediately
+- [ ] Profile page shows user info without loading spinner
+- [ ] No client-side Firebase calls for initial render
+
+---
+
+## Phase 6: Cleanup & Optimization (Week 5)
+
+### 6.1 Remove Unused React Components
+**Files:** Converted components
+
+- Delete React versions of converted Astro components
+- Update imports across all files
+- Remove unused React dependencies if possible
+- Update Storybook to use Astro stories
+
+**Acceptance Criteria:**
+- [ ] No orphaned React components
+- [ ] Build succeeds with no warnings
+- [ ] Storybook stories all pass
+
+### 6.2 Performance Audit
+**Tools:** Lighthouse, WebPageTest
+
+- Run Lighthouse audit on all pages
+- Target scores: Performance 95+, Accessibility 100, Best Practices 100, SEO 100
+- Optimize based on findings
+- Document baseline metrics
+
+**Acceptance Criteria:**
+- [ ] Lighthouse Performance ≥ 95
+- [ ] Lighthouse Accessibility = 100
+- [ ] Lighthouse SEO = 100
+- [ ] Total page weight < 200KB
+
+### 6.3 Update Documentation
+**Files:** `README.md`, `AGENTS.md`, `DESIGN.md`
+
+- Update architecture diagram
+- Document new component patterns
+- Update contribution guidelines
+- Add performance baseline metrics
+
+**Acceptance Criteria:**
+- [ ] README reflects new architecture
+- [ ] AGENTS.md updated with Astro patterns
+- [ ] DESIGN.md updated with new guidelines
+
+---
+
+## Risk Mitigation
+
+| Risk | Mitigation |
+|------|-----------|
+| Breaking changes during migration | Keep both React and Astro versions until conversion complete |
+| Performance regression | Run Lighthouse after each phase, rollback if scores drop |
+| Lost functionality | Write integration tests before starting each phase |
+| Team unfamiliarity with Astro | Document patterns, add code examples to AGENTS.md |
+
+---
+
+## Success Metrics
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Initial JS bundle | ~150KB | < 50KB |
+| Time to Interactive | ~3.5s | < 2s |
+| Lighthouse Performance | ~75 | ≥ 95 |
+| Firestore reads per page load | ~50+ | < 10 |
+| React components | 60+ | < 10 |
+| Astro components | 5 | 40+ |
+| Zero-JS pages | 0 | 3+ |
+
+---
+
+## Implementation Order Summary
+
+```
+Phase 0: Foundation (3 tasks, ~3 hours)
+  ↓
+Phase 1: Astro Components (6 tasks, ~8 hours)
+  ↓
+Phase 2: Server-Side Data (3 tasks, ~6 hours)
+  ↓
+Phase 3: Content Collections (3 tasks, ~6 hours)
+  ↓
+Phase 4: Performance (3 tasks, ~5 hours)
+  ↓
+Phase 5: SSR (3 tasks, ~8 hours)
+  ↓
+Phase 6: Cleanup (3 tasks, ~4 hours)
+```
+
+**Total estimated effort:** ~40 hours
+
+---
+
+## Quick Wins (Start Here)
+
+1. **Enable View Transitions** - 15 min, immediate UX improvement
+2. **Add SEO Metadata** - 30 min, immediate SEO boost
+3. **Convert MatchCard** - 1 hour, zero JS for most common component
+4. **Add Auth Middleware** - 2 hours, cleaner auth guards
+5. **Selective Hydration** - 1 hour, immediate performance gain
+
+These 5 tasks can be completed in ~4.5 hours and deliver measurable improvements.

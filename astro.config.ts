@@ -12,6 +12,10 @@ export default defineConfig({
     },
   },
   integrations: [react()],
+  trailingSlash: 'never',
+  experimental: {
+    clientPrerender: true,
+  },
   vite: {
     resolve: {
       alias: {
