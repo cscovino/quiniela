@@ -206,7 +206,7 @@
   justify-content: center;
 }
 
-@media (min-width: var(--breakpoint-md)) {
+@media (min-width: 768px) {
   .nav-bar {
     padding: var(--space-3) var(--space-4);
   }

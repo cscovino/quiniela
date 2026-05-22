@@ -109,13 +109,13 @@
   margin-bottom: 0;
 }
 
-@media (min-width: var(--breakpoint-sm)) {
+@media (min-width: 480px) {
   .tournament-template__content {
     padding: 16px 12px;
   }
 }
 
-@media (min-width: var(--breakpoint-md)) {
+@media (min-width: 768px) {
   .tournament-template__content {
     padding: 24px 16px;
   }

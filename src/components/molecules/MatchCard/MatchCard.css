@@ -126,7 +126,7 @@
   white-space: nowrap;
 }
 
-@media (min-width: var(--breakpoint-sm)) {
+@media (min-width: 480px) {
   .match-card {
     padding: var(--space-3);
   }
@@ -144,7 +144,7 @@
   }
 }
 
-@media (min-width: var(--breakpoint-md)) {
+@media (min-width: 768px) {
   .match-card {
     padding: var(--space-4);
   }

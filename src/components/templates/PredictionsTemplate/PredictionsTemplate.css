@@ -224,13 +224,13 @@
   color: var(--color-accent-500);
 }
 
-@media (min-width: var(--breakpoint-sm)) {
+@media (min-width: 480px) {
   .predictions-template {
     padding: var(--space-6) var(--space-3);
   }
 }
 
-@media (min-width: var(--breakpoint-md)) {
+@media (min-width: 768px) {
   .predictions-template {
     padding: var(--space-8) var(--space-4);
   }

@@ -47,10 +47,10 @@ describe('NavBar', () => {
     expect(screen.getByText('Predictions')).toBeInTheDocument();
   });
 
-  it('hides navigation links when not logged in', () => {
+  it('shows navigation links to all users', () => {
     render(<NavBar links={mockLinks} locale="en" />);
-    expect(screen.queryByText('Home')).not.toBeInTheDocument();
-    expect(screen.queryByText('Predictions')).not.toBeInTheDocument();
+    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('Predictions')).toBeInTheDocument();
   });
 
   it('highlights active link when logged in', () => {

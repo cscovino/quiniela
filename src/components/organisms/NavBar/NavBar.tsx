@@ -63,16 +63,15 @@ export const NavBar: React.FC<NavBarProps> = ({
       </a>
 
       <div className="nav-bar__links">
-        {user &&
-          links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
-            >
-              {link.label}
-            </a>
-          ))}
+        {links.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
+          >
+            {link.label}
+          </a>
+        ))}
       </div>
 
       <div className="nav-bar__actions">
@@ -103,41 +102,39 @@ export const NavBar: React.FC<NavBarProps> = ({
         )}
 
         {user ? (
-          <>
-            <div className="nav-bar__group nav-bar__group--desktop">
-              {user.role === 'admin' && (
-                <a href="/en/admin/matches" className="nav-bar__link">
-                  Admin
-                </a>
-              )}
-              <Icon name="user" size={18} />
-              <Typography variant="small" className="nav-bar__username">
-                {user.displayName}
-              </Typography>
-              <Button variant="secondary" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
-            </div>
-
-            <button
-              className="nav-bar__btn nav-bar__btn--icon nav-bar__hamburger"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-              aria-expanded={mobileMenuOpen}
-            >
-              <Icon name={mobileMenuOpen ? 'close' : 'menu'} size={20} />
-            </button>
-          </>
+          <div className="nav-bar__group nav-bar__group--desktop">
+            {user.role === 'admin' && (
+              <a href="/en/admin/matches" className="nav-bar__link">
+                Admin
+              </a>
+            )}
+            <Icon name="user" size={18} />
+            <Typography variant="small" className="nav-bar__username">
+              {user.displayName}
+            </Typography>
+            <Button variant="secondary" size="sm" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
         ) : (
-          <a href={loginHref}>
+          <a href={loginHref} className="nav-bar__group--desktop">
             <Button variant="primary" size="sm">
               Login
             </Button>
           </a>
         )}
+
+        <button
+          className="nav-bar__btn nav-bar__btn--icon nav-bar__hamburger"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
+        >
+          <Icon name={mobileMenuOpen ? 'close' : 'menu'} size={20} />
+        </button>
       </div>
 
-      {user && mobileMenuOpen && (
+      {mobileMenuOpen && (
         <div className={`nav-bar__mobile-menu${mobileMenuOpen ? ' open' : ''}`}>
           <div className="nav-bar__mobile-links">
             {links.map((link) => (
@@ -150,7 +147,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                 {link.label}
               </a>
             ))}
-            {user.role === 'admin' && (
+            {user?.role === 'admin' && (
               <a
                 href="/en/admin/matches"
                 className="nav-bar__mobile-link"
@@ -161,21 +158,33 @@ export const NavBar: React.FC<NavBarProps> = ({
             )}
           </div>
 
-          <div className="nav-bar__mobile-user">
-            <Icon name="user" size={18} />
-            <Typography variant="small">{user.displayName}</Typography>
-            <Button variant="secondary" size="sm" onClick={handleLogout}>
-              Logout
-            </Button>
-          </div>
+          {user ? (
+            <>
+              <div className="nav-bar__mobile-user">
+                <Icon name="user" size={18} />
+                <Typography variant="small">{user.displayName}</Typography>
+                <Button variant="secondary" size="sm" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
 
-          <div className="nav-bar__mobile-cta">
-            <a href={predictionsHref} onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="primary" size="md">
-                {locale === 'en' ? 'Make Predictions' : 'Hacer Predicciones'}
-              </Button>
-            </a>
-          </div>
+              <div className="nav-bar__mobile-cta">
+                <a href={predictionsHref} onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="primary" size="md">
+                    {locale === 'en' ? 'Make Predictions' : 'Hacer Predicciones'}
+                  </Button>
+                </a>
+              </div>
+            </>
+          ) : (
+            <div className="nav-bar__mobile-cta">
+              <a href={loginHref} onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="primary" size="md">
+                  {locale === 'en' ? 'Login' : 'Iniciar Sesión'}
+                </Button>
+              </a>
+            </div>
+          )}
         </div>
       )}
     </nav>
