@@ -11,6 +11,8 @@ export interface Props {
   theme?: 'dark' | 'light';
   activeNav?: 'home' | 'predictions' | 'rankings' | 'profile' | 'tournament' | 'admin';
   notificationCount?: number;
+  image?: string;
+  type?: 'website' | 'article' | 'sports-event';
 }
 
 const {
@@ -20,7 +22,14 @@ const {
   theme = 'dark',
   activeNav = 'home',
   notificationCount = 0,
+  image = '/icons/icon-512x512.png',
+  type = 'website',
 } = Astro.props;
+
+const siteUrl = 'https://quiniela.app';
+const canonicalUrl = Astro.url.pathname;
+const fullUrl = `${siteUrl}${canonicalUrl}`;
+const ogImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 
 const navLinks: NavLinks[] =
   locale === 'en'
@@ -38,6 +47,8 @@ const navLinks: NavLinks[] =
         { href: '/clasificacion', label: 'Clasificación', active: activeNav === 'rankings' },
         { href: '/perfil', label: 'Perfil', active: activeNav === 'profile' },
       ];
+
+const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
 ---
 
 <html lang={locale} data-theme={theme} style="view-transition-name: root;">
@@ -54,11 +65,72 @@ const navLinks: NavLinks[] =
     />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={fullUrl} />
+    <link rel="alternate" hreflang={locale} href={fullUrl} />
+    <link
+      rel="alternate"
+      hreflang={locale === 'en' ? 'es' : 'en'}
+      href={`${siteUrl}${alternateUrl}`}
+    />
+    <link rel="alternate" hreflang="x-default" href={`${siteUrl}/`} />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     <link rel="preload" href="/fonts/PressStart2P.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title.replace(/ - Quiniela$/, '')} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:url" content={fullUrl} />
+    <meta property="og:locale" content={locale === 'en' ? 'en_US' : 'es_ES'} />
+    <meta property="og:site_name" content="Quiniela" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title.replace(/ - Quiniela$/, '')} />
+    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- JSON-LD Structured Data -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': type === 'sports-event' ? 'SportsEvent' : 'WebSite',
+        name: title.replace(/ - Quiniela$/, ''),
+        description: description || 'Retro pixel art football predictions for FIFA World Cup 2026',
+        url: fullUrl,
+        image: ogImage,
+        inLanguage: locale === 'en' ? 'en-US' : 'es-ES',
+        ...(type === 'sports-event'
+          ? {
+              startDate: '2026-06-11',
+              endDate: '2026-07-19',
+              location: {
+                '@type': 'Place',
+                name: 'FIFA World Cup 2026',
+                address: {
+                  '@type': 'PostalAddress',
+                  addressCountry: ['CA', 'MX', 'US'],
+                },
+              },
+            }
+          : {}),
+        publisher: {
+          '@type': 'Organization',
+          name: 'Quiniela',
+          logo: {
+            '@type': 'ImageObject',
+            url: `${siteUrl}/icons/icon-192x192.png`,
+          },
+        },
+      })}
+    />
   </head>
   <body>
     <NavBar links={navLinks} locale={locale} notificationCount={notificationCount} />
