@@ -206,7 +206,7 @@
   justify-content: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .nav-bar {
     padding: var(--space-3) var(--space-4);
   }

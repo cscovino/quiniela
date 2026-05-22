@@ -63,15 +63,16 @@ export const NavBar: React.FC<NavBarProps> = ({
       </a>
 
       <div className="nav-bar__links">
-        {links.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
-          >
-            {link.label}
-          </a>
-        ))}
+        {user &&
+          links.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
+            >
+              {link.label}
+            </a>
+          ))}
       </div>
 
       <div className="nav-bar__actions">
@@ -136,27 +137,29 @@ export const NavBar: React.FC<NavBarProps> = ({
 
       {mobileMenuOpen && (
         <div className={`nav-bar__mobile-menu${mobileMenuOpen ? ' open' : ''}`}>
-          <div className="nav-bar__mobile-links">
-            {links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
-            {user?.role === 'admin' && (
-              <a
-                href="/en/admin/matches"
-                className="nav-bar__mobile-link"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Admin
-              </a>
-            )}
-          </div>
+          {user && (
+            <div className="nav-bar__mobile-links">
+              {links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ))}
+              {user.role === 'admin' && (
+                <a
+                  href="/en/admin/matches"
+                  className="nav-bar__mobile-link"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin
+                </a>
+              )}
+            </div>
+          )}
 
           {user ? (
             <>

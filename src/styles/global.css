@@ -368,7 +368,7 @@
 
 :root {
   --breakpoint-sm: 480px;
-  --breakpoint-md: 768px;
+  --breakpoint-md: 1024px;
 }
 
 /* ============================================

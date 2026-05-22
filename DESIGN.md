@@ -193,7 +193,7 @@ Mobile-first responsive strategy with two breakpoints:
 
 - **320px+ (base):** Single column, stacked layouts, hamburger nav, full-width buttons
 - **480px+ (`--breakpoint-sm`):** Increased padding, wider team names, larger fonts
-- **768px+ (`--breakpoint-md`):** Multi-column, horizontal nav, full desktop layouts
+- **1024px+ (`--breakpoint-md`):** Multi-column, horizontal nav, full desktop layouts
 
 **Spacing scale:** 4px grid system. All values multiples of 4 (`space-1` = 4px through `space-24` = 96px).
 

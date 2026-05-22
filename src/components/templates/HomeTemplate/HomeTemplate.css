@@ -107,7 +107,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .home-template__content {
     padding: var(--space-4) var(--space-4);
   }

@@ -51,7 +51,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .team-flag__name {
     font-size: var(--text-xs);
     max-width: none;

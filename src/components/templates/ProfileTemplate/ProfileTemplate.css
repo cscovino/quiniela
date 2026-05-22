@@ -59,7 +59,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .profile-template {
     padding: var(--space-8) var(--space-4);
   }
