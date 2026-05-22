@@ -16,7 +16,8 @@ const args = {
   name: 'FIFA World Cup 2026',
   startDate: new Date('2026-06-20'),
   endDate: new Date('2026-07-20'),
-  participantCount: 128,
+  participantCount: 48,
+  translations: { teams: 'teams' },
 };
 
 export const Active: Story = { args: { ...args, status: 'active' } };

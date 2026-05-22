@@ -55,6 +55,7 @@ const mockTournamentProps: TournamentHeaderProps = {
   startDate: new Date('2026-06-11'),
   endDate: new Date('2026-07-19'),
   participantCount: 32,
+  translations: { teams: 'teams' },
 };
 
 const mockTimestamp = {

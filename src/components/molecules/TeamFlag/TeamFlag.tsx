@@ -8,6 +8,7 @@ export interface TeamFlagProps {
   showName?: boolean;
   name?: string;
   className?: string;
+  noTruncate?: boolean;
 }
 
 export const TeamFlag: React.FC<TeamFlagProps> = ({
@@ -16,11 +17,14 @@ export const TeamFlag: React.FC<TeamFlagProps> = ({
   showName = false,
   name,
   className = '',
+  noTruncate = false,
 }) => {
   const flagClass = getFlagClass(fifaCode);
 
   return (
-    <div className={`team-flag team-flag--${size} ${className}`}>
+    <div
+      className={`team-flag team-flag--${size} ${noTruncate ? 'team-flag--no-truncate' : ''} ${className}`}
+    >
       <span
         className={`flag-icon ${flagClass}`}
         role="img"

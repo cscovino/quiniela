@@ -55,12 +55,12 @@ export const NavBar: React.FC<NavBarProps> = ({
 
   return (
     <nav className={`nav-bar ${className}`}>
-      <div className="nav-bar__brand">
+      <a href={locale === 'en' ? '/en' : '/'} className="nav-bar__brand">
         <Icon name="football" size={24} />
         <Typography variant="h3" className="nav-bar__title">
           QUINIELA
         </Typography>
-      </div>
+      </a>
 
       <div className="nav-bar__links">
         {user &&
@@ -138,7 +138,7 @@ export const NavBar: React.FC<NavBarProps> = ({
       </div>
 
       {user && mobileMenuOpen && (
-        <div className="nav-bar__mobile-menu">
+        <div className={`nav-bar__mobile-menu${mobileMenuOpen ? ' open' : ''}`}>
           <div className="nav-bar__mobile-links">
             {links.map((link) => (
               <a

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Typography } from '@atoms/Typography/Typography';
-import { Badge } from '@atoms/Badge/Badge';
 import { Icon } from '@atoms/Icon/Icon';
 import './TournamentHeader.css';
 
@@ -13,26 +12,19 @@ export interface TournamentHeaderProps {
   endDate: Date;
   participantCount?: number;
   className?: string;
+  translations: {
+    teams: string;
+  };
 }
-
-const statusConfig: Record<
-  TournamentStatus,
-  { variant: 'info' | 'success' | 'accent'; label: string }
-> = {
-  draft: { variant: 'info', label: 'Draft' },
-  active: { variant: 'success', label: 'Active' },
-  finished: { variant: 'accent', label: 'Finished' },
-};
 
 export const TournamentHeader: React.FC<TournamentHeaderProps> = ({
   name,
-  status,
   startDate,
   endDate,
   participantCount,
   className = '',
+  translations,
 }) => {
-  const config = statusConfig[status];
   const formattedDates = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   return (
@@ -48,14 +40,12 @@ export const TournamentHeader: React.FC<TournamentHeaderProps> = ({
           <Typography variant="small">{formattedDates}</Typography>
         </div>
 
-        <Badge variant={config.variant} size="md">
-          {config.label}
-        </Badge>
-
         {participantCount !== undefined && (
           <div className="tournament-header__participants">
             <Icon name="user" size={16} />
-            <Typography variant="small">{participantCount} players</Typography>
+            <Typography variant="small">
+              {participantCount} {translations.teams}
+            </Typography>
           </div>
         )}
       </div>

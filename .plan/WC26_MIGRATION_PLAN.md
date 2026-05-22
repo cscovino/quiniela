@@ -1,6 +1,6 @@
 # WC26 Brand Migration + Mobile-First Refactor
 
-> **Status:** In progress — colors done, mobile done, Storybook fixed
+> **Status:** ✅ Complete
 > **Updated:** 2026-05-21
 
 ---
@@ -9,25 +9,32 @@
 
 | Task | Status |
 |------|--------|
+| T1: global.css WC26 colors | ✅ Done |
+| T2: Color touch-ups (invalid vars) | ✅ Done |
+| T3: App icon (Gamepad pixel art) | ✅ Done |
+| T4: Header title visible at 480px | ✅ Done |
+| T5: Flip max-width → min-width (mobile-first) | ✅ Done |
 | T6: Create DESIGN.md | ✅ Done |
-| T7: Update PROJECT_PLAN.md | Pending |
+| T7: Update PROJECT_PLAN.md | ✅ Done |
 
 ---
 
-## Next Steps
+## Verification
 
-1. **T3:** Update `scripts/generate-icons.mjs` to match header football icon (Gamepad style), regenerate icons, update `manifest.json` theme color
-2. **T5:** Flip CSS only in files that are actually broken on mobile (check MatchCard, TeamFlag)
-3. **T6-T7:** Docs
-
----
-
-## Execution Order
-
-```
-T3 (app icon) → T5 (mobile flip) → T6 (DESIGN.md) → T7 (PROJECT_PLAN) → lint → build → verify
-```
+- `pnpm lint` ✅
+- `pnpm build` ✅
+- `pnpm test:run` ✅ (357 tests, 82%+ coverage)
+- `pnpm audit` ✅ (0 vulnerabilities)
 
 ---
 
-*Last updated: 2026-05-21*
+## Commits
+
+1. `feat: update app icon to match header football icon` — Gamepad icon + WC26 theme color
+2. `refactor: flip CSS to mobile-first with breakpoint tokens` — 7 CSS files + global.css tokens
+3. `docs: create DESIGN.md following Stitch specification` — YAML tokens + canonical sections
+4. `docs: update migration plan and project plan` — Decisions 41-46
+
+---
+
+*Last updated: 2026-05-21 — Migration Complete*

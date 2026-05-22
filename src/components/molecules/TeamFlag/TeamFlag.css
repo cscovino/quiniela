@@ -39,6 +39,12 @@
   max-width: 60px;
 }
 
+.team-flag--no-truncate .team-flag__name {
+  max-width: none;
+  overflow: visible;
+  text-overflow: unset;
+}
+
 @media (min-width: var(--breakpoint-sm)) {
   .team-flag__name {
     max-width: 80px;

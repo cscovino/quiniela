@@ -36,6 +36,7 @@ export interface MatchCardProps {
   locale?: 'en' | 'es';
   className?: string;
   onClick?: () => void;
+  compact?: boolean;
 }
 
 const getStatusConfig = (
@@ -71,6 +72,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
   locale = 'en',
   className = '',
   onClick,
+  compact = false,
 }) => {
   const config = getStatusConfig(status, translations);
   const localeCode = locale === 'en' ? 'en-US' : 'es-ES';
@@ -84,9 +86,11 @@ export const MatchCard: React.FC<MatchCardProps> = ({
     minute: '2-digit',
   });
 
+  const flagSize = compact ? 'sm' : 'md';
+
   return (
     <div
-      className={`match-card ${className}`}
+      className={`match-card ${compact ? 'match-card--compact' : ''} ${className}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -99,9 +103,15 @@ export const MatchCard: React.FC<MatchCardProps> = ({
 
       <div className="match-card__teams">
         <div className="match-card__team match-card__team--home">
-          <TeamFlag fifaCode={homeTeam.fifaCode} name={homeTeam.name} size="md" showName />
+          <TeamFlag
+            fifaCode={homeTeam.fifaCode}
+            name={homeTeam.name}
+            size={flagSize}
+            showName
+            noTruncate={compact}
+          />
           {result && (
-            <Typography variant="h2" className="match-card__score">
+            <Typography variant={compact ? 'h3' : 'h2'} className="match-card__score">
               {result.home}
             </Typography>
           )}
@@ -113,11 +123,17 @@ export const MatchCard: React.FC<MatchCardProps> = ({
 
         <div className="match-card__team match-card__team--away">
           {result && (
-            <Typography variant="h2" className="match-card__score">
+            <Typography variant={compact ? 'h3' : 'h2'} className="match-card__score">
               {result.away}
             </Typography>
           )}
-          <TeamFlag fifaCode={awayTeam.fifaCode} name={awayTeam.name} size="md" showName />
+          <TeamFlag
+            fifaCode={awayTeam.fifaCode}
+            name={awayTeam.name}
+            size={flagSize}
+            showName
+            noTruncate={compact}
+          />
         </div>
       </div>
 
@@ -133,10 +149,12 @@ export const MatchCard: React.FC<MatchCardProps> = ({
             {stadium}
           </Typography>
         )}
-        <Badge variant={config.variant} size="sm">
-          {config.icon && <Icon name={config.icon} size={12} />}
-          {config.label}
-        </Badge>
+        {status !== 'scheduled' && (
+          <Badge variant={config.variant} size="sm">
+            {config.icon && <Icon name={config.icon} size={12} />}
+            {config.label}
+          </Badge>
+        )}
       </div>
     </div>
   );
