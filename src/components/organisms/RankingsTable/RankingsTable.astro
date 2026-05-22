@@ -1,0 +1,327 @@
+---
+export interface RankingEntry {
+  userId: string;
+  predictorId?: string;
+  avatarUrl?: string;
+  displayName: string;
+  points: number;
+  accuracy: number;
+  streak: number;
+}
+
+export interface Props {
+  rankings: RankingEntry[];
+  currentUserId?: string;
+  title?: string;
+  page?: number;
+  totalPages?: number;
+  emptyMessage?: string;
+  className?: string;
+}
+
+const {
+  rankings = [],
+  currentUserId,
+  title = 'Global Rankings',
+  page = 1,
+  totalPages = 1,
+  emptyMessage = 'No rankings available yet',
+  className = '',
+} = Astro.props;
+
+const getPositionBadge = (position: number) => {
+  if (position === 1) return { variant: 'accent', icon: 'trophy' };
+  if (position === 2) return { variant: 'info', icon: 'trophy' };
+  if (position === 3) return { variant: 'success', icon: 'trophy' };
+  return null;
+};
+---
+
+<div class={`rankings-table ${rankings.length === 0 ? 'rankings-table--empty' : ''} ${className}`}>
+  {
+    rankings.length === 0 ? (
+      <p>{emptyMessage}</p>
+    ) : (
+      <>
+        <h3 class="rankings-table__title">{title}</h3>
+
+        <div class="rankings-table__list">
+          {rankings.map((entry, index) => {
+            const position = (page - 1) * 20 + index + 1;
+            const isCurrentUser = entry.userId === currentUserId;
+            const positionBadge = getPositionBadge(position);
+
+            return (
+              <div class={`ranking-row ${isCurrentUser ? 'ranking-row--current' : ''}`}>
+                <div class="ranking-row__position">
+                  {positionBadge ? (
+                    <span class={`badge badge--${positionBadge.variant} badge--sm`}>
+                      <svg
+                        class="icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 2C9.24 2 7 4.24 7 7h2c0-1.66 1.34-3 3-3s3 1.34 3 3h2c0-2.76-2.24-5-5-5zM5 7H2v5c0 1.66 1.34 3 3 3h.17C5.64 16.27 6.73 17.23 8 17.63V20H6v2h12v-2h-2v-2.37c1.27-.4 2.36-1.36 2.83-2.63H19c1.66 0 3-1.34 3-3V7h-3V5h-3V7H8V5H5v2zm12 5c0 .55-.45 1-1 1h-1V9h2v3zM5 9h2v4H6c-.55 0-1-.45-1-1V9z" />
+                      </svg>
+                      #{position}
+                    </span>
+                  ) : (
+                    <span>#{position}</span>
+                  )}
+                </div>
+
+                <div class="ranking-row__user">
+                  <div class="ranking-row__avatar">
+                    {entry.avatarUrl ? (
+                      <img src={entry.avatarUrl} alt={entry.displayName} width="32" height="32" />
+                    ) : (
+                      <div class="ranking-row__avatar-placeholder">
+                        {entry.displayName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <span class="ranking-row__name">{entry.displayName}</span>
+                </div>
+
+                <div class="ranking-row__stats">
+                  <div class="ranking-row__stat">
+                    <svg
+                      class="icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                    <span>{entry.points}</span>
+                  </div>
+                  <div class="ranking-row__stat">
+                    <svg
+                      class="icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <circle cx="12" cy="12" r="6" />
+                      <circle cx="12" cy="12" r="2" />
+                    </svg>
+                    <span>{Math.round(entry.accuracy * 100)}%</span>
+                  </div>
+                  {entry.streak > 0 && (
+                    <div class="ranking-row__stat">
+                      <svg
+                        class="icon"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 23c-4.97 0-9-3.58-9-8 0-3.07 2.17-5.54 3.43-6.82L12 2l5.57 6.18C18.83 9.46 21 11.93 21 15c0 4.42-4.03 8-9 8z" />
+                      </svg>
+                      <span>{entry.streak}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {totalPages > 1 && (
+          <div class="rankings-table__pagination">
+            <span>
+              Page {page} of {totalPages}
+            </span>
+          </div>
+        )}
+      </>
+    )
+  }
+</div>
+
+<style>
+  .rankings-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--bg-card);
+    border: var(--border-pixel-md);
+    box-shadow: var(--shadow-md);
+  }
+
+  .rankings-table--empty {
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12);
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .rankings-table--empty p {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+  }
+
+  .rankings-table__title {
+    font-family: var(--font-heading);
+    font-size: var(--heading-sm);
+    line-height: var(--leading-tight);
+    margin: 0;
+  }
+
+  .rankings-table__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .rankings-table__pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: var(--border-width-sm) solid var(--border-color);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .ranking-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-card);
+    border: var(--border-width-sm) solid var(--border-color);
+    transition: background var(--duration-fast) var(--ease-out);
+  }
+
+  .ranking-row:hover {
+    background: var(--bg-card-hover);
+  }
+
+  .ranking-row--current {
+    border-color: var(--color-accent-500);
+    background: var(--bg-card-hover);
+  }
+
+  .ranking-row__position {
+    min-width: 60px;
+    display: flex;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+  }
+
+  .ranking-row__user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ranking-row__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .ranking-row__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ranking-row__avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-accent-500);
+    color: white;
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+  }
+
+  .ranking-row__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+  }
+
+  .ranking-row__stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .ranking-row__stat {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-pixel-sm);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  .badge--accent {
+    background: var(--color-accent-500);
+    color: white;
+  }
+
+  .badge--info {
+    background: var(--color-info);
+    color: white;
+  }
+
+  .badge--success {
+    background: var(--color-success);
+    color: white;
+  }
+
+  .badge--sm {
+    padding: var(--space-05) var(--space-1);
+    font-size: var(--text-xs);
+  }
+
+  .icon {
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 480px) {
+    .rankings-table {
+      padding: var(--space-6);
+    }
+
+    .ranking-row {
+      padding: var(--space-4);
+    }
+  }
+</style>

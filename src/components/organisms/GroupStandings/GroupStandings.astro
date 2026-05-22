@@ -1,0 +1,173 @@
+---
+export interface TeamStanding {
+  teamId: string;
+  fifaCode: string;
+  teamName: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  points: number;
+}
+
+export interface Props {
+  groups: {
+    name: string;
+    standings: TeamStanding[];
+  }[];
+  translations: {
+    noGroups: string;
+    team: string;
+    pts: string;
+    qualified: string;
+  };
+  className?: string;
+}
+
+const { groups = [], translations, className = '' } = Astro.props;
+---
+
+<div class={`group-standings ${groups.length === 0 ? 'group-standings--empty' : ''} ${className}`}>
+  {
+    groups.length === 0 ? (
+      <p>{translations.noGroups}</p>
+    ) : (
+      groups.map((group) => (
+        <div class="group-standings__group">
+          <div class="group-standings__group-name">
+            <h3>{group.name}</h3>
+          </div>
+          <div class="group-standings__table">
+            <div class="group-standings__header">
+              <span class="group-standings__col group-standings__col--team">
+                {translations.team}
+              </span>
+              <span class="group-standings__col">P</span>
+              <span class="group-standings__col">W</span>
+              <span class="group-standings__col">D</span>
+              <span class="group-standings__col">L</span>
+              <span class="group-standings__col">GF</span>
+              <span class="group-standings__col">GA</span>
+              <span class="group-standings__col group-standings__col--pts">{translations.pts}</span>
+            </div>
+            {group.standings.map((team) => (
+              <div class="group-standings__row">
+                <span class="group-standings__col group-standings__col--team">
+                  <span class={`fi fi-${team.fifaCode.toLowerCase()}`} aria-hidden="true" />
+                  {team.teamName}
+                </span>
+                <span class="group-standings__col">{team.played}</span>
+                <span class="group-standings__col">{team.won}</span>
+                <span class="group-standings__col">{team.drawn}</span>
+                <span class="group-standings__col">{team.lost}</span>
+                <span class="group-standings__col">{team.goalsFor}</span>
+                <span class="group-standings__col">{team.goalsAgainst}</span>
+                <span class="group-standings__col group-standings__col--pts">{team.points}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))
+    )
+  }
+</div>
+
+<style>
+  .group-standings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .group-standings--empty {
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12);
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .group-standings--empty p {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+  }
+
+  .group-standings__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .group-standings__group-name h3 {
+    font-family: var(--font-heading);
+    font-size: var(--heading-xs);
+    line-height: var(--leading-tight);
+    margin: 0;
+    color: var(--color-accent-500);
+  }
+
+  .group-standings__table {
+    display: flex;
+    flex-direction: column;
+    border: var(--border-width-sm) solid var(--border-color);
+  }
+
+  .group-standings__header,
+  .group-standings__row {
+    display: grid;
+    grid-template-columns: 2fr repeat(7, 1fr);
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    align-items: center;
+  }
+
+  .group-standings__header {
+    background: var(--bg-input);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    border-bottom: var(--border-width-sm) solid var(--border-color);
+  }
+
+  .group-standings__row {
+    border-bottom: var(--border-width-sm) solid var(--border-color);
+    font-size: var(--text-sm);
+    font-family: var(--font-body);
+  }
+
+  .group-standings__row:last-child {
+    border-bottom: none;
+  }
+
+  .group-standings__row:nth-child(even) {
+    background: var(--bg-card-hover);
+  }
+
+  .group-standings__col {
+    text-align: center;
+  }
+
+  .group-standings__col--team {
+    text-align: left;
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .group-standings__col--pts {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent-500);
+  }
+
+  @media (min-width: 480px) {
+    .group-standings__header,
+    .group-standings__row {
+      padding: var(--space-3);
+    }
+  }
+</style>
