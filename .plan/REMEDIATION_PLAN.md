@@ -316,10 +316,10 @@ Delete or wire in:
 
 ## Phase 5 — Optional hardening (1 week, post-launch)
 
-| Item | When to do it |
-|------|---------------|
-| Break up `PredictionsTemplate.tsx` (600 LOC god-object) into per-step components | If maintenance velocity drops |
-| Tighten CSP: remove `'unsafe-inline'` via per-page nonces | After Phase 0 CSP is in headers |
+| Item | Status |
+|------|--------|
+| Break up `PredictionsTemplate.tsx` (600 LOC god-object) into per-step components | ✅ DONE |
+| Tighten CSP: remove `'unsafe-inline'` via external scripts and CSS custom properties | ✅ DONE |
 | Adopt Astro `<ClientRouter />` (or remove `view-transition-name: root` dead config) | Decide: real view transitions or not |
 | Add Sentry or TrackJS | Before public launch |
 | Firebase App Check | Before public launch (prevents non-app traffic abuse) |
