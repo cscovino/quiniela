@@ -33,8 +33,8 @@ const predictionsHref = locale === 'en' ? '/en/predictions' : '/predicciones';
     <span class="nav-bar__title">QUINIELA</span>
   </a>
 
-  <!-- Always render links container to prevent hydration mismatch -->
-  <div class="nav-bar__links" data-auth-links style="display: none;">
+  <!-- Public links: visible by default, CSS handles responsive hide/show -->
+  <div class="nav-bar__links" data-auth-links>
     {
       links.map((link) => (
         <a href={link.href} class={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}>
@@ -139,8 +139,8 @@ const predictionsHref = locale === 'en' ? '/en/predictions' : '/predicciones';
   </div>
 
   <div class="nav-bar__mobile-menu" id="mobile-menu" style="display: none;">
-    <!-- Always render mobile links to prevent hydration mismatch -->
-    <div class="nav-bar__mobile-links" data-auth-mobile-links style="display: none;">
+    <!-- Public mobile links: visible by default when menu opens -->
+    <div class="nav-bar__mobile-links" data-auth-mobile-links>
       {
         links.map((link) => (
           <a
@@ -189,6 +189,9 @@ const predictionsHref = locale === 'en' ? '/en/predictions' : '/predicciones';
 </nav>
 
 <script>
+  import { useAuthStore } from '@store/auth-store';
+  import { initAuth, getCachedAuthUid } from '@services/auth-bootstrap';
+
   const hamburgerBtn = document.getElementById('hamburger-btn');
   const mobileMenu = document.getElementById('mobile-menu');
   const themeToggle = document.getElementById('theme-toggle');
@@ -226,6 +229,60 @@ const predictionsHref = locale === 'en' ? '/en/predictions' : '/predicciones';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
   });
+
+  // Auth visibility toggling
+  const links = document.querySelector('[data-auth-links]');
+  const desktopUser = document.querySelector('[data-auth-desktop]');
+  const desktopLogin = document.querySelector('[data-auth-login]');
+  const mobileLinks = document.querySelector('[data-auth-mobile-links]');
+  const mobileUser = document.querySelector('[data-auth-mobile-user]');
+  const mobileCta = document.querySelector('[data-auth-mobile-cta]');
+  const mobileLoginCta = document.querySelector('[data-auth-mobile-login-cta]');
+  const usernameEls = document.querySelectorAll(
+    '[data-auth-username], [data-auth-mobile-username]',
+  );
+
+  function render(user) {
+    // Public links: always visible
+    if (links) links.style.display = '';
+    if (mobileLinks) mobileLinks.style.display = '';
+
+    if (user) {
+      if (desktopUser) desktopUser.style.display = '';
+      if (desktopLogin) desktopLogin.style.display = 'none';
+      if (mobileUser) mobileUser.style.display = '';
+      if (mobileCta) mobileCta.style.display = '';
+      if (mobileLoginCta) mobileLoginCta.style.display = 'none';
+      usernameEls.forEach((el) => {
+        el.textContent = user.displayName || user.email || '';
+      });
+    } else {
+      if (desktopUser) desktopUser.style.display = 'none';
+      if (desktopLogin) desktopLogin.style.display = '';
+      if (mobileUser) mobileUser.style.display = 'none';
+      if (mobileCta) mobileCta.style.display = 'none';
+      if (mobileLoginCta) mobileLoginCta.style.display = '';
+    }
+  }
+
+  // Use localStorage hint for instant initial render
+  const cachedUid = getCachedAuthUid();
+  const cachedUser = useAuthStore.getState().user;
+  render(cachedUser || (cachedUid ? { uid: cachedUid, displayName: '', email: '' } : null));
+
+  // Subscribe to auth state changes
+  useAuthStore.subscribe((state) => render(state.user));
+
+  // Logout buttons
+  document
+    .getElementById('logout-btn')
+    ?.addEventListener('click', () => useAuthStore.getState().logout());
+  document
+    .getElementById('mobile-logout-btn')
+    ?.addEventListener('click', () => useAuthStore.getState().logout());
+
+  // Kick off the single auth bootstrap (idempotent)
+  initAuth();
 </script>
 
 <style>

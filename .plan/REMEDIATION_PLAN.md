@@ -123,14 +123,73 @@ Wire in `firebase.json`:
 
 Export from `functions/src/index.ts`.
 
-### 1.2 — NavBar auth visibility
+### 1.2 — NavBar auth visibility (BLOCKING BUG)
 
-Fix the dead `data-auth-*` show/hide protocol. Pick **one** of:
+**Symptom**: nav links are hidden on every page, login or no login, desktop and mobile. The desktop login/user widget never shows. Hamburger opens an empty mobile menu.
 
-- **(A) Vanilla script in `NavBar.astro`** that dynamically imports `useAuthStore` and subscribes, flipping `display` styles. Lightweight; no React on every page just for the nav.
-- **(B) Tiny `client:only` React mini-component** (`NavBarAuth.tsx`) for just the auth-aware portion. Easier to maintain but adds React to anonymous page loads.
+**Root cause**: `NavBar.astro` renders all auth-aware containers with inline `style="display: none;"` (lines 37, 85, 143, 158, 175) intending a JS toggler to flip them on hydration. The toggler was the now-commented-out Firebase block in `BaseLayout.astro:162-204`. With no toggler, the containers stay hidden forever. Inline `display: none` also wins over the desktop `@media (min-width: 1024px) { .nav-bar__links { display: flex } }` rule by CSS specificity (inline beats class), so even on desktop the public links never appear.
 
-Recommendation: **(A)** to keep public pages React-free.
+**Fix** — vanilla script in `NavBar.astro` (Option A, keeps anonymous pages React-free):
+
+```astro
+<script>
+  import { useAuthStore } from '@store/auth-store';
+  import { initAuth } from '@services/auth-bootstrap'; // from 1.3
+
+  const links       = document.querySelector('[data-auth-links]');
+  const desktopUser = document.querySelector('[data-auth-desktop]');
+  const desktopLogin = document.querySelector('[data-auth-login]');
+  const mobileLinks = document.querySelector('[data-auth-mobile-links]');
+  const mobileUser  = document.querySelector('[data-auth-mobile-user]');
+  const mobileCta   = document.querySelector('[data-auth-mobile-cta]');
+  const mobileLoginCta = document.querySelector('[data-auth-mobile-login-cta]');
+  const usernameEls = document.querySelectorAll('[data-auth-username], [data-auth-mobile-username]');
+
+  function render(user) {
+    // Public links: always visible (they're public). Showing only when JS runs was a defensive
+    // measure to dodge a hydration mismatch that no longer applies — show them unconditionally.
+    if (links)       links.style.display = '';
+    if (mobileLinks) mobileLinks.style.display = '';
+
+    // Auth-dependent toggles
+    if (user) {
+      if (desktopUser)    desktopUser.style.display = '';
+      if (desktopLogin)   desktopLogin.style.display = 'none';
+      if (mobileUser)     mobileUser.style.display = '';
+      if (mobileCta)      mobileCta.style.display = '';
+      if (mobileLoginCta) mobileLoginCta.style.display = 'none';
+      usernameEls.forEach((el) => { el.textContent = user.displayName || user.email || ''; });
+    } else {
+      if (desktopUser)    desktopUser.style.display = 'none';
+      if (desktopLogin)   desktopLogin.style.display = '';
+      if (mobileUser)     mobileUser.style.display = 'none';
+      if (mobileCta)      mobileCta.style.display = 'none';
+      if (mobileLoginCta) mobileLoginCta.style.display = '';
+    }
+  }
+
+  // Initial paint with current store state, then subscribe.
+  render(useAuthStore.getState().user);
+  useAuthStore.subscribe((state) => render(state.user));
+
+  // Logout buttons
+  document.getElementById('logout-btn')?.addEventListener('click', () => useAuthStore.getState().logout());
+  document.getElementById('mobile-logout-btn')?.addEventListener('click', () => useAuthStore.getState().logout());
+
+  // Kick off the single auth bootstrap (idempotent — see 1.3).
+  initAuth();
+</script>
+```
+
+**Companion change in `NavBar.astro`**: remove the inline `style="display: none;"` from the *public* links containers (`[data-auth-links]` line 37, `[data-auth-mobile-links]` line 143). They should be visible by default; keep CSS responsive rules to hide on mobile/desktop as appropriate. Only the auth-dependent containers (`[data-auth-desktop]`, `[data-auth-login]`, `[data-auth-mobile-user]`, `[data-auth-mobile-cta]`, `[data-auth-mobile-login-cta]`) keep an initial hidden state, and the script above resolves them on first paint.
+
+**Why this works on Firebase Hosting static**: the script runs on every page after `auth-bootstrap.ts` resolves the Firebase `onAuthStateChanged` once. No SSR auth, no client-only-auth flicker (because public links show unconditionally), no React needed for the nav.
+
+**Caveat**: there's a brief window (~50-150ms) between first paint and Firebase auth resolution where the user's `data-auth-desktop`/`data-auth-login` will reflect logged-out state even for logged-in users. Mitigate with a `localStorage.getItem('quiniela_auth_uid')` hint cached on login/logout that the script reads synchronously and uses as the initial render assumption. Source of truth still becomes Firebase once resolved.
+
+**Alternatives** (kept for record, both more expensive):
+- (B) Tiny `client:only` React mini-component (`NavBarAuth.tsx`) for just the auth-aware portion. Easier to maintain but ships React on anonymous page loads.
+- (C) Astro `<ClientRouter />` + persisted store. Requires adopting view transitions properly — Phase 5 territory.
 
 ### 1.3 — Single auth bootstrap
 

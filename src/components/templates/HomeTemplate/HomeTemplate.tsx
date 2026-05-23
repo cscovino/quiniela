@@ -93,11 +93,6 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({
   className = '',
 }) => {
   const user = useAuthStore((state) => state.user);
-  const initAuth = useAuthStore((state) => state.initAuth);
-
-  useEffect(() => {
-    initAuth();
-  }, [initAuth]);
 
   const hasInitialData = initialMatches.length > 0 || initialRankings.length > 0;
 

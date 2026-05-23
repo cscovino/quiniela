@@ -14,4 +14,8 @@ export { updateGroupStandings } from './updateGroupStandings';
 export { updatePredictorStats } from './updatePredictorStats';
 export { checkAndAwardBadges } from './checkAndAwardBadges';
 
+export { standings } from './api/standings';
+export { rankings } from './api/rankings';
+export { live } from './api/live';
+
 export { db };

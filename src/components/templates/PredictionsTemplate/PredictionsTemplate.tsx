@@ -163,11 +163,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   locale = 'en',
   className = '',
 }) => {
-  const { user, initAuth, isAuthLoading } = useAuthStore();
-
-  useEffect(() => {
-    initAuth();
-  }, [initAuth]);
+  const { user, isAuthLoading } = useAuthStore();
 
   const [predictors, setPredictors] = useState<Predictor[]>([]);
   const [selectedPredictorId, setSelectedPredictorId] = useState<string | null>(null);

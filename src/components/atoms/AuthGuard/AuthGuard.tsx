@@ -18,11 +18,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   message,
   loadingMessage = 'Loading...',
 }) => {
-  const { user, isAuthLoading, initAuth } = useAuthStore();
-
-  React.useEffect(() => {
-    initAuth();
-  }, [initAuth]);
+  const { user, isAuthLoading } = useAuthStore();
 
   if (isAuthLoading) {
     return (

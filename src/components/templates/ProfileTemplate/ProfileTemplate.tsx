@@ -43,17 +43,13 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
   locale = 'en',
   className = '',
 }) => {
-  const { user, initAuth, isAuthLoading } = useAuthStore();
+  const { user, isAuthLoading } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<PredictorStats | null>(null);
   const [rank, setRank] = useState(0);
   const [badges, setBadges] = useState<BadgeEarned[]>([]);
   const [lockedBadges, setLockedBadges] = useState<BadgeLocked[]>([]);
   const [pointsHistory, setPointsHistory] = useState<PointEntry[]>([]);
-
-  useEffect(() => {
-    initAuth();
-  }, [initAuth]);
 
   useEffect(() => {
     if (!user) {

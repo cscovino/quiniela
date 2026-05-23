@@ -25,6 +25,18 @@ interface AuthState {
 
 let unsubscribe: (() => void) | null = null;
 
+function cacheAuthUid(uid: string | null) {
+  try {
+    if (uid) {
+      localStorage.setItem('quiniela_auth_uid', uid);
+    } else {
+      localStorage.removeItem('quiniela_auth_uid');
+    }
+  } catch {
+    // localStorage unavailable
+  }
+}
+
 export function __resetAuthStore() {
   unsubscribe?.();
   unsubscribe = null;
@@ -111,6 +123,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   initAuth: () => {
     if (unsubscribe) return;
     unsubscribe = onAuthStateChanged((user) => {
+      cacheAuthUid(user?.uid ?? null);
       set({ user, isAuthLoading: false });
     });
   },

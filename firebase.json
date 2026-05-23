@@ -30,6 +30,20 @@
     ],
     "cleanUrls": true,
     "trailingSlash": false,
+    "rewrites": [
+      {
+        "source": "/api/standings",
+        "function": "standings"
+      },
+      {
+        "source": "/api/rankings",
+        "function": "rankings"
+      },
+      {
+        "source": "/api/live",
+        "function": "live"
+      }
+    ],
     "headers": [
       {
         "source": "_astro/**",
