@@ -15,45 +15,34 @@ export interface Props {
   isAdmin?: boolean;
 }
 
-const {
-  links,
-  locale,
-  notificationCount = 0,
-  className = '',
-  isLoggedIn = false,
-  userDisplayName,
-  isAdmin = false,
-} = Astro.props;
+const { links, locale, notificationCount = 0, className = '', userDisplayName } = Astro.props;
 
 const otherLocale = locale === 'en' ? 'es' : 'en';
 const otherLocaleLabel = locale === 'en' ? 'ES' : 'EN';
 const otherLocaleHref = locale === 'en' ? '/' : '/en';
 const loginHref = locale === 'en' ? '/en/login' : '/login';
 const predictionsHref = locale === 'en' ? '/en/predictions' : '/predicciones';
-const adminHref = '/en/admin/matches';
 ---
 
 <nav class={`nav-bar ${className}`}>
   <a href={locale === 'en' ? '/en' : '/'} class="nav-bar__brand">
     <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path
-        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95.49-7.4-2.97-6.91-6.92.24-1.93 1.44-3.55 3.11-4.5l1.31 2.28c-.79.47-1.33 1.28-1.42 2.21-.24 1.94 1.16 3.34 3.1 3.1.93-.09 1.74-.63 2.21-1.42l2.28 1.31c-.95 1.67-2.57 2.87-4.5 3.11-.19.02-.38.03-.58.03v.8z"
-      ></path>
+      <path d="M4 4h16v2H4zm0 14h16v2H4zM2 6h2v12H2zm18 0h2v12h-2zM8 9h2v6H8z"></path>
+      <path d="M6 11h6v2H6zm8-2h2v2h-2zm2 4h2v2h-2z"></path>
     </svg>
     <span class="nav-bar__title">QUINIELA</span>
   </a>
 
-  {
-    isLoggedIn && (
-      <div class="nav-bar__links">
-        {links.map((link) => (
-          <a href={link.href} class={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}>
-            {link.label}
-          </a>
-        ))}
-      </div>
-    )
-  }
+  <!-- Always render links container to prevent hydration mismatch -->
+  <div class="nav-bar__links" data-auth-links style="display: none;">
+    {
+      links.map((link) => (
+        <a href={link.href} class={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}>
+          {link.label}
+        </a>
+      ))
+    }
+  </div>
 
   <div class="nav-bar__actions">
     <a
@@ -92,37 +81,26 @@ const adminHref = '/en/admin/matches';
       )
     }
 
-    {
-      isLoggedIn ? (
-        <div class="nav-bar__group nav-bar__group--desktop">
-          {isAdmin && (
-            <a href={adminHref} class="nav-bar__link">
-              Admin
-            </a>
-          )}
-          <svg
-            class="icon"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          <span class="nav-bar__username">{userDisplayName}</span>
-          <button type="button" class="nav-bar__logout" id="logout-btn">
-            Logout
-          </button>
-        </div>
-      ) : (
-        <a href={loginHref} class="nav-bar__group--desktop">
-          <span class="nav-bar__login-btn">Login</span>
-        </a>
-      )
-    }
+    <!-- Always render both auth states to prevent hydration mismatch -->
+    <div class="nav-bar__group nav-bar__group--desktop" data-auth-desktop style="display: none;">
+      <svg
+        class="icon"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span class="nav-bar__username" data-auth-username>{userDisplayName}</span>
+      <button type="button" class="nav-bar__logout" id="logout-btn"> Logout </button>
+    </div>
+    <a href={loginHref} class="nav-bar__group--desktop" data-auth-login>
+      <span class="nav-bar__login-btn">Login</span>
+    </a>
 
     <button
       type="button"
@@ -161,65 +139,52 @@ const adminHref = '/en/admin/matches';
   </div>
 
   <div class="nav-bar__mobile-menu" id="mobile-menu" style="display: none;">
-    {
-      isLoggedIn && (
-        <div class="nav-bar__mobile-links">
-          {links.map((link) => (
-            <a
-              href={link.href}
-              class={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
-              data-close-menu
-            >
-              {link.label}
-            </a>
-          ))}
-          {isAdmin && (
-            <a href={adminHref} class="nav-bar__mobile-link" data-close-menu>
-              Admin
-            </a>
-          )}
-        </div>
-      )
-    }
-
-    {
-      isLoggedIn ? (
-        <>
-          <div class="nav-bar__mobile-user">
-            <svg
-              class="icon"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-            <span>{userDisplayName}</span>
-            <button type="button" class="nav-bar__logout" id="mobile-logout-btn">
-              Logout
-            </button>
-          </div>
-
-          <div class="nav-bar__mobile-cta">
-            <a href={predictionsHref} data-close-menu>
-              <span class="nav-bar__cta-btn">
-                {locale === 'en' ? 'Make Predictions' : 'Hacer Predicciones'}
-              </span>
-            </a>
-          </div>
-        </>
-      ) : (
-        <div class="nav-bar__mobile-cta">
-          <a href={loginHref} data-close-menu>
-            <span class="nav-bar__cta-btn">{locale === 'en' ? 'Login' : 'Iniciar Sesión'}</span>
+    <!-- Always render mobile links to prevent hydration mismatch -->
+    <div class="nav-bar__mobile-links" data-auth-mobile-links style="display: none;">
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            class={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
+            data-close-menu
+          >
+            {link.label}
           </a>
-        </div>
-      )
-    }
+        ))
+      }
+    </div>
+
+    <!-- Always render both mobile auth states -->
+    <div class="nav-bar__mobile-user" data-auth-mobile-user style="display: none;">
+      <svg
+        class="icon"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span data-auth-mobile-username>{userDisplayName}</span>
+      <button type="button" class="nav-bar__logout" id="mobile-logout-btn"> Logout </button>
+    </div>
+
+    <div class="nav-bar__mobile-cta" data-auth-mobile-cta style="display: none;">
+      <a href={predictionsHref} data-close-menu>
+        <span class="nav-bar__cta-btn">
+          {locale === 'en' ? 'Make Predictions' : 'Hacer Predicciones'}
+        </span>
+      </a>
+    </div>
+
+    <div class="nav-bar__mobile-cta" data-auth-mobile-login-cta>
+      <a href={loginHref} data-close-menu>
+        <span class="nav-bar__cta-btn">{locale === 'en' ? 'Login' : 'Iniciar Sesión'}</span>
+      </a>
+    </div>
   </div>
 </nav>
 
@@ -268,7 +233,7 @@ const adminHref = '/en/admin/matches';
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-2) var(--space-3);
     background: var(--bg-card);
     border-bottom: var(--border-pixel-md);
     border-image: linear-gradient(
@@ -278,25 +243,43 @@ const adminHref = '/en/admin/matches';
         var(--color-warm-500)
       )
       1;
+    box-shadow: var(--shadow-md);
     position: sticky;
     top: 0;
     z-index: 100;
     gap: var(--space-4);
   }
 
+  .nav-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      var(--color-secondary-500),
+      var(--color-vibrant-500),
+      var(--color-warm-500),
+      var(--color-gold-500)
+    );
+  }
+
   .nav-bar__brand {
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    flex-shrink: 0;
     text-decoration: none;
     color: inherit;
   }
 
   .nav-bar__title {
-    font-family: var(--font-heading);
-    font-size: var(--heading-xs);
-    line-height: var(--leading-tight);
-    background: linear-gradient(135deg, var(--color-secondary-500), var(--color-vibrant-500));
+    font-family: var(--font-pixel);
+    font-size: var(--text-lg);
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--color-gold-500), var(--color-warm-500));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -309,25 +292,28 @@ const adminHref = '/en/admin/matches';
   }
 
   .nav-bar__link {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
     color: var(--text-secondary);
     text-decoration: none;
-    padding: var(--space-1) var(--space-2);
+    padding: var(--space-2) var(--space-3);
     border: var(--border-pixel-sm) solid transparent;
     transition:
       color var(--duration-fast) var(--ease-out),
+      background var(--duration-fast) var(--ease-out),
       border-color var(--duration-fast) var(--ease-out);
   }
 
   .nav-bar__link:hover {
-    color: var(--color-accent-500);
-    border-color: var(--color-accent-500);
+    color: var(--text-primary);
+    text-decoration: none;
+    background: var(--bg-card-hover);
   }
 
   .nav-bar__link--active {
     color: var(--color-accent-500);
     border-color: var(--color-accent-500);
+    background: var(--bg-card-hover);
   }
 
   .nav-bar__actions {
@@ -337,12 +323,12 @@ const adminHref = '/en/admin/matches';
   }
 
   .nav-bar__btn {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
     padding: var(--space-1) var(--space-2);
-    background: transparent;
+    background: var(--bg-input);
     border: var(--border-pixel-sm) solid var(--border-color);
     color: var(--text-secondary);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
     cursor: pointer;
     text-decoration: none;
     display: flex;
@@ -360,53 +346,59 @@ const adminHref = '/en/admin/matches';
 
   .nav-bar__btn--active {
     background: var(--color-accent-500);
-    color: white;
-    border-color: var(--color-accent-500);
+    color: var(--text-inverse);
+    border-color: var(--color-accent-700);
   }
 
   .nav-bar__btn--icon {
-    padding: var(--space-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
     position: relative;
   }
 
   .nav-bar__btn--notification {
-    position: relative;
+    color: var(--color-accent-500);
   }
 
   .nav-bar__badge {
     position: absolute;
     top: -4px;
     right: -4px;
-    background: var(--color-error);
-    color: white;
-    font-size: var(--text-xs);
-    font-weight: 700;
-    padding: 0 var(--space-1);
     min-width: 16px;
     height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 0 4px;
+    background: var(--color-error);
+    color: #ffffff;
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    line-height: 16px;
+    text-align: center;
     border: var(--border-pixel-sm) solid var(--bg-card);
   }
 
   .nav-bar__group {
-    display: none;
+    display: flex;
     align-items: center;
     gap: var(--space-2);
   }
 
   .nav-bar__username {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .nav-bar__logout {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
     padding: var(--space-1) var(--space-2);
-    background: transparent;
+    background: var(--bg-input);
     border: var(--border-pixel-sm) solid var(--border-color);
     color: var(--text-secondary);
     cursor: pointer;
@@ -421,23 +413,30 @@ const adminHref = '/en/admin/matches';
   }
 
   .nav-bar__login-btn {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    padding: var(--space-1) var(--space-3);
-    background: var(--color-accent-500);
-    color: white;
-    border: var(--border-pixel-sm) solid var(--color-accent-500);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    border: var(--border-pixel-sm) solid var(--border-color);
     text-decoration: none;
     display: inline-block;
-    transition: background var(--duration-fast) var(--ease-out);
+    transition:
+      background var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
   }
 
   .nav-bar__login-btn:hover {
-    background: var(--color-accent-600);
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
   }
 
   .nav-bar__hamburger {
     display: flex;
+  }
+
+  .nav-bar__group--desktop {
+    display: none;
   }
 
   .nav-bar__mobile-menu {
@@ -448,55 +447,68 @@ const adminHref = '/en/admin/matches';
     right: 0;
     background: var(--bg-card);
     border-bottom: var(--border-pixel-md);
+    box-shadow: var(--shadow-lg);
     padding: var(--space-4);
-    flex-direction: column;
-    gap: var(--space-4);
-    z-index: 99;
+    z-index: 100;
+  }
+
+  .nav-bar__mobile-menu.open {
+    display: block;
   }
 
   .nav-bar__mobile-links {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
+    margin-bottom: var(--space-4);
   }
 
   .nav-bar__mobile-link {
-    font-family: var(--font-body);
-    font-size: var(--text-base);
+    font-family: var(--font-pixel);
+    font-size: var(--text-sm);
     color: var(--text-secondary);
     text-decoration: none;
-    padding: var(--space-2) var(--space-3);
+    padding: var(--space-3) var(--space-4);
     border: var(--border-pixel-sm) solid transparent;
     transition:
       color var(--duration-fast) var(--ease-out),
+      background var(--duration-fast) var(--ease-out),
       border-color var(--duration-fast) var(--ease-out);
   }
 
-  .nav-bar__mobile-link:hover,
+  .nav-bar__mobile-link:hover {
+    color: var(--text-primary);
+    background: var(--bg-card-hover);
+  }
+
   .nav-bar__mobile-link--active {
     color: var(--color-accent-500);
     border-color: var(--color-accent-500);
+    background: var(--bg-card-hover);
   }
 
   .nav-bar__mobile-user {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2) 0;
+    padding: var(--space-3) var(--space-4);
     border-top: var(--border-pixel-sm) solid var(--border-color);
+    border-bottom: var(--border-pixel-sm) solid var(--border-color);
+    margin-bottom: var(--space-4);
   }
 
   .nav-bar__mobile-cta {
-    padding-top: var(--space-2);
+    display: flex;
+    justify-content: center;
   }
 
   .nav-bar__cta-btn {
-    font-family: var(--font-body);
-    font-size: var(--text-base);
+    font-family: var(--font-pixel);
+    font-size: var(--text-sm);
     padding: var(--space-2) var(--space-4);
     background: var(--color-accent-500);
-    color: white;
-    border: var(--border-pixel-sm) solid var(--color-accent-500);
+    color: var(--text-inverse);
+    border: var(--border-pixel-sm) solid var(--color-accent-700);
     text-decoration: none;
     display: block;
     text-align: center;
@@ -512,6 +524,10 @@ const adminHref = '/en/admin/matches';
   }
 
   @media (min-width: 1024px) {
+    .nav-bar {
+      padding: var(--space-3) var(--space-4);
+    }
+
     .nav-bar__links {
       display: flex;
     }
@@ -526,6 +542,14 @@ const adminHref = '/en/admin/matches';
 
     .nav-bar__mobile-menu {
       display: none !important;
+    }
+
+    .nav-bar__title {
+      font-size: var(--text-xl);
+    }
+
+    .nav-bar__actions {
+      gap: var(--space-3);
     }
   }
 </style>

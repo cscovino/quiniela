@@ -58,6 +58,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       await register(email, password, displayName);
+      window.dispatchEvent(
+        new CustomEvent('authStateChanged', {
+          detail: { user: useAuthStore.getState().user },
+        }),
+      );
       window.location.href = redirectUrl;
     } catch {
       // Error handled by store
@@ -68,6 +73,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     clearError();
     try {
       await loginWithGoogle();
+      window.dispatchEvent(
+        new CustomEvent('authStateChanged', {
+          detail: { user: useAuthStore.getState().user },
+        }),
+      );
       window.location.href = redirectUrl;
     } catch {
       // Error handled by store

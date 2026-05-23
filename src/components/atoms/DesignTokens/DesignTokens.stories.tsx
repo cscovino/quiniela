@@ -199,7 +199,7 @@ export const Typography: Story = {
   render: () => (
     <div className="tokens-page">
       <h1 className="tokens-page__title">Typography</h1>
-      <p className="tokens-page__subtitle">Press Start 2P (headings) + Inter (body)</p>
+      <p className="tokens-page__subtitle">Press Start 2P (all text)</p>
 
       <section className="tokens-section">
         <h2 className="tokens-section__title">Pixel Font - Headings</h2>

@@ -77,16 +77,6 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     <link rel="preload" href="/fonts/PressStart2P.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/Inter-Medium.woff2" as="font" type="font/woff2" crossorigin />
-    <link
-      rel="preload"
-      href="/fonts/Inter-SemiBold.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link rel="preload" href="/fonts/Inter-Bold.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- DNS Preconnect for Firebase -->
     <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
@@ -165,6 +155,50 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
           navigator.serviceWorker.register('/sw.js');
         });
       }
+
+      // Initialize Firebase auth and dispatch state changes
+      // TODO: Re-enable after fixing React hooks error
+      // Defer until after React hydration to avoid conflicts
+      /*
+      window.addEventListener('load', () => {
+        setTimeout(async () => {
+          try {
+            const firebaseModule = await import('@services/firebase');
+            const authModule = await import('firebase/auth');
+            const firestoreModule = await import('firebase/firestore');
+
+            const { auth } = firebaseModule;
+            const { onAuthStateChanged } = authModule;
+            const { db } = firebaseModule;
+            const { doc, getDoc } = firestoreModule;
+
+            onAuthStateChanged(auth, async (firebaseUser) => {
+              if (firebaseUser) {
+                getDoc(doc(db, 'users', firebaseUser.uid)).then((userDoc) => {
+                  const userData = userDoc.exists() ? userDoc.data() : {};
+                  window.dispatchEvent(new CustomEvent('authStateChanged', {
+                    detail: {
+                      user: {
+                        uid: firebaseUser.uid,
+                        displayName: firebaseUser.displayName || userData.displayName || '',
+                        email: firebaseUser.email || '',
+                        role: userData.role || 'user',
+                      }
+                    }
+                  }));
+                });
+              } else {
+                window.dispatchEvent(new CustomEvent('authStateChanged', {
+                  detail: { user: null }
+                }));
+              }
+            });
+          } catch (error) {
+            console.error('Auth initialization failed:', error);
+          }
+        }, 100);
+      });
+      */
 
       // Performance monitoring
       if ('PerformanceObserver' in window) {
