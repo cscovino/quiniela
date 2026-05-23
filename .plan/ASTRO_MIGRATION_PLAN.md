@@ -388,45 +388,28 @@ Migrate from React-heavy architecture to Astro-native components, leveraging the
 
 ---
 
-## Phase 5: SSR for Authenticated Pages (Week 4-5)
+## ⏳ Phase 5: SSR for Authenticated Pages (DEFERRED)
 
-### 5.1 Enable SSR Mode
-**Files:** `astro.config.ts`
+**Status:** DEFERRED - Requires server adapter which conflicts with static hosting ($0 cost) requirement.
 
-- Switch from `output: 'static'` to `output: 'server'`
-- Configure Firebase Admin SDK for server-side queries
-- Set up Firebase session cookie validation
+**What's Ready:**
+- ✅ Firebase Admin SDK installed
+- ✅ Admin utilities created (`src/lib/firebase-admin.ts`)
+- ✅ Middleware with auth guard structure
+- ✅ Locals interface defined for user context
 
-**Acceptance Criteria:**
-- [ ] Build succeeds in SSR mode
-- [ ] Static pages still generate (home, tournament info)
-- [ ] Dynamic pages render server-side
+**Blockers:**
+- SSR requires `output: 'server'` + server adapter
+- Firebase Hosting static mode doesn't support SSR
+- Need to choose deployment target (Firebase Functions, Vercel, Node)
 
-### 5.2 Server-Side Auth Guards
-**Files:** `src/middleware.ts`, protected pages
+**Alternative (Current Approach):**
+- Client-side auth with Firebase Auth
+- API routes for cached data
+- Protected pages use client-side `AuthGuard` component
+- Middleware provides locale detection for static pages
 
-- Validate Firebase session cookie in middleware
-- Inject user data into Astro context
-- Redirect or render based on auth state
-- Remove client-side auth checks for page access
-
-**Acceptance Criteria:**
-- [ ] Protected pages inaccessible without valid session
-- [ ] User data available server-side
-- [ ] No flash of login state on page load
-
-### 5.3 Server-Side Data Fetching
-**Files:** Protected page templates
-
-- Fetch user-specific data server-side (predictions, profile)
-- Pass data to Astro components as props
-- Remove client-side loading states
-- Add error boundaries for server-side failures
-
-**Acceptance Criteria:**
-- [ ] Predictions page loads with data immediately
-- [ ] Profile page shows user info without loading spinner
-- [ ] No client-side Firebase calls for initial render
+See `.plan/PHASE5_SSR_DEFERRED.md` for details.
 
 ---
 
@@ -526,7 +509,8 @@ Phase 6: Cleanup (3 tasks, ~4 hours)
 ```
 
 **Total estimated effort:** ~40 hours  
-**Completed so far:** ~20 hours (Phase 0 + Quick Wins + Phase 1 + Phase 2 + Phase 3 + Phase 4)
+**Completed so far:** ~21 hours (Phase 0-4 + Phase 5 prep)  
+**Deferred:** Phase 5 (SSR) - requires server adapter
 
 ---
 
@@ -603,3 +587,10 @@ These 5 tasks completed in ~4.5 hours and deliver measurable improvements.
 - Web Vitals monitoring utility (LCP, CLS, INP, FCP)
 - Navigation timing utility
 - Commit: `7a91245`
+
+### 2026-05-23 12:24 - Checkpoint 11: Phase 5 SSR Deferred ⏳
+- Firebase Admin SDK installed
+- Admin utilities created
+- SSR deferred due to static hosting requirement
+- Middleware ready for future SSR implementation
+- Commit: pending

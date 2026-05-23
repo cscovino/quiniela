@@ -4,6 +4,7 @@ import path from 'path';
 
 // https://astro.build/config
 export default defineConfig({
+  output: 'static',
   i18n: {
     defaultLocale: 'es',
     locales: ['en', 'es'],
