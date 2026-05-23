@@ -69,7 +69,12 @@ export const Icon: React.FC<IconProps> = ({ name, size = 24, color, className = 
   const Component = iconMap[name];
 
   return (
-    <span className={`icon ${className}`} style={{ color }} role="img" aria-label={name}>
+    <span
+      className={`icon ${className}`}
+      style={color ? ({ '--icon-color': color } as React.CSSProperties) : undefined}
+      role="img"
+      aria-label={name}
+    >
       <Component width={size} height={size} />
     </span>
   );

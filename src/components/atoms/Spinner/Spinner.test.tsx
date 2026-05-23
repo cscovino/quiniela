@@ -5,17 +5,17 @@ describe('Spinner', () => {
   it('renders with default size', () => {
     render(<Spinner />);
     const el = screen.getByRole('status');
-    expect(el).toHaveStyle({ width: '24px', height: '24px' });
+    expect(el).toHaveClass('spinner--md');
   });
 
   it('applies small size', () => {
     render(<Spinner size="sm" />);
-    expect(screen.getByRole('status')).toHaveStyle({ width: '16px', height: '16px' });
+    expect(screen.getByRole('status')).toHaveClass('spinner--sm');
   });
 
   it('applies large size', () => {
     render(<Spinner size="lg" />);
-    expect(screen.getByRole('status')).toHaveStyle({ width: '32px', height: '32px' });
+    expect(screen.getByRole('status')).toHaveClass('spinner--lg');
   });
 
   it('has loading aria-label', () => {

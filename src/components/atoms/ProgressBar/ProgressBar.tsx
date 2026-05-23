@@ -30,7 +30,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       <div className="progress-bar__track">
         <div
           className={`progress-bar__fill progress-bar__fill--${variant}`}
-          style={{ width: `${percentage}%` }}
+          style={{ '--progress-width': `${percentage}%` } as React.CSSProperties}
         />
       </div>
       {showLabel && <span className="progress-bar__label">{Math.round(percentage)}%</span>}

@@ -56,7 +56,7 @@ const navLinks: NavLinks[] =
 const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
 ---
 
-<html lang={locale} data-theme={theme} style="view-transition-name: root;">
+<html lang={locale} data-theme={theme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -142,40 +142,6 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
     <NavBar links={navLinks} locale={locale} notificationCount={notificationCount} />
     <slot />
     <ToastProvider client:idle />
-    <script>
-      const html = document.documentElement;
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        html.setAttribute('data-theme', savedTheme);
-      }
-
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
-        });
-      }
-
-      // Initialize Firebase auth and subscribe to state changes
-      // Single auth bootstrap loaded lazily by auth-gated routes
-      // See src/store/auth-store.ts for the centralized auth init
-
-      // Performance monitoring (dev only)
-      if ('PerformanceObserver' in window && import.meta.env.DEV) {
-        window.addEventListener('load', () => {
-          setTimeout(() => {
-            const nav = performance.getEntriesByType('navigation')[0];
-            if (nav) {
-              const metrics = {
-                ttfb: Math.round(nav.responseStart - nav.requestStart),
-                domInteractive: Math.round(nav.domInteractive - nav.startTime),
-                loadComplete: Math.round(nav.loadEventEnd - nav.startTime),
-              };
-              // eslint-disable-next-line no-console
-              console.debug('[Performance]', metrics);
-            }
-          }, 0);
-        });
-      }
-    </script>
+    <script src="../scripts/runtime.ts"></script>
   </body>
 </html>

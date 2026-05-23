@@ -1,0 +1,31 @@
+// Theme restoration from localStorage
+const html = document.documentElement;
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+  html.setAttribute('data-theme', savedTheme);
+}
+
+// Service worker registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+
+// Performance monitoring (dev only)
+if ('PerformanceObserver' in window && import.meta.env.DEV) {
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const nav = performance.getEntriesByType('navigation')[0];
+      if (nav) {
+        const metrics = {
+          ttfb: Math.round(nav.responseStart - nav.requestStart),
+          domInteractive: Math.round(nav.domInteractive - nav.startTime),
+          loadComplete: Math.round(nav.loadEventEnd - nav.startTime),
+        };
+        // eslint-disable-next-line no-console
+        console.debug('[Performance]', metrics);
+      }
+    }, 0);
+  });
+}

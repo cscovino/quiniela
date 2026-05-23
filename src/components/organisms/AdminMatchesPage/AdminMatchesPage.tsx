@@ -7,6 +7,7 @@ import type { Match, MatchStatus } from '@types/firestore';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { getDb } from '@services/firebase';
 import { useAuthStore } from '@store/auth-store';
+import './AdminMatchesPage.css';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
@@ -71,7 +72,7 @@ export const AdminMatchesPage: React.FC = () => {
   if (error) {
     return (
       <div>
-        <Typography variant="body" style={{ color: 'var(--color-error)' }}>
+        <Typography variant="body" className="admin-matches-page__error">
           Error: {error}
         </Typography>
         <Button variant="secondary" size="sm" onClick={() => setError(null)}>
@@ -82,11 +83,8 @@ export const AdminMatchesPage: React.FC = () => {
   }
 
   return (
-    <div
-      className="admin-matches-page"
-      style={{ padding: 'var(--space-8)', maxWidth: '1200px', margin: '0 auto' }}
-    >
-      <Typography variant="h2" style={{ marginBottom: 'var(--space-6)' }}>
+    <div className="admin-matches-page">
+      <Typography variant="h2" className="admin-matches-page__title">
         Admin - Manage Matches
       </Typography>
       <AdminMatchList matches={matches} onUpdateResult={handleUpdateResult} />

@@ -1,15 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { PredictionForm, type MatchPrediction } from '@organisms/PredictionForm/PredictionForm';
-import {
-  GroupPredictionForm,
-  type GroupForPrediction,
-} from '@organisms/GroupPredictionForm/GroupPredictionForm';
-import { FinalPhaseForm } from '@organisms/FinalPhaseForm/FinalPhaseForm';
-import { BestPlayersForm } from '@organisms/BestPlayersForm/BestPlayersForm';
+import { type MatchPrediction } from '@organisms/PredictionForm/PredictionForm';
+import { type GroupForPrediction } from '@organisms/GroupPredictionForm/GroupPredictionForm';
 import { PredictorSelector } from '@molecules/PredictorSelector/PredictorSelector';
+import {
+  PredictionsProgress,
+  PredictionsFeedback,
+  PredictionsNavigation,
+} from '@molecules/Predictions/PredictionsUI';
+import { PredictionStepMatches } from '@molecules/Predictions/PredictionStepMatches';
+import { PredictionStepGroups } from '@molecules/Predictions/PredictionStepGroups';
+import {
+  PredictionStepFinalPhase,
+  PredictionStepBestPlayers,
+} from '@molecules/Predictions/PredictionStepFinal';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
-import { Button } from '@atoms/Button/Button';
 import { tournamentService } from '@services/tournament-service';
 import { predictionService } from '@services/prediction-service';
 import { predictorService } from '@services/predictor-service';
@@ -154,9 +159,10 @@ const calculatePredictedStandings = (
       (a, b) => b.points - a.points || b.goalsFor - b.goalsAgainst - (a.goalsFor - a.goalsAgainst),
     );
   }
-
   return result;
 };
+
+const TOTAL_STEPS = 4;
 
 export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   translations,
@@ -199,34 +205,23 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     bestScorer?: string;
   } | null>(null);
 
-  const TOTAL_STEPS = 4;
-
   useEffect(() => {
     if (!user) return;
-
     let cancelled = false;
-
-    const fetchPredictors = async () => {
-      try {
-        const userPredictors = await predictorService.getUserPredictors(user.uid);
+    predictorService
+      .getUserPredictors(user.uid)
+      .then((p) => {
         if (cancelled) return;
-
-        setPredictors(userPredictors);
-
-        if (userPredictors.length > 0) {
-          const defaultPredictor = userPredictors.find((p) => p.id === `${user.uid}-default`);
-          setSelectedPredictorId(defaultPredictor?.id || userPredictors[0].id);
+        setPredictors(p);
+        if (p.length > 0) {
+          const def = p.find((x) => x.id === `${user.uid}-default`);
+          setSelectedPredictorId(def?.id || p[0].id);
         }
-      } catch {
-        // Silently fail
-      } finally {
-        if (!cancelled) {
-          setPredictorsLoading(false);
-        }
-      }
-    };
-
-    fetchPredictors();
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setPredictorsLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -234,62 +229,48 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
   useEffect(() => {
     let cancelled = false;
-
-    const fetchData = async () => {
-      try {
-        const [matchesResult, teamsResult, groupsResult] = await Promise.allSettled([
-          tournamentService.getMatches(),
-          tournamentService.getTeams(),
-          tournamentService.getGroups(),
-        ]);
-
+    Promise.allSettled([
+      tournamentService.getMatches(),
+      tournamentService.getTeams(),
+      tournamentService.getGroups(),
+    ])
+      .then(([m, t, g]) => {
         if (cancelled) return;
-
         const tMap: Record<string, { fifaCode: string; name: string }> = {};
         const teamsList: { fifaCode: string; name: string }[] = [];
-        if (teamsResult.status === 'fulfilled') {
-          teamsResult.value.forEach((t) => {
-            tMap[t.fifaCode.toLowerCase()] = { fifaCode: t.fifaCode, name: t.name };
-            tMap[t.fifaCode] = { fifaCode: t.fifaCode, name: t.name };
-            teamsList.push({ fifaCode: t.fifaCode, name: t.name });
+        if (t.status === 'fulfilled') {
+          t.value.forEach((x) => {
+            tMap[x.fifaCode.toLowerCase()] = { fifaCode: x.fifaCode, name: x.name };
+            tMap[x.fifaCode] = { fifaCode: x.fifaCode, name: x.name };
+            teamsList.push({ fifaCode: x.fifaCode, name: x.name });
           });
         }
         setAllTeams(teamsList);
         setTeamsMap(tMap);
-
-        const allMatches =
-          matchesResult.status === 'fulfilled'
-            ? matchesResult.value.map((m) => ({ ...m, id: m.slug }))
-            : [];
-
-        const groupMatches = allMatches.filter((m) => m.phase === 'group');
-
-        setFirestoreMatches(groupMatches);
-        setMatches(groupMatches.map((m) => mapMatchToPrediction(m, tMap)));
-
-        if (groupsResult.status === 'fulfilled' && teamsResult.status === 'fulfilled') {
-          const sortedGroups = [...groupsResult.value].sort((a, b) => a.order - b.order);
-          const groupsForPrediction: GroupForPrediction[] = sortedGroups.map((group) => ({
-            slug: group.slug,
-            name: group.name,
-            teams: teamsResult.value
-              .filter((t) => t.groupId === group.slug)
-              .map((t) => ({ fifaCode: t.fifaCode, name: t.name })),
-          }));
-          setGroups(groupsForPrediction);
+        const all = m.status === 'fulfilled' ? m.value.map((x) => ({ ...x, id: x.slug })) : [];
+        const groupM = all.filter((x) => x.phase === 'group');
+        setFirestoreMatches(groupM);
+        setMatches(groupM.map((x) => mapMatchToPrediction(x, tMap)));
+        if (g.status === 'fulfilled' && t.status === 'fulfilled') {
+          setGroups(
+            [...g.value]
+              .sort((a, b) => a.order - b.order)
+              .map((grp) => ({
+                slug: grp.slug,
+                name: grp.name,
+                teams: t.value
+                  .filter((x) => x.groupId === grp.slug)
+                  .map((x) => ({ fifaCode: x.fifaCode, name: x.name })),
+              })),
+          );
         }
-      } catch {
-        if (!cancelled) {
-          setMatches([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
+      })
+      .catch(() => {
+        if (!cancelled) setMatches([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -297,161 +278,111 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
   useEffect(() => {
     if (!user || !selectedPredictorId) return;
-
     let cancelled = false;
-
-    const fetchExistingBets = async () => {
-      try {
-        const { matchBets, groupBets } = await predictionService.getExistingBets(
-          user.uid,
-          selectedPredictorId,
-        );
-
+    predictionService
+      .getExistingBets(user.uid, selectedPredictorId)
+      .then(({ matchBets, groupBets }) => {
         if (cancelled) return;
-
-        const matchBetIds = new Set<string>();
-        matchBets.forEach((_, matchId) => matchBetIds.add(matchId));
-        setExistingMatchBets(matchBetIds);
-
-        const groupBetIds = new Set<string>();
-        groupBets.forEach((_, groupId) => groupBetIds.add(groupId));
-        setExistingGroupBets(groupBetIds);
-      } catch {
-        // Silently fail
-      }
-    };
-
-    fetchExistingBets();
+        setExistingMatchBets(new Set(matchBets.keys()));
+        setExistingGroupBets(new Set(groupBets.keys()));
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, [user, selectedPredictorId]);
 
   const handleMatchPredictionsChange = useCallback(
-    (predictions: Record<string, { home?: number; away?: number; winner?: string }>) => {
+    (p: Record<string, { home?: number; away?: number; winner?: string }>) => {
       const cleaned: Record<string, { home?: number; away?: number }> = {};
-      for (const [key, val] of Object.entries(predictions)) {
-        if (val.home != null && val.away != null) {
-          cleaned[key] = { home: val.home, away: val.away };
-        }
+      for (const [k, v] of Object.entries(p)) {
+        if (v.home != null && v.away != null) cleaned[k] = { home: v.home, away: v.away };
       }
       setMatchPredictions(cleaned);
     },
     [],
   );
 
-  const handleMatchSubmit = useCallback(
-    async (predictions: Record<string, { home?: number; away?: number; winner?: string }>) => {
-      if (!user || !selectedPredictorId) return;
-
+  const withFeedback = useCallback(
+    async (
+      fn: () => Promise<{ successCount: number; errors: string[] }>,
+      successKey: string,
+      stepIndex: number,
+    ) => {
       setSubmitting(true);
       setFeedback(null);
-
-      const result = await predictionService.submitBatchMatchBets(
-        user.uid,
-        selectedPredictorId,
-        predictions,
-        firestoreMatches,
-      );
-
+      const result = await fn();
       setSubmitting(false);
-
       if (result.successCount > 0) {
         setFeedback({
           type: 'success',
           message:
             locale === 'en'
-              ? `${result.successCount} match prediction(s) submitted!`
-              : `¡${result.successCount} predicción(es) de partidos enviadas!`,
+              ? `${result.successCount} prediction(s) submitted!`
+              : `¡${result.successCount} predicción(es) enviadas!`,
         });
-
-        const newBetIds = new Set(existingMatchBets);
-        Object.keys(predictions).forEach((id) => newBetIds.add(id));
-        setExistingMatchBets(newBetIds);
-        setSubmittedSteps((prev) => new Set(prev).add(0));
+        setSubmittedSteps((prev) => new Set(prev).add(stepIndex));
       }
-
-      if (result.errors.length > 0) {
-        setFeedback({
-          type: 'error',
-          message: result.errors[0],
-        });
-      }
-
+      if (result.errors.length > 0) setFeedback({ type: 'error', message: result.errors[0] });
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, selectedPredictorId, firestoreMatches, locale, existingMatchBets],
+    [locale],
+  );
+
+  const handleMatchSubmit = useCallback(
+    async (p: Record<string, { home?: number; away?: number; winner?: string }>) => {
+      if (!user || !selectedPredictorId) return;
+      await withFeedback(
+        () =>
+          predictionService.submitBatchMatchBets(
+            user.uid,
+            selectedPredictorId,
+            p,
+            firestoreMatches,
+          ),
+        'match',
+        0,
+      );
+      const newBets = new Set(existingMatchBets);
+      Object.keys(p).forEach((id) => newBets.add(id));
+      setExistingMatchBets(newBets);
+    },
+    [user, selectedPredictorId, firestoreMatches, withFeedback, existingMatchBets],
   );
 
   const handleGroupSubmit = useCallback(
-    async (predictions: Record<string, string[]>) => {
+    async (p: Record<string, string[]>) => {
       if (!user || !selectedPredictorId) return;
-
-      setSubmitting(true);
-      setFeedback(null);
-
-      const result = await predictionService.submitBatchGroupBets(
-        user.uid,
-        selectedPredictorId,
-        predictions,
+      await withFeedback(
+        () => predictionService.submitBatchGroupBets(user.uid, selectedPredictorId, p),
+        'group',
+        1,
       );
-
-      setSubmitting(false);
-
-      if (result.successCount > 0) {
-        setFeedback({
-          type: 'success',
-          message:
-            locale === 'en'
-              ? `${result.successCount} group prediction(s) submitted!`
-              : `¡${result.successCount} predicción(es) de grupos enviadas!`,
-        });
-
-        const newBetIds = new Set(existingGroupBets);
-        Object.keys(predictions).forEach((id) => newBetIds.add(id));
-        setExistingGroupBets(newBetIds);
-        setSubmittedSteps((prev) => new Set(prev).add(1));
-      }
-
-      if (result.errors.length > 0) {
-        setFeedback({
-          type: 'error',
-          message: result.errors[0],
-        });
-      }
-
-      setTimeout(() => setFeedback(null), 5000);
+      const newBets = new Set(existingGroupBets);
+      Object.keys(p).forEach((id) => newBets.add(id));
+      setExistingGroupBets(newBets);
     },
-    [user, selectedPredictorId, locale, existingGroupBets],
+    [user, selectedPredictorId, withFeedback, existingGroupBets],
   );
 
   const handleFinalPhaseSubmit = useCallback(
     async (data: { first?: string; second?: string; third?: string; fourth?: string }) => {
       if (!user || !selectedPredictorId) return;
-
       setSubmitting(true);
       setFeedback(null);
-
       try {
         setExistingFinalPhase(data);
         setSubmittedSteps((prev) => new Set(prev).add(2));
         setFeedback({
           type: 'success',
-          message:
-            locale === 'en'
-              ? 'Final phase prediction submitted!'
-              : '¡Predicción de fase final enviada!',
+          message: locale === 'en' ? 'Final phase submitted!' : '¡Fase final enviada!',
         });
       } catch {
         setFeedback({
           type: 'error',
-          message:
-            locale === 'en'
-              ? 'Failed to submit final phase prediction'
-              : 'Error al enviar predicción de fase final',
+          message: locale === 'en' ? 'Failed to submit' : 'Error al enviar',
         });
       }
-
       setSubmitting(false);
       setTimeout(() => setFeedback(null), 5000);
     },
@@ -461,30 +392,21 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   const handleBestPlayersSubmit = useCallback(
     async (data: { bestGoalkeeper?: string; bestScorer?: string }) => {
       if (!user || !selectedPredictorId) return;
-
       setSubmitting(true);
       setFeedback(null);
-
       try {
         setExistingBestPlayers(data);
         setSubmittedSteps((prev) => new Set(prev).add(3));
         setFeedback({
           type: 'success',
-          message:
-            locale === 'en'
-              ? 'Best players prediction submitted!'
-              : '¡Predicción de mejores jugadores enviada!',
+          message: locale === 'en' ? 'Best players submitted!' : '¡Mejores jugadores enviados!',
         });
       } catch {
         setFeedback({
           type: 'error',
-          message:
-            locale === 'en'
-              ? 'Failed to submit best players prediction'
-              : 'Error al enviar predicción de mejores jugadores',
+          message: locale === 'en' ? 'Failed to submit' : 'Error al enviar',
         });
       }
-
       setSubmitting(false);
       setTimeout(() => setFeedback(null), 5000);
     },
@@ -493,22 +415,16 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
   const handleCreatePredictor = async (name: string) => {
     if (!user) return;
-
-    const newPredictor = await predictorService.createPredictor(user.uid, name);
-    setPredictors((prev) => [...prev, newPredictor]);
-    setSelectedPredictorId(newPredictor.id);
+    const np = await predictorService.createPredictor(user.uid, name);
+    setPredictors((prev) => [...prev, np]);
+    setSelectedPredictorId(np.id);
   };
 
   const handleNext = () => {
-    if (currentStep < TOTAL_STEPS - 1) {
-      setCurrentStep((prev) => prev + 1);
-    }
+    if (currentStep < TOTAL_STEPS - 1) setCurrentStep((p) => p + 1);
   };
-
   const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
-    }
+    if (currentStep > 0) setCurrentStep((p) => p - 1);
   };
 
   if (loading || isAuthLoading || predictorsLoading) {
@@ -529,9 +445,9 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           <Typography variant="h1">{translations.title}</Typography>
           <Typography variant="body">{translations.loginRequired}</Typography>
           <a href={locale === 'en' ? '/en/login' : '/login'}>
-            <Button variant="primary" size="md">
+            <button type="button" className="predictions-template__login-btn">
               {translations.loginButton}
-            </Button>
+            </button>
           </a>
         </div>
       </div>
@@ -539,12 +455,12 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   }
 
   if (!selectedPredictorId) {
-    const predictorTranslations = {
+    const pt = {
       title: locale === 'en' ? 'Choose Your Predictor' : 'Elige tu Pronosticador',
       selectPredictor:
         locale === 'en'
           ? 'Select or create a predictor to start'
-          : 'Selecciona o crea un pronosticador para comenzar',
+          : 'Selecciona o crea un pronosticador',
       createPredictor: locale === 'en' ? 'Create New Predictor' : 'Crear Nuevo Pronosticador',
       createButton: locale === 'en' ? 'Create' : 'Crear',
       namePlaceholder: locale === 'en' ? 'Predictor name...' : 'Nombre del pronosticador...',
@@ -552,7 +468,6 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
       noPredictors: locale === 'en' ? 'No predictors yet' : 'Aún no hay pronosticadores',
       getStarted: locale === 'en' ? 'Get Started' : 'Comenzar',
     };
-
     return (
       <div className={`predictions-template ${className}`}>
         <main className="predictions-template__content">
@@ -562,35 +477,28 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
             onSelectPredictor={setSelectedPredictorId}
             onCreatePredictor={handleCreatePredictor}
             isLoading={predictorsLoading}
-            translations={predictorTranslations}
+            translations={pt}
           />
         </main>
       </div>
     );
   }
 
-  const availableMatches = matches.filter((m) => !existingMatchBets.has(m.matchId));
   const predictedStandings = calculatePredictedStandings(
     firestoreMatches,
     matchPredictions,
     teamsMap,
   );
-
   const stepLabels = [
     translations.stepMatches,
     translations.stepGroups,
     translations.stepFinalPhase,
     translations.stepBestPlayers,
   ];
-
-  const canAdvance =
-    currentStep === 0
-      ? Object.keys(matchPredictions).length > 0
-      : currentStep === 1
-        ? true
-        : currentStep === 2
-          ? true
-          : true;
+  const canAdvance = currentStep === 0 ? Object.keys(matchPredictions).length > 0 : true;
+  const stepCounter = translations.stepXofY
+    .replace('{current}', String(currentStep + 1))
+    .replace('{total}', String(TOTAL_STEPS));
 
   return (
     <div className={`predictions-template ${className}`}>
@@ -599,183 +507,77 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           <Typography variant="h1">{translations.title}</Typography>
         </header>
 
-        <div className="predictions-template__progress">
-          {stepLabels.map((label, index) => (
-            <div
-              key={label}
-              className={`predictions-template__progress-step ${index === currentStep ? 'active' : ''} ${submittedSteps.has(index) ? 'completed' : ''}`}
-            >
-              <span className="predictions-template__progress-number">
-                {submittedSteps.has(index) ? '✓' : index + 1}
-              </span>
-              <span className="predictions-template__progress-label">{label}</span>
-            </div>
-          ))}
-        </div>
+        <PredictionsProgress
+          stepLabels={stepLabels}
+          currentStep={currentStep}
+          submittedSteps={submittedSteps}
+          stepCounter={stepCounter}
+        />
+        <PredictionsFeedback feedback={feedback} />
 
-        <div className="predictions-template__step-counter">
-          {translations.stepXofY
-            .replace('{current}', String(currentStep + 1))
-            .replace('{total}', String(TOTAL_STEPS))}
-        </div>
-
-        {feedback && (
-          <div
-            className={`predictions-template__feedback predictions-template__feedback--${feedback.type}`}
-          >
-            <Typography variant="small">{feedback.message}</Typography>
+        <section className="predictions-template__section">
+          <div className="predictions-template__section-header">
+            <Typography variant="h2">{stepLabels[currentStep]}</Typography>
+            <Typography variant="body">
+              {currentStep === 0
+                ? translations.stepMatchesDesc
+                : currentStep === 1
+                  ? translations.stepGroupsDesc
+                  : currentStep === 2
+                    ? translations.stepFinalPhaseDesc
+                    : translations.stepBestPlayersDesc}
+            </Typography>
           </div>
-        )}
 
-        {currentStep === 0 && (
-          <section className="predictions-template__section">
-            <div className="predictions-template__section-header">
-              <Typography variant="h2">{translations.stepMatches}</Typography>
-              <Typography variant="body">{translations.stepMatchesDesc}</Typography>
-            </div>
-            {availableMatches.length === 0 ? (
-              <div className="predictions-template__empty">
-                <Typography variant="body">
-                  {locale === 'en'
-                    ? 'No matches available for prediction. All scheduled matches have been predicted or deadlines have passed.'
-                    : 'No hay partidos disponibles para predecir. Todos los partidos programados han sido pronosticados o los plazos han pasado.'}
-                </Typography>
-              </div>
-            ) : (
-              <PredictionForm
-                matches={availableMatches}
-                onSubmit={handleMatchSubmit}
-                onPredictionsChange={handleMatchPredictionsChange}
-                isDisabled={submitting}
-              />
-            )}
-          </section>
-        )}
-
-        {currentStep === 1 && (
-          <section className="predictions-template__section">
-            <div className="predictions-template__section-header">
-              <Typography variant="h2">{translations.stepGroups}</Typography>
-              <Typography variant="body">{translations.stepGroupsDesc}</Typography>
-            </div>
-
-            {Object.keys(predictedStandings).length > 0 && (
-              <div className="predictions-template__predicted-standings">
-                <Typography variant="h3">{translations.predictedStandings}</Typography>
-                {Object.entries(predictedStandings).map(([groupId, standings]) => (
-                  <div key={groupId} className="predictions-template__predicted-group">
-                    <Typography variant="small" className="predictions-template__group-name">
-                      {groups.find((g) => g.slug === groupId)?.name || groupId}
-                    </Typography>
-                    <table className="predictions-template__predicted-table">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>{translations.team}</th>
-                          <th>P</th>
-                          <th>W</th>
-                          <th>D</th>
-                          <th>L</th>
-                          <th>GF</th>
-                          <th>GA</th>
-                          <th>{translations.pts}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {standings.map((s, i) => (
-                          <tr key={s.teamId}>
-                            <td>{i + 1}</td>
-                            <td className="predictions-template__team-cell">{s.fifaCode}</td>
-                            <td>{s.played}</td>
-                            <td>{s.won}</td>
-                            <td>{s.drawn}</td>
-                            <td>{s.lost}</td>
-                            <td>{s.goalsFor}</td>
-                            <td>{s.goalsAgainst}</td>
-                            <td className="predictions-template__pts-cell">{s.points}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {groups.length > 0 ? (
-              <GroupPredictionForm
-                groups={groups}
-                onSubmit={handleGroupSubmit}
-                existingBets={existingGroupBets}
-                isDisabled={submitting}
-              />
-            ) : (
-              <div className="predictions-template__empty">
-                <Typography variant="body">
-                  {locale === 'en'
-                    ? 'Group predictions will be available once groups are confirmed.'
-                    : 'Las predicciones de grupos estarán disponibles una vez confirmados los grupos.'}
-                </Typography>
-              </div>
-            )}
-          </section>
-        )}
-
-        {currentStep === 2 && (
-          <section className="predictions-template__section">
-            <div className="predictions-template__section-header">
-              <Typography variant="h2">{translations.stepFinalPhase}</Typography>
-              <Typography variant="body">{translations.stepFinalPhaseDesc}</Typography>
-            </div>
-            {allTeams.length > 0 ? (
-              <FinalPhaseForm
-                teams={allTeams}
-                onSubmit={handleFinalPhaseSubmit}
-                existingPrediction={existingFinalPhase || undefined}
-                isDisabled={submitting}
-              />
-            ) : (
-              <div className="predictions-template__empty">
-                <Typography variant="body">
-                  {locale === 'en'
-                    ? 'Teams will be available soon.'
-                    : 'Los equipos estarán disponibles pronto.'}
-                </Typography>
-              </div>
-            )}
-          </section>
-        )}
-
-        {currentStep === 3 && (
-          <section className="predictions-template__section">
-            <div className="predictions-template__section-header">
-              <Typography variant="h2">{translations.stepBestPlayers}</Typography>
-              <Typography variant="body">{translations.stepBestPlayersDesc}</Typography>
-            </div>
-            <BestPlayersForm
-              onSubmit={handleBestPlayersSubmit}
+          {currentStep === 0 && (
+            <PredictionStepMatches
+              matches={matches}
+              existingMatchBets={existingMatchBets}
+              teamsMap={teamsMap}
+              onSubmit={handleMatchSubmit}
+              onPredictionsChange={handleMatchPredictionsChange}
+              isDisabled={submitting}
+              locale={locale}
+            />
+          )}
+          {currentStep === 1 && (
+            <PredictionStepGroups
+              groups={groups}
+              predictedStandings={predictedStandings}
+              existingGroupBets={existingGroupBets}
+              onSubmit={handleGroupSubmit}
+              isDisabled={submitting}
+              locale={locale}
+              translations={translations}
+            />
+          )}
+          {currentStep === 2 && (
+            <PredictionStepFinalPhase
+              teams={allTeams}
+              existingPrediction={existingFinalPhase || undefined}
+              onSubmit={handleFinalPhaseSubmit}
+              isDisabled={submitting}
+              locale={locale}
+            />
+          )}
+          {currentStep === 3 && (
+            <PredictionStepBestPlayers
               existingPrediction={existingBestPlayers || undefined}
+              onSubmit={handleBestPlayersSubmit}
               isDisabled={submitting}
             />
-          </section>
-        )}
-
-        <div className="predictions-template__navigation">
-          <Button variant="secondary" size="md" onClick={handleBack} disabled={currentStep === 0}>
-            {translations.buttonBack}
-          </Button>
-          {currentStep < TOTAL_STEPS - 1 && (
-            <Button variant="primary" size="md" onClick={handleNext} disabled={!canAdvance}>
-              {translations.buttonNext}
-            </Button>
           )}
-        </div>
+        </section>
 
-        {!submittedSteps.has(currentStep) && (
-          <div className="predictions-template__hint">
-            <Typography variant="small">{translations.submitToAdvance}</Typography>
-          </div>
-        )}
+        <PredictionsNavigation
+          onBack={handleBack}
+          onNext={handleNext}
+          canAdvance={canAdvance}
+          currentStep={currentStep}
+          totalSteps={TOTAL_STEPS}
+          translations={translations}
+          submittedSteps={submittedSteps}
+        />
       </main>
     </div>
   );

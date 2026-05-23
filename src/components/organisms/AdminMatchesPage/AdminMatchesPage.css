@@ -1,0 +1,13 @@
+.admin-matches-page {
+  padding: var(--space-8);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-matches-page__title {
+  margin-bottom: var(--space-6);
+}
+
+.admin-matches-page__error {
+  color: var(--color-error);
+}

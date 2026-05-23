@@ -18,7 +18,7 @@ describe('Icon', () => {
   it('applies custom color', () => {
     const { container } = render(<Icon name="target" color="#ff0000" />);
     const span = container.firstChild;
-    expect(span).toHaveStyle({ color: '#ff0000' });
+    expect(span).toHaveStyle({ '--icon-color': '#ff0000' });
   });
 
   it('renders all icon types', () => {

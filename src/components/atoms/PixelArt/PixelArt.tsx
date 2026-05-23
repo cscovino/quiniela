@@ -238,7 +238,7 @@ export const PixelArt: React.FC<PixelArtProps> = ({
   return (
     <div
       className={`pixel-art pixel-art--${name} ${animationClass} ${className}`}
-      style={{ width: size, height: size }}
+      style={{ '--pixel-art-size': `${size}px` } as React.CSSProperties}
       role="img"
       aria-label={name}
     >
