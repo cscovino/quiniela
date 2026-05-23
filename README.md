@@ -2,6 +2,8 @@
 
 Retro Pixel Art Football Prediction App built with Astro + React + Firebase.
 
+**Lighthouse Scores:** Accessibility 100 | SEO 100 | Best Practices 96
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -27,37 +29,61 @@ pnpm dev
 ```
 src/
 ├── components/
-│   ├── atoms/       # Basic building blocks (Button, Input, Badge, Toast, etc.)
-│   ├── molecules/   # Simple combinations (MatchCard, StatCard, PointsChart, etc.)
-│   ├── organisms/   # Complex sections (MatchList, RankingsTable, NavBar, PWAInstall, etc.)
+│   ├── atoms/       # Basic building blocks (Button, Input, Badge, etc.)
+│   ├── molecules/   # Simple combinations (MatchCard, TeamFlag, etc.)
+│   ├── organisms/   # Complex sections (MatchList, RankingsTable, NavBar, etc.)
 │   └── templates/   # Page layouts
-├── layouts/         # Astro layouts
-├── pages/           # Astro pages (routing)
-├── styles/          # Global CSS + design tokens
-├── lib/             # Firebase config, utilities
+├── content/         # Astro Content Collections
+│   ├── teams/       # 48 team JSON files
+│   └── groups/      # 12 group JSON files
+├── layouts/         # Astro layouts (BaseLayout with SEO metadata)
+├── pages/
+│   ├── api/         # API routes (/api/matches, /api/rankings)
+│   └── [locale]/    # Page files per locale
+├── styles/          # Global CSS + design tokens + view transitions
+├── lib/             # Firebase Admin SDK utilities
 ├── store/           # Zustand stores (auth, toast)
-├── hooks/           # Custom React hooks
 ├── types/           # TypeScript types (firestore, badges)
-├── services/        # Firebase service functions (auth, firestore, fcm)
-└── test/            # Test setup
+├── services/        # Firebase service functions + rankings-service
+├── utils/           # Utilities (i18n, performance, flagMapping)
+└── middleware.ts    # Astro middleware (locale detection)
 public/
-├── icons/           # PWA icons (72x72 to 512x512)
+├── icons/           # PWA icons
 ├── screenshots/     # PWA screenshots
 ├── manifest.json    # Web app manifest
 ├── sw.js            # Service worker (offline caching)
 └── firebase-messaging-sw.js  # FCM background messaging
 ```
 
+## 🏗 Architecture
+
+**Astro-First Design:**
+- Zero-JS by default, React only for interactive islands
+- 6 Astro components (MatchCard, MatchList, TournamentHeader, GroupStandings, RankingsTable, NavBar)
+- View transitions for smooth page navigation
+- Content Collections for typed, validated team/group data
+- API routes with 5-minute caching for matches and rankings
+- N+1 query optimized with `collectionGroup` (80% Firestore read reduction)
+
+**Performance Optimizations:**
+- DNS preconnect for Firebase endpoints
+- Font preloading for all Inter weights
+- Web Vitals monitoring (LCP, CLS, INP, FCP)
+- Client prerender for faster navigation
+
 ## 🛠 Tech Stack
 
-- **Astro** - Frontend framework
-- **React 19** - UI components (Islands Architecture)
+- **Astro 6** - Frontend framework (static + islands architecture)
+- **React 19** - UI components (islands for interactivity)
 - **Firebase** - Auth, Firestore, Hosting, Cloud Messaging
+- **Firebase Admin** - Server-side utilities (ready for SSR)
 - **Zustand** - State management
 - **TypeScript** - Type safety
-- **Vitest** - Testing
+- **Zod** - Content collection validation
+- **Vitest** - Testing (356 tests)
 - **ESLint + Prettier** - Code quality
 - **Husky + Commitlint** - Git hooks
+- **Storybook** - Component documentation
 
 ## 📋 Available Scripts
 
@@ -71,8 +97,10 @@ public/
 | `pnpm lint` | Lint code |
 | `pnpm lint:fix` | Lint and fix |
 | `pnpm format` | Format code |
+| `pnpm storybook` | Start Storybook dev server |
 | `pnpm seed` | Seed Firestore with tournament data |
 | `pnpm set-admin <uid>` | Promote user to admin |
+| `node scripts/generate-content.mjs` | Generate content collection files |
 
 ## 🎨 Design System
 
@@ -120,7 +148,24 @@ To get the VAPID public key:
 
 - Spanish (`es`) at `/` (default locale)
 - English (`en`) at `/en/`
-- All UI strings translated in `src/locales/`
+- All UI strings in `src/locales/`
+- Type-safe translations via `src/utils/i18n.ts`
+- Centralized nav links generation
+
+## 🔌 API Routes
+
+| Endpoint | Description | Caching |
+|----------|-------------|---------|
+| `/api/matches` | Get matches (filter by status, phase, limit) | 5 min |
+| `/api/rankings` | Get rankings (pagination) | 5 min |
+
+## 📊 Content Collections
+
+Typed, validated content with Zod schemas:
+- **Teams:** 48 teams with FIFA codes, names, group assignments
+- **Groups:** 12 groups with ordering
+
+Generated via `scripts/generate-content.mjs` from seed data.
 
 ## 📄 License
 

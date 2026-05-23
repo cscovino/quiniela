@@ -2,6 +2,8 @@
 
 Retro pixel art football prediction app. Astro 6 + React 19 + Firebase.
 
+**Lighthouse:** Accessibility 100 | SEO 100 | Best Practices 96
+
 ## Commands
 
 ```bash
@@ -17,6 +19,7 @@ pnpm storybook    # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build Storybook static
 pnpm seed         # Seed Firestore with tournament data
 pnpm set-admin    # Promote user to admin
+node scripts/generate-content.mjs  # Generate content collection files
 ```
 
 **Verification order:** `lint → test:run → build`
@@ -26,15 +29,40 @@ pnpm set-admin    # Promote user to admin
 - **i18n:** Spanish (`es`) at `/`, English at `/en/`. No redirect file needed.
 - **Routing:** One page file per locale (e.g., `src/pages/index.astro` for Spanish, `src/pages/en/index.astro` for English). Do NOT use `[locale]` dynamic routes.
 - **Components:** Atomic Design — `@atoms/`, `@molecules/`, `@organisms/`, `@templates/`
+- **Astro Components:** MatchCard, MatchList, TournamentHeader, GroupStandings, RankingsTable, NavBar (zero-JS)
 - **State:** Zustand (auth store, toast store)
 - **Backend:** Firebase (Auth, Firestore, Cloud Functions, Cloud Messaging)
 - **PWA:** Service worker, web manifest, FCM push notifications
+- **Content Collections:** Teams (48), Groups (12) with Zod validation
+- **API Routes:** `/api/matches`, `/api/rankings` with 5-min caching
+- **Middleware:** Locale detection, ready for SSR auth guards
 
 ## Path Aliases
 
 `@/`, `@atoms/`, `@molecules/`, `@organisms/`, `@templates/`, `@layouts/`, `@styles/`, `@utils/`, `@hooks/`, `@store/`, `@services/`, `@types/`, `@locales/`
 
 Configured in both `astro.config.ts` (Vite) and `tsconfig.json`.
+
+## Astro Patterns
+
+**Zero-JS by Default:**
+- Use `.astro` components for static content
+- Add `client:load` only for interactive React islands
+- Use `client:visible` for below-fold components
+- Use `client:idle` for non-critical interactive components
+
+**Content Collections:**
+- Config: `src/content.config.ts`
+- Data: `src/content/teams/*.json`, `src/content/groups/*.json`
+- Import: `import { getCollection } from 'astro:content'`
+
+**i18n Utilities:**
+- `getTranslations(locale)` from `@utils/i18n`
+- `getNavLinks(locale, activeNav)` from `@utils/i18n`
+
+**View Transitions:**
+- Enabled in `astro.config.ts` with `clientPrerender`
+- CSS animations in `global.css` (`::view-transition-old/new`)
 
 ## Design System
 
@@ -80,6 +108,14 @@ The app is a Progressive Web App:
 - Firebase `browserLocalPersistence` for session persistence
 - CSP meta tag in BaseLayout for XSS mitigation
 - Zero vulnerabilities (`pnpm audit` clean)
+- Static hosting ($0 additional cost) - SSR deferred
+- Astro components for static UI (MatchCard, MatchList, etc.)
+- API routes with caching for matches and rankings
+- N+1 query optimized with `collectionGroup`
+- Content Collections for typed team/group data
+- View transitions enabled for smooth navigation
+- DNS preconnect for Firebase endpoints
+- Web Vitals monitoring built-in
 
 ## Project Plan
 
