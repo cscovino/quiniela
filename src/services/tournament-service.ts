@@ -8,7 +8,7 @@ import {
   orderBy,
   type QueryConstraint,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { getDb } from './firebase';
 import type {
   Tournament,
   Group,
@@ -20,21 +20,23 @@ import type {
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
+const db = () => getDb();
+
 export const tournamentService = {
   getTournament: async (): Promise<Tournament | null> => {
-    const docRef = doc(db, 'tournaments', TOURNAMENT_ID);
+    const docRef = doc(db(), 'tournaments', TOURNAMENT_ID);
     const snapshot = await getDoc(docRef);
     return snapshot.exists() ? (snapshot.data() as Tournament) : null;
   },
 
   getGroups: async (): Promise<Group[]> => {
-    const q = query(collection(db, 'tournaments', TOURNAMENT_ID, 'groups'), orderBy('order'));
+    const q = query(collection(db(), 'tournaments', TOURNAMENT_ID, 'groups'), orderBy('order'));
     const snapshot = await getDocs(q);
     return snapshot.docs.map((d) => d.data() as Group);
   },
 
   getTeams: async (): Promise<Team[]> => {
-    const snapshot = await getDocs(collection(db, 'tournaments', TOURNAMENT_ID, 'teams'));
+    const snapshot = await getDocs(collection(db(), 'tournaments', TOURNAMENT_ID, 'teams'));
     return snapshot.docs.map((d) => d.data() as Team);
   },
 
@@ -46,7 +48,7 @@ export const tournamentService = {
     const constraints: QueryConstraint[] = [orderBy('date')];
     if (filters?.phase) constraints.push(where('phase', '==', filters.phase));
     if (filters?.groupId) constraints.push(where('groupId', '==', filters.groupId));
-    const q = query(collection(db, 'tournaments', TOURNAMENT_ID, 'matches'), ...constraints);
+    const q = query(collection(db(), 'tournaments', TOURNAMENT_ID, 'matches'), ...constraints);
     const snapshot = await getDocs(q);
     const matches = snapshot.docs.map((d) => ({ ...d.data(), id: d.id }) as Match & { id: string });
     if (filters?.status) {
@@ -56,7 +58,9 @@ export const tournamentService = {
   },
 
   getGroupStandings: async (): Promise<GroupStandings[]> => {
-    const snapshot = await getDocs(collection(db, 'tournaments', TOURNAMENT_ID, 'group_standings'));
+    const snapshot = await getDocs(
+      collection(db(), 'tournaments', TOURNAMENT_ID, 'group_standings'),
+    );
     return snapshot.docs.map((d) => d.data() as GroupStandings);
   },
 
@@ -64,7 +68,7 @@ export const tournamentService = {
     userId: string,
     predictorId: string,
   ): Promise<PredictorStats | null> => {
-    const docRef = doc(db, 'users', userId, 'predictors', predictorId, 'stats', TOURNAMENT_ID);
+    const docRef = doc(db(), 'users', userId, 'predictors', predictorId, 'stats', TOURNAMENT_ID);
     const snapshot = await getDoc(docRef);
     return snapshot.exists() ? (snapshot.data() as PredictorStats) : null;
   },
@@ -73,9 +77,9 @@ export const tournamentService = {
     tournamentId: string = TOURNAMENT_ID,
   ): Promise<(PredictorStats & { userId: string; predictorId: string })[]> => {
     const { collectionGroup, getDocs, query, where } = await import('firebase/firestore');
-    const { db } = await import('./firebase');
+    const { getDb } = await import('./firebase');
 
-    const statsRef = collectionGroup(db, 'stats');
+    const statsRef = collectionGroup(getDb(), 'stats');
     const q = query(statsRef, where('__name__', '==', tournamentId));
 
     const snapshot = await getDocs(q);

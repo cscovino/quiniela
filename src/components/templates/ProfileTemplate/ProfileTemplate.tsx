@@ -43,7 +43,8 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
   locale = 'en',
   className = '',
 }) => {
-  const { user, isAuthLoading } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<PredictorStats | null>(null);
   const [rank, setRank] = useState(0);

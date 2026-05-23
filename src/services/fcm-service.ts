@@ -1,40 +1,28 @@
-import { getToken, onMessage } from 'firebase/messaging';
+import { getToken } from 'firebase/messaging';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
-import { db, messaging } from './firebase';
+import { getDb, getMessagingInstance } from './firebase';
 
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_FIREBASE_VAPID_PUBLIC_KEY || '';
 
 export const fcmService = {
   async requestPermission(userId: string): Promise<string | null> {
-    if (!('Notification' in window)) {
-      return null;
-    }
+    if (!('Notification' in window)) return null;
+    if (!('serviceWorker' in navigator)) return null;
 
-    if (!('serviceWorker' in navigator)) {
-      return null;
-    }
-
-    if (!messaging) {
-      return null;
-    }
+    const msg = await getMessagingInstance();
+    if (!msg) return null;
 
     try {
       const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        return null;
-      }
+      if (permission !== 'granted') return null;
 
       const registration = await navigator.serviceWorker.ready;
-
-      const token = await getToken(messaging, {
+      const token = await getToken(msg, {
         vapidKey: VAPID_PUBLIC_KEY,
         serviceWorkerRegistration: registration,
       });
 
-      if (token) {
-        await this.saveToken(userId, token);
-      }
-
+      if (token) await this.saveToken(userId, token);
       return token;
     } catch {
       return null;
@@ -42,7 +30,7 @@ export const fcmService = {
   },
 
   async saveToken(userId: string, token: string): Promise<void> {
-    await setDoc(doc(db, 'users', userId, 'fcm_tokens', token), {
+    await setDoc(doc(getDb(), 'users', userId, 'fcm_tokens', token), {
       token,
       createdAt: new Date(),
       platform: this.getPlatform(),
@@ -51,7 +39,7 @@ export const fcmService = {
 
   async removeToken(userId: string, token: string): Promise<void> {
     try {
-      await deleteDoc(doc(db, 'users', userId, 'fcm_tokens', token));
+      await deleteDoc(doc(getDb(), 'users', userId, 'fcm_tokens', token));
     } catch {
       // Token may not exist
     }
@@ -59,11 +47,11 @@ export const fcmService = {
 
   async unsubscribe(userId: string, token: string): Promise<void> {
     await this.removeToken(userId, token);
-
-    if (messaging) {
+    const msg = await getMessagingInstance();
+    if (msg) {
       try {
         const { deleteToken } = await import('firebase/messaging');
-        await deleteToken(messaging);
+        await deleteToken(msg);
       } catch {
         // Token may not exist
       }
@@ -77,17 +65,20 @@ export const fcmService = {
     return 'web';
   },
 
-  onMessage(callback: (payload: Record<string, unknown>) => void): (() => void) | null {
-    if (!messaging || typeof window === 'undefined') return null;
-
-    return onMessage(messaging, callback);
+  async onMessage(
+    callback: (payload: Record<string, unknown>) => Promise<void>,
+  ): Promise<(() => void) | null> {
+    const msg = await getMessagingInstance();
+    if (!msg || typeof window === 'undefined') return null;
+    const { onMessage } = await import('firebase/messaging');
+    return onMessage(msg, callback);
   },
 
   async getCurrentToken(): Promise<string | null> {
-    if (!messaging) return null;
-
+    const msg = await getMessagingInstance();
+    if (!msg) return null;
     try {
-      return await getToken(messaging, { vapidKey: VAPID_PUBLIC_KEY });
+      return await getToken(msg, { vapidKey: VAPID_PUBLIC_KEY });
     } catch {
       return null;
     }

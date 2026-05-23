@@ -44,11 +44,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const [password, setPassword] = useState('');
   const [showReset, setShowReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
-  const { login, loginWithGoogle, resetPassword, isLoading, error, clearError } = useAuthStore();
+  const login = useAuthStore((s) => s.login);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
+  const resetPassword = useAuthStore((s) => s.resetPassword);
+  const isLoading = useAuthStore((s) => s.isLoading);
+  const error = useAuthStore((s) => s.error);
+  const clearError = useAuthStore((s) => s.clearError);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
+    if (!email.trim()) {
+      useAuthStore.setState({ error: 'Email is required' });
+      return;
+    }
+    if (!password) {
+      useAuthStore.setState({ error: 'Password is required' });
+      return;
+    }
     try {
       await login(email, password);
       window.dispatchEvent(
@@ -144,7 +157,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       <form onSubmit={handleSubmit} className="login-form__form">
         {error && (
-          <div className="login-form__error">
+          <div className="login-form__error" role="alert" aria-live="polite">
             <Typography variant="small">{getErrorMessage()}</Typography>
           </div>
         )}

@@ -5,7 +5,7 @@ import { Button } from '@atoms/Button/Button';
 import { updateMatchResult } from '@services/admin-service';
 import type { Match, MatchStatus } from '@types/firestore';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '@services/firebase';
+import { getDb } from '@services/firebase';
 import { useAuthStore } from '@store/auth-store';
 
 const TOURNAMENT_ID = 'world-cup-2026';
@@ -24,7 +24,7 @@ export const AdminMatchesPage: React.FC = () => {
 
     const fetchMatches = async () => {
       try {
-        const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
+        const matchesRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches');
         const q = query(matchesRef, orderBy('date'));
         const snapshot = await getDocs(q);
         const matchesData = snapshot.docs.map((doc) => ({

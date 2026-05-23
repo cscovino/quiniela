@@ -5,14 +5,15 @@ import * as firebaseAuth from 'firebase/auth';
 import * as firebaseFirestore from 'firebase/firestore';
 
 vi.mock('../firebase', () => ({
-  auth: {
+  getAuthInstance: () => ({
     currentUser: null,
     onAuthStateChanged: vi.fn((cb) => {
       cb(null);
       return vi.fn();
     }),
-  },
-  db: 'mock-db',
+  }),
+  getDb: () => 'mock-db',
+  initFirebase: vi.fn(() => Promise.resolve()),
 }));
 
 const mockUser = {

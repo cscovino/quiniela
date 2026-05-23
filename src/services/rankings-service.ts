@@ -1,5 +1,5 @@
 import { collectionGroup, getDocs, query, where } from 'firebase/firestore';
-import { db } from './firebase';
+import { getDb } from './firebase';
 import type { PredictorStats } from '../types/firestore';
 
 const TOURNAMENT_ID = 'world-cup-2026';
@@ -8,7 +8,7 @@ export const rankingsService = {
   getAllPredictorStats: async (
     tournamentId: string = TOURNAMENT_ID,
   ): Promise<(PredictorStats & { userId: string; predictorId: string })[]> => {
-    const statsRef = collectionGroup(db, 'stats');
+    const statsRef = collectionGroup(getDb(), 'stats');
     const q = query(statsRef, where('__name__', '==', tournamentId));
 
     const snapshot = await getDocs(q);

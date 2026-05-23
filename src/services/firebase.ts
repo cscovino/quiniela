@@ -1,9 +1,7 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
+import { initializeApp, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getAuth, setPersistence, browserLocalPersistence, type Auth } from 'firebase/auth';
 import type { Messaging } from 'firebase/messaging';
-
-let messaging: Messaging | null = null;
 
 const firebaseConfig = {
   apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
@@ -14,28 +12,55 @@ const firebaseConfig = {
   appId: import.meta.env.PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+let app: FirebaseApp | null = null;
+let _db: Firestore | null = null;
+let _auth: Auth | null = null;
+let _messaging: Messaging | null = null;
+let initPromise: Promise<void> | null = null;
 
-export const db = getFirestore(app);
-export const auth = getAuth(app);
-
-if (typeof window !== 'undefined' && typeof ServiceWorkerRegistration !== 'undefined') {
-  import('firebase/messaging')
-    .then(({ getMessaging }) => {
-      try {
-        messaging = getMessaging(app);
-      } catch {
-        messaging = null;
-      }
-    })
-    .catch(() => {
-      messaging = null;
-    });
+function ensureApp(): FirebaseApp {
+  if (!app) {
+    app = initializeApp(firebaseConfig);
+  }
+  return app;
 }
 
-setPersistence(auth, browserLocalPersistence).catch(() => {
-  // Persistence setup failure is non-critical
-});
+export async function initFirebase(): Promise<void> {
+  if (initPromise) return initPromise;
+  initPromise = (async () => {
+    const a = ensureApp();
+    _db = getFirestore(a);
+    _auth = getAuth(a);
+    await setPersistence(_auth, browserLocalPersistence).catch(() => {});
+  })();
+  return initPromise;
+}
 
-export { messaging };
-export default app;
+export function getDb(): Firestore {
+  if (!_db) {
+    ensureApp();
+    _db = getFirestore(app!);
+  }
+  return _db;
+}
+
+export function getAuthInstance(): Auth {
+  if (!_auth) {
+    ensureApp();
+    _auth = getAuth(app!);
+  }
+  return _auth;
+}
+
+export async function getMessagingInstance(): Promise<Messaging | null> {
+  if (_messaging) return _messaging;
+  try {
+    const { getMessaging } = await import('firebase/messaging');
+    _messaging = getMessaging(ensureApp());
+    return _messaging;
+  } catch {
+    return null;
+  }
+}
+
+export { initFirebase as default };

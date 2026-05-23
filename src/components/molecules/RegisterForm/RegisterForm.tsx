@@ -42,17 +42,23 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { register, loginWithGoogle, isLoading, error, clearError } = useAuthStore();
+  const register = useAuthStore((s) => s.register);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
+  const isLoading = useAuthStore((s) => s.isLoading);
+  const error = useAuthStore((s) => s.error);
+  const clearError = useAuthStore((s) => s.clearError);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
 
     if (!displayName.trim()) {
+      useAuthStore.setState({ error: translations.errors.displayNameRequired });
       return;
     }
 
     if (password !== confirmPassword) {
+      useAuthStore.setState({ error: translations.errors.passwordMismatch });
       return;
     }
 
@@ -106,7 +112,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <form onSubmit={handleSubmit} className="register-form__form">
         {error && (
-          <div className="register-form__error">
+          <div className="register-form__error" role="alert" aria-live="polite">
             <Typography variant="small">{getErrorMessage()}</Typography>
           </div>
         )}

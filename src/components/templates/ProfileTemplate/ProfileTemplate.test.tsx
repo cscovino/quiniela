@@ -2,11 +2,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { ProfileTemplate } from './ProfileTemplate';
-import { useAuthStore } from '@store/auth-store';
 import { tournamentService } from '@services/tournament-service';
 
+const mockAuthState = {
+  user: null,
+  isAuthLoading: false,
+  isLoading: false,
+  error: null,
+  initAuth: vi.fn(),
+};
+
 vi.mock('@store/auth-store', () => ({
-  useAuthStore: vi.fn(),
+  useAuthStore: vi.fn((selector?: (s: any) => any) =>
+    selector ? selector(mockAuthState) : mockAuthState,
+  ),
 }));
 
 vi.mock('@services/tournament-service', () => ({
@@ -45,11 +54,8 @@ describe('ProfileTemplate', () => {
   });
 
   it('shows login required when not authenticated', () => {
-    vi.mocked(useAuthStore).mockReturnValue({
-      user: null,
-      isAuthLoading: false,
-      initAuth: vi.fn(),
-    });
+    mockAuthState.user = null;
+    mockAuthState.isAuthLoading = false;
 
     render(<ProfileTemplate translations={translations} />);
 
@@ -59,11 +65,8 @@ describe('ProfileTemplate', () => {
   });
 
   it('shows loading spinner while auth is loading', () => {
-    vi.mocked(useAuthStore).mockReturnValue({
-      user: null,
-      isAuthLoading: true,
-      initAuth: vi.fn(),
-    });
+    mockAuthState.user = null;
+    mockAuthState.isAuthLoading = true;
 
     render(<ProfileTemplate translations={translations} />);
 
@@ -78,11 +81,8 @@ describe('ProfileTemplate', () => {
       avatarUrl: '/avatars/carlos.png',
     };
 
-    vi.mocked(useAuthStore).mockReturnValue({
-      user: mockUser,
-      isAuthLoading: false,
-      initAuth: vi.fn(),
-    });
+    mockAuthState.user = mockUser;
+    mockAuthState.isAuthLoading = false;
 
     vi.mocked(tournamentService.getPredictorStats).mockResolvedValue({
       totalPoints: 480,

@@ -8,12 +8,12 @@ import {
   where,
   type Timestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { getDb } from './firebase';
 import type { Predictor } from '@types/firestore';
 
 export const predictorService = {
   async getUserPredictors(userId: string): Promise<Predictor[]> {
-    const predictorsRef = collection(db, 'users', userId, 'predictors');
+    const predictorsRef = collection(getDb(), 'users', userId, 'predictors');
     const snapshot = await getDocs(predictorsRef);
     return snapshot.docs.map((doc) => doc.data() as Predictor);
   },
@@ -27,7 +27,7 @@ export const predictorService = {
       ...(avatarUrl && { avatarUrl }),
     };
 
-    await setDoc(doc(db, 'users', userId, 'predictors', predictorId), {
+    await setDoc(doc(getDb(), 'users', userId, 'predictors', predictorId), {
       ...predictor,
       createdAt: serverTimestamp(),
     });
@@ -36,7 +36,7 @@ export const predictorService = {
   },
 
   async getDefaultPredictor(userId: string): Promise<Predictor | null> {
-    const predictorsRef = collection(db, 'users', userId, 'predictors');
+    const predictorsRef = collection(getDb(), 'users', userId, 'predictors');
     const q = query(predictorsRef, where('id', '==', `${userId}-default`));
     const snapshot = await getDocs(q);
 

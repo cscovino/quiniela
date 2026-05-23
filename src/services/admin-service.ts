@@ -1,5 +1,5 @@
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from './firebase';
+import { getDb } from './firebase';
 import type { MatchStatus } from '../types/firestore';
 
 export const updateMatchResult = async (
@@ -9,7 +9,7 @@ export const updateMatchResult = async (
   awayScore: number | null,
   status: MatchStatus,
 ): Promise<void> => {
-  const matchRef = doc(db, 'tournaments', tournamentId, 'matches', matchId);
+  const matchRef = doc(getDb(), 'tournaments', tournamentId, 'matches', matchId);
 
   const updateData: {
     status: MatchStatus;

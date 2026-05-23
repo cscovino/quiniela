@@ -6,17 +6,43 @@ import {
   signOut,
   sendPasswordResetEmail,
   type UserCredential,
+  type Auth,
+  type User as FirebaseUser,
 } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp, getDoc, Timestamp } from 'firebase/firestore';
-import { auth, db } from './firebase';
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  getDoc,
+  type Firestore,
+  type Timestamp,
+} from 'firebase/firestore';
+import { getAuthInstance, getDb, initFirebase } from './firebase';
 import type { User } from '../types/firestore';
 
-const googleProvider = new GoogleAuthProvider();
+let googleProvider: GoogleAuthProvider | null = null;
+
+function ensureAuth(): Auth {
+  initFirebase().catch(() => {});
+  return getAuthInstance();
+}
+
+function ensureDb(): Firestore {
+  initFirebase().catch(() => {});
+  return getDb();
+}
+
+function getGoogleProvider(): GoogleAuthProvider {
+  if (!googleProvider) {
+    googleProvider = new GoogleAuthProvider();
+  }
+  return googleProvider;
+}
 
 const createDefaultPredictor = async (userId: string, displayName: string) => {
   const predictorId = `${userId}-default`;
-  await setDoc(doc(db, 'users', userId, 'predictors', predictorId), {
-    id: predictorId,
+  await setDoc(doc(ensureDb(), 'users', userId, 'predictors', predictorId), {
+    uid: predictorId,
     userId,
     name: displayName,
     avatarUrl: null,
@@ -32,9 +58,9 @@ export const registerWithEmail = async (
   avatarUrl?: string,
   favoriteTeamId?: string,
 ): Promise<UserCredential> => {
-  const credential = await createUserWithEmailAndPassword(auth, email, password);
+  const credential = await createUserWithEmailAndPassword(ensureAuth(), email, password);
 
-  await setDoc(doc(db, 'users', credential.user.uid), {
+  await setDoc(doc(ensureDb(), 'users', credential.user.uid), {
     uid: credential.user.uid,
     displayName,
     email,
@@ -51,15 +77,15 @@ export const registerWithEmail = async (
 };
 
 export const loginWithEmail = async (email: string, password: string): Promise<UserCredential> => {
-  return signInWithEmailAndPassword(auth, email, password);
+  return signInWithEmailAndPassword(ensureAuth(), email, password);
 };
 
 export const loginWithGoogle = async (): Promise<UserCredential> => {
-  const credential = await signInWithPopup(auth, googleProvider);
+  const credential = await signInWithPopup(ensureAuth(), getGoogleProvider());
 
-  const userDoc = await getDoc(doc(db, 'users', credential.user.uid));
+  const userDoc = await getDoc(doc(ensureDb(), 'users', credential.user.uid));
   if (!userDoc.exists()) {
-    await setDoc(doc(db, 'users', credential.user.uid), {
+    await setDoc(doc(ensureDb(), 'users', credential.user.uid), {
       uid: credential.user.uid,
       displayName: credential.user.displayName || '',
       email: credential.user.email || '',
@@ -77,17 +103,17 @@ export const loginWithGoogle = async (): Promise<UserCredential> => {
 };
 
 export const logout = async (): Promise<void> => {
-  await signOut(auth);
+  await signOut(ensureAuth());
 };
 
 export const resetPassword = async (email: string): Promise<void> => {
-  await sendPasswordResetEmail(auth, email);
+  await sendPasswordResetEmail(ensureAuth(), email);
 };
 
-export const getCurrentUser = () => auth.currentUser;
+export const getCurrentUser = () => ensureAuth().currentUser;
 
 export const onAuthStateChanged = (callback: (user: User | null) => void) => {
-  return auth.onAuthStateChanged((firebaseUser) => {
+  return ensureAuth().onAuthStateChanged((firebaseUser: FirebaseUser | null) => {
     if (firebaseUser) {
       callback({
         uid: firebaseUser.uid,
@@ -95,8 +121,12 @@ export const onAuthStateChanged = (callback: (user: User | null) => void) => {
         email: firebaseUser.email || '',
         avatarUrl: firebaseUser.photoURL || undefined,
         role: 'user',
-        createdAt: Timestamp.now(),
-        lastLoginAt: Timestamp.now(),
+        createdAt: (firebaseUser.metadata.creationTime
+          ? new Date(firebaseUser.metadata.creationTime)
+          : new Date()) as unknown as Timestamp,
+        lastLoginAt: (firebaseUser.metadata.lastSignInTime
+          ? new Date(firebaseUser.metadata.lastSignInTime)
+          : new Date()) as unknown as Timestamp,
       });
     } else {
       callback(null);

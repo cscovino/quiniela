@@ -9,7 +9,7 @@ import {
   getDocs,
   writeBatch,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { getDb } from './firebase';
 import type { MatchBet, KnockoutBet, GroupBet, Match } from '../types/firestore';
 
 const TOURNAMENT_ID = 'world-cup-2026';
@@ -24,7 +24,7 @@ const validateMatchBet = async (
   userId: string,
   predictorId: string,
 ): Promise<BetValidationResult> => {
-  const matchRef = doc(db, 'tournaments', TOURNAMENT_ID, 'matches', matchId);
+  const matchRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'matches', matchId);
   const matchSnap = await getDoc(matchRef);
 
   if (!matchSnap.exists()) {
@@ -42,7 +42,7 @@ const validateMatchBet = async (
   }
 
   const betId = `${predictorId}-${matchId}`;
-  const existingBetRef = doc(db, 'tournaments', TOURNAMENT_ID, 'bets', betId);
+  const existingBetRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'bets', betId);
   const existingBetSnap = await getDoc(existingBetRef);
 
   if (existingBetSnap.exists()) {
@@ -57,7 +57,7 @@ const validateKnockoutBet = async (
   userId: string,
   predictorId: string,
 ): Promise<BetValidationResult> => {
-  const matchRef = doc(db, 'tournaments', TOURNAMENT_ID, 'matches', matchId);
+  const matchRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'matches', matchId);
   const matchSnap = await getDoc(matchRef);
 
   if (!matchSnap.exists()) {
@@ -79,7 +79,7 @@ const validateKnockoutBet = async (
   }
 
   const betId = `${predictorId}-${matchId}`;
-  const existingBetRef = doc(db, 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
+  const existingBetRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
   const existingBetSnap = await getDoc(existingBetRef);
 
   if (existingBetSnap.exists()) {
@@ -94,7 +94,7 @@ const validateGroupBet = async (
   userId: string,
   predictorId: string,
 ): Promise<BetValidationResult> => {
-  const matchesRef = collection(db, 'tournaments', TOURNAMENT_ID, 'matches');
+  const matchesRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches');
   const q = query(matchesRef, where('groupId', '==', groupId));
   const matchesSnap = await getDocs(q);
 
@@ -106,7 +106,7 @@ const validateGroupBet = async (
   }
 
   const betId = `${predictorId}-${groupId}`;
-  const existingBetRef = doc(db, 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
+  const existingBetRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
   const existingBetSnap = await getDoc(existingBetRef);
 
   if (existingBetSnap.exists()) {
@@ -142,7 +142,7 @@ export const predictionService = {
         isWinner: false,
       };
 
-      const betRef = doc(db, 'tournaments', TOURNAMENT_ID, 'bets', betId);
+      const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'bets', betId);
       await setDoc(betRef, {
         ...betData,
         createdAt: serverTimestamp(),
@@ -179,7 +179,7 @@ export const predictionService = {
         points: 0,
       };
 
-      const betRef = doc(db, 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
+      const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
       await setDoc(betRef, {
         ...betData,
         createdAt: serverTimestamp(),
@@ -215,7 +215,7 @@ export const predictionService = {
         points: 0,
       };
 
-      const betRef = doc(db, 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
+      const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
       await setDoc(betRef, {
         ...betData,
         createdAt: serverTimestamp(),
@@ -241,7 +241,7 @@ export const predictionService = {
     let successCount = 0;
     let errorCount = 0;
 
-    const batch = writeBatch(db);
+    const batch = writeBatch(getDb());
 
     for (const [matchId, prediction] of Object.entries(predictions)) {
       const match = matches.find((m) => m.id === matchId || m.slug === matchId);
@@ -265,7 +265,7 @@ export const predictionService = {
         }
 
         const betId = `${predictorId}-${matchId}`;
-        const betRef = doc(db, 'tournaments', TOURNAMENT_ID, 'bets', betId);
+        const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'bets', betId);
 
         batch.set(betRef, {
           userId,
@@ -285,7 +285,7 @@ export const predictionService = {
         }
 
         const betId = `${predictorId}-${matchId}`;
-        const betRef = doc(db, 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
+        const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
 
         batch.set(betRef, {
           userId,
@@ -322,7 +322,7 @@ export const predictionService = {
     const errors: string[] = [];
     let successCount = 0;
 
-    const batch = writeBatch(db);
+    const batch = writeBatch(getDb());
 
     for (const [groupId, positions] of Object.entries(predictions)) {
       if (!positions || positions.length !== 4) {
@@ -331,7 +331,7 @@ export const predictionService = {
       }
 
       const betId = `${predictorId}-${groupId}`;
-      const betRef = doc(db, 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
+      const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
 
       batch.set(betRef, {
         userId,
@@ -372,7 +372,7 @@ export const predictionService = {
     const knockoutBets = new Map<string, string>();
     const groupBets = new Map<string, string[]>();
 
-    const matchBetsRef = collection(db, 'tournaments', TOURNAMENT_ID, 'bets');
+    const matchBetsRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'bets');
     const matchBetsQuery = query(matchBetsRef, where('predictorId', '==', predictorId));
     const matchBetsSnap = await getDocs(matchBetsQuery);
 
@@ -383,7 +383,7 @@ export const predictionService = {
       }
     }
 
-    const knockoutBetsRef = collection(db, 'tournaments', TOURNAMENT_ID, 'knockout_bets');
+    const knockoutBetsRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'knockout_bets');
     const knockoutBetsQuery = query(knockoutBetsRef, where('predictorId', '==', predictorId));
     const knockoutBetsSnap = await getDocs(knockoutBetsQuery);
 
@@ -394,7 +394,7 @@ export const predictionService = {
       }
     }
 
-    const groupBetsRef = collection(db, 'tournaments', TOURNAMENT_ID, 'group_bets');
+    const groupBetsRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'group_bets');
     const groupBetsQuery = query(groupBetsRef, where('predictorId', '==', predictorId));
     const groupBetsSnap = await getDocs(groupBetsQuery);
 
