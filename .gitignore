@@ -34,4 +34,8 @@ storybook-static
 
 # Firebase
 .firebase-sessions
+.firebase/
 functions/lib/
+
+# OMC
+.omc/

@@ -1,25 +1,10 @@
-const CACHE_NAME = 'quiniela-v2';
-const STATIC_CACHE = 'quiniela-static-v2';
-const DYNAMIC_CACHE = 'quiniela-dynamic-v2';
+const CACHE_NAME = 'quiniela-v3';
+const STATIC_CACHE = 'quiniela-static-v3';
+const DYNAMIC_CACHE = 'quiniela-dynamic-v3';
 
 const STATIC_ASSETS = [
-  '/',
-  '/en/',
-  '/predicciones/',
-  '/en/predictions/',
-  '/clasificacion/',
-  '/en/rankings/',
-  '/perfil/',
-  '/en/profile/',
-  '/torneo/',
-  '/en/tournament/',
-  '/login/',
-  '/en/login/',
-  '/register/',
-  '/en/register/',
   '/manifest.json',
   '/fonts/PressStart2P.woff2',
-  '/fonts/Inter-Regular.woff2',
 ];
 
 const FIREBASE_HOSTS = [
@@ -73,6 +58,16 @@ self.addEventListener('fetch', (event) => {
 
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
+
+  // Skip dev server paths (Vite HMR, source modules, dependency cache)
+  if (
+    url.pathname.startsWith('/src/') ||
+    url.pathname.startsWith('/@') ||
+    url.pathname.startsWith('/node_modules/') ||
+    url.pathname === '/sw.js'
+  ) {
+    return;
+  }
 
   // Navigation requests: network-first, fallback to cache
   if (event.request.mode === 'navigate') {

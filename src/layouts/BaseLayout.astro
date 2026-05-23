@@ -2,7 +2,12 @@
 import '@styles/global.css';
 import NavBar from '@organisms/NavBar/NavBar.astro';
 import { ToastProvider } from '@organisms/ToastProvider/ToastProvider';
-import type { NavLinks } from '@organisms/NavBar/NavBar';
+
+interface NavLinks {
+  href: string;
+  label: string;
+  active: boolean;
+}
 
 export interface Props {
   locale: 'en' | 'es';
@@ -57,6 +62,7 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#00bfff" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Quiniela" />
     <meta
@@ -82,9 +88,6 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
     <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://firebase.googleapis.com" crossorigin />
     <link rel="dns-prefetch" href="https://fcm.googleapis.com" />
-
-    <!-- Module Preload for critical scripts -->
-    <link rel="modulepreload" href="/_astro/src/services/firebase.ts" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={type} />
