@@ -16,6 +16,15 @@ export default defineConfig({
   experimental: {
     clientPrerender: true,
   },
+  image: {
+    domains: ['flagicons.lipis.dev', 'flagcdn.com', 'upload.wikimedia.org'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.flagcdn.com',
+      },
+    ],
+  },
   vite: {
     resolve: {
       alias: {

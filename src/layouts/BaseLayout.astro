@@ -78,6 +78,23 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     <link rel="preload" href="/fonts/PressStart2P.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Inter-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/fonts/Inter-SemiBold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="preload" href="/fonts/Inter-Bold.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- DNS Preconnect for Firebase -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://firebase.googleapis.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fcm.googleapis.com" />
+
+    <!-- Module Preload for critical scripts -->
+    <link rel="modulepreload" href="/_astro/src/services/firebase.ts" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={type} />
@@ -146,6 +163,23 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js');
+        });
+      }
+
+      // Performance monitoring
+      if ('PerformanceObserver' in window) {
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            const nav = performance.getEntriesByType('navigation')[0];
+            if (nav) {
+              const metrics = {
+                ttfb: Math.round(nav.responseStart - nav.requestStart),
+                domInteractive: Math.round(nav.domInteractive - nav.startTime),
+                loadComplete: Math.round(nav.loadEventEnd - nav.startTime),
+              };
+              console.debug('[Performance]', metrics);
+            }
+          }, 0);
         });
       }
     </script>
