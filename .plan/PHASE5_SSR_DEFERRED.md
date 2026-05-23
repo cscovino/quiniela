@@ -1,26 +1,39 @@
-# Phase 5: SSR - Deferred
+# Phase 5: SSR - Deferred (Updated 2026-05-23)
 
-## Status
-**DEFERRED** - Requires server adapter which conflicts with static hosting ($0 cost) requirement.
+## Decision: Static + Cloud Functions (NOT SSR)
 
-## What's Ready
-- ✅ Firebase Admin SDK installed (`firebase-admin`)
-- ✅ Admin utilities created (`src/lib/firebase-admin.ts`)
-- ✅ Middleware with auth guard structure (`src/middleware.ts`)
-- ✅ Locals interface defined for user context
+After completing Phases 0-4, we confirmed that **static hosting + Cloud Function endpoints** is the correct architecture for Quiniela. SSR is explicitly deferred indefinitely.
 
-## Blockers
-- SSR requires `output: 'server'` + server adapter
-- Firebase Hosting static mode doesn't support SSR
-- Need to choose: Firebase Functions adapter, Node adapter, or different host
+## Why not SSR?
 
-## When to Implement
-1. When deployment target supports SSR (Firebase Functions, Vercel, Node server)
-2. When server-side auth guards are needed
-3. When user-specific data should be pre-rendered
+- **Cost**: SSR requires Firebase Functions/Run adapter → cold starts, per-invocation billing
+- **Complexity**: SSR adds server-side rendering complexity for minimal benefit
+- **Free tier**: Static hosting is free; SSR would exceed free tier limits
+- **Performance**: CDN-cached static HTML + edge-cached JSON endpoints = faster than SSR
 
-## Alternative (Current Approach)
-- Client-side auth with Firebase Auth
-- API routes for cached data (`/api/matches`, `/api/rankings`)
-- Protected pages use client-side `AuthGuard` component
-- Middleware provides locale detection for static pages
+## Current Architecture (Target State)
+
+```
+Firebase Hosting (CDN)
+  ├─ Static HTML (Astro build) — cached 1 year (immutable)
+  ├─ Edge-cached JSON via Functions:
+  │    /api/standings  (s-maxage=60)
+  │    /api/rankings   (s-maxage=60)
+  │    /api/live       (s-maxage=30)
+  └─ Security headers via firebase.json
+```
+
+## What replaced SSR needs
+
+| SSR Need | Current Solution |
+|----------|-----------------|
+| Server-side auth guards | Client-side AuthGuard + NavBar auth bootstrap |
+| Pre-rendered user data | Build-time data via `build-data.ts` (stale shell) |
+| Dynamic content | Cloud Function endpoints with CDN caching |
+| Locale detection | Static page pairs (es/en) — no middleware needed |
+
+## When to reconsider SSR
+
+1. If real-time personalization becomes critical (e.g., personalized homepages)
+2. If SEO requires server-rendered auth-gated content
+3. If deployment budget increases beyond free tier

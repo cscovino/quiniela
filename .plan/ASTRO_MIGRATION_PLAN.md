@@ -6,7 +6,7 @@ Migrate from React-heavy architecture to Astro-native components, leveraging the
 
 **Goal:** Zero-JS by default, React only where interactivity requires it.
 
-**Status:** Phase 0 & Quick Wins IN PROGRESS (4/5 complete)
+**Status:** COMPLETED - 2026-05-23. Superseded by REMEDIATION_PLAN.md
 
 ---
 
