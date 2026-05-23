@@ -65,10 +65,6 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Quiniela" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com https://fcmregistrations.googleapis.com https://fcm.googleapis.com wss://*.firebaseio.com;"
-    />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={fullUrl} />
@@ -159,52 +155,12 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
         });
       }
 
-      // Initialize Firebase auth and dispatch state changes
-      // TODO: Re-enable after fixing React hooks error
-      // Defer until after React hydration to avoid conflicts
-      /*
-      window.addEventListener('load', () => {
-        setTimeout(async () => {
-          try {
-            const firebaseModule = await import('@services/firebase');
-            const authModule = await import('firebase/auth');
-            const firestoreModule = await import('firebase/firestore');
+      // Initialize Firebase auth and subscribe to state changes
+      // Single auth bootstrap loaded lazily by auth-gated routes
+      // See src/store/auth-store.ts for the centralized auth init
 
-            const { auth } = firebaseModule;
-            const { onAuthStateChanged } = authModule;
-            const { db } = firebaseModule;
-            const { doc, getDoc } = firestoreModule;
-
-            onAuthStateChanged(auth, async (firebaseUser) => {
-              if (firebaseUser) {
-                getDoc(doc(db, 'users', firebaseUser.uid)).then((userDoc) => {
-                  const userData = userDoc.exists() ? userDoc.data() : {};
-                  window.dispatchEvent(new CustomEvent('authStateChanged', {
-                    detail: {
-                      user: {
-                        uid: firebaseUser.uid,
-                        displayName: firebaseUser.displayName || userData.displayName || '',
-                        email: firebaseUser.email || '',
-                        role: userData.role || 'user',
-                      }
-                    }
-                  }));
-                });
-              } else {
-                window.dispatchEvent(new CustomEvent('authStateChanged', {
-                  detail: { user: null }
-                }));
-              }
-            });
-          } catch (error) {
-            console.error('Auth initialization failed:', error);
-          }
-        }, 100);
-      });
-      */
-
-      // Performance monitoring
-      if ('PerformanceObserver' in window) {
+      // Performance monitoring (dev only)
+      if ('PerformanceObserver' in window && import.meta.env.DEV) {
         window.addEventListener('load', () => {
           setTimeout(() => {
             const nav = performance.getEntriesByType('navigation')[0];
@@ -214,6 +170,7 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
                 domInteractive: Math.round(nav.domInteractive - nav.startTime),
                 loadComplete: Math.round(nav.loadEventEnd - nav.startTime),
               };
+              // eslint-disable-next-line no-console
               console.debug('[Performance]', metrics);
             }
           }, 0);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useAuthStore } from '../auth-store';
+import { useAuthStore, __resetAuthStore } from '../auth-store';
 import * as authHelpers from '../../services/auth-helpers';
 
 vi.mock('../../services/auth-helpers', () => ({
@@ -15,6 +15,7 @@ vi.mock('../../services/auth-helpers', () => ({
 describe('auth-store', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    __resetAuthStore();
     useAuthStore.setState({
       user: null,
       isLoading: false,

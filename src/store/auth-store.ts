@@ -23,6 +23,13 @@ interface AuthState {
   initAuth: () => void;
 }
 
+let unsubscribe: (() => void) | null = null;
+
+export function __resetAuthStore() {
+  unsubscribe?.();
+  unsubscribe = null;
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: false,
@@ -102,7 +109,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   clearError: () => set({ error: null }),
 
   initAuth: () => {
-    onAuthStateChanged((user) => {
+    if (unsubscribe) return;
+    unsubscribe = onAuthStateChanged((user) => {
       set({ user, isAuthLoading: false });
     });
   },
