@@ -17,5 +17,6 @@ export { checkAndAwardBadges } from './checkAndAwardBadges';
 export { standings } from './api/standings';
 export { rankings } from './api/rankings';
 export { live } from './api/live';
+export { setUserRole } from './api/setUserRole';
 
 export { db };

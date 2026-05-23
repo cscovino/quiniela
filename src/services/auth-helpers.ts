@@ -113,14 +113,21 @@ export const resetPassword = async (email: string): Promise<void> => {
 export const getCurrentUser = () => ensureAuth().currentUser;
 
 export const onAuthStateChanged = (callback: (user: User | null) => void) => {
-  return ensureAuth().onAuthStateChanged((firebaseUser: FirebaseUser | null) => {
+  return ensureAuth().onAuthStateChanged(async (firebaseUser: FirebaseUser | null) => {
     if (firebaseUser) {
+      let role = 'user';
+      try {
+        const idTokenResult = await firebaseUser.getIdTokenResult();
+        role = ((idTokenResult.claims as Record<string, unknown>).role as string) || 'user';
+      } catch {
+        // Fallback to default role if token refresh fails
+      }
       callback({
         uid: firebaseUser.uid,
         displayName: firebaseUser.displayName || '',
         email: firebaseUser.email || '',
         avatarUrl: firebaseUser.photoURL || undefined,
-        role: 'user',
+        role,
         createdAt: (firebaseUser.metadata.creationTime
           ? new Date(firebaseUser.metadata.creationTime)
           : new Date()) as unknown as Timestamp,

@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -11,7 +11,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const functions = getFunctions(app);
 
 const userId = process.argv[2];
 
@@ -21,16 +21,16 @@ if (!userId) {
 }
 
 async function setAdminRole() {
-  const userRef = doc(db, 'users', userId);
-  const userDoc = await getDoc(userRef);
+  const setUserRole = httpsCallable(functions, 'setUserRole');
 
-  if (!userDoc.exists()) {
-    console.error(`User ${userId} not found`);
+  try {
+    const result = await setUserRole({ uid: userId, role: 'admin' });
+    console.log(`✅ User ${userId} is now an admin`);
+    console.log('Result:', result.data);
+  } catch (error: any) {
+    console.error('❌ Failed:', error.message);
     process.exit(1);
   }
-
-  await updateDoc(userRef, { role: 'admin' });
-  console.log(`✅ User ${userId} is now an admin`);
 }
 
 setAdminRole().catch((err) => {
