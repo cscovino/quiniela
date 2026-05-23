@@ -1,10 +1,47 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import HomePage from '@pages/HomePage.astro';
+import { HomeTemplate } from '@templates/HomeTemplate/HomeTemplate';
+import { getBuildData } from '@lib/build-data';
 import en from '@locales/en/common.json';
 
 const locale = 'en';
 const translations = en;
+
+const buildData = await getBuildData();
+
+const templateProps = {
+  tournamentProps: {
+    name: 'FIFA World Cup 2026',
+    status: 'active' as const,
+    startDate: new Date('2026-06-11'),
+    endDate: new Date('2026-07-19'),
+    participantCount: 48,
+    translations: {
+      teams: 'teams',
+    },
+  },
+  matches: buildData.matches,
+  rankings: [],
+  translations: {
+    heroTitle: 'Predict. Compete. Win.',
+    heroSubtitle: 'Make your predictions for every match and climb the leaderboard!',
+    ctaPredictions: 'Make Predictions',
+    ctaStandings: 'View Standings',
+    matchesTitle: 'Upcoming Matches',
+    rankingsTitle: 'Top Players',
+    loginToPredict: 'Login to make predictions and compete!',
+    loginToRankings: 'Login to see the rankings',
+    matchList: {
+      scheduled: 'Scheduled',
+      live: 'LIVE',
+      finished: 'Finished',
+      postponed: 'Postponed',
+      cancelled: 'Cancelled',
+      vs: 'VS',
+    },
+  },
+  locale,
+};
 ---
 
 <BaseLayout
@@ -13,5 +50,5 @@ const translations = en;
   description={translations.pages.home.description}
   activeNav="home"
 >
-  <HomePage locale={locale} />
+  <HomeTemplate {...templateProps} client:idle />
 </BaseLayout>

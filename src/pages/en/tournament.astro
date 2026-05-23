@@ -5,6 +5,27 @@ import en from '@locales/en/common.json';
 
 const locale = 'en';
 const translations = en;
+
+const templateProps = {
+  translations: {
+    title: 'Tournament',
+    standingsTab: 'Standings',
+    matchesTab: 'Matches',
+    groupStageTitle: 'Group Stage',
+    allMatchesTitle: 'All Matches',
+    noStandings: 'No standings available',
+    noMatches: 'No matches available',
+    matchList: {
+      scheduled: 'Scheduled',
+      live: 'LIVE',
+      finished: 'Finished',
+      postponed: 'Postponed',
+      cancelled: 'Cancelled',
+      vs: 'VS',
+    },
+  },
+  locale,
+};
 ---
 
 <BaseLayout
@@ -14,25 +35,5 @@ const translations = en;
     'Group standings and tournament matches'}
   activeNav="tournament"
 >
-  <TournamentTemplate
-    client:idle
-    locale={locale}
-    translations={{
-      title: 'Tournament',
-      standingsTab: 'Standings',
-      matchesTab: 'Matches',
-      groupStageTitle: 'Group Stage',
-      allMatchesTitle: 'All Matches',
-      noStandings: 'No standings available',
-      noMatches: 'No matches available',
-      matchList: {
-        scheduled: 'Scheduled',
-        live: 'LIVE',
-        finished: 'Finished',
-        postponed: 'Postponed',
-        cancelled: 'Cancelled',
-        vs: 'VS',
-      },
-    }}
-  />
+  <TournamentTemplate {...templateProps} client:idle />
 </BaseLayout>

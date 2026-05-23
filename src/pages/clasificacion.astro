@@ -1,10 +1,19 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import RankingsPage from '@pages/RankingsPage.astro';
+import { RankingsTemplate } from '@templates/RankingsTemplate/RankingsTemplate';
 import es from '@locales/es/common.json';
 
 const locale = 'es';
 const translations = es;
+
+const templateProps = {
+  translations: {
+    title: 'Clasificación de Pronosticadores',
+    noRankings: '¡Aún no hay clasificación. ¡Haz predicciones para aparecer aquí!',
+    loading: 'Cargando clasificación...',
+  },
+  locale,
+};
 ---
 
 <BaseLayout
@@ -13,5 +22,5 @@ const translations = es;
   description={translations.pages.rankings.description}
   activeNav="rankings"
 >
-  <RankingsPage locale={locale} />
+  <RankingsTemplate {...templateProps} client:idle />
 </BaseLayout>

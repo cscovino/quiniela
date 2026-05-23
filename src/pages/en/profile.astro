@@ -1,10 +1,32 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import ProfilePage from '@pages/ProfilePage.astro';
+import { ProfileTemplate } from '@templates/ProfileTemplate/ProfileTemplate';
 import en from '@locales/en/common.json';
 
 const locale = 'en';
 const translations = en;
+
+const templateProps = {
+  translations: {
+    title: 'My Profile',
+    loading: 'Loading profile...',
+    loginRequired: 'You need to login to view your profile',
+    loginButton: 'Login',
+    totalPoints: 'Total Points',
+    accuracy: 'Accuracy',
+    currentStreak: 'Current Streak',
+    bestStreak: 'Best Streak',
+    exactBets: 'Exact Bets',
+    rank: 'Rank',
+    badges: 'Badges',
+    lockedBadges: 'Locked',
+    pointsChart: 'Points Evolution',
+    noPointsData: 'No points data yet',
+    points: 'Points',
+    matches: 'Matches',
+  },
+  locale,
+};
 ---
 
 <BaseLayout
@@ -13,5 +35,5 @@ const translations = en;
   description={translations.pages.profile.description}
   activeNav="profile"
 >
-  <ProfilePage locale={locale} />
+  <ProfileTemplate {...templateProps} client:idle />
 </BaseLayout>

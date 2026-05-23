@@ -18,7 +18,8 @@
       "@store/*": ["./src/store/*"],
       "@services/*": ["./src/services/*"],
       "@types/*": ["./src/types/*"],
-      "@locales/*": ["./src/locales/*"]
+      "@locales/*": ["./src/locales/*"],
+      "@lib/*": ["./src/lib/*"]
     },
     "resolveJsonModule": true
   },
