@@ -64,11 +64,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
     try {
       await login(email, password);
-      window.dispatchEvent(
-        new CustomEvent('authStateChanged', {
-          detail: { user: useAuthStore.getState().user },
-        }),
-      );
       window.location.href = redirectUrl;
     } catch {
       // Error handled by store
@@ -79,11 +74,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     clearError();
     try {
       await loginWithGoogle();
-      window.dispatchEvent(
-        new CustomEvent('authStateChanged', {
-          detail: { user: useAuthStore.getState().user },
-        }),
-      );
       window.location.href = redirectUrl;
     } catch {
       // Error handled by store

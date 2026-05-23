@@ -1,92 +1,115 @@
 import { useAuthStore } from '@store/auth-store';
 import { initAuth, getCachedAuthUid } from '@services/auth-bootstrap';
+import type { User } from '@types/firestore';
 
-const hamburgerBtn = document.getElementById('hamburger-btn');
-const mobileMenu = document.getElementById('mobile-menu');
-const themeToggle = document.getElementById('theme-toggle');
-const hamburgerOpen = hamburgerBtn?.querySelector('.hamburger-open');
-const hamburgerClose = hamburgerBtn?.querySelector('.hamburger-close');
+let authUnsubscribe: (() => void) | null = null;
 
-hamburgerBtn?.addEventListener('click', () => {
-  const isOpen = mobileMenu?.style.display !== 'none';
-  if (mobileMenu) {
-    mobileMenu.style.display = isOpen ? 'none' : 'block';
-  }
-  hamburgerBtn.setAttribute('aria-expanded', String(!isOpen));
-  if (hamburgerOpen && hamburgerClose) {
-    hamburgerOpen.style.display = isOpen ? 'block' : 'none';
-    hamburgerClose.style.display = isOpen ? 'none' : 'block';
-  }
-});
-
-document.querySelectorAll('[data-close-menu]').forEach((link) => {
-  link.addEventListener('click', () => {
-    if (mobileMenu) {
-      mobileMenu.style.display = 'none';
-    }
-    hamburgerBtn?.setAttribute('aria-expanded', 'false');
-    if (hamburgerOpen && hamburgerClose) {
-      hamburgerOpen.style.display = 'block';
-      hamburgerClose.style.display = 'none';
-    }
-  });
-});
-
-themeToggle?.addEventListener('click', () => {
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-});
-
-// Auth visibility toggling
-const links = document.querySelector('[data-auth-links]');
-const desktopUser = document.querySelector('[data-auth-desktop]');
-const desktopLogin = document.querySelector('[data-auth-login]');
-const mobileLinks = document.querySelector('[data-auth-mobile-links]');
-const mobileUser = document.querySelector('[data-auth-mobile-user]');
-const mobileCta = document.querySelector('[data-auth-mobile-cta]');
-const mobileLoginCta = document.querySelector('[data-auth-mobile-login-cta]');
-const usernameEls = document.querySelectorAll('[data-auth-username], [data-auth-mobile-username]');
-
-function render(user) {
+function render(user: User | null, els: ReturnType<typeof queryElements>) {
   // Public links: always visible
-  if (links) links.style.display = '';
-  if (mobileLinks) mobileLinks.style.display = '';
+  if (els.links) els.links.style.display = 'flex';
+  if (els.mobileLinks) els.mobileLinks.style.display = 'flex';
 
   if (user) {
-    if (desktopUser) desktopUser.style.display = '';
-    if (desktopLogin) desktopLogin.style.display = 'none';
-    if (mobileUser) mobileUser.style.display = '';
-    if (mobileCta) mobileCta.style.display = '';
-    if (mobileLoginCta) mobileLoginCta.style.display = 'none';
-    usernameEls.forEach((el) => {
+    if (els.desktopUser) els.desktopUser.style.display = 'flex';
+    if (els.desktopLogin) els.desktopLogin.style.display = 'none';
+    if (els.mobileUser) els.mobileUser.style.display = 'flex';
+    if (els.mobileCta) els.mobileCta.style.display = 'flex';
+    if (els.mobileLoginCta) els.mobileLoginCta.style.display = 'none';
+    els.usernameEls.forEach((el) => {
       el.textContent = user.displayName || user.email || '';
     });
   } else {
-    if (desktopUser) desktopUser.style.display = 'none';
-    if (desktopLogin) desktopLogin.style.display = '';
-    if (mobileUser) mobileUser.style.display = 'none';
-    if (mobileCta) mobileCta.style.display = 'none';
-    if (mobileLoginCta) mobileLoginCta.style.display = '';
+    if (els.desktopUser) els.desktopUser.style.display = 'none';
+    if (els.desktopLogin) els.desktopLogin.style.display = 'inline-block';
+    if (els.mobileUser) els.mobileUser.style.display = 'none';
+    if (els.mobileCta) els.mobileCta.style.display = 'none';
+    if (els.mobileLoginCta) els.mobileLoginCta.style.display = 'flex';
   }
 }
 
-// Use localStorage hint for instant initial render
-const cachedUid = getCachedAuthUid();
-const cachedUser = useAuthStore.getState().user;
-render(cachedUser || (cachedUid ? { uid: cachedUid, displayName: '', email: '' } : null));
+function queryElements() {
+  return {
+    hamburgerBtn: document.getElementById('hamburger-btn'),
+    mobileMenu: document.getElementById('mobile-menu'),
+    themeToggle: document.getElementById('theme-toggle'),
+    links: document.querySelector('[data-auth-links]'),
+    desktopUser: document.querySelector('[data-auth-desktop]'),
+    desktopLogin: document.querySelector('[data-auth-login]'),
+    mobileLinks: document.querySelector('[data-auth-mobile-links]'),
+    mobileUser: document.querySelector('[data-auth-mobile-user]'),
+    mobileCta: document.querySelector('[data-auth-mobile-cta]'),
+    mobileLoginCta: document.querySelector('[data-auth-mobile-login-cta]'),
+    usernameEls: document.querySelectorAll('[data-auth-username], [data-auth-mobile-username]'),
+    logoutBtn: document.getElementById('logout-btn'),
+    mobileLogoutBtn: document.getElementById('mobile-logout-btn'),
+  };
+}
 
-// Subscribe to auth state changes
-useAuthStore.subscribe((state) => render(state.user));
+function setup() {
+  const els = queryElements();
+  const hamburgerOpen = els.hamburgerBtn?.querySelector('.hamburger-open');
+  const hamburgerClose = els.hamburgerBtn?.querySelector('.hamburger-close');
 
-// Logout buttons
-document
-  .getElementById('logout-btn')
-  ?.addEventListener('click', () => useAuthStore.getState().logout());
-document
-  .getElementById('mobile-logout-btn')
-  ?.addEventListener('click', () => useAuthStore.getState().logout());
+  // Hamburger toggle
+  els.hamburgerBtn?.addEventListener('click', () => {
+    const isOpen = els.mobileMenu?.style.display !== 'none';
+    if (els.mobileMenu) {
+      els.mobileMenu.style.display = isOpen ? 'none' : 'block';
+    }
+    els.hamburgerBtn!.setAttribute('aria-expanded', String(!isOpen));
+    if (hamburgerOpen && hamburgerClose) {
+      hamburgerOpen.style.display = isOpen ? 'block' : 'none';
+      hamburgerClose.style.display = isOpen ? 'none' : 'block';
+    }
+  });
 
-// Kick off the single auth bootstrap (idempotent)
-initAuth();
+  // Close menu on link click
+  document.querySelectorAll('[data-close-menu]').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (els.mobileMenu) {
+        els.mobileMenu.style.display = 'none';
+      }
+      els.hamburgerBtn?.setAttribute('aria-expanded', 'false');
+      if (hamburgerOpen && hamburgerClose) {
+        hamburgerOpen.style.display = 'block';
+        hamburgerClose.style.display = 'none';
+      }
+    });
+  });
+
+  // Theme toggle
+  els.themeToggle?.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+
+  // Auth visibility
+  const cachedUid = getCachedAuthUid();
+  const cachedUser = useAuthStore.getState().user;
+  render(
+    cachedUser || (cachedUid ? ({ uid: cachedUid, displayName: '', email: '' } as User) : null),
+    els,
+  );
+
+  // Subscribe to auth state changes
+  authUnsubscribe = useAuthStore.subscribe((state) => render(state.user, els));
+
+  // Logout buttons
+  els.logoutBtn?.addEventListener('click', () => useAuthStore.getState().logout());
+  els.mobileLogoutBtn?.addEventListener('click', () => useAuthStore.getState().logout());
+
+  // Kick off the single auth bootstrap (idempotent)
+  initAuth();
+}
+
+// First page load
+setup();
+
+// Re-bind after every view transition
+document.addEventListener('astro:page-load', () => {
+  authUnsubscribe?.();
+  authUnsubscribe = null;
+  setup();
+});

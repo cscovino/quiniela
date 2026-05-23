@@ -1,395 +1,288 @@
-# Quiniela — Remediation Plan
+# Quiniela — Consolidated Remediation Plan
 
-> Post-migration architectural cleanup. Anchored to the actual deployment target:
-> **Astro static build + Firebase Hosting CDN + Firebase Cloud Functions (free tier)**.
+> Source of truth for remaining work after Phase 0 + significant Phase 1/3/4 progress.
+> Last re-audited: 2026-05-23.
 
-## Goals
+## Current state snapshot
 
-1. **Use Astro for what it's best at**: static HTML, Content Collections, partial hydration via islands.
-2. **Use React only where interactivity demands it**: auth flows, prediction forms, profile, admin.
-3. **Use Cloud Functions only for what changes daily**: standings, rankings, live match results — read-only, edge-cached endpoints.
-4. **Stay inside Firebase free tiers**: Hosting CDN, Functions (2M invocations/mo), Firestore reads (50k/day).
-5. **Stop client-side Firebase SDK from loading on public, anonymous-visible pages.**
+### Already shipped
 
-## Architecture (target state)
+| Area | Status |
+|------|--------|
+| Phase 0 — Hosting hygiene | DONE (commit `0002dbd`) — except cosmetic `rmdir src/pages/api/` |
+| Phase 1.1 — Cloud Function endpoints `/api/{standings,rankings,live}` | DONE — `functions/src/api/*.ts`, exported from `functions/src/index.ts` |
+| Phase 1.3 — Single auth bootstrap (`auth-bootstrap.ts`) | DONE — `src/services/auth-bootstrap.ts` exists; per-template `initAuth()` calls removed |
+| Phase 3.2 (partial) — Admin role via custom claims | MOSTLY DONE — `auth-helpers.ts:118-124` reads from `idTokenResult.claims.role`; `setUserRole` Cloud Function exists |
+| Phase 4.2 — SW shrink to PWA shell | DONE — `public/sw.js` = 85 lines, PWA shell only |
+| Phase 4.3 (partial) — Orphan deletion | DONE for `PWAInstall`, `BracketView`, `StandingsTemplate`, `AuthGuard` (already removed) |
+| `auth-store.ts` listener leak fix | DONE — `:26-43, 123-129` (idempotent + cached unsubscribe) |
+| `<ClientRouter />` adopted | DONE — `BaseLayout.astro:106` (introduces the new NavBar bug; see S1.1) |
 
-```
-                ┌──────────────────────────────────────────────────┐
-                │              Firebase Hosting (CDN)              │
-                │                                                  │
-                │   Static HTML (Astro build)                      │
-                │     ├─ Home, Tournament, Rankings shells         │
-                │     ├─ Login, Register, Predictions, Profile     │
-                │     │   pages (React island only on these)       │
-                │     └─ /_astro/* hashed assets (immutable)       │
-                │                                                  │
-                │   Edge-cached JSON (via Functions rewrite)       │
-                │     /api/standings   s-maxage=60                 │
-                │     /api/rankings    s-maxage=60                 │
-                │     /api/live        s-maxage=30                 │
-                └────────────────────┬─────────────────────────────┘
-                                     │
-                       cache miss / revalidate
-                                     │
-                                     ▼
-        ┌────────────────────────────────────────────────────┐
-        │            Firebase Cloud Functions                │
-        │                                                    │
-        │   HTTPS readers (NEW):                             │
-        │     standings.ts → reads groupStandings/*          │
-        │     rankings.ts  → reads predictorStats/*          │
-        │     live.ts      → reads matches/* where status=live│
-        │                                                    │
-        │   Firestore triggers (EXISTING, untouched):        │
-        │     calculateMatchResult                           │
-        │     updateGroupStandings  ─► writes aggregates     │
-        │     updatePredictorStats  ─► writes aggregates     │
-        │     checkAndAwardBadges                            │
-        └────────────────────┬───────────────────────────────┘
-                             │
-                             ▼
-                       ┌──────────┐
-                       │ Firestore│
-                       └──────────┘
-```
+### Active production blockers (do first)
 
-**Key idea**: background triggers already maintain the aggregates. HTTPS functions just expose them. The CDN does the caching. The client never touches the Firebase SDK to view tournament state.
-
-## Data freshness mapping
-
-| Data | Cadence | Source |
-|------|---------|--------|
-| Teams, groups | Static for tournament | Content Collections (`src/content/`) |
-| Match schedule | Rare changes | Content Collections + nightly rebuild |
-| Match results | Per-match | `/api/live` (Function, 30s edge cache) |
-| Group standings | After each match | `/api/standings` (Function, 60s edge cache) |
-| User leaderboard | After each match | `/api/rankings` (Function, 60s edge cache) |
-| User predictions | On submit | Firestore client SDK (auth-gated route only) |
-| User profile | On edit | Firestore client SDK (auth-gated route only) |
+1. **NavBar disappears after view transitions** — script's module-level DOM queries don't re-bind on `astro:page-load`.
+2. **CSP `style-src 'self'` will break Astro scoped styles in production** — Astro inlines `<style>` per component; without `'unsafe-inline'` or nonces this gets blocked.
+3. **Desktop `[data-auth-desktop]` / `[data-auth-login]` still hidden** by CSS even when the script runs correctly.
 
 ---
 
-## Phase 0 — Hosting hygiene (1 day)
+## Sprint 1 — Fix production blockers (1 day)
 
-Stop the active bleeding. Pure config changes, no app logic.
+### S1.1 — NavBar re-binds on view transitions
 
-| # | Task | File |
-|---|------|------|
-| 0.1 | Remove the SPA catch-all rewrite | `firebase.json` `hosting.rewrites` |
-| 0.2 | Add `headers`: `_astro/**` → `Cache-Control: public, max-age=31536000, immutable` | `firebase.json` |
-| 0.3 | Add `headers`: `**/*.html` → `Cache-Control: no-cache, must-revalidate` | `firebase.json` |
-| 0.4 | Add `headers`: security headers (`X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`) | `firebase.json` |
-| 0.5 | Move CSP from `<meta>` to `firebase.json` headers; keep `'unsafe-eval'` (Firebase Auth needs it), audit `'unsafe-inline'` removal next phase | `firebase.json`, `src/layouts/BaseLayout.astro:68-71` |
-| 0.6 | Set `cleanUrls: true`, `trailingSlash: false` | `firebase.json` |
-| 0.7 | Delete dead Astro API routes (don't ship in static mode) | `src/pages/api/matches.ts`, `src/pages/api/rankings.ts` |
-| 0.8 | Add `.firebase/`, `*-debug.log` to `.gitignore`; remove tracked copies | `.gitignore`, repo root |
-| 0.9 | Delete commented Firebase init block | `src/layouts/BaseLayout.astro:162-204` |
-| 0.10 | Fix `initAuth` listener leak: cache the unsubscribe, make idempotent | `src/store/auth-store.ts:104-108` |
+**File**: `src/scripts/nav-auth.ts`
 
-**Exit criteria**: clean `git status`, no 404s on production page load, CDN headers verified via `curl -I`.
+**Symptom**: nav links/auth widgets disappear after any client-side navigation.
 
----
+**Root cause**: `nav-auth.ts:4-50` calls `document.querySelector(...)` at module top level, capturing DOM nodes once. Astro `<ClientRouter />` (`BaseLayout.astro:106`) swaps the NavBar DOM on every navigation. The script's references point at discarded nodes.
 
-## Phase 1 — Cloud Function endpoints + NavBar (3 days)
-
-Build the dynamic-data layer that lets the public pages stop using the Firebase client SDK.
-
-### 1.1 — Cloud Function HTTPS readers
-
-Add to `functions/src/api/`:
-
+**Fix shape**:
 ```ts
-// functions/src/api/standings.ts
-export const standings = functions
-  .runWith({ minInstances: 0 })
-  .https.onRequest(async (req, res) => {
-    res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
-    res.set('Access-Control-Allow-Origin', '*');
-    const snap = await db.collection('groupStandings').get();
-    res.json(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-  });
-```
-
-Mirror for `rankings` (reads `predictorStats/*`, sorted, top-N) and `live` (reads `matches/*` where `status == 'live' || status == 'finished' && finishedAt > now() - 1h`).
-
-Wire in `firebase.json`:
-```json
-"rewrites": [
-  { "source": "/api/standings", "function": "standings" },
-  { "source": "/api/rankings",  "function": "rankings" },
-  { "source": "/api/live",      "function": "live" }
-]
-```
-
-Export from `functions/src/index.ts`.
-
-### 1.2 — NavBar auth visibility (BLOCKING BUG)
-
-**Symptom**: nav links are hidden on every page, login or no login, desktop and mobile. The desktop login/user widget never shows. Hamburger opens an empty mobile menu.
-
-**Root cause**: `NavBar.astro` renders all auth-aware containers with inline `style="display: none;"` (lines 37, 85, 143, 158, 175) intending a JS toggler to flip them on hydration. The toggler was the now-commented-out Firebase block in `BaseLayout.astro:162-204`. With no toggler, the containers stay hidden forever. Inline `display: none` also wins over the desktop `@media (min-width: 1024px) { .nav-bar__links { display: flex } }` rule by CSS specificity (inline beats class), so even on desktop the public links never appear.
-
-**Fix** — vanilla script in `NavBar.astro` (Option A, keeps anonymous pages React-free):
-
-```astro
-<script>
-  import { useAuthStore } from '@store/auth-store';
-  import { initAuth } from '@services/auth-bootstrap'; // from 1.3
-
+function setup() {
   const links       = document.querySelector('[data-auth-links]');
   const desktopUser = document.querySelector('[data-auth-desktop]');
-  const desktopLogin = document.querySelector('[data-auth-login]');
-  const mobileLinks = document.querySelector('[data-auth-mobile-links]');
-  const mobileUser  = document.querySelector('[data-auth-mobile-user]');
-  const mobileCta   = document.querySelector('[data-auth-mobile-cta]');
-  const mobileLoginCta = document.querySelector('[data-auth-mobile-login-cta]');
-  const usernameEls = document.querySelectorAll('[data-auth-username], [data-auth-mobile-username]');
+  // ...all queries inside setup()...
+  // ...listeners + render() call inside setup()...
+}
 
-  function render(user) {
-    // Public links: always visible (they're public). Showing only when JS runs was a defensive
-    // measure to dodge a hydration mismatch that no longer applies — show them unconditionally.
-    if (links)       links.style.display = '';
-    if (mobileLinks) mobileLinks.style.display = '';
-
-    // Auth-dependent toggles
-    if (user) {
-      if (desktopUser)    desktopUser.style.display = '';
-      if (desktopLogin)   desktopLogin.style.display = 'none';
-      if (mobileUser)     mobileUser.style.display = '';
-      if (mobileCta)      mobileCta.style.display = '';
-      if (mobileLoginCta) mobileLoginCta.style.display = 'none';
-      usernameEls.forEach((el) => { el.textContent = user.displayName || user.email || ''; });
-    } else {
-      if (desktopUser)    desktopUser.style.display = 'none';
-      if (desktopLogin)   desktopLogin.style.display = '';
-      if (mobileUser)     mobileUser.style.display = 'none';
-      if (mobileCta)      mobileCta.style.display = 'none';
-      if (mobileLoginCta) mobileLoginCta.style.display = '';
-    }
-  }
-
-  // Initial paint with current store state, then subscribe.
-  render(useAuthStore.getState().user);
-  useAuthStore.subscribe((state) => render(state.user));
-
-  // Logout buttons
-  document.getElementById('logout-btn')?.addEventListener('click', () => useAuthStore.getState().logout());
-  document.getElementById('mobile-logout-btn')?.addEventListener('click', () => useAuthStore.getState().logout());
-
-  // Kick off the single auth bootstrap (idempotent — see 1.3).
-  initAuth();
-</script>
+setup();                                              // first page load
+document.addEventListener('astro:page-load', setup);  // every transition
 ```
 
-**Companion change in `NavBar.astro`**: remove the inline `style="display: none;"` from the *public* links containers (`[data-auth-links]` line 37, `[data-auth-mobile-links]` line 143). They should be visible by default; keep CSS responsive rules to hide on mobile/desktop as appropriate. Only the auth-dependent containers (`[data-auth-desktop]`, `[data-auth-login]`, `[data-auth-mobile-user]`, `[data-auth-mobile-cta]`, `[data-auth-mobile-login-cta]`) keep an initial hidden state, and the script above resolves them on first paint.
+**Companion**: subscribe to `useAuthStore` and bind the logout buttons inside `setup()` too, otherwise listeners stack on every navigation. Either return an unsubscribe + cleanup on `astro:before-swap`, or store the unsubscribe in a module-level var and call it before re-subscribing.
 
-**Why this works on Firebase Hosting static**: the script runs on every page after `auth-bootstrap.ts` resolves the Firebase `onAuthStateChanged` once. No SSR auth, no client-only-auth flicker (because public links show unconditionally), no React needed for the nav.
+### S1.2 — Verify CSP doesn't break Astro scoped styles
 
-**Caveat**: there's a brief window (~50-150ms) between first paint and Firebase auth resolution where the user's `data-auth-desktop`/`data-auth-login` will reflect logged-out state even for logged-in users. Mitigate with a `localStorage.getItem('quiniela_auth_uid')` hint cached on login/logout that the script reads synchronously and uses as the initial render assumption. Source of truth still becomes Firebase once resolved.
+**File**: `firebase.json:83`
 
-**Alternatives** (kept for record, both more expensive):
-- (B) Tiny `client:only` React mini-component (`NavBarAuth.tsx`) for just the auth-aware portion. Easier to maintain but ships React on anonymous page loads.
-- (C) Astro `<ClientRouter />` + persisted store. Requires adopting view transitions properly — Phase 5 territory.
+**Risk**: `style-src 'self'` blocks the inline `<style>` blocks Astro generates per scoped component. Symptom would be: deployed pages have no styling, browser console full of CSP violations.
 
-### 1.3 — Single auth bootstrap
+**Verify first**: deploy to a Hosting preview channel (`firebase hosting:channel:deploy test`) and check browser console. If violations appear:
 
-- Move `onAuthStateChanged → Zustand` setup to a single module loaded once (lazy-imported by the NavBar script above and by the React islands on auth-gated routes).
-- Remove `initAuth()` calls from `HomeTemplate`, `PredictionsTemplate`, `ProfileTemplate`, `AuthGuard`.
-- Remove orphan `window.dispatchEvent('authStateChanged')` from `LoginForm`, `RegisterForm`.
+**Option A (quick)**: Re-add `'unsafe-inline'` to `style-src` only (script-src stays tight). Astro scoped styles are still safer than arbitrary inline JS — the attack surface is much smaller.
+
+**Option B (correct)**: Per-page CSP nonce. Astro 6 supports this via middleware that generates a nonce per request and writes it into `<style nonce="...">` tags. More work; do as Phase 5 hardening.
+
+**Recommendation**: Option A now, Option B in Phase 5.
+
+### S1.3 — Hide desktop auth widgets by JS, not CSS
+
+**File**: `src/components/organisms/NavBar/NavBar.astro:404-410`
+
+**Symptom**: even after S1.1, `[data-auth-desktop]` and `[data-auth-login]` stay hidden on desktop because CSS pins them `display: none` unconditionally.
+
+**Fix**: remove the unconditional `display: none` rules; let the script in S1.1 set the initial state (and the cached UID hint in `auth-bootstrap.ts` if present prevents flicker).
+
+### S1.4 — Misc cleanup
+
+- `rmdir src/pages/api/` (empty after Phase 0 deletions)
+- `src/scripts/nav-auth.ts:52` — fix implicit-any on `function render(user)`. Type it as `User | null` from `@types/firestore`.
+- Remove orphan `window.dispatchEvent('authStateChanged')` from `LoginForm.tsx:67-68, 82-83` and `RegisterForm.tsx:67-68, 82-83`. No listeners; dead code.
+
+**Sprint 1 exit criteria**: NavBar correct on first load + all client-side navigations + login/logout flips. CSP confirmed not breaking styles in a preview channel. `tsc --noEmit` clean.
 
 ---
 
-## Phase 2 — Take real advantage of Astro (1 week)
+## Phase 2 — Astro takes over public pages (1 week)
 
-Move public pages to static-shell + edge-data pattern. Remove React + Firebase from anonymous traffic.
+Move public pages to static-shell + edge-data pattern. Now unblocked since `/api/*` Cloud Functions are live.
 
 ### 2.1 — Wire Content Collections into templates
 
-- `getCollection('teams')` and `getCollection('groups')` in `.astro` frontmatter for Home, Tournament, Rankings.
+- `getCollection('teams')`, `getCollection('groups')` in `.astro` frontmatter for Home, Tournament, Rankings.
 - Pass static team metadata via props instead of letting React refetch from Firestore.
 
 ### 2.2 — Build-time tournament data
 
-- Create `src/lib/build-data.ts` using existing `src/lib/firebase-admin.ts` to fetch match schedule + last-known standings at build time.
-- Used by Tournament and Home page frontmatter.
-- This is the "stale shell" — refreshed by client-side `/api/...` fetches after first paint.
+- Create `src/lib/build-data.ts` using existing `src/lib/firebase-admin.ts`.
+- Fetch match schedule + last-known standings at build time, inject into Home/Tournament/Rankings frontmatter.
+- This becomes the "stale shell" — refreshed by client-side `fetch('/api/...')` calls.
 
 ### 2.3 — Public pages → 100% static Astro
 
 | Page | Today | After |
 |------|-------|-------|
-| Home (`/`, `/en`) | `<HomeTemplate client:load>` React island | Astro shell + tiny vanilla `client:idle` script that `fetch('/api/standings')` and `fetch('/api/live')` to patch live cells |
-| Tournament (`/torneo`, `/en/tournament`) | `<TournamentTemplate client:load>` React island | Same pattern |
-| Rankings (`/clasificacion`, `/en/rankings`) | `<RankingsTemplate client:load>` React island | Same pattern |
+| Home (`/`, `/en`) | `<HomeTemplate client:load>` React island | Astro shell + `client:idle` vanilla script that `fetch('/api/standings')` + `fetch('/api/live')` |
+| Tournament (`/torneo`, `/en/tournament`) | `<TournamentTemplate client:load>` | Same pattern |
+| Rankings (`/clasificacion`, `/en/rankings`) | `<RankingsTemplate client:load>` | Same pattern |
 
-Delete now-unused React templates: `HomeTemplate.tsx`, `TournamentTemplate.tsx`, `RankingsTemplate.tsx`, `StandingsTemplate.tsx`.
+After this, `MatchCard.tsx`, `MatchList.tsx`, `GroupStandings.tsx`, `TournamentHeader.tsx`, `RankingsTable.tsx`, `HomeTemplate.tsx`, `TournamentTemplate.tsx`, `RankingsTemplate.tsx` become deletable (see 4.3).
 
-### 2.4 — Auth-gated pages → React islands stay, downgrade hydration
+### 2.4 — Downgrade hydration on remaining islands
 
 | Page | Today | After |
 |------|-------|-------|
-| Login (`/login`) | `client:load` | `client:load` (needs immediate interactivity) |
-| Register (`/register`) | `client:load` | `client:load` |
-| Predictions (`/predicciones`) | `client:load` | `client:load` (form-heavy, needs immediate interactivity) |
-| Profile (`/perfil`) | `client:load` | `client:idle` (below-fold, can defer) |
-| Admin (`/en/admin/matches`) | `client:load` | `client:idle` |
-| ToastProvider (layout) | `client:load` | `client:idle` |
+| Login | `client:load` | `client:load` (needs immediate input) |
+| Register | `client:load` | `client:load` |
+| Predictions | `client:load` | `client:load` (form-heavy) |
+| Profile | `client:load` | `client:idle` (below-fold) |
+| Admin matches | `client:load` | `client:idle` |
+| ToastProvider | `client:idle` already | unchanged |
 
 ### 2.5 — Consolidate i18n
 
 - Single source: `src/utils/i18n.ts`.
 - Remove inline `locale === 'en' ? ...` ternaries from all templates.
-- Each component imports only the translation namespace it needs (not full dict via props).
-- Stop serializing full translation dicts into HTML `astro-island props=`.
+- Each component imports only the namespace it needs.
+- Stop serializing full translation dicts into `astro-island props=`.
 
 ### 2.6 — Collapse duplicate page pairs
 
-- `src/pages/[lang]/...` dynamic route with `getStaticPaths` returning `[{lang:'en'},{lang:'es'}]`.
-- One file per logical page instead of two (`predicciones.astro` + `en/predictions.astro` → one `[lang]/predictions.astro`).
-- Delete `src/middleware.ts` (locale already derived from URL).
+- One `src/pages/[lang]/...` dynamic route with `getStaticPaths: [{lang:'en'},{lang:'es'}]`.
+- Replaces 6-7 duplicated page-pair files.
+- Delete `src/middleware.ts` (locale derived from URL).
 
 ---
 
 ## Phase 3 — Lazy Firebase + correctness (3 days)
 
-Get Firebase SDK out of pages that don't need it; fix admin role detection.
-
 ### 3.1 — Lazy-init Firebase client SDK
 
-- `src/services/firebase.ts` exports `getAuth()`, `getDb()` instead of singletons.
+**File**: `src/services/firebase.ts`
+
+- Export `getAuth()`, `getDb()` instead of singletons.
 - Each function initializes on first call only.
-- Auth-gated route bundles still include Firebase, but anonymous pages don't.
-- Verify with `astro build && du -sh dist/_astro/` — expect ~40-60% reduction in critical bundle.
+- Verify post-build: `du -sh dist/_astro/` should drop ~40-60% for chunks that no longer touch Firebase (public-page bundles after Phase 2).
 
-### 3.2 — Fix admin role detection via custom claims
+### 3.2 (remaining) — Finish custom claims migration
 
-- Cloud Function (HTTPS, admin-protected) sets Firebase Auth custom claims: `auth.setCustomUserClaims(uid, {role: 'admin'})`.
-- `auth-helpers.ts:89-105` reads role from `idTokenResult.claims.role` instead of synthesizing it.
-- Update `scripts/set-admin-role.ts` to call the new Function instead of writing Firestore directly.
+- Confirm `scripts/set-admin-role.ts` calls the `setUserRole` Cloud Function (not direct Firestore write).
 - Update Firestore security rules to check `request.auth.token.role == 'admin'`.
+- Smoke-test admin pages with a freshly-claimed user.
 
 ### 3.3 — Store hygiene
 
-- `useAuthStore` consumers use per-field selectors or `useShallow` everywhere — never raw destructure.
-- Audit `AuthGuard.tsx:21`, `PredictionsTemplate.tsx:166`, `ProfileTemplate.tsx:46`.
+- Audit `useAuthStore` consumers for raw destructure → switch to per-field selectors or `useShallow`.
+- Hot spots: `PredictionsTemplate.tsx:166`, `ProfileTemplate.tsx:46`.
 
 ### 3.4 — Form correctness
 
-- Add `role="alert" aria-live="polite"` on error regions in `LoginForm`, `RegisterForm`.
-- Surface client-side validation failures (empty display name, password mismatch) instead of silent `return`.
+- Add `role="alert" aria-live="polite"` on error regions in `LoginForm.tsx:147-150`, `RegisterForm.tsx:109-118`.
+- Surface client-side validation failures (empty display name, password mismatch) instead of silent `return` in `RegisterForm.tsx:51-57`.
 
 ---
 
-## Phase 4 — Refresh cadence + cleanup (2 days)
+## Phase 4 — Cleanup (1 day)
 
-### 4.1 — Daily rebuild during tournament
+### 4.3 (remaining) — Final dead code purge
 
-- Cloud Scheduler job triggers GitHub Actions workflow at 04:00 UTC daily.
-- Workflow runs `astro build && firebase deploy --only hosting`.
-- Picks up schedule changes baked into Content Collections.
-- Only needed during `2026-06-01` → `2026-07-25`.
-
-### 4.2 — Service Worker shrink
-
-- With CDN-level caching from Phase 0, the SW barely matters for asset caching.
-- Reduce `sw.js` to: PWA install handling, push notifications, offline fallback page only.
-- Remove dynamic cache logic (CDN handles it better).
-
-### 4.3 — Dead code purge
-
-Delete or wire in:
-- `src/components/molecules/MatchCard/MatchCard.astro`
-- `src/components/organisms/MatchList/MatchList.astro`
-- `src/components/organisms/GroupStandings/GroupStandings.astro` (if unused after Phase 2)
-- `src/components/organisms/TournamentHeader/TournamentHeader.astro` (if unused)
-- `src/components/organisms/RankingsTable/RankingsTable.astro` (if unused)
-- `src/components/organisms/BracketView/BracketView.tsx` (orphan)
-- `src/components/organisms/PWAInstall/PWAInstall.tsx` (orphan)
-- `src/components/templates/StandingsTemplate/` (orphan)
+After Phase 2.3 ships, delete:
+- `src/components/molecules/MatchCard/MatchCard.{astro,tsx,css}` (both versions)
+- `src/components/organisms/MatchList/MatchList.{astro,tsx,css}`
+- `src/components/organisms/GroupStandings/GroupStandings.{astro,tsx,css}`
+- `src/components/organisms/TournamentHeader/TournamentHeader.{astro,tsx,css}`
+- `src/components/organisms/RankingsTable/RankingsTable.{astro,tsx,css}`
+- `src/components/templates/HomeTemplate/`
+- `src/components/templates/TournamentTemplate/`
+- `src/components/templates/RankingsTemplate/`
 
 ### 4.4 — Update migration plan docs
 
-- Mark `.plan/ASTRO_MIGRATION_PLAN.md` Phase 6 as actually-complete (or replaced by this doc).
-- Update `.plan/PHASE5_SSR_DEFERRED.md` with the explicit "static + CF endpoints" decision recorded here.
+- Mark `.plan/ASTRO_MIGRATION_PLAN.md` Phase 6 actually-complete.
+- Update `.plan/PHASE5_SSR_DEFERRED.md` to point at this plan.
 
 ---
 
-## Phase 5 — Optional hardening (1 week, post-launch)
+## Phase 5 — CI / cron / hardening (post-launch, ~1 week)
 
-| Item | Status |
-|------|--------|
-| Break up `PredictionsTemplate.tsx` (600 LOC god-object) into per-step components | ✅ DONE |
-| Tighten CSP: remove `'unsafe-inline'` via external scripts and CSS custom properties | ✅ DONE |
-| Adopt Astro `<ClientRouter />` with fade transitions on content, shared element on navbar | ✅ DONE |
-| Add Sentry or TrackJS | Before public launch |
-| Firebase App Check | Before public launch (prevents non-app traffic abuse) |
-| Firebase Hosting preview channels in CI | Quality-of-life for PR review |
+### 5.1 — Daily rebuild during tournament
+
+- Cloud Scheduler → GitHub Actions workflow at 04:00 UTC.
+- Runs `astro build && firebase deploy --only hosting`.
+- Picks up Content Collection edits (postponements, schedule corrections).
+- Only active `2026-06-01` → `2026-07-25`.
+
+### 5.2 — GitHub Actions CI pipeline
+
+- `.github/workflows/ci.yml`: typecheck + lint + vitest on every PR
+- `.github/workflows/deploy.yml`: build + deploy on push to `master`
+- `.github/workflows/preview.yml`: Firebase Hosting preview channel for PRs
+
+### 5.3 — Other hardening
+
+| Item | Trigger / when |
+|------|----------------|
+| Per-page CSP nonces (replace `'unsafe-inline'` if S1.2 needed it) | After launch traffic confirms current CSP works |
+| Break up `PredictionsTemplate.tsx` (600 LOC god-object) | If maintenance velocity drops |
+| Polish view transitions (`<ClientRouter />` already adopted) | Quality of life |
+| Add Sentry / TrackJS | Before public launch |
+| Firebase App Check | Before public launch (blocks non-app traffic) |
 
 ---
 
 ## What we explicitly are NOT doing
 
-- **Astro SSR / hybrid mode** — would require a Cloud Functions/Run runtime adapter, cold starts, cost. Defer indefinitely.
-- **Replacing Firestore client SDK on auth-gated pages** — predictions and profile need real-time writes; client SDK is correct there.
-- **Astro API routes** — removed in Phase 0. They don't ship in static mode. Cloud Functions replace them.
-- **Service worker caching of dynamic data** — the CDN does this better via `s-maxage`. SW becomes a PWA shell only.
+- **Astro hybrid SSR / Firebase Functions adapter for pages** — explicitly deferred. Static + edge-cached `/api/*` is the chosen architecture.
+- **Replacing Firestore client SDK on auth-gated pages** — predictions/profile need real-time writes; client SDK is correct there.
+- **Astro API routes** — removed in Phase 0; Cloud Functions replace them.
+- **Service Worker caching of dynamic data** — CDN does this better via `s-maxage`.
 
 ---
 
-## Cost estimate (free tier sanity check)
+## File-by-file change summary (remaining work only)
 
-Assumes peak WC26 traffic ~10k unique daily visitors during tournament.
-
-| Resource | Estimated usage | Free tier | Status |
-|----------|----------------|-----------|--------|
-| Cloud Functions invocations | 1 per `/api/*` per 60s × 3 endpoints × 24h × 30d = ~130k/mo | 2M/mo | OK |
-| Firestore reads | ~150k/mo (functions only; clients cached) | 50k/day = 1.5M/mo | OK |
-| Hosting egress | ~20 GB/mo (HTML+JS+JSON) | 10 GB/mo | **Watch** — may need Blaze plan if traffic spikes |
-| Hosting storage | ~10 MB build artifacts | 10 GB | OK |
-| Cloud Scheduler | 1 job, ~30 invocations/mo | 3 free jobs | OK |
-
-If egress goes over, the Blaze plan kicks in at $0.15/GB beyond 10 GB — negligible.
-
----
-
-## File-by-file change summary
-
-| File | Phase | Action |
-|------|-------|--------|
-| `firebase.json` | 0 | Add headers, fix rewrites, set cleanUrls |
-| `.gitignore` | 0 | Add .firebase/, *.log |
-| `src/store/auth-store.ts` | 0 | Fix listener leak |
-| `src/layouts/BaseLayout.astro` | 0 | Delete commented block; move CSP to headers |
-| `src/pages/api/*.ts` | 0 | Delete (replaced by Cloud Functions) |
-| `functions/src/api/standings.ts` | 1 | NEW |
-| `functions/src/api/rankings.ts` | 1 | NEW |
-| `functions/src/api/live.ts` | 1 | NEW |
-| `functions/src/index.ts` | 1 | Export new HTTPS functions |
-| `src/components/organisms/NavBar/NavBar.astro` | 1 | Add auth-state subscription script |
-| `src/services/auth-bootstrap.ts` | 1 | NEW; single auth init module |
-| `src/components/templates/*Template.tsx` | 1 | Remove `initAuth()` calls |
-| `src/components/molecules/{Login,Register}Form.tsx` | 1 | Remove orphan event dispatch |
-| `src/pages/index.astro`, `torneo.astro`, `clasificacion.astro` (+ en/) | 2 | Convert to static Astro (no React island) |
-| `src/lib/build-data.ts` | 2 | NEW |
-| `src/utils/i18n.ts` | 2 | Become single i18n source |
-| `src/pages/[lang]/*.astro` | 2 | NEW (consolidate duplicates) |
-| `src/middleware.ts` | 2 | Delete |
-| `src/services/firebase.ts` | 3 | Lazy init |
-| `src/services/auth-helpers.ts` | 3 | Read role from custom claims |
-| `functions/src/api/setUserRole.ts` | 3 | NEW (admin only) |
-| `scripts/set-admin-role.ts` | 3 | Call Function instead of direct write |
-| `public/sw.js` | 4 | Shrink to PWA shell only |
-| `.plan/ASTRO_MIGRATION_PLAN.md` | 4 | Update completion status |
+| File | Sprint/Phase | Action |
+|------|--------------|--------|
+| `src/scripts/nav-auth.ts` | S1.1 | Wrap setup in function, bind to `astro:page-load`, handle re-subscribe cleanup, type `render(user)` |
+| `src/components/organisms/NavBar/NavBar.astro` | S1.3 | Remove unconditional `display: none` on `[data-auth-desktop]` / `[data-auth-login]` (lines 404-410) |
+| `firebase.json` | S1.2 | Audit `style-src 'self'`; add `'unsafe-inline'` to style-src if Astro styles break |
+| `src/pages/api/` | S1.4 | `rmdir` (empty) |
+| `src/components/molecules/LoginForm/LoginForm.tsx` | S1.4 | Remove orphan `dispatchEvent('authStateChanged')` (lines 67-68, 82-83) |
+| `src/components/molecules/RegisterForm/RegisterForm.tsx` | S1.4 | Same removal (lines 67-68, 82-83) |
+| `src/lib/build-data.ts` | 2.2 | NEW — build-time Firestore admin fetch |
+| `src/pages/index.astro`, `torneo.astro`, `clasificacion.astro` + `en/` siblings | 2.3 | Convert to pure Astro shell + `client:idle` fetch script |
+| `src/components/templates/{Home,Tournament,Rankings}Template.tsx` | 2.3 then 4.3 | Used by 2.3 in transition, deleted in 4.3 |
+| `src/utils/i18n.ts` | 2.5 | Become single i18n source |
+| `src/pages/[lang]/*.astro` | 2.6 | NEW — consolidate page pairs |
+| `src/middleware.ts` | 2.6 | Delete |
+| `src/services/firebase.ts` | 3.1 | Lazy init (`getAuth()`, `getDb()` getters) |
+| `scripts/set-admin-role.ts` | 3.2 | Call `setUserRole` function instead of direct Firestore |
+| `firestore/firestore.rules` | 3.2 | Check `request.auth.token.role == 'admin'` |
+| `src/components/templates/PredictionsTemplate/PredictionsTemplate.tsx` | 3.3 | Per-field selectors via `useShallow` |
+| `src/components/templates/ProfileTemplate/ProfileTemplate.tsx` | 3.3 | Same |
+| `src/components/molecules/LoginForm/LoginForm.tsx` | 3.4 | `role="alert" aria-live="polite"` on error region |
+| `src/components/molecules/RegisterForm/RegisterForm.tsx` | 3.4 | Same + surface client-side validation errors |
+| Dead `.tsx` and `.astro` components | 4.3 | Delete after 2.3 |
+| `.plan/ASTRO_MIGRATION_PLAN.md`, `.plan/PHASE5_SSR_DEFERRED.md` | 4.4 | Doc updates |
+| Cloud Scheduler config | 5.1 | NEW |
+| `.github/workflows/{ci,deploy,preview}.yml` | 5.2 | NEW |
 
 ---
 
-## Sequencing rationale
+## Sequencing
 
-- **Phase 0 first**: pure config, zero risk, immediate wins (security headers, cache control, listener leak).
-- **Phase 1 before 2**: must have `/api/*` endpoints working before public pages can rely on them.
-- **Phase 2 before 3**: lazy Firebase only matters after we know which pages still need it.
-- **Phase 3 separately**: admin role fix touches security rules; isolate the risk.
-- **Phase 4 last**: cleanup once new architecture is proven in prod.
-- **Phase 5 optional**: post-launch, traffic-data-driven decisions.
+```
+Sprint 1 (production blockers, 1 day)
+   │
+   ├─ S1.1 NavBar astro:page-load          ◄── unblocks login UX
+   ├─ S1.2 CSP style-src verify
+   ├─ S1.3 NavBar CSS hidden fix
+   └─ S1.4 cleanup
+   │
+   ▼
+Phase 2 (Astro public pages, 1 week)
+   │  Independent slices — can ship 2.1, 2.3, 2.5, 2.6 incrementally
+   ▼
+Phase 3 (lazy Firebase + correctness, 3 days)
+   │  3.1 depends on Phase 2 to verify the win
+   │  3.2/3.3/3.4 independent — can parallelize
+   ▼
+Phase 4 (cleanup, 1 day)
+   │  4.3 must come after 2.3
+   │  4.4 can ship anytime
+   ▼
+Phase 5 (CI / cron / hardening, post-launch)
+```
 
-Estimated total: **~3 weeks of focused work** to reach the target architecture.
+Estimated total remaining work: **~2 weeks** of focused execution.
+
+---
+
+## Cost sanity check (still valid)
+
+| Resource | Estimated usage at peak | Free tier | Status |
+|----------|------------------------|-----------|--------|
+| Cloud Functions invocations | ~130k/mo (1/min × 3 endpoints × 24h × 30d, edge-cached) | 2M/mo | OK |
+| Firestore reads | ~150k/mo (functions only after Phase 2) | 50k/day = 1.5M/mo | OK |
+| Hosting egress | ~20 GB/mo at WC traffic spike | 10 GB/mo free | Watch — Blaze plan at $0.15/GB beyond |
+| Cloud Scheduler | 1 job, ~30/mo | 3 free jobs | OK |
