@@ -1,5 +1,6 @@
 ---
 import '@styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import NavBar from '@organisms/NavBar/NavBar.astro';
 import { ToastProvider } from '@organisms/ToastProvider/ToastProvider';
 
@@ -102,6 +103,8 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
     {description && <meta name="twitter:description" content={description} />}
     <meta name="twitter:image" content={ogImage} />
 
+    <ClientRouter />
+
     <!-- JSON-LD Structured Data -->
     <script
       type="application/ld+json"
@@ -140,7 +143,9 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
   </head>
   <body>
     <NavBar links={navLinks} locale={locale} notificationCount={notificationCount} />
-    <slot />
+    <main transition:name="content" transition:animate="fade">
+      <slot />
+    </main>
     <ToastProvider client:idle />
     <script src="../scripts/runtime.ts"></script>
   </body>

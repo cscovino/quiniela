@@ -14,9 +14,6 @@ export default defineConfig({
   },
   integrations: [react()],
   trailingSlash: 'never',
-  experimental: {
-    clientPrerender: true,
-  },
   image: {
     domains: ['flagicons.lipis.dev', 'flagcdn.com', 'upload.wikimedia.org'],
     remotePatterns: [

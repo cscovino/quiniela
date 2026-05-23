@@ -61,8 +61,10 @@ Configured in both `astro.config.ts` (Vite) and `tsconfig.json`.
 - `getNavLinks(locale, activeNav)` from `@utils/i18n`
 
 **View Transitions:**
-- Enabled in `astro.config.ts` with `clientPrerender`
-- CSS animations in `global.css` (`::view-transition-old/new`)
+- `<ClientRouter />` from `astro:transitions` in `BaseLayout.astro` `<head>`
+- `transition:name="navbar"` on `NavBar.astro` root `<nav>`
+- `transition:name="content" transition:animate="fade"` on `<main>` in `BaseLayout.astro`
+- CSS animations in `global.css` (`::view-transition-old/new(content)`)
 
 ## Design System
 

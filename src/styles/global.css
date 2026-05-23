@@ -580,15 +580,12 @@ code {
    VIEW TRANSITIONS
    ============================================ */
 
-html {
-  view-transition-name: root;
-}
-
-::view-transition-old(root) {
+/* Content area transitions */
+::view-transition-old(content) {
   animation: fade-out 0.2s ease-out;
 }
 
-::view-transition-new(root) {
+::view-transition-new(content) {
   animation: fade-in 0.3s ease-in;
 }
 

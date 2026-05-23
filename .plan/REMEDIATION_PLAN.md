@@ -320,7 +320,7 @@ Delete or wire in:
 |------|--------|
 | Break up `PredictionsTemplate.tsx` (600 LOC god-object) into per-step components | ✅ DONE |
 | Tighten CSP: remove `'unsafe-inline'` via external scripts and CSS custom properties | ✅ DONE |
-| Adopt Astro `<ClientRouter />` (or remove `view-transition-name: root` dead config) | Decide: real view transitions or not |
+| Adopt Astro `<ClientRouter />` with fade transitions on content, shared element on navbar | ✅ DONE |
 | Add Sentry or TrackJS | Before public launch |
 | Firebase App Check | Before public launch (prevents non-app traffic abuse) |
 | Firebase Hosting preview channels in CI | Quality-of-life for PR review |
