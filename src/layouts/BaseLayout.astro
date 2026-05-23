@@ -141,7 +141,7 @@ const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
   <body>
     <NavBar links={navLinks} locale={locale} notificationCount={notificationCount} />
     <slot />
-    <ToastProvider client:load />
+    <ToastProvider client:idle />
     <script>
       const html = document.documentElement;
       const savedTheme = localStorage.getItem('theme');
