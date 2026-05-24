@@ -1,19 +1,12 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { RankingsTemplate } from '@templates/RankingsTemplate/RankingsTemplate';
+import { getBuildRankings } from '@lib/build-data';
 import en from '@locales/en/common.json';
 
 const locale = 'en';
 const translations = en;
 
-const templateProps = {
-  translations: {
-    title: 'Predictor Rankings',
-    noRankings: 'No rankings available yet. Make predictions to appear here!',
-    loading: 'Loading rankings...',
-  },
-  locale,
-};
+const rankings = await getBuildRankings();
 ---
 
 <BaseLayout
@@ -22,5 +15,115 @@ const templateProps = {
   description={translations.pages.rankings.description}
   activeNav="rankings"
 >
-  <RankingsTemplate {...templateProps} client:idle />
+  <main class="rankings-template__content">
+    <header class="rankings-template__header">
+      <h1>Predictor Rankings</h1>
+    </header>
+
+    {
+      rankings.length > 0 ? (
+        <table class="rankings-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>Pts</th>
+              <th>Accuracy</th>
+              <th>Streak</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rankings.map((r, i) => (
+              <tr>
+                <td class="rankings-table__rank">{i + 1}</td>
+                <td class="rankings-table__name">{r.displayName}</td>
+                <td class="rankings-table__points">{r.points}</td>
+                <td>{r.accuracy}%</td>
+                <td>{r.streak}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p class="rankings-template__empty">
+          No rankings available yet. Make predictions to appear here!
+        </p>
+      )
+    }
+  </main>
 </BaseLayout>
+
+<style>
+  .rankings-template__content {
+    max-width: var(--container-xl);
+    margin: 0 auto;
+    padding: var(--space-2) var(--space-2);
+  }
+
+  .rankings-template__header {
+    margin-bottom: var(--space-4);
+  }
+
+  .rankings-template__header h1 {
+    font-family: var(--font-pixel);
+    font-size: var(--heading-sm);
+    background: linear-gradient(135deg, var(--color-gold-500), var(--color-warm-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .rankings-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+    border: var(--border-pixel-md);
+    box-shadow: var(--shadow-md);
+  }
+
+  .rankings-table th,
+  .rankings-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: center;
+    border-bottom: var(--border-pixel-sm);
+  }
+
+  .rankings-table th {
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    background: var(--bg-input);
+  }
+
+  .rankings-table__rank {
+    font-family: var(--font-pixel);
+    font-size: var(--text-sm);
+    color: var(--color-accent-500);
+  }
+
+  .rankings-table__name {
+    font-family: var(--font-pixel);
+    text-align: left !important;
+  }
+
+  .rankings-table__points {
+    font-weight: bold;
+    color: var(--color-gold-500);
+  }
+
+  .rankings-template__empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: var(--space-8);
+  }
+
+  @media (min-width: 1024px) {
+    .rankings-template__content {
+      padding: var(--space-4) var(--space-4);
+    }
+
+    .rankings-template__header h1 {
+      font-size: var(--heading-md);
+    }
+  }
+</style>

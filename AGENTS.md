@@ -30,12 +30,13 @@ node scripts/generate-content.mjs  # Generate content collection files
 - **Routing:** One page file per locale (e.g., `src/pages/index.astro` for Spanish, `src/pages/en/index.astro` for English). Do NOT use `[locale]` dynamic routes.
 - **Components:** Atomic Design — `@atoms/`, `@molecules/`, `@organisms/`, `@templates/`
 - **Astro Components:** MatchCard, MatchList, TournamentHeader, GroupStandings, RankingsTable, NavBar (zero-JS)
+- **Public Pages:** Pure static Astro shells + `client:idle` fetch scripts (Home, Tournament, Rankings)
 - **State:** Zustand (auth store, toast store)
 - **Backend:** Firebase (Auth, Firestore, Cloud Functions, Cloud Messaging)
 - **PWA:** Service worker, web manifest, FCM push notifications
 - **Content Collections:** Teams (48), Groups (12) with Zod validation
-- **API Routes:** `/api/matches`, `/api/rankings` with 5-min caching
-- **Middleware:** Locale detection, ready for SSR auth guards
+- **Build Data:** `src/lib/build-data.ts` for build-time tournament data via Admin SDK
+- **API Routes:** `/api/live`, `/api/standings`, `/api/rankings` with 5-min caching (Cloud Functions)
 
 ## Path Aliases
 
@@ -118,6 +119,7 @@ The app is a Progressive Web App:
 - View transitions enabled for smooth navigation
 - DNS preconnect for Firebase endpoints
 - Web Vitals monitoring built-in
+- No middleware — locale derived from URL path in each page
 
 ## Project Plan
 
