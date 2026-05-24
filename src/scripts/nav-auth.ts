@@ -1,5 +1,5 @@
 import { useAuthStore } from '@store/auth-store';
-import { initAuth, getCachedAuthUid } from '@services/auth-bootstrap';
+import { initAuth } from '@services/auth-bootstrap';
 import type { User } from '@app-types/firestore';
 
 let authUnsubscribe: (() => void) | null = null;
@@ -85,13 +85,10 @@ function setup() {
     localStorage.setItem('theme', newTheme);
   });
 
-  // Auth visibility
-  const cachedUid = getCachedAuthUid();
+  // Auth visibility: only render cached user if we have real data,
+  // otherwise show neutral state until auth listener fires
   const cachedUser = useAuthStore.getState().user;
-  render(
-    cachedUser || (cachedUid ? ({ uid: cachedUid, displayName: '', email: '' } as User) : null),
-    els,
-  );
+  render(cachedUser || null, els);
 
   // Subscribe to auth state changes
   authUnsubscribe = useAuthStore.subscribe((state) => render(state.user, els));

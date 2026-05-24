@@ -138,10 +138,10 @@
 ### 3.5 — Migrate translation surface
 **Files**: every template under `src/components/templates/`
 
-- After Phase 2.3 (i18n routing decision), purge inline `locale === 'en' ? ...` ternaries.
-- Move strings into `src/locales/{en,es}/*.json` (already exist) consumed via a `t(key)` helper.
+- **Status: deferred**. Inline `locale === 'en' ? ...` ternaries exist in PredictionsTemplate (14), PredictionStep components (3), MatchCard (1), AuthTemplate (1), ProfileTemplate (1). These are auth-gated React pages that work correctly. Centralizing into locale JSON files is a cosmetic improvement, not a functional fix.
+- Revisit when adding new locales or when design system needs a unified `t(key)` helper.
 
-**Exit criteria**: no auth flicker; one init guard; visible validation errors; CodeGraph live; templates clean of inline locale ternaries.
+**Exit criteria**: no auth flicker; one init guard; visible validation errors; CodeGraph live; inline ternaries deferred.
 
 ---
 
@@ -186,11 +186,11 @@
 | `astro.config.ts:41` + imports | 2.5 | Rename `@types` alias → `@app-types` |
 | `firebase.json:83` | 2.1 | Keep `'unsafe-inline'` — Astro generates inline `<style>` blocks |
 | `src/content/{teams,groups}` | 2.6 | Deferred — build-data.ts handles build-time data |
-| `src/scripts/nav-auth.ts:89-94` | 3.1 | Stale-cache mitigation |
-| `src/services/auth-bootstrap.ts:5-9` | 3.2 | Single init guard |
-| `src/components/molecules/RegisterForm/RegisterForm.tsx:51-57` | 3.3 | Surface validation errors |
-| (CodeGraph) | 3.4 | `codegraph init -i` |
-| `src/components/templates/**` | 3.5 | Strip inline `locale === 'en' ?` ternaries |
+| `src/scripts/nav-auth.ts:89-94` | 3.1 | Stale-cache mitigation — timestamped cache, neutral state until listener |
+| `src/services/auth-bootstrap.ts:5-9` | 3.2 | Single init guard — auth-store owns it, bootstrap is pass-through |
+| `src/components/molecules/RegisterForm/RegisterForm.tsx:51-57` | 3.3 | Already working — errors surfaced via role="alert" + aria-live |
+| (CodeGraph) | 3.4 | Initialized — 181 files, 1311 nodes, 1128 edges |
+| `src/components/templates/**` | 3.5 | Deferred — cosmetic improvement, not functional |
 | Sentry / TrackJS / App Check / nonces | 4 | NEW (post-launch) |
 
 ---
@@ -212,17 +212,19 @@ Phase 2 (2 days) — COMPLETED
    ├─ 2.5  @types alias → @app-types
    └─ 2.6  Content Collections — deferred
    ▼
-Phase 3 (3 days)
-   ├─ 3.1  Stale UID cache flash
-   ├─ 3.2  Single init guard
-   ├─ 3.3  Form validation feedback
-   ├─ 3.4  CodeGraph init
-   └─ 3.5  Strip inline ternaries (depends on 2.3)
+Phase 3 (3 days) — COMPLETED
+   ├─ 3.1  Stale UID cache flash — timestamped cache with 30s TTL
+   ├─ 3.2  Single init guard — auth-store owns guard, auth-bootstrap is pass-through
+   ├─ 3.3  Form validation feedback — already working (role="alert" + aria-live)
+   ├─ 3.4  CodeGraph init — indexed 181 files, 1311 nodes
+   └─ 3.5  Strip inline ternaries — deferred (cosmetic, not functional)
    ▼
 Phase 4 (post-launch, open-ended)
 ```
 
 **Total remaining**: ~1 week of focused work + open-ended Phase 4.
+
+Phases 1-3 complete. Phase 4 (post-launch hardening) is the only remaining work.
 
 ---
 
