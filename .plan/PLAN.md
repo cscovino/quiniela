@@ -84,10 +84,11 @@
 - Firebase client SDK removed from public-page bundles.
 
 ### 2.3 — Resolve i18n routing
-**Files**: `src/pages/{index,torneo,clasificacion,predicciones,perfil,login,register}.astro` + `src/pages/en/{...}.astro` (dual-tree today)
+**Files**: `src/pages/[lang]/*.astro` with `getStaticPaths`
 
-- **Decision: retain dual-tree**. Each page derives locale from its URL path (`/` = es, `/en/` = en). No middleware needed (deleted).
-- Templates converted to static Astro shells with locale-specific translations imported directly.
+- **Decision: dynamic `[lang]` routes**. Single file per page generates both `/es/*` and `/en/*` via `getStaticPaths`.
+- English slugs used for both locales (e.g., `/es/tournament`, `/en/tournament`).
+- No middleware needed — locale derived from URL path in each page.
 
 ### 2.4 — Gate service worker on production
 **File**: `src/scripts/runtime.ts:9-13`
@@ -107,7 +108,7 @@
 - **Status: deferred**. Public pages now use `build-data.ts` which fetches from Firestore at build time via Admin SDK. Content Collections would be redundant unless we want to eliminate Firestore dependency during build (not currently needed — service account is configured and working).
 - Revisit if we ever remove the Admin SDK dependency or want fully offline builds.
 
-**Exit criteria**: tight CSP (kept `'unsafe-inline'` — Astro requires it), no double-fetch (resolved by Phase 2.3 static conversion), single i18n strategy (dual-tree retained), no dev-mode SW, no alias collision, Content Collections deferred.
+**Exit criteria**: tight CSP (kept `'unsafe-inline'` — Astro requires it), no double-fetch (resolved by Phase 2.3 static conversion), single i18n strategy (dynamic `[lang]` routes), no dev-mode SW, no alias collision, Content Collections deferred.
 
 ---
 
@@ -207,7 +208,7 @@ Phase 1 (1 day, HIGHEST PRIORITY)
 Phase 2 (2 days) — COMPLETED
    ├─ 2.1  CSP style-src — kept 'unsafe-inline' (Astro requires it)
    ├─ 2.2  Drop double-fetch — resolved by static conversion
-   ├─ 2.3  i18n routing — dual-tree retained, middleware deleted
+   ├─ 2.3  i18n routing — dynamic [lang] routes with getStaticPaths
    ├─ 2.4  SW dev gate — gated on PROD
    ├─ 2.5  @types alias → @app-types
    └─ 2.6  Content Collections — deferred

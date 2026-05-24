@@ -26,8 +26,8 @@ node scripts/generate-content.mjs  # Generate content collection files
 
 ## Architecture
 
-- **i18n:** Spanish (`es`) at `/`, English at `/en/`. No redirect file needed.
-- **Routing:** One page file per locale (e.g., `src/pages/index.astro` for Spanish, `src/pages/en/index.astro` for English). Do NOT use `[locale]` dynamic routes.
+- **i18n:** Spanish at `/es/`, English at `/en/`. Dynamic `[lang]` routes with `getStaticPaths`.
+- **Routing:** One page file per route under `src/pages/[lang]/`. English slugs used for both locales (e.g., `/es/tournament`, `/en/tournament`). Do NOT use separate locale directories.
 - **Components:** Atomic Design — `@atoms/`, `@molecules/`, `@organisms/`, `@templates/`
 - **Astro Components:** MatchCard, MatchList, TournamentHeader, GroupStandings, RankingsTable, NavBar (zero-JS)
 - **Public Pages:** Pure static Astro shells + `client:idle` fetch scripts (Home, Tournament, Rankings)
