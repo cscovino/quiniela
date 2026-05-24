@@ -2,6 +2,7 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getBuildData, getBuildRankings } from '@lib/build-data';
 import { getLocalizedPaths } from '@utils/slug-map';
+import { getFlagClass } from '@utils/flagMapping';
 import PredictionsPage from '@pages/PredictionsPage.astro';
 import AuthPage from '@pages/AuthPage.astro';
 import { ProfileTemplate } from '@templates/ProfileTemplate/ProfileTemplate';
@@ -159,7 +160,14 @@ const profileTranslations = {
                     {group.standings.map((s) => (
                       <tr>
                         <td>{s.position}</td>
-                        <td class="group-standings__team">{s.fifaCode}</td>
+                        <td class="group-standings__team">
+                          <span
+                            class={`flag-icon ${getFlagClass(s.fifaCode)}`}
+                            role="img"
+                            aria-label={`${s.fifaCode} flag`}
+                          />
+                          <span>{s.fifaCode}</span>
+                        </td>
                         <td>{s.played}</td>
                         <td>{s.won}</td>
                         <td>{s.drawn}</td>
@@ -188,7 +196,12 @@ const profileTranslations = {
                 <div class="match-card">
                   <div class="match-card__teams">
                     <div class="match-card__team match-card__team--home">
-                      <span class="team-flag">{match.homeTeam.fifaCode}</span>
+                      <span
+                        class={`flag-icon ${getFlagClass(match.homeTeam.fifaCode)}`}
+                        role="img"
+                        aria-label={`${match.homeTeam.name} flag`}
+                      />
+                      <span class="team-code">{match.homeTeam.fifaCode}</span>
                       <span class="team-name">{match.homeTeam.name}</span>
                       {match.result && <span class="match-card__score">{match.result.home}</span>}
                     </div>
@@ -198,7 +211,12 @@ const profileTranslations = {
                     <div class="match-card__team match-card__team--away">
                       {match.result && <span class="match-card__score">{match.result.away}</span>}
                       <span class="team-name">{match.awayTeam.name}</span>
-                      <span class="team-flag">{match.awayTeam.fifaCode}</span>
+                      <span class="team-code">{match.awayTeam.fifaCode}</span>
+                      <span
+                        class={`flag-icon ${getFlagClass(match.awayTeam.fifaCode)}`}
+                        role="img"
+                        aria-label={`${match.awayTeam.name} flag`}
+                      />
                     </div>
                   </div>
                   <div class="match-card__footer">
@@ -502,7 +520,28 @@ const profileTranslations = {
     color: var(--color-success-700);
   }
 
-  .team-flag {
+  .flag-icon {
+    width: 32px;
+    height: 24px;
+    flex-shrink: 0;
+    border: var(--border-pixel-sm);
+    display: inline-block;
+  }
+  .group-standings__team .flag-icon {
+    width: 24px;
+    height: 18px;
+    margin-right: var(--space-2);
+    vertical-align: middle;
+  }
+  .group-standings__team {
+    text-align: left !important;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+  }
+  .team-code {
     font-family: var(--font-pixel);
     font-size: var(--text-xs);
     background: var(--bg-input);

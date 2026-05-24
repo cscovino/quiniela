@@ -61,27 +61,23 @@ function setup() {
   const hamburgerOpen = els.hamburgerBtn?.querySelector('.hamburger-open');
   const hamburgerClose = els.hamburgerBtn?.querySelector('.hamburger-close');
 
-  // Hamburger toggle
+  // Hamburger toggle (class-based; works with CSS `display: none` default)
   els.hamburgerBtn?.addEventListener('click', () => {
-    const isOpen = els.mobileMenu?.style.display !== 'none';
-    if (els.mobileMenu) {
-      els.mobileMenu.style.display = isOpen ? 'none' : 'block';
-    }
-    els.hamburgerBtn!.setAttribute('aria-expanded', String(!isOpen));
-    if (hamburgerOpen && hamburgerClose) {
-      hamburgerOpen.style.display = isOpen ? 'block' : 'none';
-      hamburgerClose.style.display = isOpen ? 'none' : 'block';
+    const willOpen = !els.mobileMenu?.classList.contains('open');
+    els.mobileMenu?.classList.toggle('open', willOpen);
+    els.hamburgerBtn!.setAttribute('aria-expanded', String(willOpen));
+    if (hamburgerOpen instanceof HTMLElement && hamburgerClose instanceof HTMLElement) {
+      hamburgerOpen.style.display = willOpen ? 'none' : 'block';
+      hamburgerClose.style.display = willOpen ? 'block' : 'none';
     }
   });
 
   // Close menu on link click
   document.querySelectorAll('[data-close-menu]').forEach((link) => {
     link.addEventListener('click', () => {
-      if (els.mobileMenu) {
-        els.mobileMenu.style.display = 'none';
-      }
+      els.mobileMenu?.classList.remove('open');
       els.hamburgerBtn?.setAttribute('aria-expanded', 'false');
-      if (hamburgerOpen && hamburgerClose) {
+      if (hamburgerOpen instanceof HTMLElement && hamburgerClose instanceof HTMLElement) {
         hamburgerOpen.style.display = 'block';
         hamburgerClose.style.display = 'none';
       }

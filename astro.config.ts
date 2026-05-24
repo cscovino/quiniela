@@ -9,6 +9,9 @@ export default defineConfig({
     defaultLocale: 'es',
     locales: ['es', 'en'],
   },
+  redirects: {
+    '/': '/es',
+  },
   integrations: [react()],
   trailingSlash: 'never',
   image: {

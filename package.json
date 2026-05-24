@@ -12,6 +12,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "deploy:app": "pnpm build && pnpm firebase:hosting",
+    "firebase:hosting": "firebase deploy --only hosting",
+    "firebase:functions": "firebase deploy --only functions",
+    "firebase:firestore": "firebase deploy --only firestore",
     "test": "vitest",
     "test:run": "vitest run",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\"",
@@ -26,7 +30,8 @@
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,astro}": [
       "eslint --fix",
-      "prettier --write"
+      "prettier --write",
+      "pnpm test:run"
     ]
   },
   "dependencies": {

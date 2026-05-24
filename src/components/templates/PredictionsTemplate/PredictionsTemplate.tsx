@@ -206,7 +206,10 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   } | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setPredictorsLoading(false);
+      return;
+    }
     let cancelled = false;
     predictorService
       .getUserPredictors(user.uid)
