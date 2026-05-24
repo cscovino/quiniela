@@ -1,6 +1,6 @@
 import { useAuthStore } from '@store/auth-store';
 import { initAuth, getCachedAuthUid } from '@services/auth-bootstrap';
-import type { User } from '@types/firestore';
+import type { User } from '@app-types/firestore';
 
 let authUnsubscribe: (() => void) | null = null;
 

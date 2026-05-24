@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@atoms/Button/Button';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
-import type { Predictor } from '@types/firestore';
+import type { Predictor } from '@app-types/firestore';
 import './PredictorSelector.css';
 
 export interface PredictorSelectorProps {

@@ -5,8 +5,8 @@ if (savedTheme) {
   html.setAttribute('data-theme', savedTheme);
 }
 
-// Service worker registration
-if ('serviceWorker' in navigator) {
+// Service worker registration (prod only)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js');
   });

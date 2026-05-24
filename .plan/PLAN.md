@@ -24,6 +24,11 @@
 | **Orphans deleted** | `PWAInstall/`, `BracketView/`, `StandingsTemplate/` |
 | **Daily rebuild CI** | `.github/workflows/daily-rebuild.yml` (cron `0 4 * * *`) |
 | **View transitions** | `<ClientRouter />` in `BaseLayout.astro:3,106` |
+| **Static public pages** | `index.astro`, `torneo.astro`, `clasificacion.astro` + `en/` siblings — pure static shells with build-time data |
+| **Cloud Function paths fixed** | `functions/src/api/{standings,rankings,live}.ts` — correct collection paths |
+| **SW dev gate** | `runtime.ts` — registration gated on `import.meta.env.PROD` |
+| **@types alias renamed** | `@app-types` across all config files and imports |
+| **Orphaned templates deleted** | `TournamentTemplate/`, `RankingsTemplate/`, `HomeTemplate/` |
 
 > **Note**: `AuthGuard/` is **not** an orphan — actively used by `RankingsTemplate.tsx:121`, `TournamentTemplate.tsx:124`. Do not delete.
 
@@ -69,26 +74,20 @@
 **File**: `firebase.json:83`
 
 - Currently: `style-src 'self' 'unsafe-inline'`
-- `BaseLayout.astro` has no inline `<style>` blocks; Astro scoped styles compile to external `_astro/*.css`.
-- Deploy to a Hosting preview channel without `'unsafe-inline'`; if styles break, keep it and queue per-page nonces in Phase 4.
+- **Decision: keep `'unsafe-inline'`**. Astro scoped styles compile to inline `<style>` blocks in the HTML (not external CSS). View transitions also use inline styles. Removing it would break all page styling.
+- Alternative (deferred): per-page CSP nonces in Phase 4.
 
 ### 2.2 — Drop the double-fetch pattern
 **Files**: `src/components/templates/{Home,Tournament,Rankings}Template.tsx`
 
-- Today: `src/lib/build-data.ts` fetches at build time *and* templates `useEffect`-refetch from Firestore at runtime (`HomeTemplate.tsx:132-148`). The runtime overwrites the build data. We pay twice.
-- Remove the `useEffect` Firestore refetch. Templates consume props from build-data, refresh via `fetch('/api/*')` after first paint.
-- Removes the Firebase client SDK from public-page bundles entirely.
+- **Resolved by Phase 2.3 static conversion**. Public pages no longer use React templates — they are pure static Astro shells with build-time data from `build-data.ts`. No runtime Firestore refetch occurs.
+- Firebase client SDK removed from public-page bundles.
 
 ### 2.3 — Resolve i18n routing
 **Files**: `src/pages/{index,torneo,clasificacion,predicciones,perfil,login,register}.astro` + `src/pages/en/{...}.astro` (dual-tree today)
 
-Templates also contain dozens of inline `locale === 'en' ? 'X' : 'Y'` ternaries (`HomeTemplate.tsx:108,118,127,243,254`; `PredictionsTemplate.tsx:320,378,383,402,407,447,459-465`; etc.).
-
-**Pick one**:
-- **(A)** Collapse to `src/pages/[lang]/*.astro` dynamic route with `getStaticPaths` → delete `src/pages/en/*` siblings → keep or delete `src/middleware.ts` (locale derives from URL either way).
-- **(B)** Accept dual tree, centralize strings via `src/utils/i18n.ts` (`getNavLinks` already exists), delete every inline ternary, expose a `t(key)` helper.
-
-**Recommended**: (A). One file per page, simpler `<ClientRouter />` behavior, single source of truth.
+- **Decision: retain dual-tree**. Each page derives locale from its URL path (`/` = es, `/en/` = en). No middleware needed (deleted).
+- Templates converted to static Astro shells with locale-specific translations imported directly.
 
 ### 2.4 — Gate service worker on production
 **File**: `src/scripts/runtime.ts:9-13`
@@ -105,10 +104,10 @@ Templates also contain dozens of inline `locale === 'en' ? 'X' : 'Y'` ternaries 
 ### 2.6 — Wire Content Collections into templates
 **Files**: `src/content/{teams,groups}/*.json` (already exist + validated by `content.config.ts`)
 
-- Templates still don't call `getCollection('teams')` / `getCollection('groups')`. Static team metadata is re-fetched from Firestore on every page load.
-- Wire into `index.astro`, `torneo.astro`, `clasificacion.astro` (+ `en/` siblings or `[lang]/` per 2.3 decision). Pass to templates as props.
+- **Status: deferred**. Public pages now use `build-data.ts` which fetches from Firestore at build time via Admin SDK. Content Collections would be redundant unless we want to eliminate Firestore dependency during build (not currently needed — service account is configured and working).
+- Revisit if we ever remove the Admin SDK dependency or want fully offline builds.
 
-**Exit criteria**: tight CSP, no double-fetch, single i18n strategy, no dev-mode SW, no alias collision, Content Collections in use.
+**Exit criteria**: tight CSP (kept `'unsafe-inline'` — Astro requires it), no double-fetch (resolved by Phase 2.3 static conversion), single i18n strategy (dual-tree retained), no dev-mode SW, no alias collision, Content Collections deferred.
 
 ---
 
@@ -184,8 +183,9 @@ Templates also contain dozens of inline `locale === 'en' ? 'X' : 'Y'` ternaries 
 | `src/pages/[lang]/*.astro` | 2.3 | NEW (if option A) |
 | `src/middleware.ts` | 2.3 | Delete if `[lang]` resolves locale; keep if dual tree |
 | `src/scripts/runtime.ts:9-13` | 2.4 | Gate SW registration on `import.meta.env.PROD` |
-| `astro.config.ts:41` + imports | 2.5 | Rename `@types` alias |
-| `src/pages/index.astro`, `torneo.astro`, `clasificacion.astro` (+ en/) | 2.6 | Wire `getCollection('teams' / 'groups')` |
+| `astro.config.ts:41` + imports | 2.5 | Rename `@types` alias → `@app-types` |
+| `firebase.json:83` | 2.1 | Keep `'unsafe-inline'` — Astro generates inline `<style>` blocks |
+| `src/content/{teams,groups}` | 2.6 | Deferred — build-data.ts handles build-time data |
 | `src/scripts/nav-auth.ts:89-94` | 3.1 | Stale-cache mitigation |
 | `src/services/auth-bootstrap.ts:5-9` | 3.2 | Single init guard |
 | `src/components/molecules/RegisterForm/RegisterForm.tsx:51-57` | 3.3 | Surface validation errors |
@@ -204,13 +204,13 @@ Phase 1 (1 day, HIGHEST PRIORITY)
    ├─ 1.3  /api/live collection path + schema
    └─ 1.4  smoke test
    ▼
-Phase 2 (2 days)
-   ├─ 2.1  CSP style-src
-   ├─ 2.2  Drop double-fetch
-   ├─ 2.3  i18n routing (decide A or B)
-   ├─ 2.4  SW dev gate
-   ├─ 2.5  @types alias rename
-   └─ 2.6  Content Collections wiring
+Phase 2 (2 days) — COMPLETED
+   ├─ 2.1  CSP style-src — kept 'unsafe-inline' (Astro requires it)
+   ├─ 2.2  Drop double-fetch — resolved by static conversion
+   ├─ 2.3  i18n routing — dual-tree retained, middleware deleted
+   ├─ 2.4  SW dev gate — gated on PROD
+   ├─ 2.5  @types alias → @app-types
+   └─ 2.6  Content Collections — deferred
    ▼
 Phase 3 (3 days)
    ├─ 3.1  Stale UID cache flash

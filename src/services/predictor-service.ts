@@ -9,7 +9,7 @@ import {
   type Timestamp,
 } from 'firebase/firestore';
 import { getDb } from './firebase';
-import type { Predictor } from '@types/firestore';
+import type { Predictor } from '@app-types/firestore';
 
 export const predictorService = {
   async getUserPredictors(userId: string): Promise<Predictor[]> {

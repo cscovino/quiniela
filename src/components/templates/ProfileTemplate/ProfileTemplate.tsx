@@ -9,9 +9,9 @@ import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
 import { Button } from '@atoms/Button/Button';
 import { tournamentService } from '@services/tournament-service';
-import { BADGE_DEFINITIONS, getBadgeName, getBadgeDescription } from '@types/badges';
+import { BADGE_DEFINITIONS, getBadgeName, getBadgeDescription } from '@app-types/badges';
 import { useAuthStore } from '@store/auth-store';
-import type { PredictorStats } from '@types/firestore';
+import type { PredictorStats } from '@app-types/firestore';
 import type { PointEntry } from '@molecules/PointsChart/PointsChart';
 import './ProfileTemplate.css';
 

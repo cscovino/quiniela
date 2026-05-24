@@ -3,7 +3,7 @@ import { AdminMatchList } from '@organisms/AdminMatchList/AdminMatchList';
 import { Typography } from '@atoms/Typography/Typography';
 import { Button } from '@atoms/Button/Button';
 import { updateMatchResult } from '@services/admin-service';
-import type { Match, MatchStatus } from '@types/firestore';
+import type { Match, MatchStatus } from '@app-types/firestore';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { getDb } from '@services/firebase';
 import { useAuthStore } from '@store/auth-store';

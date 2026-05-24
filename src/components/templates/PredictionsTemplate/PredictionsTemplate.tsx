@@ -19,7 +19,7 @@ import { tournamentService } from '@services/tournament-service';
 import { predictionService } from '@services/prediction-service';
 import { predictorService } from '@services/predictor-service';
 import { useAuthStore } from '@store/auth-store';
-import type { Match, Predictor } from '@types/firestore';
+import type { Match, Predictor } from '@app-types/firestore';
 import './PredictionsTemplate.css';
 
 export interface PredictionsTemplateProps {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@atoms/Button/Button';
 import { Typography } from '@atoms/Typography/Typography';
-import type { Match, MatchStatus } from '@types/firestore';
+import type { Match, MatchStatus } from '@app-types/firestore';
 import './AdminMatchResultForm.css';
 
 export interface AdminMatchResultFormProps {

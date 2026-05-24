@@ -38,7 +38,7 @@ export default defineConfig({
         '@hooks': path.resolve('./src/hooks'),
         '@store': path.resolve('./src/store'),
         '@services': path.resolve('./src/services'),
-        '@types': path.resolve('./src/types'),
+        '@app-types': path.resolve('./src/types'),
         '@locales': path.resolve('./src/locales'),
         '@lib': path.resolve('./src/lib'),
       },
