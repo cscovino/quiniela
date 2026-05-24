@@ -54,6 +54,12 @@ const navLinks: NavLinks[] =
         { href: '/es/perfil', label: 'Perfil', active: activeNav === 'profile' },
       ];
 
+const adminLink: NavLinks = {
+  href: '/admin/matches',
+  label: 'Admin',
+  active: activeNav === 'admin',
+};
+
 const alternateUrl =
   locale === 'en' ? canonicalUrl.replace('/en', '/es') : canonicalUrl.replace('/es', '/en');
 ---
@@ -143,7 +149,12 @@ const alternateUrl =
     />
   </head>
   <body>
-    <NavBar links={navLinks} locale={locale} notificationCount={notificationCount} />
+    <NavBar
+      links={navLinks}
+      adminLink={adminLink}
+      locale={locale}
+      notificationCount={notificationCount}
+    />
     <main transition:name="content" transition:animate="fade">
       <slot />
     </main>

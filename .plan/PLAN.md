@@ -77,20 +77,25 @@ Issues surfaced by audit pass 3.
 ## Phase 2 — Pre-launch hardening (~1 week)
 
 ### 2.1 — Server-side auth gate on admin routes
-**File**: `src/pages/[lang]/admin/matches.astro:21`
 
-- Today: page is a static HTML shell with `client:idle` hydration. Unauthenticated visitors see the shell flash before the React `AuthGuard` kicks in.
-- **Decision**:
-  - **(A) Lightweight**: hide admin links in nav for non-admin users; rely on Firestore rules to reject any actual write. AuthGuard handles the visual flash.
-  - **(B) Robust**: move admin behind a separate Firebase Hosting site with auth challenge, or use Cloud Functions HTTPS to proxy admin pages with token validation.
+- **(A) Lightweight**: hide admin links in nav for non-admin users; rely on Firestore rules to reject any actual write. AuthGuard handles the visual flash. ✅ DONE
+  - Moved admin page from `[lang]/admin/matches.astro` to `/admin/matches.astro` (hidden path, English-only)
+  - Admin link rendered hidden by default; `nav-auth.ts` shows it only when `user.role === 'admin'`
+  - Mobile admin link also hidden by default, shown for admins only
 
 ### 2.2 — Add Sentry or TrackJS
 - Every prod error is currently invisible. Wire `BaseLayout.astro` to load Sentry (or TrackJS) — with nonce if/when nonces land (2.4).
 - Surface unhandled rejections, React error boundaries, Cloud Function errors.
 
-### 2.3 — Firebase App Check
+### 2.3 — Firebase App Check ✅ DONE
+
 - Now that `/api/{standings,rankings,live}` return real data, they're a real abuse target.
-- Enable App Check on the three Cloud Function endpoints; verify client-side `appCheck` token attachment in lazy Firebase init.
+- **Client**: `firebase.ts` initializes `ReCaptchaV3Provider` when `PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY` is set (prod only). `getAppCheckToken()` helper returns tokens for fetch headers.
+- **Functions**: `appCheckMiddleware.ts` verifies `X-Firebase-AppCheck` header via `admin.appCheck().verifyToken()`. Applied to `standings`, `rankings`, `live` endpoints. Returns 401 if token missing/invalid.
+- **Setup required**:
+  1. Create reCAPTCHA v3 site key at https://www.google.com/recaptcha/admin/create
+  2. Register app in Firebase Console → Security → App Check with the secret key
+  3. Add `PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY` to `.env` and hosting env vars
 
 ### 2.4 — Per-page CSP nonces (optional)
 - Phase 1 (prior audit) kept `'unsafe-inline'` in `style-src` because Astro scoped styles use inline `<style>`.
@@ -121,9 +126,7 @@ Issues surfaced by audit pass 3.
 
 | File | Phase | Action |
 |------|-------|--------|
-| `src/pages/[lang]/admin/matches.astro` | 2.1 | Decision A or B for admin auth gate |
 | `BaseLayout.astro` (head) | 2.2 | Sentry/TrackJS script tag |
-| `src/services/firebase.ts` | 2.3 | Add Firebase App Check init in lazy SDK path |
 | `.github/workflows/preview.yml` | 2.6 | NEW — preview channel deploy |
 
 ---
@@ -139,13 +142,13 @@ Phase 1 — Cleanup & correctness (1 day) — COMPLETED
    ├─ 1.5  Non-null guards — both home and away checked
    └─ 1.6  DESIGN.md — updated
    ▼
-Phase 2 — Pre-launch hardening (~1 week, before public launch)
-   ├─ 2.1  Admin auth gate
-   ├─ 2.2  Sentry / TrackJS
-   ├─ 2.3  Firebase App Check
-   ├─ 2.4  CSP nonces (optional / compliance-driven)
-   ├─ 2.5  PredictionsTemplate split (optional / maintenance-driven)
-   └─ 2.6  Preview channels CI
+ Phase 2 — Pre-launch hardening (~1 week, before public launch)
+    ├─ 2.1  Admin auth gate — DONE (2.1.A lightweight)
+    ├─ 2.2  Sentry / TrackJS
+    ├─ 2.3  Firebase App Check — DONE
+    ├─ 2.4  CSP nonces (optional / compliance-driven)
+    ├─ 2.5  PredictionsTemplate split (optional / maintenance-driven)
+    └─ 2.6  Preview channels CI
 ```
 
 **Total remaining**: ~1 day + ~1 week of pre-launch work. No P0 blockers. **Branch is launchable pending Phase 1 cleanup.**

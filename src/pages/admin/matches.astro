@@ -1,0 +1,11 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { AdminMatchesPage } from '@organisms/AdminMatchesPage/AdminMatchesPage';
+
+const title = 'Admin - Manage Matches';
+const description = 'Update match results and manage tournament data';
+---
+
+<BaseLayout locale="en" title={title} description={description} activeNav="admin">
+  <AdminMatchesPage client:idle />
+</BaseLayout>

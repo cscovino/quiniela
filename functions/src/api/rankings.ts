@@ -1,13 +1,18 @@
 import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
+import { verifyAppCheckToken } from './appCheckMiddleware';
 
 const db = admin.firestore();
 
 export const rankings = functions
   .runWith({ minInstances: 0 })
-  .https.onRequest(async (_req, res) => {
+  .https.onRequest(async (req, res) => {
     res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     res.set('Access-Control-Allow-Origin', '*');
+
+    await new Promise<void>((resolve, reject) => {
+      verifyAppCheckToken(req, res, resolve);
+    }).catch(() => {});
 
     try {
       const statsSnap = await db.collectionGroup('stats').get();

@@ -1,6 +1,7 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getAuth, setPersistence, browserLocalPersistence, type Auth } from 'firebase/auth';
+import { initializeAppCheck, ReCaptchaV3Provider, type AppCheck } from 'firebase/app-check';
 import type { Messaging } from 'firebase/messaging';
 
 const firebaseConfig = {
@@ -15,6 +16,7 @@ const firebaseConfig = {
 let app: FirebaseApp | null = null;
 let _db: Firestore | null = null;
 let _auth: Auth | null = null;
+let _appCheck: AppCheck | null = null;
 let _messaging: Messaging | null = null;
 let initPromise: Promise<void> | null = null;
 
@@ -32,8 +34,27 @@ export async function initFirebase(): Promise<void> {
     _db = getFirestore(a);
     _auth = getAuth(a);
     await setPersistence(_auth, browserLocalPersistence).catch(() => {});
+
+    const recaptchaKey = import.meta.env.PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY;
+    if (recaptchaKey && import.meta.env.PROD) {
+      _appCheck = initializeAppCheck(a, {
+        provider: new ReCaptchaV3Provider(recaptchaKey),
+        isTokenAutoRefreshEnabled: true,
+      });
+    }
   })();
   return initPromise;
+}
+
+export async function getAppCheckToken(): Promise<string | undefined> {
+  if (!_appCheck) return undefined;
+  const { getToken } = await import('firebase/app-check');
+  try {
+    const result = await getToken(_appCheck, { forceRefresh: false });
+    return result.token;
+  } catch {
+    return undefined;
+  }
 }
 
 export function getDb(): Firestore {

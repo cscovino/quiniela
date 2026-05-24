@@ -9,6 +9,15 @@ function render(user: User | null, els: ReturnType<typeof queryElements>) {
   if (els.links) els.links.style.display = 'flex';
   if (els.mobileLinks) els.mobileLinks.style.display = 'flex';
 
+  // Admin links: only for admin users
+  const isAdmin = user?.role === 'admin';
+  els.adminLinkEls.forEach((el) => {
+    el.style.display = isAdmin ? 'inline-block' : 'none';
+  });
+  els.adminMobileLinkEls.forEach((el) => {
+    el.style.display = isAdmin ? 'block' : 'none';
+  });
+
   if (user) {
     if (els.desktopUser) els.desktopUser.style.display = 'flex';
     if (els.desktopLogin) els.desktopLogin.style.display = 'none';
@@ -42,6 +51,8 @@ function queryElements() {
     usernameEls: document.querySelectorAll('[data-auth-username], [data-auth-mobile-username]'),
     logoutBtn: document.getElementById('logout-btn'),
     mobileLogoutBtn: document.getElementById('mobile-logout-btn'),
+    adminLinkEls: document.querySelectorAll('[data-auth-admin-link]'),
+    adminMobileLinkEls: document.querySelectorAll('[data-auth-admin-mobile-link]'),
   };
 }
 

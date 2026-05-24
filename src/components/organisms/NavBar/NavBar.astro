@@ -7,6 +7,7 @@ export interface NavLinks {
 
 export interface Props {
   links: NavLinks[];
+  adminLink?: NavLinks;
   locale: 'en' | 'es';
   notificationCount?: number;
   className?: string;
@@ -15,7 +16,14 @@ export interface Props {
   isAdmin?: boolean;
 }
 
-const { links, locale, notificationCount = 0, className = '', userDisplayName } = Astro.props;
+const {
+  links,
+  adminLink,
+  locale,
+  notificationCount = 0,
+  className = '',
+  userDisplayName,
+} = Astro.props;
 
 const otherLocale = locale === 'en' ? 'es' : 'en';
 const otherLocaleLabel = locale === 'en' ? 'ES' : 'EN';
@@ -41,6 +49,18 @@ const predictionsHref = locale === 'en' ? '/en/predictions' : '/es/predicciones'
           {link.label}
         </a>
       ))
+    }
+    {
+      adminLink && (
+        <a
+          href={adminLink.href}
+          class={`nav-bar__link ${adminLink.active ? 'nav-bar__link--active' : ''}`}
+          data-auth-admin-link
+          style="display:none"
+        >
+          {adminLink.label}
+        </a>
+      )
     }
   </div>
 
@@ -184,6 +204,20 @@ const predictionsHref = locale === 'en' ? '/en/predictions' : '/es/predicciones'
         <span class="nav-bar__cta-btn">{locale === 'en' ? 'Login' : 'Iniciar Sesión'}</span>
       </a>
     </div>
+
+    {
+      adminLink && (
+        <a
+          href={adminLink.href}
+          class="nav-bar__mobile-link nav-bar__mobile-link--admin"
+          data-auth-admin-mobile-link
+          data-close-menu
+          style="display:none"
+        >
+          {adminLink.label}
+        </a>
+      )
+    }
   </div>
 </nav>
 
