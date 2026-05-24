@@ -219,7 +219,7 @@ Sharp corners only. Zero `border-radius` across all elements. This is a core des
 - **Atoms:** Button, Input, Icon, Badge, Avatar, Spinner, Typography, Tooltip, ProgressBar, Divider, Checkbox, Radio
 - **Molecules:** MatchCard, TeamFlag, PredictorSelector, GroupStandings
 - **Organisms:** NavBar, Footer, ToastProvider
-- **Templates:** HomeTemplate, PredictionsTemplate, TournamentTemplate, RankingsTemplate, ProfileTemplate
+- **Templates:** PredictionsTemplate, ProfileTemplate, AuthTemplate
 
 **Naming convention:** BEM with double underscore (`.block__element--modifier`)
 

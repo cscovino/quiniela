@@ -1,231 +1,168 @@
 # Quiniela — Plan
 
 > Single source of truth. Pending work organized by Phase.
-> Generated from a fresh audit on `noram-2026 @ 952a5f1`.
+> Audited from current source code (commit `952a5f1+`, audit pass 3).
 
 ---
 
-## Status — what's already shipped
+## Status — shipped & verified
+
+All earlier remediation phases are complete and verified in source:
 
 | Area | Evidence |
 |------|----------|
-| **Hosting hygiene** | `firebase.json` — no SPA catch-all; `_astro/**` immutable; HTML no-cache; security headers; CSP; cleanUrls; trailingSlash. `.gitignore` covers `.firebase/`, `*.log`. `src/pages/api/` removed. |
+| **Hosting hygiene** | `firebase.json` — no SPA catch-all; `_astro/**` immutable; HTML no-cache; security headers; CSP; cleanUrls/trailingSlash. `.gitignore` covers `.firebase/`, `*.log`. |
 | **`auth-store` listener leak fix** | `auth-store.ts:26, 123-129` |
-| **Cloud Function endpoints** | `functions/src/api/{standings,rankings,live,setUserRole}.ts` exist (but with bugs — see Phase 1) |
-| **`firebase.json` rewrites `/api/*`** | `firebase.json:33-46` |
+| **Cloud Functions correct paths** | `functions/src/api/standings.ts:14-16`, `rankings.ts:13`, `live.ts:14-27` — query right Firestore paths, emit `Cache-Control: s-maxage=...` |
+| **`firebase.json` `/api/*` rewrites** | `firebase.json:33-46` |
 | **Single auth bootstrap** | `src/services/auth-bootstrap.ts` |
-| **NavBar `astro:page-load` fix** | `src/scripts/nav-auth.ts:111-115` |
-| **Orphan `dispatchEvent` removed** | confirmed via grep |
-| **Lazy Firebase** | `firebase.ts:28-53` — `getDb()`, `getAuthInstance()`, `initPromise` |
-| **Admin role via custom claims** | `auth-helpers.ts:120-121`, `scripts/set-admin-role.ts:24-28` uses `httpsCallable('setUserRole')`, `firestore.rules:6-9` |
+| **NavBar `astro:page-load` re-binding** | `src/scripts/nav-auth.ts:108-112` |
+| **Lazy Firebase client SDK** | `firebase.ts:28-53` — `getDb()`, `getAuthInstance()`, `initPromise` |
+| **Admin role via custom claims** | `auth-helpers.ts:120-121`, `scripts/set-admin-role.ts:24-28`, `firestore.rules:6-9` |
 | **`useAuthStore` per-field selectors** | `PredictionsTemplate.tsx:172-173`, `ProfileTemplate.tsx:46-47` |
 | **Form a11y** | `LoginForm.tsx:150`, `RegisterForm.tsx:105` — `role="alert" aria-live="polite"` |
-| **SW lean PWA shell** | `public/sw.js` = 84 lines |
+| **SW lean PWA shell + PROD gate** | `public/sw.js` = 84 lines, `runtime.ts:9` gated on `import.meta.env.PROD` |
 | **Orphans deleted** | `PWAInstall/`, `BracketView/`, `StandingsTemplate/` |
 | **Daily rebuild CI** | `.github/workflows/daily-rebuild.yml` (cron `0 4 * * *`) |
-| **View transitions** | `<ClientRouter />` in `BaseLayout.astro:3,106` |
-| **Static public pages** | `index.astro`, `torneo.astro`, `clasificacion.astro` + `en/` siblings — pure static shells with build-time data |
-| **Cloud Function paths fixed** | `functions/src/api/{standings,rankings,live}.ts` — correct collection paths |
-| **SW dev gate** | `runtime.ts` — registration gated on `import.meta.env.PROD` |
-| **@types alias renamed** | `@app-types` across all config files and imports |
-| **Orphaned templates deleted** | `TournamentTemplate/`, `RankingsTemplate/`, `HomeTemplate/` |
+| **View transitions** | `<ClientRouter />` in `BaseLayout.astro:107`; `<main transition:name="content" transition:animate="fade">` at `:147` |
+| **`[lang]/[slug]` dynamic route** | `src/pages/[lang]/[slug].astro` + `src/utils/slug-map.ts` — locale derived from URL; localized slugs (`/es/torneo` ↔ `/en/tournament`). `src/middleware.ts` deleted. |
+| **Public pages 100% static** | `[lang]/index.astro`, `[lang]/[slug].astro` — pure Astro shells with build-time data from `src/lib/build-data.ts` (firebase-admin SDK). No `client:*` on public routes. |
+| **Old React templates deleted** | `HomeTemplate/`, `TournamentTemplate/`, `RankingsTemplate/` removed; current templates are `AuthTemplate`, `PredictionTemplate`, `PredictionsTemplate`, `ProfileTemplate` |
+| **`@types` → `@app-types` alias rename** | `astro.config.ts:38`, `tsconfig.json:20`. Zero remaining `from '@types/` imports. |
+| **CSP `'unsafe-inline'` in `style-src`** | Kept by design — Astro scoped styles require it. Deferred to nonces in Phase 2. |
+| **Decision: Content Collections deferred** | `build-data.ts` reads via Admin SDK at build time; Content Collections would be redundant. Revisit if going offline-build. |
 
-> **Note**: `AuthGuard/` is **not** an orphan — actively used by `RankingsTemplate.tsx:121`, `TournamentTemplate.tsx:124`. Do not delete.
-
----
-
-## Phase 1 — Fix broken `/api/*` endpoints (1 day, HIGHEST PRIORITY)
-
-**Context**: The Firestore database has real data populated. All three `/api/*` Cloud Functions are currently querying **wrong collection paths**, so they return empty arrays in production. The frontend masks this today via direct Firestore reads in templates — but Phase 2 will lean on these endpoints, at which point every public page goes blank.
-
-### 1.1 — `/api/standings` — fix collection path
-**File**: `functions/src/api/standings.ts:13`
-
-- Currently queries: `db.collection('groupStandings')`
-- Should query: `db.collection('tournaments').doc('world-cup-2026').collection('group_standings')`
-- Reference: `src/lib/build-data.ts:58`, `src/services/firestore-helpers.ts:46-51`, `functions/src/updateGroupStandings.ts:140`
-
-### 1.2 — `/api/rankings` — fix collection path
-**File**: `functions/src/api/rankings.ts:13-17`
-
-- Currently queries: `db.collection('predictorStats')`
-- Should query: `db.collectionGroup('stats')` filtered by tournament; join to predictor info
-- Reference: `firestore.rules:56`, `src/lib/build-data.ts:138`
-
-### 1.3 — `/api/live` — fix collection path + schema
-**File**: `functions/src/api/live.ts:17-22`
-
-- Currently queries: `db.collection('matches')` filtered by `finishedAt`
-- Should query: `db.collection('tournaments').doc('world-cup-2026').collection('matches')`
-- Schema fix: there is no `finishedAt` field — use `date` (`Timestamp`) + `status` (`'live' | 'finished'`)
-
-### 1.4 — Smoke test
-- `curl https://<region>-<project>.cloudfunctions.net/standings | jq 'length'` returns > 0
-- Same for `rankings` and `live`
-- Verify edge cache: response headers include `Cache-Control: public, s-maxage=...`
-
-**Exit criteria**: All three endpoints return real data; CDN caching headers verified.
+> `AuthGuard/` is **not** an orphan — actively used by `RankingsTemplate.tsx:121`, `TournamentTemplate.tsx:124` (note: these templates are deleted now too; verify AuthGuard's remaining consumers before any removal).
 
 ---
 
-## Phase 2 — Critical cleanup (2 days)
+## Phase 1 — Cleanup & correctness (1 day)
 
-### 2.1 — Remove `'unsafe-inline'` from CSP `style-src`
-**File**: `firebase.json:83`
+Issues surfaced by audit pass 3.
 
-- Currently: `style-src 'self' 'unsafe-inline'`
-- **Decision: keep `'unsafe-inline'`**. Astro scoped styles compile to inline `<style>` blocks in the HTML (not external CSS). View transitions also use inline styles. Removing it would break all page styling.
-- Alternative (deferred): per-page CSP nonces in Phase 4.
+### 1.1 — Remove dead `fetch('/api/standings')` from home (HIGH)
+**File**: `src/pages/[lang]/index.astro:136-148`
 
-### 2.2 — Drop the double-fetch pattern
-**Files**: `src/components/templates/{Home,Tournament,Rankings}Template.tsx`
+- The home page issues a runtime `fetch('/api/standings')` then no-ops on the result. Wasted network roundtrip on every page load.
+- **Fix**: either render the fetched standings, or remove the script entirely. Build-time data via `build-data.ts` already covers the static case.
 
-- **Resolved by Phase 2.3 static conversion**. Public pages no longer use React templates — they are pure static Astro shells with build-time data from `build-data.ts`. No runtime Firestore refetch occurs.
-- Firebase client SDK removed from public-page bundles.
+### 1.2 — Replace fragile `displayName` reconstruction (HIGH)
+**Files**: `functions/src/api/rankings.ts:51`, `src/lib/build-data.ts:155`
 
-### 2.3 — Resolve i18n routing
-**Files**: `src/pages/[lang]/[slug].astro` with `getStaticPaths` + `src/utils/slug-map.ts`
+- Both compute `displayName = predictorId.split('-').slice(1).join('-') || userId.slice(0,8)`.
+- Breaks if a predictor name contains hyphens; falls through to a UID prefix if no hyphen at all.
+- **Fix**: read `displayName` from `users/{uid}/predictors/{predictorId}` doc (authoritative source).
 
-- **Decision: dynamic `[lang]/[slug]` routes with localized slugs**. Single catch-all file generates both `/es/*` and `/en/*` via `getStaticPaths` with slug map.
-- Localized slugs: `/es/torneo`, `/es/clasificacion`, `/es/predicciones`, `/es/perfil` vs `/en/tournament`, `/en/rankings`, `/en/predictions`, `/en/profile`.
-- No middleware needed — locale derived from URL path in each page.
+### 1.3 — Declare Firestore composite index for `/api/live`
+**Files**: `functions/src/api/live.ts:22-26`, `firestore/firestore.indexes.json`
 
-### 2.4 — Gate service worker on production
-**File**: `src/scripts/runtime.ts:9-13`
+- Query: `where('status','==','finished').where('date','>=', oneHourAgo)` requires a composite index `(status ASC, date ASC)` on `matches`.
+- **Fix**: add to `firestore.indexes.json`; deploy with `firebase deploy --only firestore:indexes`.
 
-- Wrap registration in `if (import.meta.env.PROD) { ... }` so dev doesn't ship the SW.
+### 1.4 — Add try/catch fallback in `build-data.ts`
+**File**: `src/lib/build-data.ts` — `getBuildData()`, `getBuildRankings()`
 
-### 2.5 — Rename `@types` path alias
-**File**: `astro.config.ts:41` + every import using `@types/firestore` (~10 files)
+- A transient Firestore failure during daily rebuild (`.github/workflows/daily-rebuild.yml`) would break the deploy.
+- **Fix**: wrap calls in try/catch, fall back to empty arrays + log a build warning. Daily CI then degrades gracefully instead of failing.
 
-- Currently collides with the npm `@types/*` scope.
-- Rename alias to `@app-types` or `@models`.
-- Verify: `grep -rl "from '@types/" src/`, then mass-rename.
+### 1.5 — Harden `build-data.ts` non-null cast
+**File**: `src/lib/build-data.ts:109`
 
-### 2.6 — Wire Content Collections into templates
-**Files**: `src/content/{teams,groups}/*.json` (already exist + validated by `content.config.ts`)
+- `s.result.away!` non-null assertion: if `result.home` is set but `result.away` is `null` (partial Firestore write during a match), this propagates `undefined as number`.
+- **Fix**: guard `if (result.home !== null && result.away !== null)` before constructing the view-model.
 
-- **Status: deferred**. Public pages now use `build-data.ts` which fetches from Firestore at build time via Admin SDK. Content Collections would be redundant unless we want to eliminate Firestore dependency during build (not currently needed — service account is configured and working).
-- Revisit if we ever remove the Admin SDK dependency or want fully offline builds.
+### 1.6 — Update `DESIGN.md`
+**File**: `DESIGN.md:222`
 
-**Exit criteria**: tight CSP (kept `'unsafe-inline'` — Astro requires it), no double-fetch (resolved by Phase 2.3 static conversion), single i18n strategy (dynamic `[lang]` routes), no dev-mode SW, no alias collision, Content Collections deferred.
+- Still references deleted `HomeTemplate`, `TournamentTemplate`, `RankingsTemplate`.
+- **Fix**: drop them; mention the `[lang]/[slug]` + `build-data.ts` architecture.
 
----
-
-## Phase 3 — Polish (3 days)
-
-### 3.1 — Fix stale UID cache flash
-**File**: `src/scripts/nav-auth.ts:89-94`
-
-- Cached UID hint paints "logged in" with empty `displayName`/`email`. If user logged out from another tab, they see logged-in UI for ~50-200ms.
-- Track a timestamp with the cached UID; treat older than N seconds as suspect; render neutral state until auth listener fires.
-
-### 3.2 — Single auth init guard
-**Files**: `src/services/auth-bootstrap.ts:5-9`, `src/store/auth-store.ts:124`
-
-- Both guard against double-init. Keep `auth-store.ts` (real subscription owner); make `auth-bootstrap.ts` a thin pass-through call site.
-
-### 3.3 — Surface form validation errors
-**Files**: `src/components/molecules/RegisterForm/RegisterForm.tsx:51-57`, `LoginForm/LoginForm.tsx`
-
-- Today: client-side validation failures (empty display name, password mismatch) silent-return.
-- Surface via the `aria-live` region already in place (`role="alert"`).
-
-### 3.4 — Initialize CodeGraph
-- Project root `CLAUDE.md` asks for `.codegraph/`; not present.
-- Run `codegraph init -i`.
-- Speeds future explore/refactor work by ~5-10×.
-
-### 3.5 — Migrate translation surface
-**Files**: every template under `src/components/templates/`
-
-- **Status: deferred**. Inline `locale === 'en' ? ...` ternaries exist in PredictionsTemplate (14), PredictionStep components (3), MatchCard (1), AuthTemplate (1), ProfileTemplate (1). These are auth-gated React pages that work correctly. Centralizing into locale JSON files is a cosmetic improvement, not a functional fix.
-- Revisit when adding new locales or when design system needs a unified `t(key)` helper.
-
-**Exit criteria**: no auth flicker; one init guard; visible validation errors; CodeGraph live; inline ternaries deferred.
+**Exit criteria**: home page has no dead fetch; rankings display name is authoritative; composite index declared; daily rebuild survives Firestore blip; docs match reality.
 
 ---
 
-## Phase 4 — Hardening (post-launch, ~1 week)
+## Phase 2 — Pre-launch hardening (~1 week)
 
-| Item | Trigger |
-|------|---------|
-| Add Sentry or TrackJS | Before public launch — every prod error is invisible today |
-| Firebase App Check | Before public launch — once `/api/*` returns real data (Phase 1), it becomes a real target |
-| Per-page CSP nonces | If Phase 2.1 needs `'unsafe-inline'` retained |
-| Break up `PredictionsTemplate.tsx` (600 LOC god-object) | If maintenance velocity drops |
-| Polish view transitions CSS (fade-in/out tuning) | Quality of life |
-| Hosting preview channels per PR | After CI matures |
+### 2.1 — Server-side auth gate on admin routes
+**File**: `src/pages/[lang]/admin/matches.astro:21`
+
+- Today: page is a static HTML shell with `client:idle` hydration. Unauthenticated visitors see the shell flash before the React `AuthGuard` kicks in.
+- **Decision**:
+  - **(A) Lightweight**: hide admin links in nav for non-admin users; rely on Firestore rules to reject any actual write. AuthGuard handles the visual flash.
+  - **(B) Robust**: move admin behind a separate Firebase Hosting site with auth challenge, or use Cloud Functions HTTPS to proxy admin pages with token validation.
+
+### 2.2 — Add Sentry or TrackJS
+- Every prod error is currently invisible. Wire `BaseLayout.astro` to load Sentry (or TrackJS) — with nonce if/when nonces land (2.4).
+- Surface unhandled rejections, React error boundaries, Cloud Function errors.
+
+### 2.3 — Firebase App Check
+- Now that `/api/{standings,rankings,live}` return real data, they're a real abuse target.
+- Enable App Check on the three Cloud Function endpoints; verify client-side `appCheck` token attachment in lazy Firebase init.
+
+### 2.4 — Per-page CSP nonces (optional)
+- Phase 1 (prior audit) kept `'unsafe-inline'` in `style-src` because Astro scoped styles use inline `<style>`.
+- If compliance later requires nonce-only CSP: Astro 6 supports per-request nonces via middleware. Larger refactor; defer until compliance signal arrives.
+
+### 2.5 — Break up `PredictionsTemplate.tsx` (optional)
+- 600 LOC god-object. Only do this if maintenance velocity drops; otherwise leave alone.
+
+### 2.6 — Hosting preview channels per PR
+- `.github/workflows/preview.yml` deploying to a Firebase Hosting preview channel on every PR.
+- Quality-of-life for code review. Free tier.
 
 ---
 
 ## What we are NOT doing
 
-- **Astro hybrid SSR / Cloud Functions adapter for pages** — explicitly deferred. Static + edge-cached `/api/*` is the architecture.
-- **Replace Firestore client SDK on auth-gated routes** — predictions/profile/admin need real-time reads + writes; client SDK is correct there.
-- **Astro API routes** — removed; Cloud Functions own this.
+- **Astro hybrid SSR** — deferred. Static + edge-cached `/api/*` is the architecture.
+- **Replace Firestore client SDK on auth-gated routes** — predictions/profile/admin need real-time reads + writes.
+- **Astro API routes** — removed; Cloud Functions own this surface.
 - **Dynamic SW caching** — CDN does it better.
-- **Delete `AuthGuard/`** — actively used; old plan was wrong.
+- **Delete `AuthGuard/`** — actively used (verify consumers before any future removal).
+- **Remove `'unsafe-inline'` from CSP `style-src`** — Astro scoped styles require it.
+- **Wire Content Collections** — `build-data.ts` via Admin SDK is the chosen path.
 
 ---
 
-## File-by-file change summary (remaining work)
+## File-by-file change summary (remaining)
 
 | File | Phase | Action |
 |------|-------|--------|
-| `functions/src/api/standings.ts:13` | 1.1 | Fix collection path → `tournaments/world-cup-2026/group_standings` |
-| `functions/src/api/rankings.ts:13-17` | 1.2 | Switch to `collectionGroup('stats')` |
-| `functions/src/api/live.ts:17-22` | 1.3 | Fix path; use `date` + `status` instead of `finishedAt` |
-| `firebase.json:83` | 2.1 | Remove `'unsafe-inline'` from `style-src` |
-| `src/components/templates/HomeTemplate/HomeTemplate.tsx:132-148` | 2.2 | Drop `useEffect` Firestore refetch; consume props + `/api/*` |
-| `src/components/templates/TournamentTemplate/TournamentTemplate.tsx` | 2.2 | Same |
-| `src/components/templates/RankingsTemplate/RankingsTemplate.tsx` | 2.2 | Same |
-| `src/pages/en/*.astro` | 2.3 | Delete (if option A) — replaced by `[lang]/*.astro` |
-| `src/pages/[lang]/*.astro` | 2.3 | NEW (if option A) |
-| `src/middleware.ts` | 2.3 | Delete if `[lang]` resolves locale; keep if dual tree |
-| `src/scripts/runtime.ts:9-13` | 2.4 | Gate SW registration on `import.meta.env.PROD` |
-| `astro.config.ts:41` + imports | 2.5 | Rename `@types` alias → `@app-types` |
-| `firebase.json:83` | 2.1 | Keep `'unsafe-inline'` — Astro generates inline `<style>` blocks |
-| `src/content/{teams,groups}` | 2.6 | Deferred — build-data.ts handles build-time data |
-| `src/scripts/nav-auth.ts:89-94` | 3.1 | Stale-cache mitigation — timestamped cache, neutral state until listener |
-| `src/services/auth-bootstrap.ts:5-9` | 3.2 | Single init guard — auth-store owns it, bootstrap is pass-through |
-| `src/components/molecules/RegisterForm/RegisterForm.tsx:51-57` | 3.3 | Already working — errors surfaced via role="alert" + aria-live |
-| (CodeGraph) | 3.4 | Initialized — 181 files, 1311 nodes, 1128 edges |
-| `src/components/templates/**` | 3.5 | Deferred — cosmetic improvement, not functional |
-| Sentry / TrackJS / App Check / nonces | 4 | NEW (post-launch) |
+| `src/pages/[lang]/index.astro:136-148` | 1.1 | Remove dead `fetch('/api/standings')` or wire it to render |
+| `functions/src/api/rankings.ts:51` | 1.2 | Read `displayName` from predictor doc |
+| `src/lib/build-data.ts:155` | 1.2 | Same |
+| `firestore/firestore.indexes.json` | 1.3 | Add composite index `(status, date)` on `matches` |
+| `src/lib/build-data.ts` (`getBuildData`, `getBuildRankings`) | 1.4 | try/catch with empty-state fallback |
+| `src/lib/build-data.ts:109` | 1.5 | Guard `result.home`/`result.away` both non-null |
+| `DESIGN.md:222` | 1.6 | Drop deleted-template references |
+| `src/pages/[lang]/admin/matches.astro` | 2.1 | Decision A or B for admin auth gate |
+| `BaseLayout.astro` (head) | 2.2 | Sentry/TrackJS script tag |
+| `src/services/firebase.ts` | 2.3 | Add Firebase App Check init in lazy SDK path |
+| `.github/workflows/preview.yml` | 2.6 | NEW — preview channel deploy |
 
 ---
 
 ## Sequencing
 
 ```
-Phase 1 (1 day, HIGHEST PRIORITY)
-   ├─ 1.1  /api/standings collection path
-   ├─ 1.2  /api/rankings collection path
-   ├─ 1.3  /api/live collection path + schema
-   └─ 1.4  smoke test
+Phase 1 — Cleanup & correctness (1 day)
+   ├─ 1.1  Remove dead fetch
+   ├─ 1.2  Authoritative displayName
+   ├─ 1.3  Composite index
+   ├─ 1.4  Build try/catch
+   ├─ 1.5  Non-null guards
+   └─ 1.6  DESIGN.md
    ▼
-Phase 2 (2 days) — COMPLETED
-   ├─ 2.1  CSP style-src — kept 'unsafe-inline' (Astro requires it)
-   ├─ 2.2  Drop double-fetch — resolved by static conversion
-   ├─ 2.3  i18n routing — dynamic [lang] routes with getStaticPaths
-   ├─ 2.4  SW dev gate — gated on PROD
-   ├─ 2.5  @types alias → @app-types
-   └─ 2.6  Content Collections — deferred
-   ▼
-Phase 3 (3 days) — COMPLETED
-   ├─ 3.1  Stale UID cache flash — timestamped cache with 30s TTL
-   ├─ 3.2  Single init guard — auth-store owns guard, auth-bootstrap is pass-through
-   ├─ 3.3  Form validation feedback — already working (role="alert" + aria-live)
-   ├─ 3.4  CodeGraph init — indexed 181 files, 1311 nodes
-   └─ 3.5  Strip inline ternaries — deferred (cosmetic, not functional)
-   ▼
-Phase 4 (post-launch, open-ended)
+Phase 2 — Pre-launch hardening (~1 week, before public launch)
+   ├─ 2.1  Admin auth gate
+   ├─ 2.2  Sentry / TrackJS
+   ├─ 2.3  Firebase App Check
+   ├─ 2.4  CSP nonces (optional / compliance-driven)
+   ├─ 2.5  PredictionsTemplate split (optional / maintenance-driven)
+   └─ 2.6  Preview channels CI
 ```
 
-**Total remaining**: ~1 week of focused work + open-ended Phase 4.
-
-Phases 1-3 complete. Phase 4 (post-launch hardening) is the only remaining work.
+**Total remaining**: ~1 day + ~1 week of pre-launch work. No P0 blockers. **Branch is launchable pending Phase 1 cleanup.**
 
 ---
 
@@ -234,6 +171,6 @@ Phases 1-3 complete. Phase 4 (post-launch hardening) is the only remaining work.
 | Resource | Peak estimated | Free tier | Status |
 |----------|----------------|-----------|--------|
 | Cloud Functions invocations | ~130k/mo (1/min × 3 endpoints, edge-cached) | 2M/mo | OK |
-| Firestore reads | ~150k/mo (functions only after Phase 2.2) | 1.5M/mo (50k/day) | OK |
+| Firestore reads | ~150k/mo (functions only, no client refetch on public pages) | 1.5M/mo (50k/day) | OK |
 | Hosting egress | ~20 GB/mo at WC peak | 10 GB/mo free | Watch — Blaze plan at $0.15/GB beyond |
 | GitHub Actions minutes | ~30/mo (daily rebuild during tournament) | 2000/mo free | OK |

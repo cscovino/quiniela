@@ -43,12 +43,29 @@ export const rankings = functions
         .sort((a, b) => b.totalPoints - a.totalPoints)
         .slice(0, 100);
 
+      const predictorRefs = new Set<string>();
+      for (const s of sorted) {
+        predictorRefs.add(`users/${s.userId}/predictors/${s.predictorId}`);
+      }
+
+      const predictorDocs = await Promise.all(
+        Array.from(predictorRefs).map(async (ref) => {
+          const snap = await db.doc(ref).get();
+          return { id: ref, name: snap.exists ? snap.data()?.name || null : null };
+        }),
+      );
+
+      const nameMap = new Map<string, string>();
+      for (const p of predictorDocs) {
+        nameMap.set(p.id, p.name || p.id.split('/').pop() || 'Unknown');
+      }
+
       const rankings = sorted.map((s, i) => ({
         id: s.id,
         rank: i + 1,
         userId: s.userId,
         predictorId: s.predictorId,
-        displayName: s.predictorId.split('-').slice(1).join('-') || s.userId.slice(0, 8),
+        displayName: nameMap.get(`users/${s.userId}/predictors/${s.predictorId}`) || s.predictorId,
         totalPoints: s.totalPoints,
         accuracy: s.accuracy,
         currentStreak: s.currentStreak,

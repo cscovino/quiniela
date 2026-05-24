@@ -132,20 +132,6 @@ const rankingsUrl = isEs ? '/es/clasificacion' : '/en/rankings';
       </div>
     </section>
   </main>
-
-  <script is:inline>
-    document.addEventListener('astro:page-load', function () {
-      fetch('/api/standings')
-        .then(function (r) {
-          return r.json();
-        })
-        .then(function (data) {
-          var container = document.getElementById('matches-container');
-          if (!container || !data || data.length === 0) return;
-        })
-        .catch(function () {});
-    });
-  </script>
 </BaseLayout>
 
 <style>
