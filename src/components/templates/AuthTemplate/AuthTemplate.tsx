@@ -20,7 +20,7 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({
   locale = 'es',
   className = '',
 }) => {
-  const redirectUrl = locale === 'en' ? '/en/predictions' : '/predicciones';
+  const redirectUrl = locale === 'en' ? '/en/predictions' : '/es/predictions';
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
 
   return (

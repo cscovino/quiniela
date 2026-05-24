@@ -1,0 +1,24 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import AuthPage from '@pages/AuthPage.astro';
+import es from '@locales/es/auth.json';
+import en from '@locales/en/auth.json';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'es' }, props: { locale: 'es' } },
+    { params: { lang: 'en' }, props: { locale: 'en' } },
+  ];
+}
+
+const { locale } = Astro.props;
+const translations = locale === 'en' ? en : es;
+---
+
+<BaseLayout
+  locale={locale}
+  title={translations.auth.login.title}
+  description={translations.auth.login.subtitle}
+>
+  <AuthPage locale={locale} initialMode="login" />
+</BaseLayout>

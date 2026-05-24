@@ -444,7 +444,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         <div className="predictions-template__auth-required">
           <Typography variant="h1">{translations.title}</Typography>
           <Typography variant="body">{translations.loginRequired}</Typography>
-          <a href={locale === 'en' ? '/en/login' : '/login'}>
+          <a href={locale === 'en' ? '/en/login' : '/es/login'}>
             <button type="button" className="predictions-template__login-btn">
               {translations.loginButton}
             </button>

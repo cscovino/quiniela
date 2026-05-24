@@ -35,7 +35,7 @@ export interface RegisterFormProps {
 export const RegisterForm: React.FC<RegisterFormProps> = ({
   translations,
   onLoginClick,
-  redirectUrl = '/predicciones',
+  redirectUrl = '/es/predictions',
   className = '',
 }) => {
   const [displayName, setDisplayName] = useState('');

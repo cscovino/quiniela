@@ -14,7 +14,7 @@ export interface AuthGuardProps {
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({
   children,
-  loginUrl = '/login',
+  loginUrl = '/es/login',
   message,
   loadingMessage = 'Loading...',
 }) => {

@@ -141,7 +141,7 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
         <div className="profile-template__auth-required">
           <Typography variant="h1">{translations.title}</Typography>
           <Typography variant="body">{translations.loginRequired}</Typography>
-          <a href={locale === 'en' ? '/en/login' : '/login'}>
+          <a href={locale === 'en' ? '/en/login' : '/es/login'}>
             <Button variant="primary" size="md">
               {translations.loginButton}
             </Button>

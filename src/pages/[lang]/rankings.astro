@@ -2,9 +2,18 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getBuildRankings } from '@lib/build-data';
 import es from '@locales/es/common.json';
+import en from '@locales/en/common.json';
 
-const locale = 'es';
-const translations = es;
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'es' }, props: { locale: 'es' } },
+    { params: { lang: 'en' }, props: { locale: 'en' } },
+  ];
+}
+
+const { locale } = Astro.props;
+const translations = locale === 'en' ? en : es;
+const isEs = locale === 'es';
 
 const rankings = await getBuildRankings();
 ---
@@ -17,7 +26,7 @@ const rankings = await getBuildRankings();
 >
   <main class="rankings-template__content">
     <header class="rankings-template__header">
-      <h1>Clasificación de Pronosticadores</h1>
+      <h1>{isEs ? 'Clasificación de Pronosticadores' : 'Predictor Rankings'}</h1>
     </header>
 
     {
@@ -26,10 +35,10 @@ const rankings = await getBuildRankings();
           <thead>
             <tr>
               <th>#</th>
-              <th>Jugador</th>
-              <th>Pts</th>
-              <th>Precisión</th>
-              <th>Racha</th>
+              <th>{isEs ? 'Jugador' : 'Player'}</th>
+              <th>{isEs ? 'Pts' : 'Pts'}</th>
+              <th>{isEs ? 'Precisión' : 'Accuracy'}</th>
+              <th>{isEs ? 'Racha' : 'Streak'}</th>
             </tr>
           </thead>
           <tbody>
@@ -46,7 +55,9 @@ const rankings = await getBuildRankings();
         </table>
       ) : (
         <p class="rankings-template__empty">
-          ¡Aún no hay clasificación. ¡Haz predicciones para aparecer aquí!
+          {isEs
+            ? '¡Aún no hay clasificación. ¡Haz predicciones para aparecer aquí!'
+            : 'No rankings available yet. Make predictions to appear here!'}
         </p>
       )
     }

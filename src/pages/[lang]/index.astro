@@ -2,22 +2,30 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getBuildData } from '@lib/build-data';
 import es from '@locales/es/common.json';
+import en from '@locales/en/common.json';
 
-const locale = 'es';
-const translations = es;
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'es' }, props: { locale: 'es' } },
+    { params: { lang: 'en' }, props: { locale: 'en' } },
+  ];
+}
+
+const { locale } = Astro.props;
+const translations = locale === 'en' ? en : es;
 
 const buildData = await getBuildData();
 
-function formatDate(date: Date, locale: string) {
-  return date.toLocaleDateString(locale === 'en' ? 'en-US' : 'es-ES', {
+function formatDate(date: Date, loc: string) {
+  return date.toLocaleDateString(loc === 'en' ? 'en-US' : 'es-ES', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
 }
 
-function formatTime(date: Date, locale: string) {
-  return date.toLocaleTimeString(locale === 'en' ? 'en-US' : 'es-ES', {
+function formatTime(date: Date, loc: string) {
+  return date.toLocaleTimeString(loc === 'en' ? 'en-US' : 'es-ES', {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -45,8 +53,8 @@ function statusVariant(status: string) {
   return variants[status] || 'info';
 }
 
-const predictionsUrl = '/predicciones';
-const rankingsUrl = '/clasificacion';
+const predictionsUrl = locale === 'en' ? '/en/predictions' : '/es/predictions';
+const rankingsUrl = locale === 'en' ? '/en/rankings' : '/es/rankings';
 ---
 
 <BaseLayout
@@ -57,16 +65,28 @@ const rankingsUrl = '/clasificacion';
 >
   <main class="home-template__content">
     <section class="home-template__hero">
-      <h2 class="home-template__hero-title">Predice. Compite. Gana.</h2>
-      <p>Haz tus predicciones para cada partido y escala en la clasificación!</p>
+      <h2 class="home-template__hero-title">
+        {locale === 'en' ? 'Predict. Compete. Win.' : 'Predice. Compite. Gana.'}
+      </h2>
+      <p>
+        {
+          locale === 'en'
+            ? 'Make your predictions for every match and climb the leaderboard!'
+            : '¡Haz tus predicciones para cada partido y escala en la clasificación!'
+        }
+      </p>
       <div class="home-template__actions">
-        <a href={predictionsUrl} class="btn btn--primary btn--lg">Hacer Predicciones</a>
-        <a href={rankingsUrl} class="btn btn--secondary btn--lg">Ver Clasificación</a>
+        <a href={predictionsUrl} class="btn btn--primary btn--lg">
+          {locale === 'en' ? 'Make Predictions' : 'Hacer Predicciones'}
+        </a>
+        <a href={rankingsUrl} class="btn btn--secondary btn--lg">
+          {locale === 'en' ? 'View Standings' : 'Ver Clasificación'}
+        </a>
       </div>
     </section>
 
     <section class="home-template__matches">
-      <h3>Próximos Partidos</h3>
+      <h3>{locale === 'en' ? 'Upcoming Matches' : 'Próximos Partidos'}</h3>
       <div id="matches-container" class="match-list">
         {
           buildData.matches.length > 0 ? (
@@ -103,7 +123,9 @@ const rankingsUrl = '/clasificacion';
               </div>
             ))
           ) : (
-            <p class="match-list__empty">No hay partidos próximos</p>
+            <p class="match-list__empty">
+              {locale === 'en' ? 'No upcoming matches' : 'No hay partidos próximos'}
+            </p>
           )
         }
       </div>

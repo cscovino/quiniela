@@ -1,10 +1,18 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import PredictionsPage from '@pages/PredictionsPage.astro';
+import es from '@locales/es/common.json';
 import en from '@locales/en/common.json';
 
-const locale = 'en';
-const translations = en;
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'es' }, props: { locale: 'es' } },
+    { params: { lang: 'en' }, props: { locale: 'en' } },
+  ];
+}
+
+const { locale } = Astro.props;
+const translations = locale === 'en' ? en : es;
 ---
 
 <BaseLayout

@@ -27,27 +27,27 @@ export function getTranslations(locale: Locale): Translations {
 
 export function getNavLinks(locale: Locale, activeNav: string) {
   const nav = translations[locale].common.nav;
-  const prefix = locale === 'en' ? '/en' : '';
+  const prefix = locale === 'en' ? '/en' : '/es';
 
   return [
-    { href: prefix || '/', label: nav.home, active: activeNav === 'home' },
+    { href: `${prefix}/`, label: nav.home, active: activeNav === 'home' },
     {
-      href: `${prefix}/torneo`,
+      href: `${prefix}/tournament`,
       label: locale === 'en' ? 'Tournament' : 'Torneo',
       active: activeNav === 'tournament',
     },
     {
-      href: `${prefix}/predicciones`,
+      href: `${prefix}/predictions`,
       label: locale === 'en' ? 'Predictions' : 'Predicciones',
       active: activeNav === 'predictions',
     },
     {
-      href: `${prefix}/clasificacion`,
+      href: `${prefix}/rankings`,
       label: locale === 'en' ? 'Rankings' : 'Clasificación',
       active: activeNav === 'rankings',
     },
     {
-      href: `${prefix}/perfil`,
+      href: `${prefix}/profile`,
       label: locale === 'en' ? 'Profile' : 'Perfil',
       active: activeNav === 'profile',
     },

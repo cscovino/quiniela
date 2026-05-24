@@ -1,25 +1,38 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getBuildData } from '@lib/build-data';
+import es from '@locales/es/common.json';
 import en from '@locales/en/common.json';
 
-const locale = 'en';
-const translations = en;
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'es' }, props: { locale: 'es' } },
+    { params: { lang: 'en' }, props: { locale: 'en' } },
+  ];
+}
+
+const { locale } = Astro.props;
+const translations = locale === 'en' ? en : es;
 
 const buildData = await getBuildData();
 const standings = buildData.standings;
+
+const isEs = locale === 'es';
 ---
 
 <BaseLayout
   locale={locale}
-  title={translations.pages.tournament?.title || 'Tournament - Quiniela'}
+  title={translations.pages.tournament?.title ||
+    (isEs ? 'Torneo - Quiniela' : 'Tournament - Quiniela')}
   description={translations.pages.tournament?.description ||
-    'Group standings and tournament matches'}
+    (isEs
+      ? 'Clasificación de grupos y partidos del torneo'
+      : 'Group standings and tournament matches')}
   activeNav="tournament"
 >
   <main class="tournament-template__content">
     <header class="tournament-template__header">
-      <h1>Tournament</h1>
+      <h1>{isEs ? 'Torneo' : 'Tournament'}</h1>
     </header>
 
     <div class="tournament-template__tabs" role="tablist">
@@ -27,15 +40,17 @@ const standings = buildData.standings;
         class="tournament-template__tab active"
         data-tab="standings"
         role="tab"
-        aria-selected="true">Standings</button
+        aria-selected="true"
       >
-      <button class="tournament-template__tab" data-tab="matches" role="tab" aria-selected="false"
-        >Matches</button
-      >
+        {isEs ? 'Clasificación' : 'Standings'}
+      </button>
+      <button class="tournament-template__tab" data-tab="matches" role="tab" aria-selected="false">
+        {isEs ? 'Partidos' : 'Matches'}
+      </button>
     </div>
 
     <section class="tournament-template__standings" data-panel="standings">
-      <h2>Group Stage</h2>
+      <h2>{isEs ? 'Fase de Grupos' : 'Group Stage'}</h2>
       {
         standings.length > 0 ? (
           standings.map((group) => (
@@ -45,13 +60,13 @@ const standings = buildData.standings;
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Team</th>
+                    <th>{isEs ? 'Equipo' : 'Team'}</th>
                     <th>P</th>
-                    <th>W</th>
-                    <th>D</th>
-                    <th>L</th>
+                    <th>{isEs ? 'G' : 'W'}</th>
+                    <th>{isEs ? 'E' : 'D'}</th>
+                    <th>{isEs ? 'P' : 'L'}</th>
                     <th>GF</th>
-                    <th>GA</th>
+                    <th>GC</th>
                     <th>Pts</th>
                   </tr>
                 </thead>
@@ -74,14 +89,18 @@ const standings = buildData.standings;
             </div>
           ))
         ) : (
-          <p class="tournament-template__empty">No standings available</p>
+          <p class="tournament-template__empty">
+            {isEs ? 'No hay clasificación disponible' : 'No standings available'}
+          </p>
         )
       }
     </section>
 
     <section class="tournament-template__matches" data-panel="matches" hidden>
       <div id="matches-content">
-        <p class="tournament-template__empty">Loading matches...</p>
+        <p class="tournament-template__empty">
+          {isEs ? 'Cargando partidos...' : 'Loading matches...'}
+        </p>
       </div>
     </section>
   </main>

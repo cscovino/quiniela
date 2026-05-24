@@ -19,13 +19,13 @@ const { links, locale, notificationCount = 0, className = '', userDisplayName } 
 
 const otherLocale = locale === 'en' ? 'es' : 'en';
 const otherLocaleLabel = locale === 'en' ? 'ES' : 'EN';
-const otherLocaleHref = locale === 'en' ? '/' : '/en';
-const loginHref = locale === 'en' ? '/en/login' : '/login';
-const predictionsHref = locale === 'en' ? '/en/predictions' : '/predicciones';
+const otherLocaleHref = locale === 'en' ? '/es/' : '/en/';
+const loginHref = locale === 'en' ? '/en/login' : '/es/login';
+const predictionsHref = locale === 'en' ? '/en/predictions' : '/es/predictions';
 ---
 
 <nav class={`nav-bar ${className}`} transition:name="navbar">
-  <a href={locale === 'en' ? '/en' : '/'} class="nav-bar__brand">
+  <a href={locale === 'en' ? '/en/' : '/es/'} class="nav-bar__brand">
     <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
       <path d="M4 4h16v2H4zm0 14h16v2H4zM2 6h2v12H2zm18 0h2v12h-2zM8 9h2v6H8z"></path>
       <path d="M6 11h6v2H6zm8-2h2v2h-2zm2 4h2v2h-2z"></path>

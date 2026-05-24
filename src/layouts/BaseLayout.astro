@@ -40,21 +40,22 @@ const ogImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 const navLinks: NavLinks[] =
   locale === 'en'
     ? [
-        { href: '/en', label: 'Home', active: activeNav === 'home' },
+        { href: '/en/', label: 'Home', active: activeNav === 'home' },
         { href: '/en/tournament', label: 'Tournament', active: activeNav === 'tournament' },
         { href: '/en/predictions', label: 'Predictions', active: activeNav === 'predictions' },
         { href: '/en/rankings', label: 'Rankings', active: activeNav === 'rankings' },
         { href: '/en/profile', label: 'Profile', active: activeNav === 'profile' },
       ]
     : [
-        { href: '/', label: 'Inicio', active: activeNav === 'home' },
-        { href: '/torneo', label: 'Torneo', active: activeNav === 'tournament' },
-        { href: '/predicciones', label: 'Predicciones', active: activeNav === 'predictions' },
-        { href: '/clasificacion', label: 'Clasificación', active: activeNav === 'rankings' },
-        { href: '/perfil', label: 'Perfil', active: activeNav === 'profile' },
+        { href: '/es/', label: 'Inicio', active: activeNav === 'home' },
+        { href: '/es/tournament', label: 'Torneo', active: activeNav === 'tournament' },
+        { href: '/es/predictions', label: 'Predicciones', active: activeNav === 'predictions' },
+        { href: '/es/rankings', label: 'Clasificación', active: activeNav === 'rankings' },
+        { href: '/es/profile', label: 'Perfil', active: activeNav === 'profile' },
       ];
 
-const alternateUrl = locale === 'en' ? '/' : '/en' + canonicalUrl;
+const alternateUrl =
+  locale === 'en' ? canonicalUrl.replace('/en', '/es') : canonicalUrl.replace('/es', '/en');
 ---
 
 <html lang={locale} data-theme={theme}>
