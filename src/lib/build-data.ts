@@ -1,5 +1,4 @@
 import { getFirestore } from './firebase-admin';
-import type { MatchListProps } from '@organisms/MatchList/MatchList';
 import type { RankingsTableProps } from '@organisms/RankingsTable/RankingsTable';
 import type { GroupStandingsProps } from '@organisms/GroupStandings/GroupStandings';
 
@@ -49,14 +48,21 @@ interface PredictorStatsData {
   predictorId: string;
 }
 
+interface GroupData {
+  slug: string;
+  name: string;
+  order: number;
+}
+
 export async function getBuildData() {
   const db = getFirestore();
 
   try {
-    const [teamsSnap, matchesSnap, standingsSnap] = await Promise.all([
+    const [teamsSnap, matchesSnap, standingsSnap, groupsSnap] = await Promise.all([
       db.collection(`tournaments/${TOURNAMENT_ID}/teams`).get(),
       db.collection(`tournaments/${TOURNAMENT_ID}/matches`).orderBy('date').get(),
       db.collection(`tournaments/${TOURNAMENT_ID}/group_standings`).get(),
+      db.collection(`tournaments/${TOURNAMENT_ID}/groups`).get(),
     ]);
 
     const teams: Record<string, TeamData> = {};
@@ -65,29 +71,32 @@ export async function getBuildData() {
       teams[data.fifaCode.toLowerCase()] = data;
     });
 
-    const allMatches = matchesSnap.docs.map((doc) => ({
+    // groups: keyed by doc.id (the slug used as groupId in teams)
+    const groupsMap = new Map<string, GroupData>();
+    groupsSnap.forEach((doc) => {
+      const data = doc.data() as Partial<GroupData>;
+      groupsMap.set(doc.id, {
+        slug: data.slug || doc.id,
+        name: data.name || doc.id,
+        order: data.order ?? 999,
+      });
+    });
+
+    const rawMatches = matchesSnap.docs.map((doc) => ({
       ...doc.data(),
       id: doc.id,
     })) as (MatchData & { id: string })[];
 
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayEnd = new Date(todayStart);
-    todayEnd.setDate(todayEnd.getDate() + 1);
+    type MatchView = {
+      homeTeam: { fifaCode: string; name: string };
+      awayTeam: { fifaCode: string; name: string };
+      date: Date;
+      status: string;
+      stadium: string;
+      result?: { home: number; away: number };
+    };
 
-    const todayMatches = allMatches.filter((m) => {
-      const d = m.date.toDate();
-      return d >= todayStart && d < todayEnd;
-    });
-
-    const upcomingMatches = allMatches
-      .filter((m) => m.date.toDate() >= now && m.status === 'scheduled')
-      .sort((a, b) => a.date.toMillis() - b.date.toMillis())
-      .slice(0, 5);
-
-    const displayMatches = todayMatches.length > 0 ? todayMatches : upcomingMatches;
-
-    const matches: MatchListProps['matches'] = displayMatches.slice(0, 5).map((m) => {
+    function toViewModel(m: MatchData & { id: string }): MatchView {
       const homeTeam = m.homeTeamId
         ? teams[m.homeTeamId.toLowerCase()] || {
             fifaCode: m.homeTeamId.toUpperCase(),
@@ -114,16 +123,44 @@ export async function getBuildData() {
         stadium: m.stadium,
         result,
       };
+    }
+
+    // Full ordered list (already sorted by Firestore `orderBy('date')`)
+    const allMatches: MatchView[] = rawMatches.map(toViewModel);
+
+    // Home-page subset: today's matches OR next 5 upcoming
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(todayStart);
+    todayEnd.setDate(todayEnd.getDate() + 1);
+
+    const todayMatches = rawMatches.filter((m) => {
+      const d = m.date.toDate();
+      return d >= todayStart && d < todayEnd;
     });
 
-    const standings: GroupStandingsProps['groups'] = standingsSnap.docs.map((doc) => {
+    const upcomingMatches = rawMatches
+      .filter((m) => m.date.toDate() >= now && m.status === 'scheduled')
+      .sort((a, b) => a.date.toMillis() - b.date.toMillis())
+      .slice(0, 5);
+
+    const displayMatches = todayMatches.length > 0 ? todayMatches : upcomingMatches;
+    const matches: MatchView[] = displayMatches.slice(0, 5).map(toViewModel);
+
+    type StandingsRow = GroupStandingsProps['groups'][number];
+    type StandingsRowWithOrder = StandingsRow & { __order: number };
+
+    let standings: StandingsRowWithOrder[] = standingsSnap.docs.map((doc) => {
       const data = doc.data() as StandingData;
+      const group = groupsMap.get(data.groupId);
       return {
-        name: data.groupId,
-        standings: data.standings.map((s) => ({
+        name: group?.name || data.groupId,
+        __order: group?.order ?? 999,
+        standings: data.standings.map((s, idx) => ({
           teamId: s.teamId,
           fifaCode: teams[s.teamId.toLowerCase()]?.fifaCode || s.teamId.toUpperCase(),
           teamName: teams[s.teamId.toLowerCase()]?.name || s.teamId.toUpperCase(),
+          position: s.position ?? idx + 1,
           played: s.played,
           won: s.won,
           drawn: s.drawn,
@@ -135,7 +172,48 @@ export async function getBuildData() {
       };
     });
 
-    return { matches, standings, teams, allMatches };
+    // Fallback: synthesize zero-state standings from teams grouped by groupId
+    // when the standings collection is empty (e.g., before any match results).
+    // Teams.groupId references the group document id (slug, e.g. "group-a").
+    if (standings.length === 0) {
+      const byGroup = new Map<string, StandingsRow['standings']>();
+      for (const team of Object.values(teams)) {
+        if (!team.groupId) continue;
+        if (!byGroup.has(team.groupId)) byGroup.set(team.groupId, []);
+        byGroup.get(team.groupId)!.push({
+          teamId: team.fifaCode,
+          fifaCode: team.fifaCode,
+          teamName: team.name,
+          position: 0,
+          played: 0,
+          won: 0,
+          drawn: 0,
+          lost: 0,
+          goalsFor: 0,
+          goalsAgainst: 0,
+          points: 0,
+        });
+      }
+      standings = Array.from(byGroup.entries()).map(([groupId, teamsInGroup]) => {
+        const group = groupsMap.get(groupId);
+        return {
+          name: group?.name || groupId,
+          __order: group?.order ?? 999,
+          standings: teamsInGroup
+            .sort((a, b) => a.teamName.localeCompare(b.teamName))
+            .map((s, idx) => ({ ...s, position: idx + 1 })),
+        };
+      });
+    }
+
+    // Sort groups by the canonical `order` field (Grupo A < B < C < ...)
+    standings.sort((a, b) => a.__order - b.__order);
+    const standingsOut: GroupStandingsProps['groups'] = standings.map((s) => ({
+      name: s.name,
+      standings: s.standings,
+    }));
+
+    return { matches, standings: standingsOut, teams, allMatches };
   } catch (error) {
     console.warn('[build-data] getBuildData failed, returning empty data:', error);
     return { matches: [], standings: [], teams: {}, allMatches: [] };

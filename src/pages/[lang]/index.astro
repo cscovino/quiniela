@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getBuildData } from '@lib/build-data';
+import { getFlagClass } from '@utils/flagMapping';
 import es from '@locales/es/common.json';
 import en from '@locales/en/common.json';
 
@@ -95,7 +96,12 @@ const rankingsUrl = isEs ? '/es/clasificacion' : '/en/rankings';
               <div class="match-card">
                 <div class="match-card__teams">
                   <div class="match-card__team match-card__team--home">
-                    <span class="team-flag">{match.homeTeam.fifaCode}</span>
+                    <span
+                      class={`flag-icon ${getFlagClass(match.homeTeam.fifaCode)}`}
+                      role="img"
+                      aria-label={`${match.homeTeam.name} flag`}
+                    />
+                    <span class="team-code">{match.homeTeam.fifaCode}</span>
                     <span class="team-name">{match.homeTeam.name}</span>
                     {match.result && <span class="match-card__score">{match.result.home}</span>}
                   </div>
@@ -105,7 +111,12 @@ const rankingsUrl = isEs ? '/es/clasificacion' : '/en/rankings';
                   <div class="match-card__team match-card__team--away">
                     {match.result && <span class="match-card__score">{match.result.away}</span>}
                     <span class="team-name">{match.awayTeam.name}</span>
-                    <span class="team-flag">{match.awayTeam.fifaCode}</span>
+                    <span class="team-code">{match.awayTeam.fifaCode}</span>
+                    <span
+                      class={`flag-icon ${getFlagClass(match.awayTeam.fifaCode)}`}
+                      role="img"
+                      aria-label={`${match.awayTeam.name} flag`}
+                    />
                   </div>
                 </div>
                 <div class="match-card__footer">
@@ -378,7 +389,15 @@ const rankingsUrl = isEs ? '/es/clasificacion' : '/en/rankings';
     color: var(--color-accent-700);
   }
 
-  .team-flag {
+  .flag-icon {
+    width: 32px;
+    height: 24px;
+    flex-shrink: 0;
+    border: var(--border-pixel-sm);
+    display: inline-block;
+  }
+
+  .team-code {
     font-family: var(--font-pixel);
     font-size: var(--text-xs);
     background: var(--bg-input);
