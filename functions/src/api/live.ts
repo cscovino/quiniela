@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 
 const db = admin.firestore();
+const TOURNAMENT_ID = 'world-cup-2026';
 
 export const live = functions
   .runWith({ minInstances: 0 })
@@ -14,11 +15,14 @@ export const live = functions
       const oneHourAgo = admin.firestore.Timestamp.fromMillis(now.toMillis() - 3600000);
 
       const [liveSnap, recentSnap] = await Promise.all([
-        db.collection('matches').where('status', '==', 'live').get(),
         db
-          .collection('matches')
+          .collection(`tournaments/${TOURNAMENT_ID}/matches`)
+          .where('status', '==', 'live')
+          .get(),
+        db
+          .collection(`tournaments/${TOURNAMENT_ID}/matches`)
           .where('status', '==', 'finished')
-          .where('finishedAt', '>=', oneHourAgo)
+          .where('date', '>=', oneHourAgo)
           .get(),
       ]);
 

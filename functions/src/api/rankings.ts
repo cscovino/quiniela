@@ -10,17 +10,51 @@ export const rankings = functions
     res.set('Access-Control-Allow-Origin', '*');
 
     try {
-      const snap = await db
-        .collection('predictorStats')
-        .orderBy('totalPoints', 'desc')
-        .limit(100)
-        .get();
+      const statsSnap = await db.collectionGroup('stats').get();
 
-      const rankings = snap.docs.map((d, i) => ({
-        id: d.id,
+      const allStats: Array<{
+        id: string;
+        userId: string;
+        predictorId: string;
+        totalPoints: number;
+        accuracy: number;
+        currentStreak: number;
+        exactBets: number;
+      }> = [];
+
+      statsSnap.forEach((doc) => {
+        const refPath = doc.ref.path;
+        const pathParts = refPath.split('/');
+        const userId = pathParts[1];
+        const predictorId = pathParts[3];
+        const data = doc.data();
+        allStats.push({
+          id: doc.id,
+          userId,
+          predictorId,
+          totalPoints: data.totalPoints || 0,
+          accuracy: data.accuracy || 0,
+          currentStreak: data.currentStreak || 0,
+          exactBets: data.exactBets || 0,
+        });
+      });
+
+      const sorted = allStats
+        .sort((a, b) => b.totalPoints - a.totalPoints)
+        .slice(0, 100);
+
+      const rankings = sorted.map((s, i) => ({
+        id: s.id,
         rank: i + 1,
-        ...d.data(),
+        userId: s.userId,
+        predictorId: s.predictorId,
+        displayName: s.predictorId.split('-').slice(1).join('-') || s.userId.slice(0, 8),
+        totalPoints: s.totalPoints,
+        accuracy: s.accuracy,
+        currentStreak: s.currentStreak,
+        exactBets: s.exactBets,
       }));
+
       res.json(rankings);
     } catch (error) {
       functions.logger.error('rankings function error:', error);

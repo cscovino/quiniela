@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 
 const db = admin.firestore();
+const TOURNAMENT_ID = 'world-cup-2026';
 
 export const standings = functions
   .runWith({ minInstances: 0 })
@@ -10,7 +11,9 @@ export const standings = functions
     res.set('Access-Control-Allow-Origin', '*');
 
     try {
-      const snap = await db.collection('groupStandings').get();
+      const snap = await db
+        .collection(`tournaments/${TOURNAMENT_ID}/group_standings`)
+        .get();
       const standings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       res.json(standings);
     } catch (error) {
