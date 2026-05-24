@@ -32,7 +32,7 @@ export function getNavLinks(locale: Locale, activeNav: string) {
   return [
     { href: `${prefix}/`, label: nav.home, active: activeNav === 'home' },
     {
-      href: `${prefix}/tournament`,
+      href: `${prefix}/${locale === 'en' ? 'tournament' : 'torneo'}`,
       label: locale === 'en' ? 'Tournament' : 'Torneo',
       active: activeNav === 'tournament',
     },
@@ -42,12 +42,12 @@ export function getNavLinks(locale: Locale, activeNav: string) {
       active: activeNav === 'predictions',
     },
     {
-      href: `${prefix}/rankings`,
+      href: `${prefix}/${locale === 'en' ? 'rankings' : 'clasificacion'}`,
       label: locale === 'en' ? 'Rankings' : 'Clasificación',
       active: activeNav === 'rankings',
     },
     {
-      href: `${prefix}/profile`,
+      href: `${prefix}/${locale === 'en' ? 'profile' : 'perfil'}`,
       label: locale === 'en' ? 'Profile' : 'Perfil',
       active: activeNav === 'profile',
     },

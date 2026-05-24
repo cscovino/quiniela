@@ -37,7 +37,7 @@ export interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({
   translations,
   onRegisterClick,
-  redirectUrl = '/es/predictions',
+  redirectUrl = '/es/predicciones',
   className = '',
 }) => {
   const [email, setEmail] = useState('');

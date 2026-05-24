@@ -13,6 +13,7 @@ export function getStaticPaths() {
 
 const { locale } = Astro.props;
 const translations = locale === 'en' ? en : es;
+const isEs = locale === 'es';
 
 const buildData = await getBuildData();
 
@@ -53,8 +54,8 @@ function statusVariant(status: string) {
   return variants[status] || 'info';
 }
 
-const predictionsUrl = locale === 'en' ? '/en/predictions' : '/es/predictions';
-const rankingsUrl = locale === 'en' ? '/en/rankings' : '/es/rankings';
+const predictionsUrl = isEs ? '/es/predicciones' : '/en/predictions';
+const rankingsUrl = isEs ? '/es/clasificacion' : '/en/rankings';
 ---
 
 <BaseLayout
