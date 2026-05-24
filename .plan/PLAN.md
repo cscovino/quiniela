@@ -36,46 +36,39 @@ All earlier remediation phases are complete and verified in source:
 
 ---
 
-## Phase 1 — Cleanup & correctness (1 day)
+## Phase 1 — Cleanup & correctness (1 day) — COMPLETED
 
 Issues surfaced by audit pass 3.
 
-### 1.1 — Remove dead `fetch('/api/standings')` from home (HIGH)
-**File**: `src/pages/[lang]/index.astro:136-148`
+### 1.1 — Remove dead `fetch('/api/standings')` from home (HIGH) ✅
+**File**: `src/pages/[lang]/index.astro`
 
-- The home page issues a runtime `fetch('/api/standings')` then no-ops on the result. Wasted network roundtrip on every page load.
-- **Fix**: either render the fetched standings, or remove the script entirely. Build-time data via `build-data.ts` already covers the static case.
+- Removed the dead `fetch('/api/standings')` script that no-oped on the result.
 
-### 1.2 — Replace fragile `displayName` reconstruction (HIGH)
-**Files**: `functions/src/api/rankings.ts:51`, `src/lib/build-data.ts:155`
+### 1.2 — Replace fragile `displayName` reconstruction (HIGH) ✅
+**Files**: `functions/src/api/rankings.ts`, `src/lib/build-data.ts`
 
-- Both compute `displayName = predictorId.split('-').slice(1).join('-') || userId.slice(0,8)`.
-- Breaks if a predictor name contains hyphens; falls through to a UID prefix if no hyphen at all.
-- **Fix**: read `displayName` from `users/{uid}/predictors/{predictorId}` doc (authoritative source).
+- Now reads `displayName` from `users/{uid}/predictors/{predictorId}` doc (authoritative source).
 
-### 1.3 — Declare Firestore composite index for `/api/live`
-**Files**: `functions/src/api/live.ts:22-26`, `firestore/firestore.indexes.json`
+### 1.3 — Declare Firestore composite index for `/api/live` ✅
+**File**: `firestore/firestore.indexes.json`
 
-- Query: `where('status','==','finished').where('date','>=', oneHourAgo)` requires a composite index `(status ASC, date ASC)` on `matches`.
-- **Fix**: add to `firestore.indexes.json`; deploy with `firebase deploy --only firestore:indexes`.
+- Index `(status ASC, date ASC)` on `matches` already declared.
 
-### 1.4 — Add try/catch fallback in `build-data.ts`
-**File**: `src/lib/build-data.ts` — `getBuildData()`, `getBuildRankings()`
+### 1.4 — Add try/catch fallback in `build-data.ts` ✅
+**File**: `src/lib/build-data.ts`
 
-- A transient Firestore failure during daily rebuild (`.github/workflows/daily-rebuild.yml`) would break the deploy.
-- **Fix**: wrap calls in try/catch, fall back to empty arrays + log a build warning. Daily CI then degrades gracefully instead of failing.
+- Both `getBuildData()` and `getBuildRankings()` wrapped in try/catch, fall back to empty arrays.
 
-### 1.5 — Harden `build-data.ts` non-null cast
+### 1.5 — Harden `build-data.ts` non-null cast ✅
 **File**: `src/lib/build-data.ts:109`
 
-- `s.result.away!` non-null assertion: if `result.home` is set but `result.away` is `null` (partial Firestore write during a match), this propagates `undefined as number`.
-- **Fix**: guard `if (result.home !== null && result.away !== null)` before constructing the view-model.
+- Guard `result.home !== null && result.away !== null` before constructing view-model.
 
-### 1.6 — Update `DESIGN.md`
+### 1.6 — Update `DESIGN.md` ✅
 **File**: `DESIGN.md:222`
 
-- Still references deleted `HomeTemplate`, `TournamentTemplate`, `RankingsTemplate`.
-- **Fix**: drop them; mention the `[lang]/[slug]` + `build-data.ts` architecture.
+- Removed references to deleted `HomeTemplate`, `TournamentTemplate`, `RankingsTemplate`.
 
 **Exit criteria**: home page has no dead fetch; rankings display name is authoritative; composite index declared; daily rebuild survives Firestore blip; docs match reality.
 
@@ -128,13 +121,6 @@ Issues surfaced by audit pass 3.
 
 | File | Phase | Action |
 |------|-------|--------|
-| `src/pages/[lang]/index.astro:136-148` | 1.1 | Remove dead `fetch('/api/standings')` or wire it to render |
-| `functions/src/api/rankings.ts:51` | 1.2 | Read `displayName` from predictor doc |
-| `src/lib/build-data.ts:155` | 1.2 | Same |
-| `firestore/firestore.indexes.json` | 1.3 | Add composite index `(status, date)` on `matches` |
-| `src/lib/build-data.ts` (`getBuildData`, `getBuildRankings`) | 1.4 | try/catch with empty-state fallback |
-| `src/lib/build-data.ts:109` | 1.5 | Guard `result.home`/`result.away` both non-null |
-| `DESIGN.md:222` | 1.6 | Drop deleted-template references |
 | `src/pages/[lang]/admin/matches.astro` | 2.1 | Decision A or B for admin auth gate |
 | `BaseLayout.astro` (head) | 2.2 | Sentry/TrackJS script tag |
 | `src/services/firebase.ts` | 2.3 | Add Firebase App Check init in lazy SDK path |
@@ -145,13 +131,13 @@ Issues surfaced by audit pass 3.
 ## Sequencing
 
 ```
-Phase 1 — Cleanup & correctness (1 day)
-   ├─ 1.1  Remove dead fetch
-   ├─ 1.2  Authoritative displayName
-   ├─ 1.3  Composite index
-   ├─ 1.4  Build try/catch
-   ├─ 1.5  Non-null guards
-   └─ 1.6  DESIGN.md
+Phase 1 — Cleanup & correctness (1 day) — COMPLETED
+   ├─ 1.1  Remove dead fetch — done
+   ├─ 1.2  Authoritative displayName — reads from predictor doc
+   ├─ 1.3  Composite index — already declared
+   ├─ 1.4  Build try/catch — graceful fallback
+   ├─ 1.5  Non-null guards — both home and away checked
+   └─ 1.6  DESIGN.md — updated
    ▼
 Phase 2 — Pre-launch hardening (~1 week, before public launch)
    ├─ 2.1  Admin auth gate
