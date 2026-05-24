@@ -26,7 +26,7 @@ node scripts/generate-content.mjs  # Generate content collection files
 
 ## Architecture
 
-- **i18n:** Spanish at `/es/`, English at `/en/`. Dynamic `[lang]` routes with `getStaticPaths`.
+- **i18n:** Spanish at `/es/`, English at `/en/`. Dynamic `[lang]/[slug]` routes with localized slugs (e.g., `/es/torneo`, `/en/tournament`). Slug map in `src/utils/slug-map.ts`.
 - **Routing:** One page file per route under `src/pages/[lang]/`. English slugs used for both locales (e.g., `/es/tournament`, `/en/tournament`). Do NOT use separate locale directories.
 - **Components:** Atomic Design — `@atoms/`, `@molecules/`, `@organisms/`, `@templates/`
 - **Astro Components:** MatchCard, MatchList, TournamentHeader, GroupStandings, RankingsTable, NavBar (zero-JS)

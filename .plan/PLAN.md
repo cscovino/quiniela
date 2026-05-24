@@ -84,10 +84,10 @@
 - Firebase client SDK removed from public-page bundles.
 
 ### 2.3 — Resolve i18n routing
-**Files**: `src/pages/[lang]/*.astro` with `getStaticPaths`
+**Files**: `src/pages/[lang]/[slug].astro` with `getStaticPaths` + `src/utils/slug-map.ts`
 
-- **Decision: dynamic `[lang]` routes**. Single file per page generates both `/es/*` and `/en/*` via `getStaticPaths`.
-- English slugs used for both locales (e.g., `/es/tournament`, `/en/tournament`).
+- **Decision: dynamic `[lang]/[slug]` routes with localized slugs**. Single catch-all file generates both `/es/*` and `/en/*` via `getStaticPaths` with slug map.
+- Localized slugs: `/es/torneo`, `/es/clasificacion`, `/es/predicciones`, `/es/perfil` vs `/en/tournament`, `/en/rankings`, `/en/predictions`, `/en/profile`.
 - No middleware needed — locale derived from URL path in each page.
 
 ### 2.4 — Gate service worker on production
