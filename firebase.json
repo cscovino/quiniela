@@ -30,6 +30,13 @@
     ],
     "cleanUrls": true,
     "trailingSlash": false,
+    "redirects": [
+      {
+        "source": "/admin",
+        "destination": "/admin/matches",
+        "type": 302
+      }
+    ],
     "rewrites": [
       {
         "source": "/api/standings",
