@@ -21,6 +21,7 @@ import { predictionService } from '@services/prediction-service';
 import { predictorService } from '@services/predictor-service';
 import { useAuthStore } from '@store/auth-store';
 import type { Match, Predictor } from '@app-types/firestore';
+import { calculateGroupStandings as calculateGroupStanding } from '@utils/predictions-flow';
 import './PredictionsTemplate.css';
 
 export interface PredictionsTemplateProps {
@@ -113,69 +114,16 @@ const calculatePredictedStandings = (
   predictions: Record<string, { home?: number; away?: number }>,
   teamsMap: Record<string, { fifaCode: string; name: string }>,
 ): Record<string, PredictedStanding[]> => {
-  const groupStandings: Record<string, Record<string, PredictedStanding>> = {};
+  const groupIds = [...new Set(matches.filter((m) => m.phase === 'group').map((m) => m.groupId))];
+  const result: Record<string, PredictedStanding[]> = {};
 
-  for (const match of matches) {
-    const pred = predictions[match.id];
-    if (!pred || pred.home == null || pred.away == null) continue;
-    if (!match.homeTeamId || !match.awayTeamId) continue;
-
-    const groupId = match.groupId || 'unknown';
-    if (!groupStandings[groupId]) groupStandings[groupId] = {};
-
-    const initTeam = (teamId: string) => {
-      if (!groupStandings[groupId][teamId]) {
-        const team = teamsMap[teamId] || { fifaCode: teamId.toUpperCase(), name: teamId };
-        groupStandings[groupId][teamId] = {
-          teamId,
-          fifaCode: team.fifaCode,
-          name: team.name,
-          played: 0,
-          won: 0,
-          drawn: 0,
-          lost: 0,
-          goalsFor: 0,
-          goalsAgainst: 0,
-          points: 0,
-        };
-      }
-    };
-
-    initTeam(match.homeTeamId);
-    initTeam(match.awayTeamId);
-
-    const home = groupStandings[groupId][match.homeTeamId];
-    const away = groupStandings[groupId][match.awayTeamId];
-
-    home.played++;
-    away.played++;
-    home.goalsFor += pred.home;
-    home.goalsAgainst += pred.away;
-    away.goalsFor += pred.away;
-    away.goalsAgainst += pred.home;
-
-    if (pred.home > pred.away) {
-      home.won++;
-      home.points += 3;
-      away.lost++;
-    } else if (pred.home < pred.away) {
-      away.won++;
-      away.points += 3;
-      home.lost++;
-    } else {
-      home.drawn++;
-      away.drawn++;
-      home.points += 1;
-      away.points += 1;
+  for (const groupId of groupIds) {
+    const standings = calculateGroupStanding(matches, predictions, teamsMap, groupId);
+    if (standings.length > 0) {
+      result[groupId] = standings;
     }
   }
 
-  const result: Record<string, PredictedStanding[]> = {};
-  for (const [groupId, teams] of Object.entries(groupStandings)) {
-    result[groupId] = Object.values(teams).sort(
-      (a, b) => b.points - a.points || b.goalsFor - b.goalsAgainst - (a.goalsFor - a.goalsAgainst),
-    );
-  }
   return result;
 };
 
