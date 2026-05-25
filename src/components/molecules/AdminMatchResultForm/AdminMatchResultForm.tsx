@@ -30,24 +30,33 @@ export const AdminMatchResultForm: React.FC<AdminMatchResultFormProps> = ({
     e.preventDefault();
     setError(null);
 
-    if (status === 'finished') {
-      if (homeScore === '' || awayScore === '') {
-        setError('Scores are required for finished matches');
-        return;
-      }
+    const scoresAllowed = status === 'finished' || status === 'live';
 
-      const home = parseInt(homeScore, 10);
-      const away = parseInt(awayScore, 10);
-
-      if (isNaN(home) || isNaN(away) || home < 0 || away < 0) {
-        setError('Scores must be non-negative integers');
-        return;
-      }
-
-      onSubmit(home, away, status);
-    } else {
+    if (!scoresAllowed) {
       onSubmit(null, null, status);
+      return;
     }
+
+    const bothEmpty = homeScore === '' && awayScore === '';
+    if (status === 'finished' && bothEmpty) {
+      setError('Scores are required for finished matches');
+      return;
+    }
+
+    if (bothEmpty) {
+      onSubmit(null, null, status);
+      return;
+    }
+
+    const home = parseInt(homeScore, 10);
+    const away = parseInt(awayScore, 10);
+
+    if (isNaN(home) || isNaN(away) || home < 0 || away < 0) {
+      setError('Scores must be non-negative integers');
+      return;
+    }
+
+    onSubmit(home, away, status);
   };
 
   return (
@@ -70,7 +79,7 @@ export const AdminMatchResultForm: React.FC<AdminMatchResultFormProps> = ({
           </label>
         </div>
 
-        {status === 'finished' && (
+        {(status === 'finished' || status === 'live') && (
           <div className="admin-match-result-form__scores">
             <label>
               <Typography variant="small">{match.homeTeamId?.toUpperCase() || 'Home'}</Typography>

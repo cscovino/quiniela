@@ -11,6 +11,9 @@ export const updateMatchResult = async (
 ): Promise<void> => {
   const matchRef = doc(getDb(), 'tournaments', tournamentId, 'matches', matchId);
 
+  const scoresAllowedForStatus = status === 'finished' || status === 'live';
+  const scoresProvided = homeScore !== null && awayScore !== null;
+
   const updateData: {
     status: MatchStatus;
     updatedAt: ReturnType<typeof serverTimestamp>;
@@ -19,7 +22,7 @@ export const updateMatchResult = async (
     status,
     updatedAt: serverTimestamp(),
     result:
-      status === 'finished' && homeScore !== null && awayScore !== null
+      scoresAllowedForStatus && scoresProvided
         ? { home: homeScore, away: awayScore }
         : { home: null, away: null },
   };
