@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { type MatchPrediction } from '@organisms/PredictionForm/PredictionForm';
 import { type GroupForPrediction } from '@organisms/GroupPredictionForm/GroupPredictionForm';
 import { PredictorSelector } from '@molecules/PredictorSelector/PredictorSelector';
+import { getLoginRoute } from '@utils/i18n';
 import {
   PredictionsProgress,
   PredictionsFeedback,
@@ -47,6 +48,22 @@ export interface PredictionsTemplateProps {
     predictedStandings: string;
     team: string;
     pts: string;
+    feedback: {
+      submittedCount: string;
+      finalPhaseSubmitted: string;
+      bestPlayersSubmitted: string;
+      submitFailed: string;
+    };
+    predictor: {
+      title: string;
+      select: string;
+      create: string;
+      createButton: string;
+      namePlaceholder: string;
+      loading: string;
+      noPredictors: string;
+      getStarted: string;
+    };
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -319,17 +336,17 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
       if (result.successCount > 0) {
         setFeedback({
           type: 'success',
-          message:
-            locale === 'en'
-              ? `${result.successCount} prediction(s) submitted!`
-              : `¡${result.successCount} predicción(es) enviadas!`,
+          message: translations.feedback.submittedCount.replace(
+            '{count}',
+            String(result.successCount),
+          ),
         });
         setSubmittedSteps((prev) => new Set(prev).add(stepIndex));
       }
       if (result.errors.length > 0) setFeedback({ type: 'error', message: result.errors[0] });
       setTimeout(() => setFeedback(null), 5000);
     },
-    [locale],
+    [translations],
   );
 
   const handleMatchSubmit = useCallback(
@@ -378,18 +395,18 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         setSubmittedSteps((prev) => new Set(prev).add(2));
         setFeedback({
           type: 'success',
-          message: locale === 'en' ? 'Final phase submitted!' : '¡Fase final enviada!',
+          message: translations.feedback.finalPhaseSubmitted,
         });
       } catch {
         setFeedback({
           type: 'error',
-          message: locale === 'en' ? 'Failed to submit' : 'Error al enviar',
+          message: translations.feedback.submitFailed,
         });
       }
       setSubmitting(false);
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, selectedPredictorId, locale],
+    [user, selectedPredictorId, translations],
   );
 
   const handleBestPlayersSubmit = useCallback(
@@ -402,18 +419,18 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         setSubmittedSteps((prev) => new Set(prev).add(3));
         setFeedback({
           type: 'success',
-          message: locale === 'en' ? 'Best players submitted!' : '¡Mejores jugadores enviados!',
+          message: translations.feedback.bestPlayersSubmitted,
         });
       } catch {
         setFeedback({
           type: 'error',
-          message: locale === 'en' ? 'Failed to submit' : 'Error al enviar',
+          message: translations.feedback.submitFailed,
         });
       }
       setSubmitting(false);
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, selectedPredictorId, locale],
+    [user, selectedPredictorId, translations],
   );
 
   const handleCreatePredictor = async (name: string) => {
@@ -447,7 +464,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
         <div className="predictions-template__auth-required">
           <Typography variant="h1">{translations.title}</Typography>
           <Typography variant="body">{translations.loginRequired}</Typography>
-          <a href={locale === 'en' ? '/en/login' : '/es/login'}>
+          <a href={getLoginRoute(locale)}>
             <button type="button" className="predictions-template__login-btn">
               {translations.loginButton}
             </button>
@@ -459,17 +476,14 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
   if (!selectedPredictorId) {
     const pt = {
-      title: locale === 'en' ? 'Choose Your Predictor' : 'Elige tu Pronosticador',
-      selectPredictor:
-        locale === 'en'
-          ? 'Select or create a predictor to start'
-          : 'Selecciona o crea un pronosticador',
-      createPredictor: locale === 'en' ? 'Create New Predictor' : 'Crear Nuevo Pronosticador',
-      createButton: locale === 'en' ? 'Create' : 'Crear',
-      namePlaceholder: locale === 'en' ? 'Predictor name...' : 'Nombre del pronosticador...',
-      loading: locale === 'en' ? 'Loading predictors...' : 'Cargando pronosticadores...',
-      noPredictors: locale === 'en' ? 'No predictors yet' : 'Aún no hay pronosticadores',
-      getStarted: locale === 'en' ? 'Get Started' : 'Comenzar',
+      title: translations.predictor.title,
+      selectPredictor: translations.predictor.select,
+      createPredictor: translations.predictor.create,
+      createButton: translations.predictor.createButton,
+      namePlaceholder: translations.predictor.namePlaceholder,
+      loading: translations.predictor.loading,
+      noPredictors: translations.predictor.noPredictors,
+      getStarted: translations.predictor.getStarted,
     };
     return (
       <div className={`predictions-template ${className}`}>

@@ -6,27 +6,24 @@ import AuthPage from '@pages/AuthPage.astro';
 import ProfilePage from '@pages/ProfilePage.astro';
 import TournamentPage from '@pages/TournamentPage.astro';
 import RankingsPage from '@pages/RankingsPage.astro';
-import es from '@locales/es/common.json';
-import en from '@locales/en/common.json';
-import esAuth from '@locales/es/auth.json';
-import enAuth from '@locales/en/auth.json';
+import { getTranslations } from '@utils/i18n';
 
 export function getStaticPaths() {
   return getLocalizedPaths();
 }
 
 const { locale, page, activeNav } = Astro.props;
-const t = locale === 'en' ? en : es;
-const tAuth = locale === 'en' ? enAuth : esAuth;
-const isEs = locale === 'es';
+const t = getTranslations(locale);
+const pages = t.common.pages;
+const tAuth = t.auth;
 ---
 
 {
   page === 'predictions' && (
     <BaseLayout
       locale={locale}
-      title={t.pages.predictions.title}
-      description={t.pages.predictions.description}
+      title={pages.predictions.title}
+      description={pages.predictions.description}
       activeNav={activeNav}
     >
       <PredictionsPage locale={locale} />
@@ -38,8 +35,8 @@ const isEs = locale === 'es';
   page === 'profile' && (
     <BaseLayout
       locale={locale}
-      title={t.pages.profile.title}
-      description={t.pages.profile.description}
+      title={pages.profile.title}
+      description={pages.profile.description}
       activeNav={activeNav}
     >
       <ProfilePage locale={locale} />
@@ -75,13 +72,8 @@ const isEs = locale === 'es';
   page === 'tournament' && (
     <BaseLayout
       locale={locale}
-      title={t.pages.tournament?.title || (isEs ? 'Torneo - Quiniela' : 'Tournament - Quiniela')}
-      description={
-        t.pages.tournament?.description ||
-        (isEs
-          ? 'Clasificación de grupos y partidos del torneo'
-          : 'Group standings and tournament matches')
-      }
+      title={pages.tournament.title}
+      description={pages.tournament.description}
       activeNav={activeNav}
     >
       <TournamentPage locale={locale} />
@@ -93,8 +85,8 @@ const isEs = locale === 'es';
   page === 'rankings' && (
     <BaseLayout
       locale={locale}
-      title={t.pages.rankings.title}
-      description={t.pages.rankings.description}
+      title={pages.rankings.title}
+      description={pages.rankings.description}
       activeNav={activeNav}
     >
       <RankingsPage locale={locale} />

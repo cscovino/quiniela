@@ -3,6 +3,7 @@ import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
 import { Badge } from '@atoms/Badge/Badge';
 import { Typography } from '@atoms/Typography/Typography';
 import { Icon, type IconName } from '@atoms/Icon/Icon';
+import { getDateLocale } from '@utils/i18n';
 import './MatchCard.css';
 
 export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'cancelled';
@@ -75,7 +76,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({
   compact = false,
 }) => {
   const config = getStatusConfig(status, translations);
-  const localeCode = locale === 'en' ? 'en-US' : 'es-ES';
+  const localeCode = getDateLocale(locale);
   const formattedDate = date.toLocaleDateString(localeCode, {
     month: 'short',
     day: 'numeric',

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { LoginForm, type LoginFormProps } from '@molecules/LoginForm/LoginForm';
 import { RegisterForm, type RegisterFormProps } from '@molecules/RegisterForm/RegisterForm';
 import { PixelArt } from '@atoms/PixelArt/PixelArt';
+import { getRoute } from '@utils/i18n';
 import './AuthTemplate.css';
 
 export interface AuthTemplateProps {
@@ -20,7 +21,7 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({
   locale = 'es',
   className = '',
 }) => {
-  const redirectUrl = locale === 'en' ? '/en/predictions' : '/es/predicciones';
+  const redirectUrl = getRoute(locale, 'predictions');
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
 
   return (

@@ -1,64 +1,41 @@
 ---
 import { PredictionsTemplate } from '@templates/PredictionsTemplate/PredictionsTemplate';
+import { getTranslations } from '@utils/i18n';
 
 export interface Props {
   locale: 'en' | 'es';
 }
 
 const { locale } = Astro.props;
+const p = getTranslations(locale).common.pages.predictions;
 
 const translations = {
-  title: locale === 'en' ? 'Matchday Predictions' : 'Predicciones de la Jornada',
-  noMatches:
-    locale === 'en'
-      ? 'No matches available for prediction'
-      : 'No hay partidos disponibles para predecir',
-  submitSuccess: locale === 'en' ? 'Predictions submitted!' : '¡Predicciones enviadas!',
-  submitError:
-    locale === 'en' ? 'Failed to submit predictions' : 'Error al enviar las predicciones',
-  loginRequired:
-    locale === 'en'
-      ? 'You need to login to make predictions'
-      : 'Necesitas iniciar sesión para hacer predicciones',
-  loginButton: locale === 'en' ? 'Login' : 'Iniciar Sesión',
-  loading: locale === 'en' ? 'Loading predictions...' : 'Cargando predicciones...',
-  stepMatches: locale === 'en' ? 'Match Predictions' : 'Predicciones de Partidos',
-  stepMatchesDesc:
-    locale === 'en'
-      ? 'Predict the exact score for each match'
-      : 'Predice el marcador exacto de cada partido',
-  stepGroups: locale === 'en' ? 'Group Standings' : 'Clasificación de Grupos',
-  stepGroupsDesc:
-    locale === 'en'
-      ? 'Rank the teams in each group from 1st to 4th place'
-      : 'Clasifica los equipos de cada grupo del 1° al 4° lugar',
-  stepFinalPhase: locale === 'en' ? 'Final Phase' : 'Fase Final',
-  stepFinalPhaseDesc:
-    locale === 'en'
-      ? 'Choose which teams will finish 1st, 2nd, 3rd, and 4th in the tournament'
-      : 'Elige qué equipos terminarán 1°, 2°, 3° y 4° en el torneo',
-  stepBestPlayers: locale === 'en' ? 'Best Players' : 'Mejores Jugadores',
-  stepBestPlayersDesc:
-    locale === 'en'
-      ? 'Pick the best goalkeeper and top scorer of the tournament'
-      : 'Elige al mejor portero y al máximo goleador del torneo',
-  buttonNext: locale === 'en' ? 'Next Step' : 'Siguiente',
-  buttonBack: locale === 'en' ? 'Back' : 'Atrás',
-  buttonSubmit: locale === 'en' ? 'Submit' : 'Enviar',
-  stepXofY: 'Step {current} of {total}',
-  submitToAdvance:
-    locale === 'en'
-      ? 'Submit your predictions to advance to the next step'
-      : 'Envía tus predicciones para avanzar al siguiente paso',
-  predictedStandings: locale === 'en' ? 'Predicted Standings' : 'Clasificación Predicha',
-  team: locale === 'en' ? 'Team' : 'Equipo',
-  pts: 'Pts',
-};
-
-const templateProps = {
-  translations,
-  locale,
+  title: p.heading,
+  noMatches: p.noMatches,
+  submitSuccess: p.submitSuccess,
+  submitError: p.submitError,
+  loginRequired: p.loginRequired,
+  loginButton: p.loginButton,
+  loading: p.loading,
+  stepMatches: p.stepMatches,
+  stepMatchesDesc: p.stepMatchesDesc,
+  stepGroups: p.stepGroups,
+  stepGroupsDesc: p.stepGroupsDesc,
+  stepFinalPhase: p.stepFinalPhase,
+  stepFinalPhaseDesc: p.stepFinalPhaseDesc,
+  stepBestPlayers: p.stepBestPlayers,
+  stepBestPlayersDesc: p.stepBestPlayersDesc,
+  buttonNext: p.buttonNext,
+  buttonBack: p.buttonBack,
+  buttonSubmit: p.buttonSubmit,
+  stepXofY: p.stepXofY,
+  submitToAdvance: p.submitToAdvance,
+  predictedStandings: p.predictedStandings,
+  team: p.team,
+  pts: p.pts,
+  feedback: p.feedback,
+  predictor: p.predictor,
 };
 ---
 
-<PredictionsTemplate {...templateProps} client:load />
+<PredictionsTemplate translations={translations} locale={locale} client:load />

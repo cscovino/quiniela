@@ -43,8 +43,10 @@ const config: StorybookConfig = {
           '@hooks': resolve(__dirname, '../src/hooks'),
           '@store': resolve(__dirname, '../src/store'),
           '@services': resolve(__dirname, '../src/services'),
-          '@types': resolve(__dirname, '../src/types'),
+          '@app-types': resolve(__dirname, '../src/types'),
           '@locales': resolve(__dirname, '../src/locales'),
+          '@lib': resolve(__dirname, '../src/lib'),
+          '@pages': resolve(__dirname, '../src/components/pages'),
         },
       },
     };

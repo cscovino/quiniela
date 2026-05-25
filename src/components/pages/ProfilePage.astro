@@ -1,32 +1,31 @@
 ---
 import { ProfileTemplate } from '@templates/ProfileTemplate/ProfileTemplate';
+import { getTranslations } from '@utils/i18n';
 
 export interface Props {
   locale: 'en' | 'es';
 }
 
 const { locale } = Astro.props;
-const isEs = locale === 'es';
+const p = getTranslations(locale).common.pages.profile;
 
 const translations = {
-  title: isEs ? 'Mi Perfil' : 'My Profile',
-  loading: isEs ? 'Cargando perfil...' : 'Loading profile...',
-  loginRequired: isEs
-    ? 'Necesitas iniciar sesión para ver tu perfil'
-    : 'You need to login to view your profile',
-  loginButton: isEs ? 'Iniciar Sesión' : 'Login',
-  totalPoints: isEs ? 'Puntos Totales' : 'Total Points',
-  accuracy: isEs ? 'Precisión' : 'Accuracy',
-  currentStreak: isEs ? 'Racha Actual' : 'Current Streak',
-  bestStreak: isEs ? 'Mejor Racha' : 'Best Streak',
-  exactBets: isEs ? 'Apuestas Exactas' : 'Exact Bets',
-  rank: isEs ? 'Posición' : 'Rank',
-  badges: isEs ? 'Insignias' : 'Badges',
-  lockedBadges: isEs ? 'Bloqueadas' : 'Locked',
-  pointsChart: isEs ? 'Evolución de Puntos' : 'Points Evolution',
-  noPointsData: isEs ? 'Aún no hay datos de puntos' : 'No points data yet',
-  points: isEs ? 'Puntos' : 'Points',
-  matches: isEs ? 'Partidos' : 'Matches',
+  title: p.heading,
+  loading: p.loading,
+  loginRequired: p.loginRequired,
+  loginButton: p.loginButton,
+  totalPoints: p.totalPoints,
+  accuracy: p.accuracy,
+  currentStreak: p.currentStreak,
+  bestStreak: p.bestStreak,
+  exactBets: p.exactBets,
+  rank: p.rank,
+  badges: p.badges,
+  lockedBadges: p.lockedBadges,
+  pointsChart: p.pointsChart,
+  noPointsData: p.noPointsData,
+  points: p.points,
+  matches: p.matches,
 };
 ---
 

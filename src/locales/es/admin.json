@@ -1,0 +1,14 @@
+{
+  "admin": {
+    "title": "Panel de Administración",
+    "matches": "Gestionar Partidos",
+    "edit": "Editar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "status": "Estado",
+    "result": "Resultado",
+    "pointsCalculated": "Puntos calculados",
+    "loading": "Cargando partidos...",
+    "error": "Error"
+  }
+}

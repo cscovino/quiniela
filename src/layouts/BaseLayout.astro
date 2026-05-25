@@ -1,21 +1,24 @@
 ---
 import '@styles/global.css';
 import { ClientRouter } from 'astro:transitions';
-import NavBar from '@organisms/NavBar/NavBar.astro';
+import { NavBar } from '@organisms/NavBar/NavBar';
 import { ToastProvider } from '@organisms/ToastProvider/ToastProvider';
-
-interface NavLinks {
-  href: string;
-  label: string;
-  active: boolean;
-}
+import {
+  getNavLinks,
+  getAdminLink,
+  getTranslations,
+  getOtherLocale,
+  getDateLocale,
+  getOgLocale,
+  type ActiveNav,
+} from '@utils/i18n';
 
 export interface Props {
   locale: 'en' | 'es';
   title: string;
   description?: string;
   theme?: 'dark' | 'light';
-  activeNav?: 'home' | 'predictions' | 'rankings' | 'profile' | 'tournament' | 'admin';
+  activeNav?: ActiveNav;
   notificationCount?: number;
   image?: string;
   type?: 'website' | 'article' | 'sports-event';
@@ -37,31 +40,23 @@ const canonicalUrl = Astro.url.pathname;
 const fullUrl = `${siteUrl}${canonicalUrl}`;
 const ogImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 
-const navLinks: NavLinks[] =
-  locale === 'en'
-    ? [
-        { href: '/en/', label: 'Home', active: activeNav === 'home' },
-        { href: '/en/tournament', label: 'Tournament', active: activeNav === 'tournament' },
-        { href: '/en/predictions', label: 'Predictions', active: activeNav === 'predictions' },
-        { href: '/en/rankings', label: 'Rankings', active: activeNav === 'rankings' },
-        { href: '/en/profile', label: 'Profile', active: activeNav === 'profile' },
-      ]
-    : [
-        { href: '/es/', label: 'Inicio', active: activeNav === 'home' },
-        { href: '/es/torneo', label: 'Torneo', active: activeNav === 'tournament' },
-        { href: '/es/predicciones', label: 'Predicciones', active: activeNav === 'predictions' },
-        { href: '/es/clasificacion', label: 'Clasificación', active: activeNav === 'rankings' },
-        { href: '/es/perfil', label: 'Perfil', active: activeNav === 'profile' },
-      ];
-
-const adminLink: NavLinks = {
-  href: '/admin/matches',
-  label: 'Admin',
-  active: activeNav === 'admin',
+const navLinks = getNavLinks(locale, activeNav);
+const adminLink = getAdminLink(locale, activeNav);
+const tNav = getTranslations(locale).common.nav;
+const tCommon = getTranslations(locale).common.common;
+const navBarTranslations = {
+  brandLabel: tNav.brandLabel,
+  login: tCommon.login,
+  logout: tCommon.logout,
+  makePredictions: tCommon.makePredictions,
+  switchLocale: tNav.switchLocale,
+  toggleTheme: tNav.toggleTheme,
+  toggleMenu: tNav.toggleMenu,
+  notifications: tNav.notifications,
 };
 
-const alternateUrl =
-  locale === 'en' ? canonicalUrl.replace('/en', '/es') : canonicalUrl.replace('/es', '/en');
+const otherLocale = getOtherLocale(locale);
+const alternateUrl = canonicalUrl.replace(`/${locale}`, `/${otherLocale}`);
 ---
 
 <html lang={locale} data-theme={theme}>
@@ -77,11 +72,7 @@ const alternateUrl =
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={fullUrl} />
     <link rel="alternate" hreflang={locale} href={fullUrl} />
-    <link
-      rel="alternate"
-      hreflang={locale === 'en' ? 'es' : 'en'}
-      href={`${siteUrl}${alternateUrl}`}
-    />
+    <link rel="alternate" hreflang={otherLocale} href={`${siteUrl}${alternateUrl}`} />
     <link rel="alternate" hreflang="x-default" href={`${siteUrl}/`} />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
@@ -101,7 +92,7 @@ const alternateUrl =
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:url" content={fullUrl} />
-    <meta property="og:locale" content={locale === 'en' ? 'en_US' : 'es_ES'} />
+    <meta property="og:locale" content={getOgLocale(locale)} />
     <meta property="og:site_name" content="Quiniela" />
 
     <!-- Twitter Card -->
@@ -122,7 +113,7 @@ const alternateUrl =
         description: description || 'Retro pixel art football predictions for FIFA World Cup 2026',
         url: fullUrl,
         image: ogImage,
-        inLanguage: locale === 'en' ? 'en-US' : 'es-ES',
+        inLanguage: getDateLocale(locale),
         ...(type === 'sports-event'
           ? {
               startDate: '2026-06-11',
@@ -154,6 +145,8 @@ const alternateUrl =
       adminLink={adminLink}
       locale={locale}
       notificationCount={notificationCount}
+      translations={navBarTranslations}
+      client:load
     />
     <main transition:name="content" transition:animate="fade">
       <slot />

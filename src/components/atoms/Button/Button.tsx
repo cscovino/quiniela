@@ -4,32 +4,88 @@ import './Button.css';
 export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'gold' | 'danger' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface BaseProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
   fullWidth?: boolean;
+  className?: string;
   children: React.ReactNode;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
-  size = 'md',
-  isLoading = false,
-  fullWidth = false,
-  disabled,
-  children,
-  className = '',
-  ...props
-}) => {
-  return (
-    <button
-      className={`btn btn--${variant} btn--${size} ${fullWidth ? 'btn--full-width' : ''} ${className}`}
-      disabled={disabled || isLoading}
-      {...props}
-    >
+type ButtonAsButton = BaseProps &
+  Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, keyof BaseProps> & {
+    href?: undefined;
+  };
+
+type ButtonAsLink = BaseProps &
+  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof BaseProps | 'href'> & {
+    href: string;
+  };
+
+export type ButtonProps = ButtonAsButton | ButtonAsLink;
+
+export const Button: React.FC<ButtonProps> = (props) => {
+  const {
+    variant = 'primary',
+    size = 'md',
+    isLoading = false,
+    fullWidth = false,
+    children,
+    className = '',
+  } = props;
+
+  const classes = `btn btn--${variant} btn--${size} ${fullWidth ? 'btn--full-width' : ''} ${className}`;
+  const content = (
+    <>
       {isLoading ? <span className="btn__spinner" /> : null}
       <span className="btn__content">{children}</span>
+    </>
+  );
+
+  if ('href' in props && props.href !== undefined) {
+    const {
+      variant: _v,
+      size: _s,
+      isLoading: _l,
+      fullWidth: _fw,
+      className: _c,
+      children: _ch,
+      ...anchorProps
+    } = props;
+    void _v;
+    void _s;
+    void _l;
+    void _fw;
+    void _c;
+    void _ch;
+    return (
+      <a className={classes} {...anchorProps}>
+        {content}
+      </a>
+    );
+  }
+
+  const {
+    variant: _v,
+    size: _s,
+    isLoading: _l,
+    fullWidth: _fw,
+    className: _c,
+    children: _ch,
+    disabled,
+    ...buttonProps
+  } = props;
+  void _v;
+  void _s;
+  void _l;
+  void _fw;
+  void _c;
+  void _ch;
+
+  return (
+    <button className={classes} disabled={disabled || isLoading} {...buttonProps}>
+      {content}
     </button>
   );
 };

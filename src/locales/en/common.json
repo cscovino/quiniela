@@ -6,31 +6,19 @@
   },
   "nav": {
     "home": "Home",
+    "tournament": "Tournament",
     "predictions": "Predictions",
+    "rankings": "Rankings",
     "standings": "Standings",
-    "profile": "Profile"
-  },
-  "pages": {
-    "home": {
-      "title": "Home - Quiniela",
-      "description": "Welcome to Quiniela - FIFA World Cup 2026 Predictions"
-    },
-    "predictions": {
-      "title": "Predictions - Quiniela",
-      "description": "Make your predictions for FIFA World Cup 2026 matches"
-    },
-    "rankings": {
-      "title": "Rankings - Quiniela",
-      "description": "Predictor rankings and leaderboard"
-    },
-    "profile": {
-      "title": "Profile - Quiniela",
-      "description": "Your prediction profile and statistics"
-    },
-    "tournament": {
-      "title": "Tournament - Quiniela",
-      "description": "Group standings and tournament matches"
-    }
+    "profile": "Profile",
+    "admin": "Admin",
+    "login": "Login",
+    "logout": "Logout",
+    "brandLabel": "QUINIELA",
+    "switchLocale": "Switch to Spanish",
+    "toggleTheme": "Toggle theme",
+    "toggleMenu": "Toggle menu",
+    "notifications": "Notifications"
   },
   "common": {
     "loading": "Loading...",
@@ -38,6 +26,118 @@
     "save": "Save",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "close": "Close"
+    "close": "Close",
+    "login": "Login",
+    "logout": "Logout",
+    "makePredictions": "Make Predictions"
+  },
+  "matchStatus": {
+    "scheduled": "Scheduled",
+    "live": "Live",
+    "finished": "Finished",
+    "postponed": "Postponed",
+    "cancelled": "Cancelled"
+  },
+  "matchCard": {
+    "vs": "VS"
+  },
+  "pages": {
+    "home": {
+      "title": "Home - Quiniela",
+      "description": "Welcome to Quiniela - FIFA World Cup 2026 Predictions",
+      "hero": {
+        "title": "Predict. Compete. Win.",
+        "subtitle": "Make your predictions for every match and climb the leaderboard!",
+        "ctaPredict": "Make Predictions",
+        "ctaStandings": "View Standings"
+      },
+      "matches": {
+        "title": "Upcoming Matches",
+        "empty": "No upcoming matches"
+      }
+    },
+    "tournament": {
+      "title": "Tournament - Quiniela",
+      "description": "Group standings and tournament matches",
+      "heading": "Tournament",
+      "tabStandings": "Standings",
+      "tabMatches": "Matches",
+      "groupStage": "Group Stage",
+      "allMatches": "All Matches",
+      "matchesEmpty": "No matches available",
+      "groupsEmpty": "No standings available",
+      "team": "Team",
+      "pts": "Pts",
+      "qualified": "Qualified"
+    },
+    "rankings": {
+      "title": "Rankings - Quiniela",
+      "description": "Predictor rankings and leaderboard",
+      "heading": "Predictor Rankings",
+      "empty": "No rankings available yet. Make predictions to appear here!"
+    },
+    "profile": {
+      "title": "Profile - Quiniela",
+      "description": "Your prediction profile and statistics",
+      "heading": "My Profile",
+      "loading": "Loading profile...",
+      "loginRequired": "You need to login to view your profile",
+      "loginButton": "Login",
+      "totalPoints": "Total Points",
+      "accuracy": "Accuracy",
+      "currentStreak": "Current Streak",
+      "bestStreak": "Best Streak",
+      "exactBets": "Exact Bets",
+      "rank": "Rank",
+      "badges": "Badges",
+      "lockedBadges": "Locked",
+      "pointsChart": "Points Evolution",
+      "noPointsData": "No points data yet",
+      "points": "Points",
+      "matches": "Matches"
+    },
+    "predictions": {
+      "title": "Predictions - Quiniela",
+      "description": "Make your predictions for FIFA World Cup 2026 matches",
+      "heading": "Matchday Predictions",
+      "noMatches": "No matches available for prediction",
+      "submitSuccess": "Predictions submitted!",
+      "submitError": "Failed to submit predictions",
+      "loginRequired": "You need to login to make predictions",
+      "loginButton": "Login",
+      "loading": "Loading predictions...",
+      "stepMatches": "Match Predictions",
+      "stepMatchesDesc": "Predict the exact score for each match",
+      "stepGroups": "Group Standings",
+      "stepGroupsDesc": "Rank the teams in each group from 1st to 4th place",
+      "stepFinalPhase": "Final Phase",
+      "stepFinalPhaseDesc": "Choose which teams will finish 1st, 2nd, 3rd, and 4th in the tournament",
+      "stepBestPlayers": "Best Players",
+      "stepBestPlayersDesc": "Pick the best goalkeeper and top scorer of the tournament",
+      "buttonNext": "Next Step",
+      "buttonBack": "Back",
+      "buttonSubmit": "Submit",
+      "stepXofY": "Step {current} of {total}",
+      "submitToAdvance": "Submit your predictions to advance to the next step",
+      "predictedStandings": "Predicted Standings",
+      "team": "Team",
+      "pts": "Pts",
+      "feedback": {
+        "submittedCount": "{count} prediction(s) submitted!",
+        "finalPhaseSubmitted": "Final phase submitted!",
+        "bestPlayersSubmitted": "Best players submitted!",
+        "submitFailed": "Failed to submit"
+      },
+      "predictor": {
+        "title": "Choose Your Predictor",
+        "select": "Select or create a predictor to start",
+        "create": "Create New Predictor",
+        "createButton": "Create",
+        "namePlaceholder": "Predictor name...",
+        "loading": "Loading predictors...",
+        "noPredictors": "No predictors yet",
+        "getStarted": "Get Started"
+      }
+    }
   }
 }

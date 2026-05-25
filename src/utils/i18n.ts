@@ -2,54 +2,106 @@ import esCommon from '@locales/es/common.json';
 import enCommon from '@locales/en/common.json';
 import esAuth from '@locales/es/auth.json';
 import enAuth from '@locales/en/auth.json';
+import esAdmin from '@locales/es/admin.json';
+import enAdmin from '@locales/en/admin.json';
 
 export type Locale = 'en' | 'es';
 
 export interface Translations {
   common: typeof esCommon;
   auth: typeof esAuth;
+  admin: typeof esAdmin;
 }
 
 const translations: Record<Locale, Translations> = {
-  es: {
-    common: esCommon,
-    auth: esAuth,
-  },
-  en: {
-    common: enCommon,
-    auth: enAuth,
-  },
+  es: { common: esCommon, auth: esAuth, admin: esAdmin },
+  en: { common: enCommon, auth: enAuth, admin: enAdmin },
 };
 
 export function getTranslations(locale: Locale): Translations {
   return translations[locale];
 }
 
-export function getNavLinks(locale: Locale, activeNav: string) {
-  const nav = translations[locale].common.nav;
-  const prefix = locale === 'en' ? '/en' : '/es';
+export type ActiveNav = 'home' | 'tournament' | 'predictions' | 'rankings' | 'profile' | 'admin';
 
-  return [
-    { href: `${prefix}/`, label: nav.home, active: activeNav === 'home' },
-    {
-      href: `${prefix}/${locale === 'en' ? 'tournament' : 'torneo'}`,
-      label: locale === 'en' ? 'Tournament' : 'Torneo',
-      active: activeNav === 'tournament',
-    },
-    {
-      href: `${prefix}/predictions`,
-      label: locale === 'en' ? 'Predictions' : 'Predicciones',
-      active: activeNav === 'predictions',
-    },
-    {
-      href: `${prefix}/${locale === 'en' ? 'rankings' : 'clasificacion'}`,
-      label: locale === 'en' ? 'Rankings' : 'Clasificación',
-      active: activeNav === 'rankings',
-    },
-    {
-      href: `${prefix}/${locale === 'en' ? 'profile' : 'perfil'}`,
-      label: locale === 'en' ? 'Profile' : 'Perfil',
-      active: activeNav === 'profile',
-    },
+export interface NavLink {
+  href: string;
+  label: string;
+  active: boolean;
+}
+
+const ROUTE_SLUGS: Record<Locale, Record<Exclude<ActiveNav, 'admin'>, string>> = {
+  en: {
+    home: '',
+    tournament: 'tournament',
+    predictions: 'predictions',
+    rankings: 'rankings',
+    profile: 'profile',
+  },
+  es: {
+    home: '',
+    tournament: 'torneo',
+    predictions: 'predicciones',
+    rankings: 'clasificacion',
+    profile: 'perfil',
+  },
+};
+
+export function getRoute(locale: Locale, nav: Exclude<ActiveNav, 'admin'>): string {
+  const slug = ROUTE_SLUGS[locale][nav];
+  return `/${locale}/${slug}`;
+}
+
+export function getNavLinks(locale: Locale, activeNav: ActiveNav): NavLink[] {
+  const nav = translations[locale].common.nav;
+  const items: { key: Exclude<ActiveNav, 'admin'>; label: string }[] = [
+    { key: 'home', label: nav.home },
+    { key: 'tournament', label: nav.tournament },
+    { key: 'predictions', label: nav.predictions },
+    { key: 'rankings', label: nav.rankings },
+    { key: 'profile', label: nav.profile },
   ];
+
+  return items.map((item) => ({
+    href: getRoute(locale, item.key),
+    label: item.label,
+    active: activeNav === item.key,
+  }));
+}
+
+export function getAdminLink(locale: Locale, activeNav: ActiveNav): NavLink {
+  return {
+    href: '/admin/matches',
+    label: translations[locale].common.nav.admin,
+    active: activeNav === 'admin',
+  };
+}
+
+export function getLoginRoute(locale: Locale): string {
+  return `/${locale}/login`;
+}
+
+export function getRegisterRoute(locale: Locale): string {
+  return `/${locale}/register`;
+}
+
+export function getHomeRoute(locale: Locale): string {
+  return `/${locale}/`;
+}
+
+export function getOtherLocale(locale: Locale): Locale {
+  return locale === 'en' ? 'es' : 'en';
+}
+
+const LOCALE_CODES: Record<Locale, { dateLocale: string; ogLocale: string }> = {
+  en: { dateLocale: 'en-US', ogLocale: 'en_US' },
+  es: { dateLocale: 'es-ES', ogLocale: 'es_ES' },
+};
+
+export function getDateLocale(locale: Locale): string {
+  return LOCALE_CODES[locale].dateLocale;
+}
+
+export function getOgLocale(locale: Locale): string {
+  return LOCALE_CODES[locale].ogLocale;
 }

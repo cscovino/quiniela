@@ -11,6 +11,7 @@ import { Button } from '@atoms/Button/Button';
 import { tournamentService } from '@services/tournament-service';
 import { BADGE_DEFINITIONS, getBadgeName, getBadgeDescription } from '@app-types/badges';
 import { useAuthStore } from '@store/auth-store';
+import { getLoginRoute } from '@utils/i18n';
 import type { PredictorStats } from '@app-types/firestore';
 import type { PointEntry } from '@molecules/PointsChart/PointsChart';
 import './ProfileTemplate.css';
@@ -141,11 +142,9 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
         <div className="profile-template__auth-required">
           <Typography variant="h1">{translations.title}</Typography>
           <Typography variant="body">{translations.loginRequired}</Typography>
-          <a href={locale === 'en' ? '/en/login' : '/es/login'}>
-            <Button variant="primary" size="md">
-              {translations.loginButton}
-            </Button>
-          </a>
+          <Button href={getLoginRoute(locale)} variant="primary" size="md">
+            {translations.loginButton}
+          </Button>
         </div>
       </div>
     );

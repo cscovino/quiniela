@@ -6,31 +6,19 @@
   },
   "nav": {
     "home": "Inicio",
+    "tournament": "Torneo",
     "predictions": "Predicciones",
+    "rankings": "Clasificación",
     "standings": "Clasificación",
-    "profile": "Perfil"
-  },
-  "pages": {
-    "home": {
-      "title": "Inicio - Quiniela",
-      "description": "Bienvenido a Quiniela - Predicciones de la Copa Mundial FIFA 2026"
-    },
-    "predictions": {
-      "title": "Predicciones - Quiniela",
-      "description": "Haz tus predicciones para los partidos de la Copa Mundial FIFA 2026"
-    },
-    "rankings": {
-      "title": "Clasificación - Quiniela",
-      "description": "Clasificación y tabla de posiciones de pronosticadores"
-    },
-    "profile": {
-      "title": "Perfil - Quiniela",
-      "description": "Tu perfil y estadísticas de predicciones"
-    },
-    "tournament": {
-      "title": "Torneo - Quiniela",
-      "description": "Clasificación de grupos y partidos del torneo"
-    }
+    "profile": "Perfil",
+    "admin": "Admin",
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "brandLabel": "QUINIELA",
+    "switchLocale": "Cambiar a Inglés",
+    "toggleTheme": "Cambiar tema",
+    "toggleMenu": "Abrir menú",
+    "notifications": "Notificaciones"
   },
   "common": {
     "loading": "Cargando...",
@@ -38,6 +26,118 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "makePredictions": "Hacer Predicciones"
+  },
+  "matchStatus": {
+    "scheduled": "Programado",
+    "live": "En vivo",
+    "finished": "Finalizado",
+    "postponed": "Aplazado",
+    "cancelled": "Cancelado"
+  },
+  "matchCard": {
+    "vs": "VS"
+  },
+  "pages": {
+    "home": {
+      "title": "Inicio - Quiniela",
+      "description": "Bienvenido a Quiniela - Predicciones de la Copa Mundial FIFA 2026",
+      "hero": {
+        "title": "Predice. Compite. Gana.",
+        "subtitle": "¡Haz tus predicciones para cada partido y escala en la clasificación!",
+        "ctaPredict": "Hacer Predicciones",
+        "ctaStandings": "Ver Clasificación"
+      },
+      "matches": {
+        "title": "Próximos Partidos",
+        "empty": "No hay partidos próximos"
+      }
+    },
+    "tournament": {
+      "title": "Torneo - Quiniela",
+      "description": "Clasificación de grupos y partidos del torneo",
+      "heading": "Torneo",
+      "tabStandings": "Clasificación",
+      "tabMatches": "Partidos",
+      "groupStage": "Fase de Grupos",
+      "allMatches": "Todos los Partidos",
+      "matchesEmpty": "No hay partidos disponibles",
+      "groupsEmpty": "No hay clasificación disponible",
+      "team": "Equipo",
+      "pts": "Pts",
+      "qualified": "Clasificados"
+    },
+    "rankings": {
+      "title": "Clasificación - Quiniela",
+      "description": "Clasificación y tabla de posiciones de pronosticadores",
+      "heading": "Clasificación de Pronosticadores",
+      "empty": "¡Aún no hay clasificación. ¡Haz predicciones para aparecer aquí!"
+    },
+    "profile": {
+      "title": "Perfil - Quiniela",
+      "description": "Tu perfil y estadísticas de predicciones",
+      "heading": "Mi Perfil",
+      "loading": "Cargando perfil...",
+      "loginRequired": "Necesitas iniciar sesión para ver tu perfil",
+      "loginButton": "Iniciar Sesión",
+      "totalPoints": "Puntos Totales",
+      "accuracy": "Precisión",
+      "currentStreak": "Racha Actual",
+      "bestStreak": "Mejor Racha",
+      "exactBets": "Apuestas Exactas",
+      "rank": "Posición",
+      "badges": "Insignias",
+      "lockedBadges": "Bloqueadas",
+      "pointsChart": "Evolución de Puntos",
+      "noPointsData": "Aún no hay datos de puntos",
+      "points": "Puntos",
+      "matches": "Partidos"
+    },
+    "predictions": {
+      "title": "Predicciones - Quiniela",
+      "description": "Haz tus predicciones para los partidos de la Copa Mundial FIFA 2026",
+      "heading": "Predicciones de la Jornada",
+      "noMatches": "No hay partidos disponibles para predecir",
+      "submitSuccess": "¡Predicciones enviadas!",
+      "submitError": "Error al enviar las predicciones",
+      "loginRequired": "Necesitas iniciar sesión para hacer predicciones",
+      "loginButton": "Iniciar Sesión",
+      "loading": "Cargando predicciones...",
+      "stepMatches": "Predicciones de Partidos",
+      "stepMatchesDesc": "Predice el marcador exacto de cada partido",
+      "stepGroups": "Clasificación de Grupos",
+      "stepGroupsDesc": "Clasifica los equipos de cada grupo del 1° al 4° lugar",
+      "stepFinalPhase": "Fase Final",
+      "stepFinalPhaseDesc": "Elige qué equipos terminarán 1°, 2°, 3° y 4° en el torneo",
+      "stepBestPlayers": "Mejores Jugadores",
+      "stepBestPlayersDesc": "Elige al mejor portero y al máximo goleador del torneo",
+      "buttonNext": "Siguiente",
+      "buttonBack": "Atrás",
+      "buttonSubmit": "Enviar",
+      "stepXofY": "Paso {current} de {total}",
+      "submitToAdvance": "Envía tus predicciones para avanzar al siguiente paso",
+      "predictedStandings": "Clasificación Predicha",
+      "team": "Equipo",
+      "pts": "Pts",
+      "feedback": {
+        "submittedCount": "¡{count} predicción(es) enviadas!",
+        "finalPhaseSubmitted": "¡Fase final enviada!",
+        "bestPlayersSubmitted": "¡Mejores jugadores enviados!",
+        "submitFailed": "Error al enviar"
+      },
+      "predictor": {
+        "title": "Elige tu Pronosticador",
+        "select": "Selecciona o crea un pronosticador",
+        "create": "Crear Nuevo Pronosticador",
+        "createButton": "Crear",
+        "namePlaceholder": "Nombre del pronosticador...",
+        "loading": "Cargando pronosticadores...",
+        "noPredictors": "Aún no hay pronosticadores",
+        "getStarted": "Comenzar"
+      }
+    }
   }
 }
