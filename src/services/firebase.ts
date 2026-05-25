@@ -23,6 +23,16 @@ let initPromise: Promise<void> | null = null;
 function ensureApp(): FirebaseApp {
   if (!app) {
     app = initializeApp(firebaseConfig);
+
+    if (typeof window !== 'undefined') {
+      const recaptchaKey = import.meta.env.PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY;
+      if (recaptchaKey && import.meta.env.PROD) {
+        _appCheck = initializeAppCheck(app, {
+          provider: new ReCaptchaV3Provider(recaptchaKey),
+          isTokenAutoRefreshEnabled: true,
+        });
+      }
+    }
   }
   return app;
 }
@@ -34,14 +44,6 @@ export async function initFirebase(): Promise<void> {
     _db = getFirestore(a);
     _auth = getAuth(a);
     await setPersistence(_auth, browserLocalPersistence).catch(() => {});
-
-    const recaptchaKey = import.meta.env.PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY;
-    if (recaptchaKey && import.meta.env.PROD) {
-      _appCheck = initializeAppCheck(a, {
-        provider: new ReCaptchaV3Provider(recaptchaKey),
-        isTokenAutoRefreshEnabled: true,
-      });
-    }
   })();
   return initPromise;
 }
