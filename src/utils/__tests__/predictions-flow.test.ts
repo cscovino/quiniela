@@ -10,7 +10,13 @@ import {
 } from '../predictions-flow';
 import type { MatchWithId, GroupBetRecord, KnockoutBetRecord } from '../predictions-flow';
 
-const makeMatch = (id: string, groupId: string, phase: string, home: string, away: string): MatchWithId => ({
+const makeMatch = (
+  id: string,
+  groupId: string,
+  phase: string,
+  home: string,
+  away: string,
+): MatchWithId => ({
   id,
   slug: id,
   groupId,
@@ -207,10 +213,28 @@ describe('isGroupClassificationComplete', () => {
 describe('BRACKET_MAP', () => {
   it('has entries for all knockout matches', () => {
     const expectedSlugs = [
-      'r32-m1', 'r32-m2', 'r32-m3', 'r32-m4', 'r32-m5', 'r32-m6', 'r32-m7', 'r32-m8',
-      'r16-m1', 'r16-m2', 'r16-m3', 'r16-m4', 'r16-m5', 'r16-m6', 'r16-m7', 'r16-m8',
-      'qf-m1', 'qf-m2', 'qf-m3', 'qf-m4',
-      'sf-m1', 'sf-m2',
+      'r32-m1',
+      'r32-m2',
+      'r32-m3',
+      'r32-m4',
+      'r32-m5',
+      'r32-m6',
+      'r32-m7',
+      'r32-m8',
+      'r16-m1',
+      'r16-m2',
+      'r16-m3',
+      'r16-m4',
+      'r16-m5',
+      'r16-m6',
+      'r16-m7',
+      'r16-m8',
+      'qf-m1',
+      'qf-m2',
+      'qf-m3',
+      'qf-m4',
+      'sf-m1',
+      'sf-m2',
       'third-place',
       'final',
     ];

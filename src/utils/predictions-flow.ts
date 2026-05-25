@@ -62,10 +62,7 @@ export interface PredictorProgress {
 }
 
 // 2.1: Get matches for a specific group
-export function getGroupMatches(
-  allMatches: MatchWithId[],
-  groupId: string,
-): MatchWithId[] {
+export function getGroupMatches(allMatches: MatchWithId[], groupId: string): MatchWithId[] {
   return allMatches.filter((m) => m.groupId === groupId && m.phase === 'group');
 }
 
@@ -76,9 +73,7 @@ export function calculateGroupStandings(
   teamsMap: Record<string, TeamInfo>,
   groupId: string,
 ): PredictedStanding[] {
-  const groupMatches = matches.filter(
-    (m) => m.groupId === groupId && m.phase === 'group',
-  );
+  const groupMatches = matches.filter((m) => m.groupId === groupId && m.phase === 'group');
 
   const standings: Record<string, PredictedStanding> = {};
 
@@ -135,9 +130,7 @@ export function calculateGroupStandings(
   }
 
   return Object.values(standings).sort(
-    (a, b) =>
-      b.points - a.points ||
-      b.goalsFor - b.goalsAgainst - (a.goalsFor - a.goalsAgainst),
+    (a, b) => b.points - a.points || b.goalsFor - b.goalsAgainst - (a.goalsFor - a.goalsAgainst),
   );
 }
 
@@ -313,38 +306,49 @@ export function buildKnockoutBracket(
   knockoutMatches: MatchWithId[],
   knockoutBets: KnockoutBetRecord,
 ): KnockoutMatch[] {
-  return knockoutMatches.map((match) => {
-    const bracketEntry = BRACKET_MAP[match.slug];
-    if (!bracketEntry) {
+  return knockoutMatches
+    .map((match) => {
+      const bracketEntry = BRACKET_MAP[match.slug];
+      if (!bracketEntry) {
+        return {
+          slug: match.slug,
+          phase: match.phase,
+          homeTeam: {
+            slotId: `${match.slug}-home`,
+            source: { from: 'group', groupId: '', position: 0 },
+          },
+          awayTeam: {
+            slotId: `${match.slug}-away`,
+            source: { from: 'group', groupId: '', position: 0 },
+          },
+        };
+      }
+
       return {
         slug: match.slug,
         phase: match.phase,
-        homeTeam: { slotId: `${match.slug}-home`, source: { from: 'group', groupId: '', position: 0 } },
-        awayTeam: { slotId: `${match.slug}-away`, source: { from: 'group', groupId: '', position: 0 } },
+        homeTeam: {
+          ...bracketEntry.home,
+        },
+        awayTeam: {
+          ...bracketEntry.away,
+        },
       };
-    }
-
-    return {
-      slug: match.slug,
-      phase: match.phase,
+    })
+    .map((match) => ({
+      ...match,
       homeTeam: {
-        ...bracketEntry.home,
+        ...match.homeTeam,
+        resolvedTeam: resolveSlot(match.homeTeam, groupBetsByGroupId, knockoutBets),
       },
       awayTeam: {
-        ...bracketEntry.away,
+        ...match.awayTeam,
+        resolvedTeam: resolveSlot(match.awayTeam, groupBetsByGroupId, knockoutBets),
       },
-    };
-  }).map((match) => ({
-    ...match,
-    homeTeam: {
-      ...match.homeTeam,
-      resolvedTeam: resolveSlot(match.homeTeam, groupBetsByGroupId, knockoutBets),
-    },
-    awayTeam: {
-      ...match.awayTeam,
-      resolvedTeam: resolveSlot(match.awayTeam, groupBetsByGroupId, knockoutBets),
-    },
-  })) as (KnockoutMatch & { homeTeam: { resolvedTeam: string }; awayTeam: { resolvedTeam: string } })[];
+    })) as (KnockoutMatch & {
+    homeTeam: { resolvedTeam: string };
+    awayTeam: { resolvedTeam: string };
+  })[];
 }
 
 // 2.7: Get predictor progress
@@ -371,9 +375,7 @@ export function getPredictorProgress(
     'final',
   ];
 
-  const knockoutMatches = allMatches.filter((m) =>
-    knockoutPhases.includes(m.phase as PhaseType),
-  );
+  const knockoutMatches = allMatches.filter((m) => knockoutPhases.includes(m.phase as PhaseType));
   const totalKnockout = knockoutMatches.length;
   const knockoutSubmitted = knockoutMatches.filter((m) => knockoutBets[m.slug]).length;
 
