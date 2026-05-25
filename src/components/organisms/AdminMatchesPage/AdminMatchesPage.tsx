@@ -7,19 +7,28 @@ import type { Match, MatchStatus } from '@app-types/firestore';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { getDb } from '@services/firebase';
 import { useAuthStore } from '@store/auth-store';
+import { getLoginRoute } from '@utils/i18n';
 import './AdminMatchesPage.css';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
 export const AdminMatchesPage: React.FC = () => {
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
   const [matches, setMatches] = useState<(Match & { id: string })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || user.role !== 'admin') {
-      window.location.href = '/en';
+    if (isAuthLoading) return;
+
+    if (!user) {
+      window.location.href = getLoginRoute('es');
+      return;
+    }
+
+    if (user.role !== 'admin') {
+      window.location.href = '/';
       return;
     }
 
@@ -41,7 +50,7 @@ export const AdminMatchesPage: React.FC = () => {
     };
 
     fetchMatches();
-  }, [user]);
+  }, [user, isAuthLoading]);
 
   const handleUpdateResult = async (
     matchId: string,
@@ -60,6 +69,10 @@ export const AdminMatchesPage: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to update result');
     }
   };
+
+  if (isAuthLoading) {
+    return <Typography variant="body">Verifying access...</Typography>;
+  }
 
   if (!user || user.role !== 'admin') {
     return null;
