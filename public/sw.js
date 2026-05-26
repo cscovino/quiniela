@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quiniela-v4';
+const CACHE_NAME = 'quiniela-v5';
 
 const STATIC_ASSETS = [
   '/manifest.json',
@@ -10,6 +10,12 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)),
   );
   self.skipWaiting();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (event) => {
