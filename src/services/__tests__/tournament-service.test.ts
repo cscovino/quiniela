@@ -46,7 +46,7 @@ describe('tournament-service', () => {
 
   describe('getTournament', () => {
     it('returns tournament data when exists', async () => {
-      const mockTournament = { id: 'world-cup-2026', name: 'FIFA World Cup 2026' };
+      const mockTournament = { id: 'world-cup-2026', name: 'World Cup 2026' };
       vi.mocked(firebaseFirestore.getDoc).mockResolvedValue({
         exists: () => true,
         data: () => mockTournament,

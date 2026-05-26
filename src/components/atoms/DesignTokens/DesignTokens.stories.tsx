@@ -15,7 +15,7 @@ export const Colors: Story = {
   render: () => (
     <div className="tokens-page">
       <h1 className="tokens-page__title">WC26 Design Tokens</h1>
-      <p className="tokens-page__subtitle">FIFA World Cup 2026 Official Brand Colors</p>
+      <p className="tokens-page__subtitle">World Cup 2026 Official Brand Colors</p>
 
       <section className="tokens-section">
         <h2 className="tokens-section__title">Primary Colors</h2>

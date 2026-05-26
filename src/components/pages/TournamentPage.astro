@@ -1,5 +1,6 @@
 ---
 import { getBuildData } from '@lib/build-data';
+import { TournamentHeader } from '@organisms/TournamentHeader/TournamentHeader';
 import { GroupStandings } from '@organisms/GroupStandings/GroupStandings';
 import { MatchList } from '@organisms/MatchList/MatchList';
 import type { MatchCardProps } from '@molecules/MatchCard/MatchCard';
@@ -39,12 +40,19 @@ const matchTranslations = {
 };
 
 const matches = buildData.allMatches as unknown as MatchCardProps[];
+const tournamentInfo = buildData.tournament;
 ---
 
 <main class="tournament-template__content">
-  <header class="tournament-template__header">
-    <h1>{t.pages.tournament.heading}</h1>
-  </header>
+  <TournamentHeader
+    name={t.tournament.name}
+    status={tournamentInfo.status as 'draft' | 'active' | 'finished'}
+    startDate={tournamentInfo.startDate}
+    endDate={tournamentInfo.endDate}
+    participantCount={tournamentInfo.participantCount}
+    locale={locale}
+    translations={{ teams: t.tournament.teams }}
+  />
 
   <div class="tournament-template__tabs" role="tablist">
     <button
@@ -81,19 +89,6 @@ const matches = buildData.allMatches as unknown as MatchCardProps[];
     max-width: var(--container-xl);
     margin: 0 auto;
     padding: var(--space-2) var(--space-2);
-  }
-
-  .tournament-template__header {
-    margin-bottom: var(--space-4);
-  }
-
-  .tournament-template__header h1 {
-    font-family: var(--font-pixel);
-    font-size: var(--heading-sm);
-    background: linear-gradient(135deg, var(--color-gold-500), var(--color-warm-500));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 
   .tournament-template__tabs {

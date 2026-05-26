@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getBuildData } from '@lib/build-data';
+import { TournamentHeader } from '@organisms/TournamentHeader/TournamentHeader';
 import { MatchList } from '@organisms/MatchList/MatchList';
 import { Button } from '@atoms/Button/Button';
 import type { MatchCardProps } from '@molecules/MatchCard/MatchCard';
@@ -31,6 +32,7 @@ const matchTranslations = {
 };
 
 const matches = buildData.matches as unknown as MatchCardProps[];
+const tournamentInfo = buildData.tournament;
 ---
 
 <BaseLayout
@@ -52,6 +54,16 @@ const matches = buildData.matches as unknown as MatchCardProps[];
         </Button>
       </div>
     </section>
+
+    <TournamentHeader
+      name={t.tournament.name}
+      status={tournamentInfo.status as 'draft' | 'active' | 'finished'}
+      startDate={tournamentInfo.startDate}
+      endDate={tournamentInfo.endDate}
+      participantCount={tournamentInfo.participantCount}
+      locale={locale}
+      translations={{ teams: t.tournament.teams }}
+    />
 
     <section class="home-template__matches">
       <MatchList

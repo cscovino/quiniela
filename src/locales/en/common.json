@@ -2,7 +2,13 @@
   "site": {
     "title": "Quiniela",
     "tagline": "Retro Football Predictions",
-    "description": "Make your predictions for the FIFA World Cup 2026"
+    "description": "Make your predictions for the World Cup 2026"
+  },
+  "tournament": {
+    "name": "World Cup 2026",
+    "shortName": "WC26",
+    "fullName": "World Cup 2026",
+    "teams": "teams"
   },
   "nav": {
     "home": "Home",
@@ -44,7 +50,7 @@
   "pages": {
     "home": {
       "title": "Home - Quiniela",
-      "description": "Welcome to Quiniela - FIFA World Cup 2026 Predictions",
+      "description": "Welcome to Quiniela - World Cup 2026 Predictions",
       "hero": {
         "title": "Predict. Compete. Win.",
         "subtitle": "Make your predictions for every match and climb the leaderboard!",
@@ -112,7 +118,7 @@
     },
     "predictions": {
       "title": "Predictions - Quiniela",
-      "description": "Make your predictions for FIFA World Cup 2026 matches",
+      "description": "Make your predictions for World Cup 2026 matches",
       "heading": "Matchday Predictions",
       "noMatches": "No matches available for prediction",
       "submitSuccess": "Predictions submitted!",

@@ -20,6 +20,7 @@ export interface NavBarTranslations {
   toggleTheme: string;
   toggleMenu: string;
   notifications: string;
+  tournamentName: string;
 }
 
 export interface NavBarProps {
@@ -235,7 +236,7 @@ export const NavBar: React.FC<NavBarProps> = ({
           )}
 
           <div className="nav-bar__mobile-footer">
-            <span className="nav-bar__tournament-name">FIFA World Cup 2026</span>
+            <span className="nav-bar__tournament-name">{translations.tournamentName}</span>
           </div>
         </div>
       </div>

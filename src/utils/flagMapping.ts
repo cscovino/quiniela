@@ -1,4 +1,4 @@
-export const FIFA_TO_ISO: Record<string, string> = {
+export const COUNTRY_CODE_TO_ISO: Record<string, string> = {
   AFG: 'af',
   ALB: 'al',
   ALG: 'dz',
@@ -204,7 +204,7 @@ export const FIFA_TO_ISO: Record<string, string> = {
   ZIM: 'zw',
 };
 
-export function getFlagClass(fifaCode: string): string {
-  const iso = FIFA_TO_ISO[fifaCode.toUpperCase()];
+export function getFlagClass(code: string): string {
+  const iso = COUNTRY_CODE_TO_ISO[code.toUpperCase()];
   return iso ? `fi fi-${iso}` : 'fi fi-xx';
 }

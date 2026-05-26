@@ -13,7 +13,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const args = {
-  name: 'FIFA World Cup 2026',
+  name: 'World Cup 2026',
   startDate: new Date('2026-06-20'),
   endDate: new Date('2026-07-20'),
   participantCount: 48,

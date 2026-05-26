@@ -11,6 +11,7 @@ export interface TournamentHeaderProps {
   startDate: Date;
   endDate: Date;
   participantCount?: number;
+  locale?: string;
   className?: string;
   translations: {
     teams: string;
@@ -22,10 +23,11 @@ export const TournamentHeader: React.FC<TournamentHeaderProps> = ({
   startDate,
   endDate,
   participantCount,
+  locale = 'en',
   className = '',
   translations,
 }) => {
-  const formattedDates = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+  const formattedDates = `${startDate.toLocaleDateString(locale, { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   return (
     <div className={`tournament-header ${className}`}>

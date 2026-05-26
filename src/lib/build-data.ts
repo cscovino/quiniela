@@ -250,16 +250,27 @@ function buildStandings(
 }
 
 async function queryBuildData(db: DbClient) {
-  const [teamsSnap, matchesSnap, standingsSnap, groupsSnap] = await Promise.all([
+  const [teamsSnap, matchesSnap, standingsSnap, groupsSnap, tournamentSnap] = await Promise.all([
     db.query(`tournaments/${TOURNAMENT_ID}/teams`),
     db.query(`tournaments/${TOURNAMENT_ID}/matches`, { orderBy: 'date' }),
     db.query(`tournaments/${TOURNAMENT_ID}/group_standings`),
     db.query(`tournaments/${TOURNAMENT_ID}/groups`),
+    db.doc(`tournaments/${TOURNAMENT_ID}`),
   ]);
 
   const teams = toTeamsMap(teamsSnap);
   const groupsMap = toGroupsMap(groupsSnap);
   const rawMatches = rawMatchesFromSnap(matchesSnap);
+
+  const rawTournament = tournamentSnap.exists ? tournamentSnap.data() : {};
+  const tournament = {
+    startDate:
+      (rawTournament.startDate as { toDate: () => Date })?.toDate?.() || new Date('2026-06-11'),
+    endDate:
+      (rawTournament.endDate as { toDate: () => Date })?.toDate?.() || new Date('2026-07-19'),
+    status: (rawTournament.status as string) || 'active',
+    participantCount: Object.keys(teams).length,
+  };
 
   const allMatches: MatchView[] = rawMatches.map((m) => toMatchView(m, teams));
 
@@ -283,7 +294,7 @@ async function queryBuildData(db: DbClient) {
 
   const standings = buildStandings(standingsSnap, groupsMap, teams);
 
-  return { matches, standings, teams, allMatches };
+  return { matches, standings, teams, allMatches, tournament };
 }
 
 async function queryBuildRankings(db: DbClient) {
@@ -364,7 +375,18 @@ export async function getBuildData() {
   }
 
   console.warn('[build-data] getBuildData failed, returning empty:', errors);
-  return { matches: [], standings: [], teams: {}, allMatches: [] };
+  return {
+    matches: [],
+    standings: [],
+    teams: {},
+    allMatches: [],
+    tournament: {
+      startDate: new Date('2026-06-11'),
+      endDate: new Date('2026-07-19'),
+      status: 'active',
+      participantCount: 0,
+    },
+  };
 }
 
 export async function getBuildRankings() {

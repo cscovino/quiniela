@@ -45,6 +45,7 @@ const navLinks = getNavLinks(locale, activeNav);
 const adminLink = getAdminLink(locale, activeNav);
 const tNav = getTranslations(locale).common.nav;
 const tCommon = getTranslations(locale).common.common;
+const tTournament = getTranslations(locale).common.tournament;
 const navBarTranslations = {
   brandLabel: tNav.brandLabel,
   login: tCommon.login,
@@ -54,6 +55,7 @@ const navBarTranslations = {
   toggleTheme: tNav.toggleTheme,
   toggleMenu: tNav.toggleMenu,
   notifications: tNav.notifications,
+  tournamentName: tTournament.name,
 };
 
 const otherLocale = getOtherLocale(locale);
@@ -111,7 +113,8 @@ const alternateUrl = canonicalUrl.replace(`/${locale}`, `/${otherLocale}`);
         '@context': 'https://schema.org',
         '@type': type === 'sports-event' ? 'SportsEvent' : 'WebSite',
         name: title.replace(/ - Quiniela$/, ''),
-        description: description || 'Retro pixel art football predictions for FIFA World Cup 2026',
+        description:
+          description || `Retro pixel art football predictions for ${tTournament.fullName}`,
         url: fullUrl,
         image: ogImage,
         inLanguage: getDateLocale(locale),
@@ -121,7 +124,7 @@ const alternateUrl = canonicalUrl.replace(`/${locale}`, `/${otherLocale}`);
               endDate: '2026-07-19',
               location: {
                 '@type': 'Place',
-                name: 'FIFA World Cup 2026',
+                name: tTournament.fullName,
                 address: {
                   '@type': 'PostalAddress',
                   addressCountry: ['CA', 'MX', 'US'],

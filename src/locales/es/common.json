@@ -2,7 +2,13 @@
   "site": {
     "title": "Quiniela",
     "tagline": "Predicciones de Fútbol Retro",
-    "description": "Haz tus predicciones para la Copa Mundial FIFA 2026"
+    "description": "Haz tus predicciones para la Copa Mundial 2026"
+  },
+  "tournament": {
+    "name": "Mundial 2026",
+    "shortName": "CM26",
+    "fullName": "Copa Mundial 2026",
+    "teams": "equipos"
   },
   "nav": {
     "home": "Inicio",
@@ -44,7 +50,7 @@
   "pages": {
     "home": {
       "title": "Inicio - Quiniela",
-      "description": "Bienvenido a Quiniela - Predicciones de la Copa Mundial FIFA 2026",
+      "description": "Bienvenido a Quiniela - Predicciones de la Copa Mundial 2026",
       "hero": {
         "title": "Predice. Compite. Gana.",
         "subtitle": "¡Haz tus predicciones para cada partido y escala en la clasificación!",
@@ -112,7 +118,7 @@
     },
     "predictions": {
       "title": "Predicciones - Quiniela",
-      "description": "Haz tus predicciones para los partidos de la Copa Mundial FIFA 2026",
+      "description": "Haz tus predicciones para los partidos de la Copa Mundial 2026",
       "heading": "Predicciones de la Jornada",
       "noMatches": "No hay partidos disponibles para predecir",
       "submitSuccess": "¡Predicciones enviadas!",

@@ -350,7 +350,7 @@ export const HeroComposition: Story = {
           fontSize: 'var(--text-lg)',
         }}
       >
-        FIFA World Cup Predictions
+        World Cup Predictions
       </p>
     </div>
   ),
