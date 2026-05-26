@@ -1,7 +1,7 @@
 ---
 import { getBuildData } from '@lib/build-data';
-import { LiveStandings } from '@organisms/LiveStandings/LiveStandings';
-import { LiveMatchList } from '@organisms/LiveMatchList/LiveMatchList';
+import { GroupStandings } from '@organisms/GroupStandings/GroupStandings';
+import { MatchList } from '@organisms/MatchList/MatchList';
 import type { MatchCardProps } from '@molecules/MatchCard/MatchCard';
 import { getTranslations } from '@utils/i18n';
 
@@ -62,17 +62,16 @@ const matches = buildData.allMatches as unknown as MatchCardProps[];
 
   <section class="tournament-template__standings" data-panel="standings">
     <h2>{t.pages.tournament.groupStage}</h2>
-    <LiveStandings groups={standings} translations={standingsTranslations} client:idle />
+    <GroupStandings groups={standings} translations={standingsTranslations} />
   </section>
 
   <section class="tournament-template__matches" data-panel="matches" hidden>
-    <LiveMatchList
+    <MatchList
       matches={matches}
-      title=""
+      title={t.pages.tournament.allMatches}
       emptyMessage={t.pages.tournament.matchesEmpty}
       translations={matchTranslations}
       locale={locale}
-      client:idle
     />
   </section>
 </main>
