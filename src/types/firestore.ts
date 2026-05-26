@@ -59,6 +59,7 @@ export interface Predictor {
   userId: string;
   name: string;
   avatarUrl?: string;
+  avatar?: { bgColor: string; emoji: string };
   createdAt: Timestamp;
 }
 
