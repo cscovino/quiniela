@@ -24,6 +24,7 @@
 - PWA: implement cache-busting/version update mechanism to fetch latest site
 - Predictor list UX: clarify row click vs edit button (row = edit predictions, button = edit name/avatar)
 - Predictor list: make Edit/Delete buttons more visible with pixel-art icons
+- Documentation: update README.md, DESIGN.md, and AGENTS.md to reflect current state and Phase 1 changes
 
 **Plans:** 0 plans
 
