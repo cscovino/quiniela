@@ -47,6 +47,17 @@ export const NavBar: React.FC<NavBarProps> = ({
     initAuth();
   }, []);
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
   const isLoggedIn = !!user;
   const isAdmin = user?.role === 'admin';
   const userDisplayName = user?.displayName || user?.email || '';
