@@ -2,6 +2,7 @@
 import '@styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import { NavBar } from '@organisms/NavBar/NavBar';
+import { PWAInstall } from '@organisms/PWAInstall/PWAInstall';
 import { ToastProvider } from '@organisms/ToastProvider/ToastProvider';
 import {
   getNavLinks,
@@ -152,6 +153,7 @@ const alternateUrl = canonicalUrl.replace(`/${locale}`, `/${otherLocale}`);
       <slot />
     </main>
     <ToastProvider client:idle />
+    <PWAInstall client:load />
     <script src="../scripts/runtime.ts"></script>
   </body>
 </html>
