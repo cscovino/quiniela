@@ -61,16 +61,23 @@
   display: flex;
   gap: var(--space-2);
   flex-shrink: 0;
+  padding-left: var(--space-3);
+  margin-left: var(--space-3);
+  border-left: var(--border-width-sm) solid var(--border-color);
 }
 
 .predictor-list__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   padding: var(--space-1) var(--space-2);
-  background: transparent;
+  background: var(--bg-input);
   border: var(--border-width-sm) solid var(--color-accent-500);
-  color: var(--color-primary-900);
+  color: var(--text-primary);
   font-family: var(--font-pixel);
   font-size: var(--text-xs);
   cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .predictor-list__action-btn:hover {
@@ -80,6 +87,11 @@
 .predictor-list__action-btn--danger {
   border-color: var(--color-error);
   color: var(--color-error);
+}
+
+.predictor-list__action-btn--danger:hover {
+  background: var(--color-error);
+  color: var(--text-inverse);
 }
 
 .predictor-list__create-card {

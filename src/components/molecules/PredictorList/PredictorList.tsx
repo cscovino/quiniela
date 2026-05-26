@@ -63,7 +63,7 @@ export const PredictorList: React.FC<PredictorListProps> = ({
           tabIndex={0}
           onClick={() => onSelect(predictor.id)}
           onKeyDown={(e) => e.key === 'Enter' && onSelect(predictor.id)}
-          aria-label={`Select ${predictor.name}`}
+          aria-label={`Edit predictions for ${predictor.name}`}
         >
           <div className="predictor-list__card-content">
             <PredictorAvatar predictor={predictor} size="md" />
@@ -93,9 +93,10 @@ export const PredictorList: React.FC<PredictorListProps> = ({
                 e.stopPropagation();
                 onEdit(predictor.id);
               }}
-              aria-label={`${labels.edit} ${predictor.name}`}
+              aria-label={`Edit name and avatar for ${predictor.name}`}
             >
-              {labels.edit}
+              <span className="pix pix-edit" />
+              Edit Profile
             </button>
             <button
               type="button"
@@ -104,8 +105,9 @@ export const PredictorList: React.FC<PredictorListProps> = ({
                 e.stopPropagation();
                 onDelete(predictor.id);
               }}
-              aria-label={`${labels.delete} ${predictor.name}`}
+              aria-label={`Delete ${predictor.name}`}
             >
+              <span className="pix pix-trash" />
               {labels.delete}
             </button>
           </div>
