@@ -45,14 +45,22 @@ Plans:
 
 ### Phase 2: Create stories for all possible components so I can develop focusing in one component and then that would be reflected in all the app, for example the navbar, that now is allowing to scroll the background content and the header is not being sticky
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Create Storybook stories for every missing component so components can be developed in isolation. Fix NavBar scroll-through bug and sticky positioning so background scrolling no longer bleeds through the mobile menu and the header sticks correctly.
+
+**Status:** 🚧 Planning — 7 plans created (Wave 1 ready)
+
 **Depends on:** Phase 1
-**Plans:** 0 plans
+**Plans:** 7 plans
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 2 to break down)
+- [ ] 02-01-PLAN.md — NavBar CSS fix (scroll lock + sticky) + 6 NavBar stories
+- [ ] 02-02-PLAN.md — AuthGuard, Toast, ToastProvider, PWAInstall stories
+- [ ] 02-03-PLAN.md — LoginForm, RegisterForm stories
+- [ ] 02-04-PLAN.md — PointsChart, PredictionsUI, PredictionStepFinal, AdminMatchResultForm stories
+- [ ] 02-05-PLAN.md — BestPlayersForm, FinalPhaseForm, GroupPredictionForm, KnockoutBracketForm stories
+- [ ] 02-06-PLAN.md — AdminMatchesPage, AdminMatchList stories
+- [ ] 02-07-PLAN.md — AuthTemplate, PredictionsTemplate stories + Astro page docs
 
 ### Phase 3: Check all LSP diagnostics and fix type errors
 

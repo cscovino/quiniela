@@ -414,24 +414,24 @@ table {
 | A4 | No new npm packages needed for this phase | Standard Stack | Low — all capabilities achievable with existing deps |
 | A5 | Press Start 2P font renders acceptably at 10px (0.625rem) | Common Pitfalls #5 | Medium — may need custom rem scale for pixel font |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **What is the minimum viewport width to support?**
+1. **RESOLVED: What is the minimum viewport width to support?**
    - What we know: CSS has `--breakpoint-sm: 480px` and `--breakpoint-md: 1024px`
    - What's unclear: Should we support screens below 320px (iPhone SE first gen)?
    - Recommendation: Assume 320px minimum. The `prediction-form__grid` with `minmax(340px, 1fr)` will overflow at 320px.
 
-2. **Should the PWA install prompt be shown on every visit or only once?**
+2. **RESOLVED: Should the PWA install prompt be shown on every visit or only once?**
    - What we know: `beforeinstallprompt` can only be triggered once per event capture
    - What's unclear: Should we store "install dismissed" state in localStorage?
    - Recommendation: Show install button until user installs or explicitly dismisses. Store dismissal in localStorage.
 
-3. **What tournament name should be displayed prominently (Req 9)?**
+3. **RESOLVED: What tournament name should be displayed prominently (Req 9)?**
    - What we know: The brand label in NavBar is configurable via `translations.brandLabel`
    - What's unclear: Should this be "FIFA World Cup 2026" or "Quiniela WC26" or something else?
    - Recommendation: Use "FIFA World Cup 2026" as the primary tournament name, displayed in the page header or as a hero section.
 
-4. **Should the pixel-art spinner use CSS-only or SVG frames?**
+4. **RESOLVED: Should the pixel-art spinner use CSS-only or SVG frames?**
    - What we know: Current spinner is CSS-only with `steps(8)` animation
    - What's unclear: Would a pixel-art loading animation (e.g., a spinning football) be better?
    - Recommendation: CSS-only with `clip-path` for a pixelated circle/spinner shape. Keeps it dependency-free.
