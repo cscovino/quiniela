@@ -1,5 +1,6 @@
 {
   "name": "Quiniela - Football Predictions",
+  "id": "/",
   "short_name": "Quiniela",
   "description": "Predict match outcomes, track rankings, and compete for the best predictions in the 2026 FIFA World Cup",
   "start_url": "/",
