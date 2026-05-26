@@ -257,6 +257,41 @@
   color: var(--color-accent-500);
 }
 
+/* Mobile: compact progress indicator */
+@media (max-width: 480px) {
+  .predictions-template__progress {
+    flex-direction: row;
+    gap: var(--space-1);
+  }
+
+  .predictions-template__progress-step {
+    padding: var(--space-1) var(--space-2);
+    flex: 0 0 auto;
+  }
+
+  .predictions-template__progress-label {
+    display: none;
+  }
+
+  .predictions-template__progress-number {
+    width: 20px;
+    height: 20px;
+    font-size: var(--text-xs);
+  }
+
+  .predictions-template__navigation {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .predictions-template__navigation button {
+    font-family: var(--font-pixel);
+    border: var(--border-width-md) solid;
+    padding: var(--space-2) var(--space-4);
+    clip-path: polygon(0px 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0px, calc(100% - 8px) 0px, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 4px) calc(100% - 8px), calc(100% - 4px) calc(100% - 4px), calc(100% - 8px) calc(100% - 4px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 4px), 4px calc(100% - 4px), 4px calc(100% - 8px), 0px calc(100% - 8px));
+  }
+}
+
 @media (min-width: 480px) {
   .predictions-template {
     padding: var(--space-6) var(--space-3);
