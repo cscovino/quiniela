@@ -8,6 +8,7 @@ export interface RankingEntry {
   userId: string;
   predictorId?: string;
   avatarUrl?: string;
+  avatar?: { bgColor: string; emoji: string };
   displayName: string;
   points: number;
   accuracy: number;
@@ -53,6 +54,7 @@ export const RankingsTable: React.FC<RankingsTableProps> = ({
             key={entry.predictorId || entry.userId}
             position={(page - 1) * 20 + index + 1}
             avatarUrl={entry.avatarUrl}
+            avatar={entry.avatar}
             displayName={entry.displayName}
             points={entry.points}
             accuracy={entry.accuracy}

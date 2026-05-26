@@ -5,14 +5,16 @@ import {
   type BadgeLocked,
 } from '@organisms/UserProfile/UserProfile';
 import { PointsChart } from '@molecules/PointsChart/PointsChart';
+import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList/PredictorList';
 import { Typography } from '@atoms/Typography/Typography';
 import { Spinner } from '@atoms/Spinner/Spinner';
 import { Button } from '@atoms/Button/Button';
 import { tournamentService } from '@services/tournament-service';
+import { predictorService } from '@services/predictor-service';
 import { BADGE_DEFINITIONS, getBadgeName, getBadgeDescription } from '@app-types/badges';
 import { useAuthStore } from '@store/auth-store';
-import { getLoginRoute } from '@utils/i18n';
-import type { PredictorStats } from '@app-types/firestore';
+import { getLoginRoute, getRoute } from '@utils/i18n';
+import type { Predictor, PredictorStats } from '@app-types/firestore';
 import type { PointEntry } from '@molecules/PointsChart/PointsChart';
 import './ProfileTemplate.css';
 
@@ -34,6 +36,16 @@ export interface ProfileTemplateProps {
     noPointsData: string;
     points: string;
     matches: string;
+    yourPredictors: string;
+    selectPredictor: string;
+    predictorList?: {
+      newButton?: string;
+      progress?: string;
+      points?: string;
+      edit?: string;
+      delete?: string;
+      empty?: string;
+    };
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -52,6 +64,10 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
   const [badges, setBadges] = useState<BadgeEarned[]>([]);
   const [lockedBadges, setLockedBadges] = useState<BadgeLocked[]>([]);
   const [pointsHistory, setPointsHistory] = useState<PointEntry[]>([]);
+  const [predictors, setPredictors] = useState<Predictor[]>([]);
+  const [predictorEntries, setPredictorEntries] = useState<PredictorListEntry[]>([]);
+  const [selectedPredictorId, setSelectedPredictorId] = useState<string | null>(null);
+  const [entriesLoading, setEntriesLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -60,12 +76,62 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
     }
 
     let cancelled = false;
-    const predictorId = `${user.uid}-default`;
+
+    const loadPredictors = async () => {
+      try {
+        const preds = await predictorService.getUserPredictors(user.uid);
+        if (cancelled) return;
+        setPredictors(preds);
+        if (preds.length > 0 && !selectedPredictorId) {
+          const def = preds.find((x) => x.id === `${user.uid}-default`);
+          setSelectedPredictorId(def?.id || preds[0].id);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+
+    loadPredictors();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, selectedPredictorId]);
+
+  const loadPredictorEntries = async () => {
+    if (!user) return;
+    setEntriesLoading(true);
+    try {
+      const results = await predictorService.getUserPredictorsWithStats(user.uid);
+      const entries: PredictorListEntry[] = results.map((r) => ({
+        predictor: r,
+        points: r.stats?.points,
+        groupsDone: r.progress.groupsSubmitted,
+        groupsTotal: r.progress.totalGroups,
+      }));
+      setPredictorEntries(entries);
+    } catch {
+      setPredictorEntries(predictors.map((p) => ({ predictor: p })));
+    } finally {
+      setEntriesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPredictorEntries();
+  }, [predictors.length]);
+
+  useEffect(() => {
+    if (!user || !selectedPredictorId) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
 
     const fetchData = async () => {
       try {
         const [statsResult, allStatsResult] = await Promise.allSettled([
-          tournamentService.getPredictorStats(user.uid, predictorId),
+          tournamentService.getPredictorStats(user.uid, selectedPredictorId),
           tournamentService.getAllPredictorStats(),
         ]);
 
@@ -106,7 +172,7 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
 
         if (allStatsResult.status === 'fulfilled') {
           const userIndex = allStatsResult.value.findIndex(
-            (s) => s.userId === user.uid && s.predictorId === predictorId,
+            (s) => s.userId === user.uid && s.predictorId === selectedPredictorId,
           );
           setRank(userIndex !== -1 ? userIndex + 1 : 0);
         }
@@ -123,7 +189,11 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [user, locale]);
+  }, [user, selectedPredictorId, locale]);
+
+  const handleSelectPredictor = (predictorId: string) => {
+    setSelectedPredictorId(predictorId);
+  };
 
   if (loading || isAuthLoading) {
     return (
@@ -159,6 +229,8 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
     rank: rank || 0,
   };
 
+  const predictionsRoute = getRoute(locale, 'predictions');
+
   return (
     <div className={`profile-template ${className}`}>
       <main className="profile-template__content">
@@ -184,6 +256,33 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
               lockedBadges: translations.lockedBadges,
             }}
           />
+        </section>
+
+        <section className="profile-template__predictors">
+          <Typography variant="h2">{translations.yourPredictors}</Typography>
+          <Typography variant="body">{translations.selectPredictor}</Typography>
+
+          {entriesLoading ? (
+            <div className="profile-template__loading">
+              <Spinner size="md" />
+            </div>
+          ) : (
+            <PredictorList
+              predictors={predictorEntries}
+              onSelect={(id) => {
+                handleSelectPredictor(id);
+                window.location.href = `${predictionsRoute}?predictor=${id}`;
+              }}
+              onEdit={() => {
+                window.location.href = `${predictionsRoute}?predictor=${selectedPredictorId}`;
+              }}
+              onDelete={() => {}}
+              onCreate={() => {
+                window.location.href = predictionsRoute;
+              }}
+              translations={translations.predictorList}
+            />
+          )}
         </section>
 
         <section className="profile-template__points-chart">

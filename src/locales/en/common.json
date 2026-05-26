@@ -94,7 +94,9 @@
       "pointsChart": "Points Evolution",
       "noPointsData": "No points data yet",
       "points": "Points",
-      "matches": "Matches"
+      "matches": "Matches",
+      "yourPredictors": "Your Predictors",
+      "selectPredictor": "Select a predictor to view details"
     },
     "predictions": {
       "title": "Predictions - Quiniela",

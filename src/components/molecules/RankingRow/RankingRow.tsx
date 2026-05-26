@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar } from '@atoms/Avatar/Avatar';
+import { PredictorAvatar } from '@atoms/PredictorAvatar/PredictorAvatar';
 import { Typography } from '@atoms/Typography/Typography';
 import { Badge } from '@atoms/Badge/Badge';
 import { Icon } from '@atoms/Icon/Icon';
@@ -8,6 +9,7 @@ import './RankingRow.css';
 export interface RankingRowProps {
   position: number;
   avatarUrl?: string;
+  avatar?: { bgColor: string; emoji: string };
   displayName: string;
   points: number;
   accuracy: number;
@@ -19,6 +21,7 @@ export interface RankingRowProps {
 export const RankingRow: React.FC<RankingRowProps> = ({
   position,
   avatarUrl,
+  avatar,
   displayName,
   points,
   accuracy,
@@ -35,6 +38,8 @@ export const RankingRow: React.FC<RankingRowProps> = ({
 
   const positionBadge = getPositionBadge();
 
+  const predictorLike = avatar ? { id: displayName, name: displayName, avatar } : undefined;
+
   return (
     <div className={`ranking-row ${isCurrentUser ? 'ranking-row--current' : ''} ${className}`}>
       <div className="ranking-row__position">
@@ -48,7 +53,11 @@ export const RankingRow: React.FC<RankingRowProps> = ({
       </div>
 
       <div className="ranking-row__user">
-        <Avatar src={avatarUrl} name={displayName} size="sm" />
+        {predictorLike ? (
+          <PredictorAvatar predictor={predictorLike} size="sm" />
+        ) : (
+          <Avatar src={avatarUrl} name={displayName} size="sm" />
+        )}
         <Typography variant="small" className="ranking-row__name">
           {displayName}
         </Typography>

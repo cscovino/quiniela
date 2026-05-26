@@ -94,7 +94,9 @@
       "pointsChart": "Evolución de Puntos",
       "noPointsData": "Aún no hay datos de puntos",
       "points": "Puntos",
-      "matches": "Partidos"
+      "matches": "Partidos",
+      "yourPredictors": "Tus Pronosticadores",
+      "selectPredictor": "Selecciona un pronosticador para ver detalles"
     },
     "predictions": {
       "title": "Predicciones - Quiniela",

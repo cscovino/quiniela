@@ -246,23 +246,44 @@ export async function getBuildRankings() {
     const predictorDocs = await Promise.all(
       Array.from(predictorRefs).map(async (ref) => {
         const snap = await db.doc(ref).get();
-        return { id: ref, name: snap.exists ? snap.data()?.name || null : null };
+        const data = snap.exists ? snap.data() : null;
+        return {
+          id: ref,
+          name: data?.name || null,
+          avatar: data?.avatar || null,
+          avatarUrl: data?.avatarUrl || null,
+        };
       }),
     );
 
     const nameMap = new Map<string, string>();
+    const avatarMap = new Map<string, { bgColor?: string; emoji?: string; avatarUrl?: string }>();
     for (const p of predictorDocs) {
       nameMap.set(p.id, p.name || p.id.split('/').pop() || 'Unknown');
+      avatarMap.set(p.id, {
+        bgColor: p.avatar?.bgColor,
+        emoji: p.avatar?.emoji,
+        avatarUrl: p.avatarUrl,
+      });
     }
 
-    const rankings: RankingsTableProps['rankings'] = sorted.map((s) => ({
-      userId: s.userId,
-      predictorId: s.predictorId,
-      displayName: nameMap.get(`users/${s.userId}/predictors/${s.predictorId}`) || s.predictorId,
-      points: s.totalPoints,
-      accuracy: Math.round(s.accuracy * 100),
-      streak: s.currentStreak,
-    }));
+    const rankings: RankingsTableProps['rankings'] = sorted.map((s) => {
+      const key = `users/${s.userId}/predictors/${s.predictorId}`;
+      const avatarData = avatarMap.get(key);
+      return {
+        userId: s.userId,
+        predictorId: s.predictorId,
+        displayName: nameMap.get(key) || s.predictorId,
+        avatarUrl: avatarData?.avatarUrl,
+        avatar:
+          avatarData?.bgColor && avatarData?.emoji
+            ? { bgColor: avatarData.bgColor, emoji: avatarData.emoji }
+            : undefined,
+        points: s.totalPoints,
+        accuracy: Math.round(s.accuracy * 100),
+        streak: s.currentStreak,
+      };
+    });
 
     return rankings;
   } catch (error) {
