@@ -125,6 +125,8 @@ Plans:
 
 **Goal:** Replace the emoji + bgColor predictor avatar system with deterministic `lil_guy` pixel art avatars, and refactor PredictorEditor to let users regenerate/cycle their predictor's lil_guy avatar.
 
+**Status:** ⏸️ Skipped — `lil_guy` package not found on npm registry. Consider alternative pixel avatar libraries (DiceBear, random-pixel-avatar) for future implementation.
+
 **Requirements:**
 - Install `lil_guy` as a dependency (4KB gzipped, zero deps, deterministic SVG)
 - Refactor `PredictorAvatar` component to render `lil_guy` SVG instead of emoji/initial, seeded from `predictor.id`
@@ -145,6 +147,8 @@ Plans:
 
 **Goal:** Evaluate [driver.js](https://driverjs.com/) (lightweight, MIT, 25K GitHub stars) for product tours, feature highlights, and contextual help — then integrate into the prediction flow onboarding.
 
+**Status:** ✅ Complete — 1/1 plans, 524 tests passing, build succeeds
+
 **Requirements:**
 - Research: install driver.js in a throwaway branch, prototype a tour for the prediction wizard flow (step-by-step guide through match predictions, group stage, knockout, best players)
 - Evaluate tradeoffs: bundle size impact (driver.js ~7KB gzipped), pixel-art aesthetic compatibility (tour popover styling must match the retro design system), CSP compliance
@@ -160,7 +164,7 @@ Plans:
 
 Plans:
 
-- [ ] 07-01-PLAN.md — Evaluate driver.js (spike: prototype, CSP, bundle, styling) → if approved, integrate ProductTour component, pixel-art popover, persistence, trigger buttons, AGENTS.md
+- [x] 07-01-PLAN.md — Evaluate driver.js (spike: prototype, CSP, bundle, styling) → if approved, integrate ProductTour component, pixel-art popover, persistence, trigger buttons, AGENTS.md
 
 ### Phase 8: Fix navigation performance and implement client-side data refresh
 
