@@ -137,6 +137,15 @@
         "loading": "Cargando pronosticadores...",
         "noPredictors": "Aún no hay pronosticadores",
         "getStarted": "Comenzar"
+      },
+      "predictorList": {
+        "newButton": "Nueva predicción",
+        "progress": "grupos",
+        "points": "pts",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "empty": "Aún no hay predicciones",
+        "backToPredictors": "Volver a predicciones"
       }
     }
   }

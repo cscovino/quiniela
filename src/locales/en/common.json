@@ -137,6 +137,15 @@
         "loading": "Loading predictors...",
         "noPredictors": "No predictors yet",
         "getStarted": "Get Started"
+      },
+      "predictorList": {
+        "newButton": "New prediction",
+        "progress": "groups",
+        "points": "pts",
+        "edit": "Edit",
+        "delete": "Delete",
+        "empty": "No predictions yet",
+        "backToPredictors": "Back to predictions"
       }
     }
   }
