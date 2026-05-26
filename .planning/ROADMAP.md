@@ -170,6 +170,8 @@ Plans:
 
 **Goal:** Eliminate the 2-second navigation lag by optimizing JS bundle sizes and reducing React island hydration overhead. Implement a silent client-side data refresh pattern so pages show live data without requiring daily rebuilds — without the previous 2s delay from client:idle.
 
+**Status:** ✅ Complete — 524 tests passing, build succeeds, lint clean
+
 **Requirements:**
 - Profile and measure baseline: navigation timing, JS bundle composition, hydration cost per island
 - Optimize the 353 KB i18n chunk (likely date-fns locale data — lazy-load or tree-shake)
@@ -184,4 +186,13 @@ Plans:
 
 Plans:
 
-- [ ] 08-01-PLAN.md — Performance audit, bundle optimization, island consolidation, data refresh pattern, verification
+- [x] 08-01-PLAN.md — Performance audit, bundle optimization, island consolidation, data refresh pattern, verification
+
+**Key changes:**
+- Firebase modules split into dedicated `firebase.*.js` chunk (349K) for independent caching
+- I18n chunk reduced to 4.2K via build-time inlining
+- Astro prefetch enabled with `hover` strategy, `data-astro-prefetch` on all NavBar links
+- `useLiveData` hook with 1-minute in-memory cache for silent data refresh
+- `live-data-service.ts` provides fetchLiveMatches, fetchLiveStandings, fetchLiveRankings
+- Home, Tournament, and Rankings pages wired with Live* v2 components using `client:load`
+- Pages hydrate instantly from static HTML, then silently refresh data post-hydration
