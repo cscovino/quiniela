@@ -157,52 +157,65 @@ export const NavBar: React.FC<NavBarProps> = ({
         </button>
       </div>
 
-      <div className={`nav-bar__mobile-menu ${menuOpen ? 'open' : ''}`}>
-        <div className="nav-bar__mobile-links">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
-              onClick={closeMenu}
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
+      <div
+        className={`nav-bar__mobile-menu ${menuOpen ? 'open' : ''}`}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) closeMenu();
+        }}
+      >
+        <div className="nav-bar__mobile-content">
+          {isLoggedIn && (
+            <>
+              <div className="nav-bar__mobile-cta">
+                <a href={predictionsHref} onClick={closeMenu}>
+                  <span className="nav-bar__cta-btn">{translations.makePredictions}</span>
+                </a>
+              </div>
+              <div className="nav-bar__mobile-user">
+                <Icon name="user" size={18} />
+                <span>{userDisplayName}</span>
+                <button type="button" className="nav-bar__logout-btn" onClick={handleLogout}>
+                  {translations.logout}
+                </button>
+              </div>
+            </>
+          )}
 
-        {isLoggedIn ? (
-          <>
-            <div className="nav-bar__mobile-user">
-              <Icon name="user" size={18} />
-              <span>{userDisplayName}</span>
-              <button type="button" className="nav-bar__logout" onClick={handleLogout}>
-                {translations.logout}
-              </button>
-            </div>
+          <div className="nav-bar__mobile-links">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
+                onClick={closeMenu}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          {!isLoggedIn && (
             <div className="nav-bar__mobile-cta">
-              <a href={predictionsHref} onClick={closeMenu}>
-                <span className="nav-bar__cta-btn">{translations.makePredictions}</span>
+              <a href={loginHref} onClick={closeMenu}>
+                <span className="nav-bar__cta-btn">{translations.login}</span>
               </a>
             </div>
-          </>
-        ) : (
-          <div className="nav-bar__mobile-cta">
-            <a href={loginHref} onClick={closeMenu}>
-              <span className="nav-bar__cta-btn">{translations.login}</span>
-            </a>
-          </div>
-        )}
+          )}
 
-        {adminLink && isAdmin && (
-          <a
-            href={adminLink.href}
-            className="nav-bar__mobile-link nav-bar__mobile-link--admin"
-            onClick={closeMenu}
-          >
-            {adminLink.label}
-          </a>
-        )}
+          {adminLink && isAdmin && (
+            <a
+              href={adminLink.href}
+              className="nav-bar__mobile-link nav-bar__mobile-link--admin"
+              onClick={closeMenu}
+            >
+              {adminLink.label}
+            </a>
+          )}
+
+          <div className="nav-bar__mobile-footer">
+            <span className="nav-bar__tournament-name">FIFA World Cup 2026</span>
+          </div>
+        </div>
       </div>
     </nav>
   );
