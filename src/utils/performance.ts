@@ -1,6 +1,11 @@
 export function initWebVitals(onReport?: (metric: string, value: number) => void) {
   if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
 
+  interface LayoutShift {
+    value: number;
+    hadRecentInput: boolean;
+  }
+
   const report = onReport || (() => {});
 
   // LCP - Largest Contentful Paint
@@ -20,7 +25,7 @@ export function initWebVitals(onReport?: (metric: string, value: number) => void
     let clsValue = 0;
     const clsObserver = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        const layoutShift = entry as LayoutShift;
+        const layoutShift = entry as unknown as LayoutShift;
         if (!layoutShift.hadRecentInput) {
           clsValue += layoutShift.value;
         }
