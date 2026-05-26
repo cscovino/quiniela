@@ -120,6 +120,15 @@ The app is a Progressive Web App:
 - DNS preconnect for Firebase endpoints
 - Web Vitals monitoring built-in
 - No middleware — locale derived from URL path in each page
+- **All font-sizes use rem units** with CSS variables (`--text-*`), no hardcoded `px` (WCAG 2.2)
+- **Pixel-art corners use `clip-path` polygon** (not `border-radius`); replace `box-shadow` with `filter: drop-shadow()`
+- **TeamFlag uses CSS container queries** for responsive name/FIFA code display
+- **PWA install prompt** uses `beforeinstallprompt` event with `localStorage` dismissal persistence
+- **Service worker cache versioning:** bump `CACHE_NAME` in `sw.js` on each deploy
+- **Mobile menu uses CSS `::before` backdrop overlay** pattern (not separate div)
+- **Radio inputs in reusable components** must use unique names (`React.useId()`)
+- **Prediction form grid** collapses to single column at 480px breakpoint
+- **WC26 gradient tokens** (`--gradient-wc26-*`) for page headers and section accents
 
 ## Project Plan
 

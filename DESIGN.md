@@ -184,8 +184,30 @@ Two font families create the pixel-meets-modern aesthetic:
 - **Press Start 2P (400):** Headings, labels, pixel art text. Retro gaming feel.
 - **Inter (400–700):** Body text, descriptions. Modern readability.
 
-**Heading scale:** `heading-xs` (16px) → `heading-xl` (40px), all Press Start 2P
-**Text scale:** `text-xs` (10px) → `text-3xl` (32px), all Inter
+### rem Typography Scale (WCAG 2.2 Compliance)
+
+All font-sizes use `rem` units via CSS variables in `src/styles/global.css`. This ensures accessibility compliance and consistent scaling across the app.
+
+| Variable | rem Value | Pixel Equivalent | Usage |
+|----------|-----------|------------------|-------|
+| `--text-xs` | 0.625rem | 10px | Small badges, timestamps |
+| `--text-sm` | 0.75rem | 12px | Secondary text, labels |
+| `--text-base` | 0.875rem | 14px | Body text, inputs |
+| `--text-lg` | 1rem | 16px | Emphasized text |
+| `--text-xl` | 1.125rem | 18px | Section labels |
+| `--text-2xl` | 1.5rem | 24px | Subtitles |
+| `--text-3xl` | 2rem | 32px | Page titles |
+| `--text-4xl` | 2.5rem | 40px | Hero headings |
+| `--heading-xs` | 1rem | 16px | Small pixel headings |
+| `--heading-sm` | 1.25rem | 20px | Medium pixel headings |
+| `--heading-md` | 1.5rem | 24px | Standard pixel headings |
+| `--heading-lg` | 2rem | 32px | Large pixel headings |
+| `--heading-xl` | 2.5rem | 40px | XL pixel headings |
+
+**Heading scale:** `heading-xs` (1rem) → `heading-xl` (2.5rem), all Press Start 2P
+**Text scale:** `text-xs` (0.625rem) → `text-3xl` (2rem), all Inter
+
+**No hardcoded `px` font-sizes** — all typography uses CSS variables for consistency and accessibility.
 
 ## Layout
 
@@ -212,6 +234,134 @@ Light theme uses lighter shadow colors. Cards sit on page background with visibl
 ## Shapes
 
 Sharp corners only. Zero `border-radius` across all elements. This is a core design principle — every rectangle, button, card, and input has crisp 90-degree corners matching the pixel art aesthetic.
+
+### Pixel-Art Corner Technique
+
+For components requiring stepped/pixelated corners (buttons, badges), use `clip-path` with polygon coordinates:
+
+```css
+.pixel-corners {
+  clip-path: polygon(
+    0px 4px, 4px 4px, 4px 0px,
+    calc(100% - 4px) 0px, calc(100% - 4px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 4px calc(100% - 4px), 0px calc(100% - 4px)
+  );
+}
+```
+
+**Important:** When using `clip-path`, replace `box-shadow` with `filter: drop-shadow()` since clip-path clips box-shadow as well.
+
+### Pixel-Art Spinner
+
+The Spinner component uses `clip-path` to create an 8-segment pixel circle with `steps(8)` animation:
+
+```css
+.spinner--pixel {
+  clip-path: polygon(...); /* 8-segment approximation */
+  animation: spin 0.8s steps(8) infinite;
+}
+```
+
+### Container Queries for Responsive Components
+
+TeamFlag uses CSS container queries for responsive content display:
+
+```css
+.team-flag {
+  container-type: inline-size;
+}
+
+@container (max-width: 48px) {
+  .team-flag__name { display: none; }
+  .team-flag__fifa { display: block; }
+}
+```
+
+This pattern allows components to adapt based on their container width rather than viewport width — ideal for flexible grid layouts.
+
+## WC26 Gradient Tokens
+
+Brand gradients for page headers, section dividers, and accent elements:
+
+| Token | Colors | Usage |
+|-------|--------|-------|
+| `--gradient-wc26-energy` | Red → Orange → Teal | Page h1, primary CTAs |
+| `--gradient-wc26-trophy` | Gold → Warm | Section borders, rankings |
+| `--gradient-wc26-hosts` | Blue → Green → Red | Host nation accents |
+
+**Gradient text pattern:**
+```css
+.text-gradient-energy {
+  background: var(--gradient-wc26-energy);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+```
+
+**Gradient border pattern:**
+```css
+.section-header {
+  border-image: var(--gradient-wc26-trophy) 1;
+}
+```
+
+## PWA Design
+
+### Install Prompt Component
+
+The `PWAInstall` component (`src/components/organisms/PWAInstall/`) handles the `beforeinstallprompt` event:
+
+1. Listens for `beforeinstallprompt` event on mount
+2. Stores the event for deferred prompting
+3. Shows a pixel-art styled banner with "Install App" and "Enable Notifications" CTAs
+4. Persists dismissal state in `localStorage` (`pwa-install-dismissed`)
+5. Calls `prompt()` on user interaction
+
+### Service Worker Cache Versioning
+
+Cache version is controlled by `CACHE_NAME` in `public/sw.js`:
+- Bump version on each deploy: `const CACHE_NAME = 'quiniela-v5';`
+- Old caches deleted in `activate` event
+- `SKIP_WAITING` message handler for forced updates
+
+### Manifest Configuration
+
+`public/manifest.json` includes:
+- `"id": "/"` for Chrome 121+ PWA compatibility
+- `shortcuts` for quick actions (Predictions, Rankings)
+- `screenshots` for install prompt
+
+## Mobile Menu Pattern
+
+The NavBar mobile menu uses a CSS `::before` pseudo-element for the backdrop overlay:
+
+```css
+.nav-bar__menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100vh;
+  z-index: 100;
+}
+
+.nav-bar__menu::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: -1;
+}
+```
+
+**Key features:**
+- Backdrop covers full viewport with blur effect
+- CTA button repositioned to menu bottom on mobile
+- Active nav links highlighted with accent background
+- Tournament name displayed in footer
 
 ## Components
 

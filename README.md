@@ -4,6 +4,8 @@ Retro Pixel Art Football Prediction App built with Astro + React + Firebase.
 
 **Lighthouse Scores:** Accessibility 100 | SEO 100 | Best Practices 96
 
+**Latest:** Phase 1 — Frontend UX improvements (rem typography, pixel-art components, PWA install prompt, mobile menu overhaul, responsive design fixes)
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -105,12 +107,14 @@ public/
 ## 🎨 Design System
 
 Atomic Design methodology with retro pixel art aesthetic:
-- Sharp corners (no border-radius)
-- Blocky shadows (`4px 4px 0px`)
-- Pixel borders (4px solid)
-- Press Start 2P font for headings
-- 8-bit inspired color palette
-- Light/dark theme support
+- **rem Typography Scale:** All font-sizes use CSS variables (--text-xs through --text-4xl) for WCAG 2.2 compliance
+- **Pixel-Art Corners:** clip-path polygon for stepped corners (no border-radius)
+- **Blocky Shadows:** `4px 4px 0px` (no blur)
+- **Pixel Borders:** 4px solid
+- **Container Queries:** TeamFlag uses CSS container queries for responsive name/FIFA code display
+- **WC26 Gradients:** Brand gradients (--gradient-wc26-*) for headers and accents
+- **Press Start 2P** font for headings, Inter for body
+- **Light/Dark** theme support
 
 ## 📱 PWA Features
 
@@ -118,8 +122,13 @@ The app is a Progressive Web App that can be installed on mobile devices.
 
 ### Installation
 1. Open the app in a supported browser (Chrome, Safari, Edge)
-2. Tap "Add to Home Screen" or click the "Install App" button
+2. Tap "Add to Home Screen" or click the "Install App" button in the bottom-right corner
 3. The app will be installed like a native app
+
+### Service Worker
+- Cache versioning: CACHE_NAME bumps on each deploy for fresh assets
+- SKIP_WAITING handler for forced updates
+- Offline support for cached pages and assets
 
 ### Push Notifications
 1. Open the app and log in
