@@ -190,7 +190,8 @@ export function usePredictionSteps(
         );
         if (result.success) {
           setExistingFinalPhase(data);
-          setSubmittedSteps((prev) => new Set(prev).add(2));
+          const finalPhaseIndex = groups.length + KNOCKOUT_PHASES.length;
+          setSubmittedSteps((prev) => new Set(prev).add(finalPhaseIndex));
           setFeedback({
             type: 'success',
             message: translations.feedback.finalPhaseSubmitted,
@@ -226,7 +227,8 @@ export function usePredictionSteps(
         );
         if (result.success) {
           setExistingBestPlayers(data);
-          setSubmittedSteps((prev) => new Set(prev).add(3));
+          const bestPlayersIndex = groups.length + KNOCKOUT_PHASES.length + 1;
+          setSubmittedSteps((prev) => new Set(prev).add(bestPlayersIndex));
           setFeedback({
             type: 'success',
             message: translations.feedback.bestPlayersSubmitted,
