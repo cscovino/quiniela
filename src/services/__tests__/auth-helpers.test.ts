@@ -37,6 +37,7 @@ describe('auth-helpers', () => {
       vi.mocked(firebaseAuth.createUserWithEmailAndPassword).mockResolvedValue(
         mockCredential as any,
       );
+      vi.mocked(firebaseAuth.updateProfile).mockResolvedValue();
       vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
 
       const result = await authHelpers.registerWithEmail(
@@ -50,6 +51,9 @@ describe('auth-helpers', () => {
         'test@example.com',
         'password123',
       );
+      expect(firebaseAuth.updateProfile).toHaveBeenCalledWith(mockUser, {
+        displayName: 'Test User',
+      });
       expect(firebaseFirestore.setDoc).toHaveBeenCalledTimes(2);
       expect(result.user).toEqual(mockUser);
     });
@@ -68,6 +72,7 @@ describe('auth-helpers', () => {
       vi.mocked(firebaseAuth.createUserWithEmailAndPassword).mockResolvedValue(
         mockCredential as any,
       );
+      vi.mocked(firebaseAuth.updateProfile).mockResolvedValue();
       vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
 
       await authHelpers.registerWithEmail(

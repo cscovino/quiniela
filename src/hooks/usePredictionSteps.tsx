@@ -211,7 +211,7 @@ export function usePredictionSteps(
       setSubmitting(false);
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, selectedPredictorId, translations],
+    [user, selectedPredictorId, translations, groups.length],
   );
 
   const handleBestPlayersSubmit = useCallback(
@@ -248,7 +248,7 @@ export function usePredictionSteps(
       setSubmitting(false);
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, selectedPredictorId, translations],
+    [user, selectedPredictorId, translations, groups.length],
   );
 
   // New flow handlers

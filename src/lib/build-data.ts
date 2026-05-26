@@ -215,6 +215,7 @@ export async function getBuildData() {
 
     return { matches, standings: standingsOut, teams, allMatches };
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.warn('[build-data] getBuildData failed, returning empty data:', error);
     return { matches: [], standings: [], teams: {}, allMatches: [] };
   }
@@ -287,6 +288,7 @@ export async function getBuildRankings() {
 
     return rankings;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.warn('[build-data] getBuildRankings failed, returning empty array:', error);
     return [];
   }

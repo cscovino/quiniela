@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
+  updateProfile,
   type UserCredential,
   type Auth,
   type User as FirebaseUser,
@@ -59,6 +60,8 @@ export const registerWithEmail = async (
   favoriteTeamId?: string,
 ): Promise<UserCredential> => {
   const credential = await createUserWithEmailAndPassword(ensureAuth(), email, password);
+
+  await updateProfile(credential.user, { displayName });
 
   await setDoc(doc(ensureDb(), 'users', credential.user.uid), {
     uid: credential.user.uid,
