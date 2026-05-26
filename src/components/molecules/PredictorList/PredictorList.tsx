@@ -1,0 +1,126 @@
+import React from 'react';
+import { PredictorAvatar } from '@atoms/PredictorAvatar/PredictorAvatar';
+import { Typography } from '@atoms/Typography/Typography';
+import { Badge } from '@atoms/Badge/Badge';
+import type { Predictor } from '@app-types/firestore';
+import './PredictorList.css';
+
+export interface PredictorListEntry {
+  predictor: Predictor;
+  points?: number;
+  groupsDone?: number;
+  groupsTotal?: number;
+}
+
+export interface PredictorListProps {
+  predictors: PredictorListEntry[];
+  onSelect: (predictorId: string) => void;
+  onEdit: (predictorId: string) => void;
+  onDelete: (predictorId: string) => void;
+  onCreate: () => void;
+  translations?: {
+    newButton?: string;
+    progress?: string;
+    points?: string;
+    edit?: string;
+    delete?: string;
+    empty?: string;
+  };
+}
+
+const t = {
+  newButton: 'New prediction',
+  progress: 'groups',
+  points: 'pts',
+  edit: 'Edit',
+  delete: 'Delete',
+  empty: 'No predictions yet',
+};
+
+export const PredictorList: React.FC<PredictorListProps> = ({
+  predictors,
+  onSelect,
+  onEdit,
+  onDelete,
+  onCreate,
+  translations = {},
+}) => {
+  const labels = { ...t, ...translations };
+
+  return (
+    <div className="predictor-list" role="list" aria-label="Predictor list">
+      {predictors.length === 0 && (
+        <div className="predictor-list__empty">
+          <Typography variant="body">{labels.empty}</Typography>
+        </div>
+      )}
+
+      {predictors.map(({ predictor, points, groupsDone, groupsTotal }) => (
+        <div
+          key={predictor.id}
+          className="predictor-list__card"
+          role="button"
+          tabIndex={0}
+          onClick={() => onSelect(predictor.id)}
+          onKeyDown={(e) => e.key === 'Enter' && onSelect(predictor.id)}
+          aria-label={`Select ${predictor.name}`}
+        >
+          <div className="predictor-list__card-content">
+            <PredictorAvatar predictor={predictor} size="md" />
+            <div className="predictor-list__card-info">
+              <Typography variant="body" className="predictor-list__card-name">
+                {predictor.name}
+              </Typography>
+              <div className="predictor-list__card-meta">
+                {groupsDone != null && groupsTotal != null && (
+                  <Badge variant="info">
+                    {groupsDone}/{groupsTotal} {labels.progress}
+                  </Badge>
+                )}
+                {points != null && (
+                  <Badge variant="gold">
+                    {points} {labels.points}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="predictor-list__card-actions">
+            <button
+              type="button"
+              className="predictor-list__action-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(predictor.id);
+              }}
+              aria-label={`${labels.edit} ${predictor.name}`}
+            >
+              {labels.edit}
+            </button>
+            <button
+              type="button"
+              className="predictor-list__action-btn predictor-list__action-btn--danger"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(predictor.id);
+              }}
+              aria-label={`${labels.delete} ${predictor.name}`}
+            >
+              {labels.delete}
+            </button>
+          </div>
+        </div>
+      ))}
+
+      <button
+        type="button"
+        className="predictor-list__create-card"
+        onClick={onCreate}
+        aria-label={labels.newButton}
+      >
+        <span className="predictor-list__create-icon">+</span>
+        <Typography variant="body">{labels.newButton}</Typography>
+      </button>
+    </div>
+  );
+};

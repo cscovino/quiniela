@@ -1,0 +1,33 @@
+.predictor-delete-confirm {
+  padding: var(--space-4);
+  background: var(--bg-card);
+  border: var(--border-width-md) solid var(--color-error);
+}
+
+.predictor-delete-confirm__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.predictor-delete-confirm__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.predictor-delete-confirm__label {
+  font-family: var(--font-pixel);
+  font-size: var(--text-sm);
+  color: var(--color-primary-900);
+}
+
+.predictor-delete-confirm__name {
+  color: var(--color-error);
+}
+
+.predictor-delete-confirm__actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}

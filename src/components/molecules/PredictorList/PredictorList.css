@@ -1,0 +1,105 @@
+.predictor-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.predictor-list__empty {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-primary-500);
+}
+
+.predictor-list__card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--bg-card);
+  border: var(--border-width-md) solid var(--color-accent-500);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.predictor-list__card:hover {
+  background: var(--bg-card-hover);
+}
+
+.predictor-list__card:focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 2px;
+}
+
+.predictor-list__card-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.predictor-list__card-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.predictor-list__card-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.predictor-list__card-meta {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.predictor-list__card-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.predictor-list__action-btn {
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  border: var(--border-width-sm) solid var(--color-accent-500);
+  color: var(--color-primary-900);
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.predictor-list__action-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.predictor-list__action-btn--danger {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.predictor-list__create-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: transparent;
+  border: var(--border-width-md) dashed var(--color-accent-500);
+  color: var(--color-accent-500);
+  cursor: pointer;
+  font-family: var(--font-pixel);
+}
+
+.predictor-list__create-card:hover {
+  background: var(--bg-card);
+}
+
+.predictor-list__create-icon {
+  font-size: var(--text-lg);
+  font-weight: bold;
+}
