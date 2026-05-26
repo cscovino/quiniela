@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { PredictorSelector } from '@molecules/PredictorSelector/PredictorSelector';
 import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList/PredictorList';
 import { PredictorEditor } from '@molecules/PredictorEditor/PredictorEditor';
 import { PredictorDeleteConfirm } from '@molecules/PredictorDeleteConfirm/PredictorDeleteConfirm';
@@ -28,10 +27,6 @@ export interface PredictionsTemplateProps {
     loginRequired: string;
     loginButton: string;
     loading: string;
-    stepMatches: string;
-    stepMatchesDesc: string;
-    stepGroups: string;
-    stepGroupsDesc: string;
     stepFinalPhase: string;
     stepFinalPhaseDesc: string;
     stepBestPlayers: string;
@@ -350,38 +345,6 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
             onConfirm={handleDeletePredictor}
             onCancel={handleBackToList}
             isSubmitting={isSubmitting}
-          />
-        </main>
-      </div>
-    );
-  }
-
-  if (!selectedPredictorId) {
-    const pt = {
-      title: translations.predictor.title,
-      selectPredictor: translations.predictor.select,
-      createPredictor: translations.predictor.create,
-      createButton: translations.predictor.createButton,
-      namePlaceholder: translations.predictor.namePlaceholder,
-      loading: translations.predictor.loading,
-      noPredictors: translations.predictor.noPredictors,
-      getStarted: translations.predictor.getStarted,
-    };
-    return (
-      <div className={`predictions-template ${className}`}>
-        <main className="predictions-template__content">
-          <PredictorSelector
-            predictors={predictors}
-            selectedPredictorId={selectedPredictorId}
-            onSelectPredictor={setSelectedPredictorId}
-            onCreatePredictor={async (name) => {
-              if (!user) return;
-              const np = await predictorService.createPredictor(user.uid, name);
-              setPredictors((prev) => [...prev, np]);
-              setSelectedPredictorId(np.id);
-            }}
-            isLoading={predictorsLoading}
-            translations={pt}
           />
         </main>
       </div>

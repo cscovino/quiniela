@@ -1,84 +1,17 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import type { MatchPrediction } from '@organisms/PredictionForm/PredictionForm';
 import type { GroupForPrediction } from '@organisms/GroupPredictionForm/GroupPredictionForm';
 import { tournamentService } from '@services/tournament-service';
 import { predictionService } from '@services/prediction-service';
 import { useAuthStore } from '@store/auth-store';
 import type { Match } from '@app-types/firestore';
-import {
-  calculateGroupStandings as calculateGroupStanding,
-  isGroupClassificationComplete,
-  KNOCKOUT_PHASES,
-} from '@utils/predictions-flow';
-import type { PredictionStepModel, PredictionStepKind } from '@types/prediction-steps';
-import { PredictionStepMatches } from '@molecules/Predictions/PredictionStepMatches';
-import { PredictionStepGroups } from '@molecules/Predictions/PredictionStepGroups';
+import { isGroupClassificationComplete, KNOCKOUT_PHASES } from '@utils/predictions-flow';
+import type { PredictionStepModel } from '@types/prediction-steps';
+import { PredictionStepGroup } from '@molecules/Predictions/PredictionStepGroup';
+import { PredictionStepKnockoutRound } from '@molecules/Predictions/PredictionStepKnockoutRound';
 import {
   PredictionStepFinalPhase,
   PredictionStepBestPlayers,
 } from '@molecules/Predictions/PredictionStepFinal';
-import { PredictionStepGroup } from '@molecules/Predictions/PredictionStepGroup';
-import { PredictionStepKnockoutRound } from '@molecules/Predictions/PredictionStepKnockoutRound';
-
-// 11.1 Flag-gated for safe rollback. Set false to revert to phase 10 behavior.
-const USE_NEW_PREDICTIONS_FLOW = true;
-
-interface PredictedStanding {
-  teamId: string;
-  fifaCode: string;
-  name: string;
-  played: number;
-  won: number;
-  drawn: number;
-  lost: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  points: number;
-}
-
-const mapMatchToPrediction = (
-  match: Match & { id: string },
-  teams: Record<string, { fifaCode: string; name: string }>,
-): MatchPrediction => {
-  const homeTeam = match.homeTeamId
-    ? teams[match.homeTeamId] || {
-        fifaCode: match.homeTeamId.toUpperCase(),
-        name: match.homeTeamId,
-      }
-    : { fifaCode: 'TBD', name: 'TBD' };
-  const awayTeam = match.awayTeamId
-    ? teams[match.awayTeamId] || {
-        fifaCode: match.awayTeamId.toUpperCase(),
-        name: match.awayTeamId,
-      }
-    : { fifaCode: 'TBD', name: 'TBD' };
-
-  return {
-    matchId: match.id,
-    homeTeam,
-    awayTeam,
-    phase: match.phase === 'group' ? 'group' : 'knockout',
-    predictionDeadline: match.predictionDeadline.toDate(),
-  };
-};
-
-const calculatePredictedStandings = (
-  matches: (Match & { id: string })[],
-  predictions: Record<string, { home?: number; away?: number }>,
-  teamsMap: Record<string, { fifaCode: string; name: string }>,
-): Record<string, PredictedStanding[]> => {
-  const groupIds = [...new Set(matches.filter((m) => m.phase === 'group').map((m) => m.groupId))];
-  const result: Record<string, PredictedStanding[]> = {};
-
-  for (const groupId of groupIds) {
-    const standings = calculateGroupStanding(matches, predictions, teamsMap, groupId);
-    if (standings.length > 0) {
-      result[groupId] = standings;
-    }
-  }
-
-  return result;
-};
 
 const KNOCKOUT_PHASE_LABELS: Record<string, string> = {
   'round-of-32': 'Round of 32',
@@ -99,20 +32,14 @@ export interface UsePredictionStepsResult {
   submitting: boolean;
   totalSteps: number;
   canAdvance: boolean;
-  predictedStandings: Record<string, PredictedStanding[]>;
   allTeams: { fifaCode: string; name: string }[];
   teamsMap: Record<string, { fifaCode: string; name: string }>;
   groups: GroupForPrediction[];
-  matches: MatchPrediction[];
   firestoreMatches: (Match & { id: string })[];
 }
 
 export function usePredictionSteps(
   translations: {
-    stepMatches: string;
-    stepMatchesDesc: string;
-    stepGroups: string;
-    stepGroupsDesc: string;
     stepFinalPhase: string;
     stepFinalPhaseDesc: string;
     stepBestPlayers: string;
@@ -131,11 +58,7 @@ export function usePredictionSteps(
 
   const [currentStep, setCurrentStep] = useState(0);
   const [submittedSteps, setSubmittedSteps] = useState<Set<number>>(new Set());
-  const [matchPredictions, setMatchPredictions] = useState<
-    Record<string, { home?: number; away?: number }>
-  >({});
 
-  const [matches, setMatches] = useState<MatchPrediction[]>([]);
   const [firestoreMatches, setFirestoreMatches] = useState<(Match & { id: string })[]>([]);
   const [groups, setGroups] = useState<GroupForPrediction[]>([]);
   const [allTeams, setAllTeams] = useState<{ fifaCode: string; name: string }[]>([]);
@@ -146,7 +69,6 @@ export function usePredictionSteps(
     null,
   );
   const [existingMatchBets, setExistingMatchBets] = useState<Set<string>>(new Set());
-  const [existingGroupBets, setExistingGroupBets] = useState<Set<string>>(new Set());
   const [existingFinalPhase, setExistingFinalPhase] = useState<{
     first?: string;
     second?: string;
@@ -186,8 +108,6 @@ export function usePredictionSteps(
         setTeamsMap(tMap);
         const all = m.status === 'fulfilled' ? m.value.map((x) => ({ ...x, id: x.slug })) : [];
         setFirestoreMatches(all);
-        const groupM = all.filter((x) => x.phase === 'group');
-        setMatches(groupM.map((x) => mapMatchToPrediction(x, tMap)));
         if (g.status === 'fulfilled' && t.status === 'fulfilled') {
           setGroups(
             [...g.value]
@@ -203,7 +123,7 @@ export function usePredictionSteps(
         }
       })
       .catch(() => {
-        if (!cancelled) setMatches([]);
+        if (!cancelled) setFirestoreMatches([]);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -221,7 +141,6 @@ export function usePredictionSteps(
       .then(({ matchBets, groupBets, finalPhase, bestPlayers, knockoutBets }) => {
         if (cancelled) return;
         setExistingMatchBets(new Set(matchBets.keys()));
-        setExistingGroupBets(new Set(groupBets.keys()));
 
         // 11.4 Hydrate group bets by group ID
         const groupBetsRecord: Record<string, string[]> = {};
@@ -257,79 +176,6 @@ export function usePredictionSteps(
       cancelled = true;
     };
   }, [user, selectedPredictorId]);
-
-  const handleMatchPredictionsChange = useCallback(
-    (p: Record<string, { home?: number; away?: number; winner?: string }>) => {
-      const cleaned: Record<string, { home?: number; away?: number }> = {};
-      for (const [k, v] of Object.entries(p)) {
-        if (v.home != null && v.away != null) cleaned[k] = { home: v.home, away: v.away };
-      }
-      setMatchPredictions(cleaned);
-    },
-    [],
-  );
-
-  const withFeedback = useCallback(
-    async (
-      fn: () => Promise<{ successCount: number; errors: string[] }>,
-      successKey: string,
-      stepIndex: number,
-    ) => {
-      setSubmitting(true);
-      setFeedback(null);
-      const result = await fn();
-      setSubmitting(false);
-      if (result.successCount > 0) {
-        setFeedback({
-          type: 'success',
-          message: translations.feedback.submittedCount.replace(
-            '{count}',
-            String(result.successCount),
-          ),
-        });
-        setSubmittedSteps((prev) => new Set(prev).add(stepIndex));
-      }
-      if (result.errors.length > 0) setFeedback({ type: 'error', message: result.errors[0] });
-      setTimeout(() => setFeedback(null), 5000);
-    },
-    [translations],
-  );
-
-  const handleMatchSubmit = useCallback(
-    async (p: Record<string, { home?: number; away?: number; winner?: string }>) => {
-      if (!user || !selectedPredictorId) return;
-      await withFeedback(
-        () =>
-          predictionService.submitBatchMatchBets(
-            user.uid,
-            selectedPredictorId,
-            p,
-            firestoreMatches,
-          ),
-        'match',
-        0,
-      );
-      const newBets = new Set(existingMatchBets);
-      Object.keys(p).forEach((id) => newBets.add(id));
-      setExistingMatchBets(newBets);
-    },
-    [user, selectedPredictorId, firestoreMatches, withFeedback, existingMatchBets],
-  );
-
-  const handleGroupSubmit = useCallback(
-    async (p: Record<string, string[]>) => {
-      if (!user || !selectedPredictorId) return;
-      await withFeedback(
-        () => predictionService.submitBatchGroupBets(user.uid, selectedPredictorId, p),
-        'group',
-        1,
-      );
-      const newBets = new Set(existingGroupBets);
-      Object.keys(p).forEach((id) => newBets.add(id));
-      setExistingGroupBets(newBets);
-    },
-    [user, selectedPredictorId, withFeedback, existingGroupBets],
-  );
 
   const handleFinalPhaseSubmit = useCallback(
     async (data: { first?: string; second?: string; third?: string; fourth?: string }) => {
@@ -503,97 +349,8 @@ export function usePredictionSteps(
     [user, selectedPredictorId, firestoreMatches, translations, knockoutBetsByMatchSlug],
   );
 
-  const predictedStandings = useMemo(
-    () => calculatePredictedStandings(firestoreMatches, matchPredictions, teamsMap),
-    [firestoreMatches, matchPredictions, teamsMap],
-  );
-
-  // Build steps based on flag
+  // Build steps dynamically: groups → knockout rounds → final → best players
   const steps = useMemo(() => {
-    if (!USE_NEW_PREDICTIONS_FLOW) {
-      // Phase 10 behavior: 4 fixed steps
-      return [
-        {
-          id: 'matches',
-          kind: 'group' as PredictionStepKind,
-          label: translations.stepMatches,
-          description: translations.stepMatchesDesc,
-          isComplete: submittedSteps.has(0),
-          canAdvance: Object.keys(matchPredictions).length > 0,
-          content: (
-            <PredictionStepMatches
-              matches={matches}
-              existingMatchBets={existingMatchBets}
-              teamsMap={teamsMap}
-              onSubmit={handleMatchSubmit}
-              onPredictionsChange={handleMatchPredictionsChange}
-              isDisabled={submitting}
-              locale={locale}
-            />
-          ),
-          onSubmit: () => Promise.resolve(),
-        },
-        {
-          id: 'groups',
-          kind: 'group' as PredictionStepKind,
-          label: translations.stepGroups,
-          description: translations.stepGroupsDesc,
-          isComplete: submittedSteps.has(1),
-          content: (
-            <PredictionStepGroups
-              groups={groups}
-              predictedStandings={predictedStandings}
-              existingGroupBets={existingGroupBets}
-              onSubmit={handleGroupSubmit}
-              isDisabled={submitting}
-              locale={locale}
-              translations={{
-                stepGroups: translations.stepGroups,
-                stepGroupsDesc: translations.stepGroupsDesc,
-                predictedStandings: '',
-                team: '',
-                pts: '',
-              }}
-            />
-          ),
-          onSubmit: () => Promise.resolve(),
-        },
-        {
-          id: 'final-phase',
-          kind: 'final-positions' as PredictionStepKind,
-          label: translations.stepFinalPhase,
-          description: translations.stepFinalPhaseDesc,
-          isComplete: submittedSteps.has(2),
-          content: (
-            <PredictionStepFinalPhase
-              teams={allTeams}
-              existingPrediction={existingFinalPhase || undefined}
-              onSubmit={handleFinalPhaseSubmit}
-              isDisabled={submitting}
-              locale={locale}
-            />
-          ),
-          onSubmit: () => Promise.resolve(),
-        },
-        {
-          id: 'best-players',
-          kind: 'best-players' as PredictionStepKind,
-          label: translations.stepBestPlayers,
-          description: translations.stepBestPlayersDesc,
-          isComplete: submittedSteps.has(3),
-          content: (
-            <PredictionStepBestPlayers
-              existingPrediction={existingBestPlayers || undefined}
-              onSubmit={handleBestPlayersSubmit}
-              isDisabled={submitting}
-            />
-          ),
-          onSubmit: () => Promise.resolve(),
-        },
-      ];
-    }
-
-    // 11.2 New flow: dynamic steps
     const result: PredictionStepModel[] = [];
     let stepIndex = 0;
 
@@ -718,29 +475,21 @@ export function usePredictionSteps(
 
     return result;
   }, [
-    USE_NEW_PREDICTIONS_FLOW,
     translations,
     submittedSteps,
-    matchPredictions,
-    matches,
-    existingMatchBets,
     teamsMap,
-    handleMatchSubmit,
-    handleMatchPredictionsChange,
     submitting,
     locale,
     groups,
-    predictedStandings,
-    existingGroupBets,
-    handleGroupSubmit,
+    firestoreMatches,
+    existingMatchBets,
+    groupBetsByGroupId,
+    knockoutBetsByMatchSlug,
     allTeams,
     existingFinalPhase,
     handleFinalPhaseSubmit,
     existingBestPlayers,
     handleBestPlayersSubmit,
-    firestoreMatches,
-    groupBetsByGroupId,
-    knockoutBetsByMatchSlug,
     handleGroupStepSubmit,
     handleKnockoutRoundSubmit,
   ]);
@@ -757,11 +506,9 @@ export function usePredictionSteps(
     submitting,
     totalSteps: steps.length,
     canAdvance,
-    predictedStandings,
     allTeams,
     teamsMap,
     groups,
-    matches,
     firestoreMatches,
   };
 }

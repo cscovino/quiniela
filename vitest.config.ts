@@ -51,7 +51,6 @@ export default defineConfig({
               'src/components/molecules/AdminMatchResultForm/**',
               'src/components/molecules/LoginForm/**',
               'src/components/molecules/RegisterForm/**',
-              'src/components/molecules/PredictorSelector/**',
               'src/components/organisms/AdminMatchList/**',
               'src/components/organisms/AdminMatchesPage/**',
               'src/components/organisms/BestPlayersForm/**',
