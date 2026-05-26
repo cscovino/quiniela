@@ -141,7 +141,7 @@
   background: var(--color-error);
   color: #ffffff;
   font-family: var(--font-pixel);
-  font-size: 8px;
+  font-size: var(--text-xs);
   line-height: 16px;
   text-align: center;
   border: var(--border-pixel-sm) solid var(--bg-card);
