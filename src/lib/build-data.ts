@@ -1,4 +1,3 @@
-import { getFirestore } from './firebase-admin';
 import type { RankingsTableProps } from '@organisms/RankingsTable/RankingsTable';
 import type { GroupStandingsProps } from '@organisms/GroupStandings/GroupStandings';
 
@@ -54,250 +53,332 @@ interface GroupData {
   order: number;
 }
 
-export async function getBuildData() {
-  if (import.meta.env.DEV) {
-    return { matches: [], standings: [], teams: {}, allMatches: [] };
-  }
+interface RowDoc {
+  id: string;
+  data: () => Record<string, unknown>;
+  exists: boolean;
+}
 
+interface QuerySnapshotLike {
+  docs: RowDoc[];
+  forEach: (cb: (doc: RowDoc) => void) => void;
+}
+
+type QueryOptions = { orderBy?: string };
+
+interface DbClient {
+  query: (path: string, opts?: QueryOptions) => Promise<QuerySnapshotLike>;
+  doc: (path: string) => Promise<RowDoc>;
+  collectionGroup: (id: string) => Promise<QuerySnapshotLike>;
+}
+
+async function createAdminDb(): Promise<DbClient> {
+  const { getFirestore } = await import('./firebase-admin');
   const db = getFirestore();
+  return {
+    query: async (path: string, opts?: QueryOptions): Promise<QuerySnapshotLike> => {
+      let ref: ReturnType<typeof db.collection> = db.collection(path);
+      if (opts?.orderBy) ref = ref.orderBy(opts.orderBy);
+      return ref.get();
+    },
+    doc: async (path: string): Promise<RowDoc> => {
+      return db.doc(path).get();
+    },
+    collectionGroup: async (id: string): Promise<QuerySnapshotLike> => {
+      return db.collectionGroup(id).get();
+    },
+  };
+}
 
-  try {
-    const [teamsSnap, matchesSnap, standingsSnap, groupsSnap] = await Promise.all([
-      db.collection(`tournaments/${TOURNAMENT_ID}/teams`).get(),
-      db.collection(`tournaments/${TOURNAMENT_ID}/matches`).orderBy('date').get(),
-      db.collection(`tournaments/${TOURNAMENT_ID}/group_standings`).get(),
-      db.collection(`tournaments/${TOURNAMENT_ID}/groups`).get(),
-    ]);
+async function createWebDb(): Promise<DbClient> {
+  const { initializeApp } = await import('firebase/app');
+  const f = await import('firebase/firestore');
+  const app = initializeApp({
+    apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
+    authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.PUBLIC_FIREBASE_APP_ID,
+  });
+  const db = f.getFirestore(app);
+  return {
+    query: async (path: string, opts?: QueryOptions): Promise<QuerySnapshotLike> => {
+      const ref = f.collection(db, path);
+      const snap = opts?.orderBy
+        ? await f.getDocs(f.query(ref, f.orderBy(opts.orderBy)))
+        : await f.getDocs(ref);
+      return snap as unknown as QuerySnapshotLike;
+    },
+    doc: async (path: string): Promise<RowDoc> => {
+      return f.getDoc(f.doc(db, path)) as unknown as Promise<RowDoc>;
+    },
+    collectionGroup: async (id: string): Promise<QuerySnapshotLike> => {
+      return f.getDocs(f.collectionGroup(db, id)) as unknown as Promise<QuerySnapshotLike>;
+    },
+  };
+}
 
-    const teams: Record<string, TeamData> = {};
-    teamsSnap.forEach((doc) => {
-      const data = doc.data() as TeamData;
-      teams[data.fifaCode.toLowerCase()] = data;
+function toTeamsMap(teamsSnap: QuerySnapshotLike): Record<string, TeamData> {
+  const teams: Record<string, TeamData> = {};
+  teamsSnap.forEach((doc) => {
+    const data = doc.data() as TeamData;
+    teams[data.fifaCode.toLowerCase()] = data;
+  });
+  return teams;
+}
+
+function toGroupsMap(groupsSnap: QuerySnapshotLike): Map<string, GroupData> {
+  const groupsMap = new Map<string, GroupData>();
+  groupsSnap.forEach((doc) => {
+    const data = doc.data() as Partial<GroupData>;
+    groupsMap.set(doc.id, {
+      slug: data.slug || doc.id,
+      name: data.name || doc.id,
+      order: data.order ?? 999,
     });
+  });
+  return groupsMap;
+}
 
-    // groups: keyed by doc.id (the slug used as groupId in teams)
-    const groupsMap = new Map<string, GroupData>();
-    groupsSnap.forEach((doc) => {
-      const data = doc.data() as Partial<GroupData>;
-      groupsMap.set(doc.id, {
-        slug: data.slug || doc.id,
-        name: data.name || doc.id,
-        order: data.order ?? 999,
-      });
-    });
+function rawMatchesFromSnap(matchesSnap: QuerySnapshotLike): (MatchData & { id: string })[] {
+  return matchesSnap.docs.map((doc) => ({
+    ...(doc.data() as MatchData),
+    id: doc.id,
+  }));
+}
 
-    const rawMatches = matchesSnap.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    })) as (MatchData & { id: string })[];
+type MatchView = {
+  homeTeam: { fifaCode: string; name: string };
+  awayTeam: { fifaCode: string; name: string };
+  date: Date;
+  status: string;
+  stadium: string;
+  result?: { home: number; away: number };
+};
 
-    type MatchView = {
-      homeTeam: { fifaCode: string; name: string };
-      awayTeam: { fifaCode: string; name: string };
-      date: Date;
-      status: string;
-      stadium: string;
-      result?: { home: number; away: number };
-    };
-
-    function toViewModel(m: MatchData & { id: string }): MatchView {
-      const homeTeam = m.homeTeamId
-        ? teams[m.homeTeamId.toLowerCase()] || {
-            fifaCode: m.homeTeamId.toUpperCase(),
-            name: m.homeTeamId.toUpperCase(),
-          }
-        : { fifaCode: 'TBD', name: 'TBD' };
-      const awayTeam = m.awayTeamId
-        ? teams[m.awayTeamId.toLowerCase()] || {
-            fifaCode: m.awayTeamId.toUpperCase(),
-            name: m.awayTeamId.toUpperCase(),
-          }
-        : { fifaCode: 'TBD', name: 'TBD' };
-
-      const result =
-        m.result.home !== null && m.result.away !== null
-          ? { home: m.result.home, away: m.result.away }
-          : undefined;
-
-      return {
-        homeTeam,
-        awayTeam,
-        date: m.date.toDate(),
-        status: m.status,
-        stadium: m.stadium,
-        result,
-      };
-    }
-
-    // Full ordered list (already sorted by Firestore `orderBy('date')`)
-    const allMatches: MatchView[] = rawMatches.map(toViewModel);
-
-    // Home-page subset: today's matches OR next 5 upcoming
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayEnd = new Date(todayStart);
-    todayEnd.setDate(todayEnd.getDate() + 1);
-
-    const todayMatches = rawMatches.filter((m) => {
-      const d = m.date.toDate();
-      return d >= todayStart && d < todayEnd;
-    });
-
-    const upcomingMatches = rawMatches
-      .filter((m) => m.date.toDate() >= now && m.status === 'scheduled')
-      .sort((a, b) => a.date.toMillis() - b.date.toMillis())
-      .slice(0, 5);
-
-    const displayMatches = todayMatches.length > 0 ? todayMatches : upcomingMatches;
-    const matches: MatchView[] = displayMatches.slice(0, 5).map(toViewModel);
-
-    type StandingsRow = GroupStandingsProps['groups'][number];
-    type StandingsRowWithOrder = StandingsRow & { __order: number };
-
-    let standings: StandingsRowWithOrder[] = standingsSnap.docs.map((doc) => {
-      const data = doc.data() as StandingData;
-      const group = groupsMap.get(data.groupId);
-      return {
-        name: group?.name || data.groupId,
-        __order: group?.order ?? 999,
-        standings: data.standings.map((s, idx) => ({
-          teamId: s.teamId,
-          fifaCode: teams[s.teamId.toLowerCase()]?.fifaCode || s.teamId.toUpperCase(),
-          teamName: teams[s.teamId.toLowerCase()]?.name || s.teamId.toUpperCase(),
-          position: s.position ?? idx + 1,
-          played: s.played,
-          won: s.won,
-          drawn: s.drawn,
-          lost: s.lost,
-          goalsFor: s.goalsFor,
-          goalsAgainst: s.goalsAgainst,
-          points: s.points,
-        })),
-      };
-    });
-
-    // Fallback: synthesize zero-state standings from teams grouped by groupId
-    // when the standings collection is empty (e.g., before any match results).
-    // Teams.groupId references the group document id (slug, e.g. "group-a").
-    if (standings.length === 0) {
-      const byGroup = new Map<string, StandingsRow['standings']>();
-      for (const team of Object.values(teams)) {
-        if (!team.groupId) continue;
-        if (!byGroup.has(team.groupId)) byGroup.set(team.groupId, []);
-        byGroup.get(team.groupId)!.push({
-          teamId: team.fifaCode,
-          fifaCode: team.fifaCode,
-          teamName: team.name,
-          position: 0,
-          played: 0,
-          won: 0,
-          drawn: 0,
-          lost: 0,
-          goalsFor: 0,
-          goalsAgainst: 0,
-          points: 0,
-        });
+function toMatchView(m: MatchData & { id: string }, teams: Record<string, TeamData>): MatchView {
+  const homeTeam = m.homeTeamId
+    ? teams[m.homeTeamId.toLowerCase()] || {
+        fifaCode: m.homeTeamId.toUpperCase(),
+        name: m.homeTeamId.toUpperCase(),
       }
-      standings = Array.from(byGroup.entries()).map(([groupId, teamsInGroup]) => {
-        const group = groupsMap.get(groupId);
-        return {
-          name: group?.name || groupId,
-          __order: group?.order ?? 999,
-          standings: teamsInGroup
-            .sort((a, b) => a.teamName.localeCompare(b.teamName))
-            .map((s, idx) => ({ ...s, position: idx + 1 })),
-        };
+    : { fifaCode: 'TBD', name: 'TBD' };
+  const awayTeam = m.awayTeamId
+    ? teams[m.awayTeamId.toLowerCase()] || {
+        fifaCode: m.awayTeamId.toUpperCase(),
+        name: m.awayTeamId.toUpperCase(),
+      }
+    : { fifaCode: 'TBD', name: 'TBD' };
+  const result =
+    m.result.home !== null && m.result.away !== null
+      ? { home: m.result.home, away: m.result.away }
+      : undefined;
+  return {
+    homeTeam,
+    awayTeam,
+    date: m.date.toDate(),
+    status: m.status,
+    stadium: m.stadium,
+    result,
+  };
+}
+
+function buildStandings(
+  standingsSnap: QuerySnapshotLike,
+  groupsMap: Map<string, GroupData>,
+  teams: Record<string, TeamData>,
+): GroupStandingsProps['groups'] {
+  type StandingsRow = GroupStandingsProps['groups'][number];
+  type StandingsRowWithOrder = StandingsRow & { __order: number };
+
+  let standings: StandingsRowWithOrder[] = standingsSnap.docs.map((doc) => {
+    const data = doc.data() as StandingData;
+    const group = groupsMap.get(data.groupId);
+    return {
+      name: group?.name || data.groupId,
+      __order: group?.order ?? 999,
+      standings: data.standings.map((s, idx) => ({
+        teamId: s.teamId,
+        fifaCode: teams[s.teamId.toLowerCase()]?.fifaCode || s.teamId.toUpperCase(),
+        teamName: teams[s.teamId.toLowerCase()]?.name || s.teamId.toUpperCase(),
+        position: s.position ?? idx + 1,
+        played: s.played,
+        won: s.won,
+        drawn: s.drawn,
+        lost: s.lost,
+        goalsFor: s.goalsFor,
+        goalsAgainst: s.goalsAgainst,
+        points: s.points,
+      })),
+    };
+  });
+
+  if (standings.length === 0) {
+    const byGroup = new Map<string, StandingsRow['standings']>();
+    for (const team of Object.values(teams)) {
+      if (!team.groupId) continue;
+      if (!byGroup.has(team.groupId)) byGroup.set(team.groupId, []);
+      byGroup.get(team.groupId)!.push({
+        teamId: team.fifaCode,
+        fifaCode: team.fifaCode,
+        teamName: team.name,
+        position: 0,
+        played: 0,
+        won: 0,
+        drawn: 0,
+        lost: 0,
+        goalsFor: 0,
+        goalsAgainst: 0,
+        points: 0,
       });
     }
-
-    // Sort groups by the canonical `order` field (Grupo A < B < C < ...)
-    standings.sort((a, b) => a.__order - b.__order);
-    const standingsOut: GroupStandingsProps['groups'] = standings.map((s) => ({
-      name: s.name,
-      standings: s.standings,
-    }));
-
-    return { matches, standings: standingsOut, teams, allMatches };
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.warn('[build-data] getBuildData failed, returning empty data:', error);
-    return { matches: [], standings: [], teams: {}, allMatches: [] };
+    standings = Array.from(byGroup.entries()).map(([groupId, teamsInGroup]) => {
+      const group = groupsMap.get(groupId);
+      return {
+        name: group?.name || groupId,
+        __order: group?.order ?? 999,
+        standings: teamsInGroup
+          .sort((a, b) => a.teamName.localeCompare(b.teamName))
+          .map((s, idx) => ({ ...s, position: idx + 1 })),
+      };
+    });
   }
+
+  standings.sort((a, b) => a.__order - b.__order);
+  return standings.map((s) => ({ name: s.name, standings: s.standings }));
+}
+
+async function queryBuildData(db: DbClient) {
+  const [teamsSnap, matchesSnap, standingsSnap, groupsSnap] = await Promise.all([
+    db.query(`tournaments/${TOURNAMENT_ID}/teams`),
+    db.query(`tournaments/${TOURNAMENT_ID}/matches`, { orderBy: 'date' }),
+    db.query(`tournaments/${TOURNAMENT_ID}/group_standings`),
+    db.query(`tournaments/${TOURNAMENT_ID}/groups`),
+  ]);
+
+  const teams = toTeamsMap(teamsSnap);
+  const groupsMap = toGroupsMap(groupsSnap);
+  const rawMatches = rawMatchesFromSnap(matchesSnap);
+
+  const allMatches: MatchView[] = rawMatches.map((m) => toMatchView(m, teams));
+
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(todayStart);
+  todayEnd.setDate(todayEnd.getDate() + 1);
+
+  const todayMatches = rawMatches.filter((m) => {
+    const d = m.date.toDate();
+    return d >= todayStart && d < todayEnd;
+  });
+
+  const upcomingMatches = rawMatches
+    .filter((m) => m.date.toDate() >= now && m.status === 'scheduled')
+    .sort((a, b) => a.date.toMillis() - b.date.toMillis())
+    .slice(0, 5);
+
+  const displayMatches = todayMatches.length > 0 ? todayMatches : upcomingMatches;
+  const matches: MatchView[] = displayMatches.slice(0, 5).map((m) => toMatchView(m, teams));
+
+  const standings = buildStandings(standingsSnap, groupsMap, teams);
+
+  return { matches, standings, teams, allMatches };
+}
+
+async function queryBuildRankings(db: DbClient) {
+  const statsSnap = await db.collectionGroup('stats');
+
+  const allStats: Array<PredictorStatsData & { userId: string; predictorId: string }> = [];
+
+  statsSnap.forEach((doc) => {
+    const refPath = (doc as unknown as { ref: { path: string } }).ref.path;
+    const pathParts = refPath.split('/');
+    const userId = pathParts[1];
+    const predictorId = pathParts[3];
+    allStats.push({ ...(doc.data() as PredictorStatsData), userId, predictorId });
+  });
+
+  const sorted = allStats.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 100);
+
+  const predictorRefs = new Set<string>();
+  for (const s of sorted) {
+    predictorRefs.add(`users/${s.userId}/predictors/${s.predictorId}`);
+  }
+
+  const predictorDocs = await Promise.all(
+    Array.from(predictorRefs).map(async (ref) => {
+      const snap = await db.doc(ref);
+      const data = snap.exists ? snap.data() : null;
+      return {
+        id: ref,
+        name: (data?.name as string) || null,
+        avatar: (data?.avatar as { bgColor?: string; emoji?: string } | null) || null,
+        avatarUrl: (data?.avatarUrl as string | null) || null,
+      };
+    }),
+  );
+
+  const nameMap = new Map<string, string>();
+  const avatarMap = new Map<string, { bgColor?: string; emoji?: string; avatarUrl?: string }>();
+  for (const p of predictorDocs) {
+    nameMap.set(p.id, p.name || p.id.split('/').pop() || 'Unknown');
+    avatarMap.set(p.id, {
+      bgColor: p.avatar?.bgColor,
+      emoji: p.avatar?.emoji,
+      avatarUrl: p.avatarUrl,
+    });
+  }
+
+  const rankings: RankingsTableProps['rankings'] = sorted.map((s) => {
+    const key = `users/${s.userId}/predictors/${s.predictorId}`;
+    const avatarData = avatarMap.get(key);
+    return {
+      userId: s.userId,
+      predictorId: s.predictorId,
+      displayName: nameMap.get(key) || s.predictorId,
+      avatarUrl: avatarData?.avatarUrl,
+      avatar:
+        avatarData?.bgColor && avatarData?.emoji
+          ? { bgColor: avatarData.bgColor, emoji: avatarData.emoji }
+          : undefined,
+      points: s.totalPoints,
+      accuracy: Math.round(s.accuracy * 100),
+      streak: s.currentStreak,
+    };
+  });
+
+  return rankings;
+}
+
+export async function getBuildData() {
+  const errors: unknown[] = [];
+
+  for (const create of [createAdminDb, createWebDb]) {
+    try {
+      const db = await create();
+      return await queryBuildData(db);
+    } catch (e) {
+      errors.push(e);
+    }
+  }
+
+  console.warn('[build-data] getBuildData failed, returning empty:', errors);
+  return { matches: [], standings: [], teams: {}, allMatches: [] };
 }
 
 export async function getBuildRankings() {
-  if (import.meta.env.DEV) {
-    return [];
+  const errors: unknown[] = [];
+
+  for (const create of [createAdminDb, createWebDb]) {
+    try {
+      const db = await create();
+      return await queryBuildRankings(db);
+    } catch (e) {
+      errors.push(e);
+    }
   }
 
-  const db = getFirestore();
-
-  try {
-    const statsSnap = await db.collectionGroup('stats').get();
-
-    const allStats: Array<PredictorStatsData & { userId: string; predictorId: string }> = [];
-
-    statsSnap.forEach((doc) => {
-      const refPath = doc.ref.path;
-      const pathParts = refPath.split('/');
-      const userId = pathParts[1];
-      const predictorId = pathParts[3];
-      allStats.push({ ...(doc.data() as PredictorStatsData), userId, predictorId });
-    });
-
-    const sorted = allStats.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 100);
-
-    const predictorRefs = new Set<string>();
-    for (const s of sorted) {
-      predictorRefs.add(`users/${s.userId}/predictors/${s.predictorId}`);
-    }
-
-    const predictorDocs = await Promise.all(
-      Array.from(predictorRefs).map(async (ref) => {
-        const snap = await db.doc(ref).get();
-        const data = snap.exists ? snap.data() : null;
-        return {
-          id: ref,
-          name: data?.name || null,
-          avatar: data?.avatar || null,
-          avatarUrl: data?.avatarUrl || null,
-        };
-      }),
-    );
-
-    const nameMap = new Map<string, string>();
-    const avatarMap = new Map<string, { bgColor?: string; emoji?: string; avatarUrl?: string }>();
-    for (const p of predictorDocs) {
-      nameMap.set(p.id, p.name || p.id.split('/').pop() || 'Unknown');
-      avatarMap.set(p.id, {
-        bgColor: p.avatar?.bgColor,
-        emoji: p.avatar?.emoji,
-        avatarUrl: p.avatarUrl,
-      });
-    }
-
-    const rankings: RankingsTableProps['rankings'] = sorted.map((s) => {
-      const key = `users/${s.userId}/predictors/${s.predictorId}`;
-      const avatarData = avatarMap.get(key);
-      return {
-        userId: s.userId,
-        predictorId: s.predictorId,
-        displayName: nameMap.get(key) || s.predictorId,
-        avatarUrl: avatarData?.avatarUrl,
-        avatar:
-          avatarData?.bgColor && avatarData?.emoji
-            ? { bgColor: avatarData.bgColor, emoji: avatarData.emoji }
-            : undefined,
-        points: s.totalPoints,
-        accuracy: Math.round(s.accuracy * 100),
-        streak: s.currentStreak,
-      };
-    });
-
-    return rankings;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.warn('[build-data] getBuildRankings failed, returning empty array:', error);
-    return [];
-  }
+  console.warn('[build-data] getBuildRankings failed, returning empty:', errors);
+  return [];
 }
