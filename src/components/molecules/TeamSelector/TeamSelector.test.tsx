@@ -43,4 +43,23 @@ describe('TeamSelector', () => {
     render(<TeamSelector options={mockOptions} onChange={() => {}} label="Pick winner" />);
     expect(screen.getByText('Pick winner')).toBeInTheDocument();
   });
+
+  it('multiple instances have unique radio group names', () => {
+    const { container } = render(
+      <div>
+        <TeamSelector options={mockOptions} onChange={() => {}} />
+        <TeamSelector options={mockOptions} onChange={() => {}} />
+      </div>,
+    );
+
+    const radios = container.querySelectorAll('input[type="radio"]');
+    const radioNames = Array.from(radios).map((r) => r.getAttribute('name'));
+
+    const firstSelectorRadios = radioNames.slice(0, 2);
+    const secondSelectorRadios = radioNames.slice(2, 4);
+
+    expect(firstSelectorRadios[0]).toBe(firstSelectorRadios[1]);
+    expect(secondSelectorRadios[0]).toBe(secondSelectorRadios[1]);
+    expect(firstSelectorRadios[0]).not.toBe(secondSelectorRadios[0]);
+  });
 });

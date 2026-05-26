@@ -26,6 +26,8 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
   disabled = false,
   className = '',
 }) => {
+  const uniqueId = React.useId();
+
   return (
     <div className={`team-selector ${className}`}>
       {label && (
@@ -40,7 +42,7 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
             className={`team-selector__option ${value === team.fifaCode ? 'team-selector__option--selected' : ''} ${disabled ? 'team-selector__option--disabled' : ''}`}
           >
             <Radio
-              name="team-selector"
+              name={`team-selector-${uniqueId}`}
               value={team.fifaCode}
               checked={value === team.fifaCode}
               onChange={() => onChange(team.fifaCode)}
