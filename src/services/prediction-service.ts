@@ -10,7 +10,14 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { getDb } from './firebase';
-import type { MatchBet, KnockoutBet, GroupBet, Match, FinalPhaseBet, BestPlayersBet } from '../types/firestore';
+import type {
+  MatchBet,
+  KnockoutBet,
+  GroupBet,
+  Match,
+  FinalPhaseBet,
+  BestPlayersBet,
+} from '../types/firestore';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
@@ -360,6 +367,65 @@ export const predictionService = {
     }
   },
 
+  submitBatchKnockoutBets: async (
+    userId: string,
+    predictorId: string,
+    predictions: Record<string, string>,
+    matches: (Match & { id: string })[],
+  ): Promise<{ successCount: number; errorCount: number; errors: string[] }> => {
+    const errors: string[] = [];
+    let successCount = 0;
+
+    const batch = writeBatch(getDb());
+
+    for (const [matchSlug, winner] of Object.entries(predictions)) {
+      const match = matches.find((m) => m.id === matchSlug || m.slug === matchSlug);
+      if (!match) {
+        errors.push(`Match ${matchSlug} not found`);
+        continue;
+      }
+
+      if (match.status === 'finished' || match.status === 'live') {
+        continue;
+      }
+
+      if (match.predictionDeadline && match.predictionDeadline.toDate() < new Date()) {
+        continue;
+      }
+
+      if (!match.homeTeamId || !match.awayTeamId) {
+        continue;
+      }
+
+      const betId = `${predictorId}-${matchSlug}`;
+      const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
+
+      batch.set(betRef, {
+        userId,
+        predictorId,
+        matchId: matchSlug,
+        predictedWinner: winner,
+        points: 0,
+        createdAt: serverTimestamp(),
+      });
+
+      successCount++;
+    }
+
+    try {
+      if (successCount > 0) {
+        await batch.commit();
+      }
+      return { successCount, errorCount: errors.length, errors };
+    } catch (err) {
+      return {
+        successCount: 0,
+        errorCount: Object.keys(predictions).length,
+        errors: [err instanceof Error ? err.message : 'Failed to submit knockout predictions'],
+      };
+    }
+  },
+
   submitFinalPhaseBet: async (
     userId: string,
     predictorId: string,
@@ -486,7 +552,13 @@ export const predictionService = {
 
     let finalPhase: FinalPhaseBet | null = null;
     try {
-      const finalPhaseRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'final_phase_bets', predictorId);
+      const finalPhaseRef = doc(
+        getDb(),
+        'tournaments',
+        TOURNAMENT_ID,
+        'final_phase_bets',
+        predictorId,
+      );
       const finalPhaseSnap = await getDoc(finalPhaseRef);
       if (finalPhaseSnap.exists()) {
         const data = finalPhaseSnap.data() as FinalPhaseBet;
@@ -500,7 +572,13 @@ export const predictionService = {
 
     let bestPlayers: BestPlayersBet | null = null;
     try {
-      const bestPlayersRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'best_players_bets', predictorId);
+      const bestPlayersRef = doc(
+        getDb(),
+        'tournaments',
+        TOURNAMENT_ID,
+        'best_players_bets',
+        predictorId,
+      );
       const bestPlayersSnap = await getDoc(bestPlayersRef);
       if (bestPlayersSnap.exists()) {
         const data = bestPlayersSnap.data() as BestPlayersBet;
