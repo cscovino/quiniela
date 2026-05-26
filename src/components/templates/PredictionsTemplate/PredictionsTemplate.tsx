@@ -249,10 +249,26 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     let cancelled = false;
     predictionService
       .getExistingBets(user.uid, selectedPredictorId)
-      .then(({ matchBets, groupBets }) => {
+      .then(({ matchBets, groupBets, finalPhase, bestPlayers }) => {
         if (cancelled) return;
         setExistingMatchBets(new Set(matchBets.keys()));
         setExistingGroupBets(new Set(groupBets.keys()));
+        if (finalPhase) {
+          setExistingFinalPhase({
+            first: finalPhase.first,
+            second: finalPhase.second,
+            third: finalPhase.third,
+            fourth: finalPhase.fourth,
+          });
+          setSubmittedSteps((prev) => new Set(prev).add(2));
+        }
+        if (bestPlayers) {
+          setExistingBestPlayers({
+            bestGoalkeeper: bestPlayers.bestGoalkeeper,
+            bestScorer: bestPlayers.bestScorer,
+          });
+          setSubmittedSteps((prev) => new Set(prev).add(3));
+        }
       })
       .catch(() => {});
     return () => {
@@ -339,12 +355,24 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
       setSubmitting(true);
       setFeedback(null);
       try {
-        setExistingFinalPhase(data);
-        setSubmittedSteps((prev) => new Set(prev).add(2));
-        setFeedback({
-          type: 'success',
-          message: translations.feedback.finalPhaseSubmitted,
-        });
+        const result = await predictionService.submitFinalPhaseBet(
+          user.uid,
+          selectedPredictorId,
+          data as { first: string; second: string; third: string; fourth: string },
+        );
+        if (result.success) {
+          setExistingFinalPhase(data);
+          setSubmittedSteps((prev) => new Set(prev).add(2));
+          setFeedback({
+            type: 'success',
+            message: translations.feedback.finalPhaseSubmitted,
+          });
+        } else {
+          setFeedback({
+            type: 'error',
+            message: result.error || translations.feedback.submitFailed,
+          });
+        }
       } catch {
         setFeedback({
           type: 'error',
@@ -363,12 +391,24 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
       setSubmitting(true);
       setFeedback(null);
       try {
-        setExistingBestPlayers(data);
-        setSubmittedSteps((prev) => new Set(prev).add(3));
-        setFeedback({
-          type: 'success',
-          message: translations.feedback.bestPlayersSubmitted,
-        });
+        const result = await predictionService.submitBestPlayersBet(
+          user.uid,
+          selectedPredictorId,
+          data as { bestGoalkeeper: string; bestScorer: string },
+        );
+        if (result.success) {
+          setExistingBestPlayers(data);
+          setSubmittedSteps((prev) => new Set(prev).add(3));
+          setFeedback({
+            type: 'success',
+            message: translations.feedback.bestPlayersSubmitted,
+          });
+        } else {
+          setFeedback({
+            type: 'error',
+            message: result.error || translations.feedback.submitFailed,
+          });
+        }
       } catch {
         setFeedback({
           type: 'error',

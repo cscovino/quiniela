@@ -10,7 +10,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { getDb } from './firebase';
-import type { MatchBet, KnockoutBet, GroupBet, Match } from '../types/firestore';
+import type { MatchBet, KnockoutBet, GroupBet, Match, FinalPhaseBet, BestPlayersBet } from '../types/firestore';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
@@ -360,6 +360,83 @@ export const predictionService = {
     }
   },
 
+  submitFinalPhaseBet: async (
+    userId: string,
+    predictorId: string,
+    data: { first: string; second: string; third: string; fourth: string },
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const { first, second, third, fourth } = data;
+      if (!first || !second || !third || !fourth) {
+        return { success: false, error: 'All four positions must be filled' };
+      }
+
+      const uniqueTeams = new Set([first, second, third, fourth]);
+      if (uniqueTeams.size !== 4) {
+        return { success: false, error: 'All teams must be unique' };
+      }
+
+      const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'final_phase_bets', predictorId);
+      const betData: Omit<FinalPhaseBet, 'createdAt' | 'updatedAt'> = {
+        userId,
+        predictorId,
+        first,
+        second,
+        third,
+        fourth,
+        points: 0,
+      };
+
+      await setDoc(betRef, {
+        ...betData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to submit final phase prediction',
+      };
+    }
+  },
+
+  submitBestPlayersBet: async (
+    userId: string,
+    predictorId: string,
+    data: { bestGoalkeeper: string; bestScorer: string },
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const { bestGoalkeeper, bestScorer } = data;
+      if (!bestGoalkeeper || !bestScorer) {
+        return { success: false, error: 'Both goalkeeper and scorer must be selected' };
+      }
+
+      const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'best_players_bets', predictorId);
+      const betData: Omit<BestPlayersBet, 'createdAt' | 'updatedAt'> = {
+        userId,
+        predictorId,
+        bestGoalkeeper,
+        bestScorer,
+        points: 0,
+      };
+
+      await setDoc(betRef, {
+        ...betData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to submit best players prediction',
+      };
+    }
+  },
+
   getExistingBets: async (
     userId: string,
     predictorId: string,
@@ -367,6 +444,8 @@ export const predictionService = {
     matchBets: Map<string, { home: number; away: number }>;
     knockoutBets: Map<string, string>;
     groupBets: Map<string, string[]>;
+    finalPhase: FinalPhaseBet | null;
+    bestPlayers: BestPlayersBet | null;
   }> => {
     const matchBets = new Map<string, { home: number; away: number }>();
     const knockoutBets = new Map<string, string>();
@@ -405,6 +484,34 @@ export const predictionService = {
       }
     }
 
-    return { matchBets, knockoutBets, groupBets };
+    let finalPhase: FinalPhaseBet | null = null;
+    try {
+      const finalPhaseRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'final_phase_bets', predictorId);
+      const finalPhaseSnap = await getDoc(finalPhaseRef);
+      if (finalPhaseSnap.exists()) {
+        const data = finalPhaseSnap.data() as FinalPhaseBet;
+        if (data.userId === userId) {
+          finalPhase = data;
+        }
+      }
+    } catch {
+      // Collection may not exist yet
+    }
+
+    let bestPlayers: BestPlayersBet | null = null;
+    try {
+      const bestPlayersRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'best_players_bets', predictorId);
+      const bestPlayersSnap = await getDoc(bestPlayersRef);
+      if (bestPlayersSnap.exists()) {
+        const data = bestPlayersSnap.data() as BestPlayersBet;
+        if (data.userId === userId) {
+          bestPlayers = data;
+        }
+      }
+    } catch {
+      // Collection may not exist yet
+    }
+
+    return { matchBets, knockoutBets, groupBets, finalPhase, bestPlayers };
   },
 };

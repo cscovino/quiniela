@@ -347,12 +347,149 @@ describe('prediction-service', () => {
 
     it('returns empty maps when no bets exist', async () => {
       vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({ docs: [] } as any);
+      vi.mocked(firebaseFirestore.getDoc).mockResolvedValue({ exists: () => false } as any);
 
       const result = await predictionService.getExistingBets('user-1', 'user-1-default');
 
       expect(result.matchBets.size).toBe(0);
       expect(result.knockoutBets.size).toBe(0);
       expect(result.groupBets.size).toBe(0);
+      expect(result.finalPhase).toBeNull();
+      expect(result.bestPlayers).toBeNull();
+    });
+
+    it('returns finalPhase and bestPlayers when they exist', async () => {
+      vi.mocked(firebaseFirestore.getDocs)
+        .mockResolvedValueOnce({ docs: [] } as any)
+        .mockResolvedValueOnce({ docs: [] } as any)
+        .mockResolvedValueOnce({ docs: [] } as any);
+
+      vi.mocked(firebaseFirestore.getDoc)
+        .mockResolvedValueOnce({
+          exists: () => true,
+          data: () => ({
+            userId: 'user-1',
+            predictorId: 'user-1-default',
+            first: 'arg',
+            second: 'fra',
+            third: 'bra',
+            fourth: 'ger',
+            points: 0,
+          }),
+        } as any)
+        .mockResolvedValueOnce({
+          exists: () => true,
+          data: () => ({
+            userId: 'user-1',
+            predictorId: 'user-1-default',
+            bestGoalkeeper: 'emiliano-martinez',
+            bestScorer: 'mbappe',
+            points: 0,
+          }),
+        } as any);
+
+      const result = await predictionService.getExistingBets('user-1', 'user-1-default');
+
+      expect(result.finalPhase).not.toBeNull();
+      expect(result.finalPhase?.first).toBe('arg');
+      expect(result.bestPlayers).not.toBeNull();
+      expect(result.bestPlayers?.bestScorer).toBe('mbappe');
+    });
+
+    it('ignores finalPhase/bestPlayers from other users', async () => {
+      vi.mocked(firebaseFirestore.getDocs)
+        .mockResolvedValueOnce({ docs: [] } as any)
+        .mockResolvedValueOnce({ docs: [] } as any)
+        .mockResolvedValueOnce({ docs: [] } as any);
+
+      vi.mocked(firebaseFirestore.getDoc)
+        .mockResolvedValueOnce({
+          exists: () => true,
+          data: () => ({ userId: 'other-user', first: 'arg', second: 'fra', third: 'bra', fourth: 'ger', points: 0 }),
+        } as any)
+        .mockResolvedValueOnce({
+          exists: () => true,
+          data: () => ({ userId: 'other-user', bestGoalkeeper: 'x', bestScorer: 'y', points: 0 }),
+        } as any);
+
+      const result = await predictionService.getExistingBets('user-1', 'user-1-default');
+
+      expect(result.finalPhase).toBeNull();
+      expect(result.bestPlayers).toBeNull();
+    });
+  });
+
+  describe('submitFinalPhaseBet', () => {
+    it('submits a valid final phase prediction', async () => {
+      vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
+
+      const result = await predictionService.submitFinalPhaseBet('user-1', 'user-1-default', {
+        first: 'arg',
+        second: 'fra',
+        third: 'bra',
+        fourth: 'ger',
+      });
+
+      expect(result.success).toBe(true);
+      expect(firebaseFirestore.setDoc).toHaveBeenCalled();
+    });
+
+    it('rejects if not all positions filled', async () => {
+      const result = await predictionService.submitFinalPhaseBet('user-1', 'user-1-default', {
+        first: 'arg',
+        second: '',
+        third: 'bra',
+        fourth: 'ger',
+      } as any);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('must be filled');
+    });
+
+    it('rejects if teams are not unique', async () => {
+      const result = await predictionService.submitFinalPhaseBet('user-1', 'user-1-default', {
+        first: 'arg',
+        second: 'arg',
+        third: 'bra',
+        fourth: 'ger',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('unique');
+    });
+  });
+
+  describe('submitBestPlayersBet', () => {
+    it('submits a valid best players prediction', async () => {
+      vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
+
+      const result = await predictionService.submitBestPlayersBet('user-1', 'user-1-default', {
+        bestGoalkeeper: 'emiliano-martinez',
+        bestScorer: 'mbappe',
+      });
+
+      expect(result.success).toBe(true);
+      expect(firebaseFirestore.setDoc).toHaveBeenCalled();
+    });
+
+    it('rejects if goalkeeper not selected', async () => {
+      const result = await predictionService.submitBestPlayersBet('user-1', 'user-1-default', {
+        bestGoalkeeper: '',
+        bestScorer: 'mbappe',
+      } as any);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('must be selected');
+    });
+
+    it('rejects if scorer not selected', async () => {
+      const result = await predictionService.submitBestPlayersBet('user-1', 'user-1-default', {
+        bestGoalkeeper: 'emiliano-martinez',
+        bestScorer: '',
+      } as any);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('must be selected');
     });
   });
 });

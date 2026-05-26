@@ -94,6 +94,28 @@ export interface KnockoutBet {
   createdAt: Timestamp;
 }
 
+export interface FinalPhaseBet {
+  userId: string;
+  predictorId: string;
+  first: string;
+  second: string;
+  third: string;
+  fourth: string;
+  points: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface BestPlayersBet {
+  userId: string;
+  predictorId: string;
+  bestGoalkeeper: string;
+  bestScorer: string;
+  points: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export interface TeamStanding {
   teamId: string;
   position: number;

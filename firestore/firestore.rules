@@ -132,6 +132,22 @@ service cloud.firestore {
         allow read: if true;
         allow write: if false;
       }
+      
+      // Final phase bets - predictor owns their bet
+      match /final_phase_bets/{predictorId} {
+        allow read: if request.auth != null;
+        allow create, update: if request.auth != null && 
+          request.auth.uid == resource.data.userId;
+        allow delete: if isAdmin();
+      }
+      
+      // Best players bets - predictor owns their bet
+      match /best_players_bets/{predictorId} {
+        allow read: if request.auth != null;
+        allow create, update: if request.auth != null && 
+          request.auth.uid == resource.data.userId;
+        allow delete: if isAdmin();
+      }
     }
   }
 }
