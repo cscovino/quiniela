@@ -2,7 +2,7 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getBuildData } from '@lib/build-data';
 import { TournamentHeader } from '@organisms/TournamentHeader/TournamentHeader';
-import { MatchList } from '@organisms/MatchList/MatchList';
+import { LiveMatchList } from '@organisms/LiveMatchList/LiveMatchList';
 import { Button } from '@atoms/Button/Button';
 import type { MatchCardProps } from '@molecules/MatchCard/MatchCard';
 import { getTranslations, getRoute } from '@utils/i18n';
@@ -66,12 +66,13 @@ const tournamentInfo = buildData.tournament;
     </section>
 
     <section class="home-template__matches">
-      <MatchList
-        matches={matches}
+      <LiveMatchList
+        initialMatches={matches}
         title={t.pages.home.matches.title}
         emptyMessage={t.pages.home.matches.empty}
         translations={matchTranslations}
         locale={locale}
+        client:load
       />
     </section>
   </main>

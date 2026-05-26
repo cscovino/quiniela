@@ -1,6 +1,6 @@
 ---
 import { getBuildRankings } from '@lib/build-data';
-import { RankingsTable } from '@organisms/RankingsTable/RankingsTable';
+import { LiveRankings } from '@organisms/LiveRankings/LiveRankings';
 import { getTranslations } from '@utils/i18n';
 
 export interface Props {
@@ -14,7 +14,7 @@ const rankings = await getBuildRankings();
 ---
 
 <main class="rankings-template__content">
-  <RankingsTable rankings={rankings} title={t.heading} emptyMessage={t.empty} />
+  <LiveRankings initialRankings={rankings} title={t.heading} emptyMessage={t.empty} client:load />
 </main>
 
 <style>
