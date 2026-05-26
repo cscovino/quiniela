@@ -30,7 +30,12 @@ export const TeamFlag: React.FC<TeamFlagProps> = ({
         role="img"
         aria-label={`${name || fifaCode} flag`}
       />
-      {showName && name && <span className="team-flag__name">{name}</span>}
+      {showName && name && (
+        <>
+          <span className="team-flag__name">{name}</span>
+          <span className="team-flag__fifa-code">{fifaCode}</span>
+        </>
+      )}
     </div>
   );
 };
