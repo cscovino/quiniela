@@ -42,6 +42,16 @@ const tournamentInfo = buildData.tournament;
   activeNav="home"
 >
   <main class="home-template__content">
+    <TournamentHeader
+      name={t.tournament.name}
+      status={tournamentInfo.status as 'draft' | 'active' | 'finished'}
+      startDate={tournamentInfo.startDate}
+      endDate={tournamentInfo.endDate}
+      participantCount={tournamentInfo.participantCount}
+      locale={locale}
+      translations={{ teams: t.tournament.teams }}
+    />
+
     <section class="home-template__hero">
       <h2 class="home-template__hero-title">{t.pages.home.hero.title}</h2>
       <p>{t.pages.home.hero.subtitle}</p>
@@ -54,16 +64,6 @@ const tournamentInfo = buildData.tournament;
         </Button>
       </div>
     </section>
-
-    <TournamentHeader
-      name={t.tournament.name}
-      status={tournamentInfo.status as 'draft' | 'active' | 'finished'}
-      startDate={tournamentInfo.startDate}
-      endDate={tournamentInfo.endDate}
-      participantCount={tournamentInfo.participantCount}
-      locale={locale}
-      translations={{ teams: t.tournament.teams }}
-    />
 
     <section class="home-template__matches">
       <MatchList
