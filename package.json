@@ -25,6 +25,7 @@
     "build-storybook": "storybook build",
     "seed": "tsx --env-file=.env scripts/seed-tournament.ts",
     "set-admin": "tsx --env-file=.env scripts/set-admin-role.ts",
+    "sync-displayname": "tsx --env-file=.env scripts/sync-user-displayname.ts",
     "prepare": "husky"
   },
   "lint-staged": {
