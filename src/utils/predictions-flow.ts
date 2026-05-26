@@ -26,11 +26,26 @@ export interface PredictionRecord {
   [matchId: string]: { home?: number; away?: number };
 }
 
-export interface KnockoutSlotSource {
+export interface KnockoutSlotSourceGroup {
   from: 'group';
   groupId: string;
   position: number;
 }
+
+export interface KnockoutSlotSourceWinnerOf {
+  from: 'winner-of';
+  matchSlug: string;
+}
+
+export interface KnockoutSlotSourceLoserOf {
+  from: 'loser-of';
+  matchSlug: string;
+}
+
+export type KnockoutSlotSource =
+  | KnockoutSlotSourceGroup
+  | KnockoutSlotSourceWinnerOf
+  | KnockoutSlotSourceLoserOf;
 
 export interface KnockoutMatchSlot {
   slotId: string;
@@ -345,7 +360,7 @@ export function buildKnockoutBracket(
         ...match.awayTeam,
         resolvedTeam: resolveSlot(match.awayTeam, groupBetsByGroupId, knockoutBets),
       },
-    })) as (KnockoutMatch & {
+    })) as unknown as (KnockoutMatch & {
     homeTeam: { resolvedTeam: string };
     awayTeam: { resolvedTeam: string };
   })[];
