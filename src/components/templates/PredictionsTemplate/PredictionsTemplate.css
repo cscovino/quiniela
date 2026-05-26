@@ -106,6 +106,21 @@
   align-items: stretch;
 }
 
+/* 11.7 Compact variant for >8 steps */
+.predictions-template__progress--compact {
+  flex-direction: row;
+  gap: var(--space-1);
+}
+
+.predictions-template__progress--compact .predictions-template__progress-step {
+  padding: var(--space-1) var(--space-2);
+  flex: 0 0 auto;
+}
+
+.predictions-template__progress--compact .predictions-template__progress-label {
+  font-size: 8px;
+}
+
 .predictions-template__progress-step {
   display: flex;
   align-items: center;

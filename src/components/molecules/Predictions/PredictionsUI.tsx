@@ -14,24 +14,30 @@ export const PredictionsProgress: React.FC<PredictionsProgressProps> = ({
   currentStep,
   submittedSteps,
   stepCounter,
-}) => (
-  <>
-    <div className="predictions-template__progress">
-      {stepLabels.map((label, index) => (
-        <div
-          key={label}
-          className={`predictions-template__progress-step ${index === currentStep ? 'active' : ''} ${submittedSteps.has(index) ? 'completed' : ''}`}
-        >
-          <span className="predictions-template__progress-number">
-            {submittedSteps.has(index) ? '✓' : index + 1}
-          </span>
-          <span className="predictions-template__progress-label">{label}</span>
-        </div>
-      ))}
-    </div>
-    <div className="predictions-template__step-counter">{stepCounter}</div>
-  </>
-);
+}) => {
+  // 11.7 Compact variant for >8 steps
+  const isCompact = stepLabels.length > 8;
+  return (
+    <>
+      <div
+        className={`predictions-template__progress ${isCompact ? 'predictions-template__progress--compact' : ''}`}
+      >
+        {stepLabels.map((label, index) => (
+          <div
+            key={label}
+            className={`predictions-template__progress-step ${index === currentStep ? 'active' : ''} ${submittedSteps.has(index) ? 'completed' : ''}`}
+          >
+            <span className="predictions-template__progress-number">
+              {submittedSteps.has(index) ? '✓' : index + 1}
+            </span>
+            <span className="predictions-template__progress-label">{label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="predictions-template__step-counter">{stepCounter}</div>
+    </>
+  );
+};
 
 export interface PredictionsFeedbackProps {
   feedback: { type: 'success' | 'error'; message: string } | null;

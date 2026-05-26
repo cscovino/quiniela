@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react';
 
+export type PredictionStepKind = 'group' | 'knockout-round' | 'final-positions' | 'best-players';
+
 export interface PredictionStepModel {
   id: string;
+  kind: PredictionStepKind;
   label: string;
   description: string;
   isComplete: boolean;

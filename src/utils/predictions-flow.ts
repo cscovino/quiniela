@@ -352,6 +352,15 @@ export function buildKnockoutBracket(
 }
 
 // 2.7: Get predictor progress
+export const KNOCKOUT_PHASES: PhaseType[] = [
+  'round-of-32',
+  'round-of-16',
+  'quarterfinals',
+  'semifinals',
+  'third-place',
+  'final',
+];
+
 export function getPredictorProgress(
   allMatches: MatchWithId[],
   groupBets: GroupBetRecord,
@@ -359,23 +368,15 @@ export function getPredictorProgress(
   hasFinalPhase: boolean,
   hasBestPlayers: boolean,
 ): PredictorProgress {
-  const groups = [...new Set(allMatches.filter((m) => m.phase === 'group').map((m) => m.groupId))];
-  const totalGroups = groups.length;
-  const groupsSubmitted = groups.filter((g) => {
+  const totalGroups = [
+    ...new Set(allMatches.filter((m) => m.phase === 'group').map((m) => m.groupId)),
+  ].length;
+  const groupsSubmitted = Object.keys(groupBets).filter((g) => {
     const positions = groupBets[g];
     return positions && positions.length === 4;
   }).length;
 
-  const knockoutPhases: PhaseType[] = [
-    'round-of-32',
-    'round-of-16',
-    'quarterfinals',
-    'semifinals',
-    'third-place',
-    'final',
-  ];
-
-  const knockoutMatches = allMatches.filter((m) => knockoutPhases.includes(m.phase as PhaseType));
+  const knockoutMatches = allMatches.filter((m) => KNOCKOUT_PHASES.includes(m.phase as PhaseType));
   const totalKnockout = knockoutMatches.length;
   const knockoutSubmitted = knockoutMatches.filter((m) => knockoutBets[m.slug]).length;
 
