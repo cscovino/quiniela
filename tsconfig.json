@@ -4,6 +4,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./src/*"],
       "@atoms/*": ["./src/components/atoms/*"],
@@ -24,5 +25,5 @@
     "resolveJsonModule": true
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist", "storybook-static", "coverage", "functions/lib", "node_modules"]
 }

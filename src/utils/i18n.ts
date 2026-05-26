@@ -49,6 +49,7 @@ const ROUTE_SLUGS: Record<Locale, Record<Exclude<ActiveNav, 'admin'>, string>> =
 
 export function getRoute(locale: Locale, nav: Exclude<ActiveNav, 'admin'>): string {
   const slug = ROUTE_SLUGS[locale][nav];
+  if (!slug) return `/${locale}`;
   return `/${locale}/${slug}`;
 }
 
@@ -86,7 +87,7 @@ export function getRegisterRoute(locale: Locale): string {
 }
 
 export function getHomeRoute(locale: Locale): string {
-  return `/${locale}/`;
+  return `/${locale}`;
 }
 
 export function getOtherLocale(locale: Locale): Locale {

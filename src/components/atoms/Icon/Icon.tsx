@@ -10,11 +10,16 @@ import { Flag } from 'pixelarticons/react/Flag';
 import { Check } from 'pixelarticons/react/Check';
 import { Clock } from 'pixelarticons/react/Clock';
 import { Radio } from 'pixelarticons/react/Radio';
-import { SectionX } from 'pixelarticons/react/SectionX';
+import { Close } from 'pixelarticons/react/Close';
+import { Login } from 'pixelarticons/react/Login';
+import { Logout } from 'pixelarticons/react/Logout';
 import { Gamepad } from 'pixelarticons/react/Gamepad';
+import { Eye } from 'pixelarticons/react/Eye';
 import { Sparkle } from 'pixelarticons/react/Sparkle';
 import { Crown } from 'pixelarticons/react/Crown';
 import { Menu } from 'pixelarticons/react/Menu';
+import { InfoBox } from 'pixelarticons/react/InfoBox';
+import { SquareAlert } from 'pixelarticons/react/SquareAlert';
 import './Icon.css';
 
 export type IconName =
@@ -35,7 +40,12 @@ export type IconName =
   | 'award'
   | 'crown'
   | 'menu'
-  | 'close';
+  | 'login'
+  | 'logout'
+  | 'close'
+  | 'info'
+  | 'warning'
+  | 'eye';
 
 export interface IconProps {
   name: IconName;
@@ -56,13 +66,18 @@ const iconMap: Record<IconName, React.FC<{ size?: number; color?: string; classN
   user: User,
   flag: Flag,
   check: Check,
-  x: SectionX,
+  x: Close,
   clock: Clock,
   live: Radio,
   award: Crown,
   crown: Crown,
   menu: Menu,
-  close: SectionX,
+  close: Close,
+  login: Login,
+  logout: Logout,
+  info: InfoBox,
+  warning: SquareAlert,
+  eye: Eye,
 };
 
 export const Icon: React.FC<IconProps> = ({ name, size = 24, color, className = '' }) => {

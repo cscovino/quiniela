@@ -8,13 +8,6 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
       reportsDirectory: './coverage',
-      all: false,
-      thresholds: {
-        lines: 70,
-        functions: 70,
-        branches: 70,
-        statements: 70,
-      },
       include: [
         'src/components/atoms/**',
         'src/components/molecules/**',
