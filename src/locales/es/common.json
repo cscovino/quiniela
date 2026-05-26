@@ -96,7 +96,19 @@
       "points": "Puntos",
       "matches": "Partidos",
       "yourPredictors": "Tus Pronosticadores",
-      "selectPredictor": "Selecciona un pronosticador para ver detalles"
+      "selectPredictor": "Selecciona un pronosticador para ver detalles",
+      "editProfile": "Editar Perfil",
+      "cancelEditing": "Cancelar",
+      "saveProfile": "Guardar Cambios",
+      "saving": "Guardando...",
+      "profileSaved": "Perfil actualizado exitosamente",
+      "profileSaveError": "Error al actualizar el perfil",
+      "displayNameLabel": "Nombre",
+      "displayNameRequired": "El nombre es obligatorio",
+      "avatarUrlLabel": "URL del Avatar",
+      "avatarUrlHint": "URL de tu imagen de avatar (opcional)",
+      "favoriteTeamLabel": "Equipo Favorito",
+      "favoriteTeamHint": "ej. Argentina (opcional)"
     },
     "predictions": {
       "title": "Predicciones - Quiniela",

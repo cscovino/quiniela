@@ -64,20 +64,23 @@ Plans:
 
 ### Phase 3: Check all LSP diagnostics and fix type errors
 
-**Goal:** Eliminate all TypeScript errors, Astro diagnostics, and ESLint warnings across the project. Fix `tsconfig.json` to handle TS6 deprecations and exclude build artifacts that cause `astro check` to OOM. Achieve zero diagnostic output from `tsc --noEmit`, `astro check`, and `eslint`.
+**Goal:** Eliminate all TypeScript errors, Astro diagnostics, and ESLint warnings across the project. Implement client-side data fetching so static pages show live data without rebuilds.
 
 **Requirements:**
 - Fix TS5101 `baseUrl` deprecation error via `ignoreDeprecations: "6.0"`
-- Exclude build artifact directories (`storybook-static`, `coverage`, `functions/lib`) from TypeScript checking to prevent `astro check` OOM crash
-- Fix ESLint warnings: 2x `react-hooks/exhaustive-deps` in `usePredictionSteps.tsx`, 2x `no-console` in `build-data.ts`
-- Verify: `tsc --noEmit` (0 errors), `astro check` (0 errors, no OOM), `eslint` (0 warnings), `build` (passes), `test:run` (passes)
+- Exclude build artifact directories from TypeScript checking to prevent `astro check` OOM crash
+- Fix all 35 source TypeScript errors across 6 service files
+- Fix ESLint warnings
+- Create LiveMatchList, LiveStandings, LiveRankings container components
+- Wire up Home, Tournament, Rankings pages with client:idle
+- Fix NavBar mobile scroll lock
 
 **Depends on:** Phase 2
 **Plans:** 1 plan
 
 Plans:
 
-- [ ] 03-01-PLAN.md — Fix tsconfig.json (TS6 deprecation + build artifact exclude), fix ESLint warnings, verify clean diagnostics
+- [x] 03-01-PLAN.md — Fix tsconfig.json, fix all TS/ESLint errors, implement live data fetching, fix NavBar scroll lock
 
 ### Phase 4: Add Edit Profile UI to let users update their displayName and avatar from the profile page
 
@@ -96,7 +99,7 @@ Plans:
 
 Plans:
 
-- [ ] 04-01-PLAN.md — Add updateUserProfile helper + auth store action + EditProfileForm component + ProfileTemplate integration + i18n
+- [x] 04-01-PLAN.md — Add updateUserProfile helper + auth store action + EditProfileForm component + ProfileTemplate integration + i18n
 
 ### Phase 5: Replace all hardcoded tournament name strings with dynamic values from translations/config
 

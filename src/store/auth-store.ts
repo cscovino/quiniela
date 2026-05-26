@@ -21,6 +21,7 @@ interface AuthState {
   resetPassword: (email: string) => Promise<void>;
   clearError: () => void;
   initAuth: () => void;
+  setUser: (user: User) => void;
 }
 
 let unsubscribe: (() => void) | null = null;
@@ -119,6 +120,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   clearError: () => set({ error: null }),
+
+  setUser: (user: User) => set({ user }),
 
   initAuth: () => {
     if (unsubscribe) return;

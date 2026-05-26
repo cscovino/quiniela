@@ -96,7 +96,19 @@
       "points": "Points",
       "matches": "Matches",
       "yourPredictors": "Your Predictors",
-      "selectPredictor": "Select a predictor to view details"
+      "selectPredictor": "Select a predictor to view details",
+      "editProfile": "Edit Profile",
+      "cancelEditing": "Cancel",
+      "saveProfile": "Save Changes",
+      "saving": "Saving...",
+      "profileSaved": "Profile updated successfully",
+      "profileSaveError": "Failed to update profile",
+      "displayNameLabel": "Display Name",
+      "displayNameRequired": "Display name is required",
+      "avatarUrlLabel": "Avatar URL",
+      "avatarUrlHint": "URL to your avatar image (optional)",
+      "favoriteTeamLabel": "Favorite Team",
+      "favoriteTeamHint": "e.g. Argentina (optional)"
     },
     "predictions": {
       "title": "Predictions - Quiniela",

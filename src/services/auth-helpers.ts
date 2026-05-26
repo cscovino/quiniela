@@ -13,6 +13,7 @@ import {
 import {
   doc,
   setDoc,
+  updateDoc,
   serverTimestamp,
   getDoc,
   type Firestore,
@@ -39,6 +40,35 @@ function getGoogleProvider(): GoogleAuthProvider {
   }
   return googleProvider;
 }
+
+export const updateUserProfile = async (
+  uid: string,
+  data: {
+    displayName?: string;
+    avatarUrl?: string | null;
+    favoriteTeamId?: string | null;
+  },
+): Promise<void> => {
+  const authUser = getCurrentUser();
+  if (!authUser) throw new Error('Not authenticated');
+
+  const authUpdate: { displayName?: string; photoURL?: string | null } = {};
+  if (data.displayName !== undefined) authUpdate.displayName = data.displayName;
+  if (data.avatarUrl !== undefined) authUpdate.photoURL = data.avatarUrl || null;
+
+  if (Object.keys(authUpdate).length > 0) {
+    await updateProfile(authUser, authUpdate);
+  }
+
+  const firestoreData: Record<string, unknown> = {};
+  if (data.displayName !== undefined) firestoreData.displayName = data.displayName;
+  if (data.avatarUrl !== undefined) firestoreData.avatarUrl = data.avatarUrl || null;
+  if (data.favoriteTeamId !== undefined) firestoreData.favoriteTeamId = data.favoriteTeamId || null;
+
+  if (Object.keys(firestoreData).length > 0) {
+    await updateDoc(doc(ensureDb(), 'users', uid), firestoreData);
+  }
+};
 
 const createDefaultPredictor = async (userId: string, displayName: string) => {
   const predictorId = `${userId}-default`;

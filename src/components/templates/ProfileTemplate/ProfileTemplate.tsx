@@ -4,6 +4,7 @@ import {
   type BadgeEarned,
   type BadgeLocked,
 } from '@organisms/UserProfile/UserProfile';
+import { EditProfileForm } from '@molecules/EditProfileForm/EditProfileForm';
 import { PointsChart } from '@molecules/PointsChart/PointsChart';
 import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList/PredictorList';
 import { Typography } from '@atoms/Typography/Typography';
@@ -38,6 +39,18 @@ export interface ProfileTemplateProps {
     matches: string;
     yourPredictors: string;
     selectPredictor: string;
+    editProfile?: string;
+    cancelEditing?: string;
+    saveProfile?: string;
+    saving?: string;
+    profileSaved?: string;
+    profileSaveError?: string;
+    displayNameLabel?: string;
+    displayNameRequired?: string;
+    avatarUrlLabel?: string;
+    avatarUrlHint?: string;
+    favoriteTeamLabel?: string;
+    favoriteTeamHint?: string;
     predictorList?: {
       newButton?: string;
       progress?: string;
@@ -68,6 +81,7 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
   const [predictorEntries, setPredictorEntries] = useState<PredictorListEntry[]>([]);
   const [selectedPredictorId, setSelectedPredictorId] = useState<string | null>(null);
   const [entriesLoading, setEntriesLoading] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -241,27 +255,54 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
     <div className={`profile-template ${className}`}>
       <main className="profile-template__content">
         <header className="profile-template__header">
-          <Typography variant="h1">{translations.title}</Typography>
+          <div className="profile-template__header-row">
+            <Typography variant="h1">{translations.title}</Typography>
+            {!editing && translations.editProfile && (
+              <Button type="button" variant="secondary" size="sm" onClick={() => setEditing(true)}>
+                {translations.editProfile}
+              </Button>
+            )}
+          </div>
         </header>
 
         <section className="profile-template__user">
-          <UserProfile
-            displayName={user.displayName}
-            avatarUrl={user.avatarUrl}
-            stats={displayStats}
-            badges={badges}
-            lockedBadges={lockedBadges}
-            translations={{
-              totalPoints: translations.totalPoints,
-              accuracy: translations.accuracy,
-              currentStreak: translations.currentStreak,
-              bestStreak: translations.bestStreak,
-              exactBets: translations.exactBets,
-              rank: translations.rank,
-              badges: translations.badges,
-              lockedBadges: translations.lockedBadges,
-            }}
-          />
+          {editing ? (
+            <EditProfileForm
+              translations={{
+                displayNameLabel: translations.displayNameLabel || 'Display Name',
+                displayNameRequired: translations.displayNameRequired || 'Display name is required',
+                avatarUrlLabel: translations.avatarUrlLabel || 'Avatar URL',
+                avatarUrlHint: translations.avatarUrlHint || '',
+                favoriteTeamLabel: translations.favoriteTeamLabel || 'Favorite Team',
+                favoriteTeamHint: translations.favoriteTeamHint || '',
+                saveProfile: translations.saveProfile || 'Save Changes',
+                cancelEditing: translations.cancelEditing || 'Cancel',
+                saving: translations.saving || 'Saving...',
+                profileSaved: translations.profileSaved || 'Profile updated',
+                profileSaveError: translations.profileSaveError || 'Failed to update profile',
+              }}
+              onCancel={() => setEditing(false)}
+              onSaved={() => setEditing(false)}
+            />
+          ) : (
+            <UserProfile
+              displayName={user.displayName}
+              avatarUrl={user.avatarUrl}
+              stats={displayStats}
+              badges={badges}
+              lockedBadges={lockedBadges}
+              translations={{
+                totalPoints: translations.totalPoints,
+                accuracy: translations.accuracy,
+                currentStreak: translations.currentStreak,
+                bestStreak: translations.bestStreak,
+                exactBets: translations.exactBets,
+                rank: translations.rank,
+                badges: translations.badges,
+                lockedBadges: translations.lockedBadges,
+              }}
+            />
+          )}
         </section>
 
         <section className="profile-template__predictors">
