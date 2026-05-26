@@ -86,6 +86,22 @@ The app is a Progressive Web App:
 - **Icons:** Generated via `scripts/generate-icons.mjs` using sharp
 - **Env:** Requires `VITE_FIREBASE_VAPID_PUBLIC_KEY` for push notifications
 
+## Product Tour (driver.js)
+
+The app uses [driver.js](https://driverjs.com/) (~8KB gzipped, MIT, zero deps) for guided onboarding tours.
+
+- **Component:** `ProductTour` organism in `src/components/organisms/ProductTour/`
+- **Tour definitions:** Pre-configured step arrays in `src/components/organisms/ProductTour/tours.ts`
+  - `PREDICTION_WIZARD_TOUR` — walks through the prediction step wizard
+  - `FIRST_PREDICTOR_TOUR` — auto-starts for users with no predictors
+- **Persistence:** completed tours stored in `localStorage` under `tour_completed_{tourId}`
+- **Triggers:**
+  - First predictor tour: auto-starts with 1s delay when `predictors.length === 0`
+  - Prediction wizard: manual via " Tour" button in wizard header
+- **Styling:** Popover overrides in `ProductTour.css` — pixel-art aesthetic (Press Start 2P headings, 4px borders, drop-shadow, sharp corners, retro color palette via CSS variables)
+- **CSP:** Compatible with existing policy (`style-src 'self' 'unsafe-inline'` allows inline popover styles)
+- **Bundle:** ~8KB gzipped, loaded only on pages that import `ProductTour`
+
 ## Git Hooks
 
 - **pre-commit:** `lint-staged` runs ESLint + Prettier on staged files

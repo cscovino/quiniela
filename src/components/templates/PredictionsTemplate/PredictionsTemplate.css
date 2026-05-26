@@ -18,6 +18,22 @@
   gap: var(--space-2);
 }
 
+.predictions-template__tour-btn {
+  align-self: flex-start;
+  background: var(--color-accent-500);
+  border: 2px solid var(--color-quaternary-500);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--duration-normal) var(--ease-out);
+}
+
+.predictions-template__tour-btn:hover {
+  background: var(--color-accent-600);
+}
+
 .predictions-template__back-btn {
   align-self: flex-start;
   background: none;

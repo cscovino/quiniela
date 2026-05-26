@@ -14,6 +14,8 @@ import { predictorService } from '@services/predictor-service';
 import { useAuthStore } from '@store/auth-store';
 import type { Predictor } from '@app-types/firestore';
 import { usePredictionSteps } from '@hooks/usePredictionSteps';
+import { ProductTour, resetTour } from '@organisms/ProductTour/ProductTour';
+import { PREDICTION_WIZARD_TOUR, FIRST_PREDICTOR_TOUR } from '@organisms/ProductTour/tours';
 import './PredictionsTemplate.css';
 
 type PredictorView = 'list' | 'wizard' | 'editor' | 'delete';
@@ -97,6 +99,8 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   const [editingPredictor, setEditingPredictor] = useState<Predictor | null>(null);
   const [deletingPredictor, setDeletingPredictor] = useState<Predictor | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showWizardTour, setShowWizardTour] = useState(false);
+  const [showFirstTour, setShowFirstTour] = useState(false);
 
   const {
     loading: stepsLoading,
@@ -160,6 +164,17 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
       cancelled = true;
     };
   }, [loadPredictorEntries]);
+
+  useEffect(() => {
+    if (view === 'list' && predictors.length === 0) {
+      const timer = setTimeout(() => {
+        if (!localStorage.getItem('tour_completed_first-predictor')) {
+          setShowFirstTour(true);
+        }
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [view, predictors.length]);
 
   const handleSelectPredictor = (predictorId: string) => {
     setSelectedPredictorId(predictorId);
@@ -377,6 +392,17 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           >
             ← {listTranslations.backToPredictors}
           </button>
+          <button
+            type="button"
+            className="predictions-template__tour-btn"
+            onClick={() => {
+              resetTour('prediction-wizard');
+              setShowWizardTour(true);
+            }}
+            aria-label="Start guided tour"
+          >
+            🎮 Tour
+          </button>
         </header>
 
         <PredictionsProgress
@@ -408,6 +434,24 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           submittedSteps={submittedSteps}
         />
       </main>
+
+      {showWizardTour && (
+        <ProductTour
+          tourId="prediction-wizard"
+          steps={PREDICTION_WIZARD_TOUR}
+          onComplete={() => setShowWizardTour(false)}
+          onClose={() => setShowWizardTour(false)}
+        />
+      )}
+
+      {showFirstTour && (
+        <ProductTour
+          tourId="first-predictor"
+          steps={FIRST_PREDICTOR_TOUR}
+          onComplete={() => setShowFirstTour(false)}
+          onClose={() => setShowFirstTour(false)}
+        />
+      )}
     </div>
   );
 };
