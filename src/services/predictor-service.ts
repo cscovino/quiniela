@@ -67,7 +67,7 @@ export const predictorService = {
       createdAt: serverTimestamp(),
     });
 
-    return { ...predictor, createdAt: new Date() as Timestamp };
+    return { ...predictor, createdAt: new Date() as unknown as Timestamp };
   },
 
   async getDefaultPredictor(userId: string): Promise<Predictor | null> {

@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist", "storybook-static", "coverage", "functions/lib", "node_modules"]
+}

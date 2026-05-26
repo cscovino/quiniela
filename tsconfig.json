@@ -25,5 +25,5 @@
     "resolveJsonModule": true
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "storybook-static", "coverage", "functions/lib", "node_modules"]
+  "exclude": ["dist", "storybook-static", "coverage", "functions/lib", "node_modules", "src/**/*.test.*", "src/**/*.stories.*", "src/**/__tests__/**", "src/test/**"]
 }

@@ -66,12 +66,12 @@ export const fcmService = {
   },
 
   async onMessage(
-    callback: (payload: Record<string, unknown>) => Promise<void>,
+    callback: (payload: Record<string, unknown>) => void,
   ): Promise<(() => void) | null> {
     const msg = await getMessagingInstance();
     if (!msg || typeof window === 'undefined') return null;
-    const { onMessage } = await import('firebase/messaging');
-    return onMessage(msg, callback);
+    const { onMessage: fbOnMessage } = await import('firebase/messaging');
+    return fbOnMessage(msg, callback);
   },
 
   async getCurrentToken(): Promise<string | null> {

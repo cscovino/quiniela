@@ -1,5 +1,6 @@
 import {
   collection,
+  collectionGroup,
   doc,
   getDoc,
   getDocs,
@@ -76,10 +77,7 @@ export const tournamentService = {
   getAllPredictorStats: async (
     tournamentId: string = TOURNAMENT_ID,
   ): Promise<(PredictorStats & { userId: string; predictorId: string })[]> => {
-    const { collectionGroup, getDocs, query, where } = await import('firebase/firestore');
-    const { getDb } = await import('./firebase');
-
-    const statsRef = collectionGroup(getDb(), 'stats');
+    const statsRef = collectionGroup(db(), 'stats');
     const q = query(statsRef, where('__name__', '==', tournamentId));
 
     const snapshot = await getDocs(q);

@@ -5,7 +5,7 @@ import { predictionService } from '@services/prediction-service';
 import { useAuthStore } from '@store/auth-store';
 import type { Match } from '@app-types/firestore';
 import { isGroupClassificationComplete, KNOCKOUT_PHASES } from '@utils/predictions-flow';
-import type { PredictionStepModel } from '@types/prediction-steps';
+import type { PredictionStepModel } from '../types/prediction-steps';
 import { PredictionStepGroup } from '@molecules/Predictions/PredictionStepGroup';
 import { PredictionStepKnockoutRound } from '@molecules/Predictions/PredictionStepKnockoutRound';
 import {

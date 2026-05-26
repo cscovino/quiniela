@@ -29,9 +29,13 @@ export function getFirebaseAdmin() {
 }
 
 export function getAuth() {
-  return getFirebaseAdmin().auth();
+  const admin = getFirebaseAdmin();
+  if (!admin) throw new Error('Firebase admin not initialized');
+  return admin.auth();
 }
 
 export function getFirestore() {
-  return getFirebaseAdmin().firestore();
+  const admin = getFirebaseAdmin();
+  if (!admin) throw new Error('Firebase admin not initialized');
+  return admin.firestore();
 }

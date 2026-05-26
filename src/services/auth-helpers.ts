@@ -19,7 +19,7 @@ import {
   type Timestamp,
 } from 'firebase/firestore';
 import { getAuthInstance, getDb, initFirebase } from './firebase';
-import type { User } from '../types/firestore';
+import type { User, UserRole } from '../types/firestore';
 
 let googleProvider: GoogleAuthProvider | null = null;
 
@@ -130,7 +130,7 @@ export const onAuthStateChanged = (callback: (user: User | null) => void) => {
         displayName: firebaseUser.displayName || '',
         email: firebaseUser.email || '',
         avatarUrl: firebaseUser.photoURL || undefined,
-        role,
+        role: role as UserRole,
         createdAt: (firebaseUser.metadata.creationTime
           ? new Date(firebaseUser.metadata.creationTime)
           : new Date()) as unknown as Timestamp,

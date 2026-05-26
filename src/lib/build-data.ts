@@ -55,6 +55,10 @@ interface GroupData {
 }
 
 export async function getBuildData() {
+  if (import.meta.env.DEV) {
+    return { matches: [], standings: [], teams: {}, allMatches: [] };
+  }
+
   const db = getFirestore();
 
   try {
@@ -222,6 +226,10 @@ export async function getBuildData() {
 }
 
 export async function getBuildRankings() {
+  if (import.meta.env.DEV) {
+    return [];
+  }
+
   const db = getFirestore();
 
   try {

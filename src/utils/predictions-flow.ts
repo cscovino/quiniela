@@ -50,6 +50,7 @@ export type KnockoutSlotSource =
 export interface KnockoutMatchSlot {
   slotId: string;
   source: KnockoutSlotSource;
+  resolvedTeam?: string;
 }
 
 export interface KnockoutMatch {

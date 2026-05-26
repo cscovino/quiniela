@@ -16,7 +16,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 if ('PerformanceObserver' in window && import.meta.env.DEV) {
   window.addEventListener('load', () => {
     setTimeout(() => {
-      const nav = performance.getEntriesByType('navigation')[0];
+      const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       if (nav) {
         const metrics = {
           ttfb: Math.round(nav.responseStart - nav.requestStart),

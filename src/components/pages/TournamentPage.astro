@@ -1,7 +1,7 @@
 ---
 import { getBuildData } from '@lib/build-data';
-import { GroupStandings } from '@organisms/GroupStandings/GroupStandings';
-import { MatchList } from '@organisms/MatchList/MatchList';
+import { LiveStandings } from '@organisms/LiveStandings/LiveStandings';
+import { LiveMatchList } from '@organisms/LiveMatchList/LiveMatchList';
 import type { MatchCardProps } from '@molecules/MatchCard/MatchCard';
 import { getTranslations } from '@utils/i18n';
 
@@ -15,7 +15,6 @@ const t = getTranslations(locale).common;
 
 const buildData = await getBuildData();
 
-// Localize group names for Spanish ("Group A" → "Grupo A")
 const standings = isEs
   ? buildData.standings.map((g) => ({
       ...g,
@@ -63,16 +62,17 @@ const matches = buildData.allMatches as unknown as MatchCardProps[];
 
   <section class="tournament-template__standings" data-panel="standings">
     <h2>{t.pages.tournament.groupStage}</h2>
-    <GroupStandings groups={standings} translations={standingsTranslations} />
+    <LiveStandings groups={standings} translations={standingsTranslations} client:idle />
   </section>
 
   <section class="tournament-template__matches" data-panel="matches" hidden>
-    <MatchList
+    <LiveMatchList
       matches={matches}
-      title={t.pages.tournament.allMatches}
+      title=""
       emptyMessage={t.pages.tournament.matchesEmpty}
       translations={matchTranslations}
       locale={locale}
+      client:idle
     />
   </section>
 </main>
