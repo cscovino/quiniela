@@ -513,6 +513,24 @@
   --gradient-wc26-trophy: linear-gradient(135deg, var(--color-gold-500), var(--color-warm-400));
   --gradient-wc26-stadium: linear-gradient(180deg, var(--bg-dark), var(--bg-card));
   --gradient-wc26-celebration: linear-gradient(135deg, var(--color-gold-500), var(--color-vibrant-500), var(--color-accent-500));
+
+  /* Gradient Text Utilities */
+  --text-gradient-energy: var(--gradient-wc26-energy);
+  --text-gradient-trophy: var(--gradient-wc26-trophy);
+}
+
+.text-gradient-energy {
+  background: var(--gradient-wc26-energy);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-trophy {
+  background: var(--gradient-wc26-trophy);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ============================================

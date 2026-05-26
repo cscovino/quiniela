@@ -38,6 +38,10 @@
 
 .predictions-template__header h1 {
   font-size: var(--heading-xs);
+  background: var(--gradient-wc26-energy);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .predictions-template__loading {
@@ -95,6 +99,7 @@
   gap: var(--space-2);
   padding-bottom: var(--space-4);
   border-bottom: var(--border-pixel-sm);
+  border-image: var(--gradient-wc26-trophy) 1;
 }
 
 .predictions-template__progress {
@@ -140,7 +145,7 @@
 }
 
 .predictions-template__progress-step.completed {
-  background: var(--bg-card-hover);
+  background: linear-gradient(135deg, var(--bg-card-hover), var(--bg-card));
   border-color: var(--color-success-border);
   color: var(--color-success);
 }
