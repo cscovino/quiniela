@@ -39,8 +39,14 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   expiredText = 'Expired',
   className = '',
 }) => {
-  const [time, setTime] = useState<TimeParts>(getTimeRemaining(targetDate));
-  const [isExpired, setIsExpired] = useState(targetDate.getTime() <= Date.now());
+  const initialTime = getTimeRemaining(targetDate);
+  const [time, setTime] = useState<TimeParts>(initialTime);
+  const [isExpired, setIsExpired] = useState(
+    initialTime.days === 0 &&
+      initialTime.hours === 0 &&
+      initialTime.minutes === 0 &&
+      initialTime.seconds === 0,
+  );
 
   useEffect(() => {
     if (isExpired) return;

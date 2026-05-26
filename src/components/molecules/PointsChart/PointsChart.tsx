@@ -26,11 +26,15 @@ export const PointsChart: React.FC<PointsChartProps> = ({ data, translations, cl
 
     const sorted = [...data].sort((a, b) => a.date.getTime() - b.date.getTime());
 
-    let cumulative = 0;
-    const points = sorted.map((entry) => {
-      cumulative += entry.points;
-      return { ...entry, cumulative };
-    });
+    const points = sorted.reduce(
+      (acc, entry) => {
+        const cumulative =
+          acc.length > 0 ? acc[acc.length - 1].cumulative + entry.points : entry.points;
+        acc.push({ ...entry, cumulative });
+        return acc;
+      },
+      [] as Array<PointEntry & { cumulative: number }>,
+    );
 
     const maxPoints = Math.max(...points.map((p) => p.cumulative), 0);
     const minDate = points[0].date.getTime();

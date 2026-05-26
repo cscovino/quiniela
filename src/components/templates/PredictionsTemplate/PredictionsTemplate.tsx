@@ -89,7 +89,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
 
   const [predictors, setPredictors] = useState<Predictor[]>([]);
   const [selectedPredictorId, setSelectedPredictorId] = useState<string | null>(null);
-  const [predictorsLoading, setPredictorsLoading] = useState(true);
+  const [predictorsLoading, setPredictorsLoading] = useState(!!user);
   const [predictorEntries, setPredictorEntries] = useState<PredictorListEntry[]>([]);
   const [entriesLoading, setEntriesLoading] = useState(false);
 
@@ -112,9 +112,11 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   useEffect(() => {
     if (!user) {
       setPredictorsLoading(false);
+      setEntriesLoading(false);
       return;
     }
     let cancelled = false;
+    setPredictorsLoading(true);
     predictorService
       .getUserPredictors(user.uid)
       .then((p) => {
@@ -150,7 +152,13 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
   }, [user, predictors]);
 
   useEffect(() => {
-    loadPredictorEntries();
+    let cancelled = false;
+    loadPredictorEntries().then(() => {
+      if (cancelled) return;
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [loadPredictorEntries]);
 
   const handleSelectPredictor = (predictorId: string) => {

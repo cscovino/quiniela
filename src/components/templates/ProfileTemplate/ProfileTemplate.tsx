@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   UserProfile,
   type BadgeEarned,
@@ -58,7 +58,7 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
 }) => {
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!user);
   const [stats, setStats] = useState<PredictorStats | null>(null);
   const [rank, setRank] = useState(0);
   const [badges, setBadges] = useState<BadgeEarned[]>([]);
@@ -97,7 +97,7 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
     };
   }, [user, selectedPredictorId]);
 
-  const loadPredictorEntries = async () => {
+  const loadPredictorEntries = useCallback(async () => {
     if (!user) return;
     setEntriesLoading(true);
     try {
@@ -114,11 +114,17 @@ export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
     } finally {
       setEntriesLoading(false);
     }
-  };
+  }, [user, predictors]);
 
   useEffect(() => {
-    loadPredictorEntries();
-  }, [predictors.length]);
+    let cancelled = false;
+    loadPredictorEntries().then(() => {
+      if (cancelled) return;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [loadPredictorEntries]);
 
   useEffect(() => {
     if (!user || !selectedPredictorId) {

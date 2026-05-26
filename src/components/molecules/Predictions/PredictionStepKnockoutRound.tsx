@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { TeamSelector } from '@molecules/TeamSelector/TeamSelector';
 import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
 import { Button } from '@atoms/Button/Button';
@@ -183,10 +183,18 @@ export const PredictionStepKnockoutRound: React.FC<PredictionStepKnockoutRoundPr
     }
   };
 
+  const [now, setNow] = useState(0);
+
+  useEffect(() => {
+    setNow(Date.now());
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const isMatchDisabled = (match: KnockoutRoundMatch) => {
     if (isDisabled || isSubmitting) return true;
     if (!match.homeTeam || !match.awayTeam) return true;
-    if (match.predictionDeadline.getTime() <= Date.now()) return true;
+    if (match.predictionDeadline.getTime() <= now) return true;
     return false;
   };
 

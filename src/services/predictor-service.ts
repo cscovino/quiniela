@@ -12,8 +12,14 @@ import {
   type Timestamp,
 } from 'firebase/firestore';
 import { getDb } from './firebase';
+import { predictionService } from './prediction-service';
+import { tournamentService } from './tournament-service';
 import type { Predictor, PredictorStats } from '@app-types/firestore';
-import { getPredictorProgress, type GroupBetRecord, type KnockoutBetRecord } from '@utils/predictions-flow';
+import {
+  getPredictorProgress,
+  type GroupBetRecord,
+  type KnockoutBetRecord,
+} from '@utils/predictions-flow';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
@@ -204,18 +210,20 @@ export const predictorService = {
         }
 
         // Get progress
-        const { predictionService } = await import('./prediction-service');
         const { groupBets, knockoutBets, finalPhase, bestPlayers } =
           await predictionService.getExistingBets(userId, predictor.id);
 
         // We need all matches to calculate total counts
-        const { tournamentService } = await import('./tournament-service');
         const allMatches = await tournamentService.getMatches();
 
         const groupBetsRecord: GroupBetRecord = {};
-        groupBets.forEach((v, k) => { groupBetsRecord[k] = v; });
+        groupBets.forEach((v, k) => {
+          groupBetsRecord[k] = v;
+        });
         const knockoutBetsRecord: KnockoutBetRecord = {};
-        knockoutBets.forEach((v, k) => { knockoutBetsRecord[k] = v; });
+        knockoutBets.forEach((v, k) => {
+          knockoutBetsRecord[k] = v;
+        });
 
         const progress = getPredictorProgress(
           allMatches.map((m) => ({ ...m, id: m.slug })),
