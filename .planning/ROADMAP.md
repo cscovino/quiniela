@@ -22,6 +22,8 @@
 - Spinner: redesign to match pixel-art style (currently looks like spinning square)
 - Mobile: eliminate horizontal scrolling completely
 - PWA: implement cache-busting/version update mechanism to fetch latest site
+- Predictor list UX: clarify row click vs edit button (row = edit predictions, button = edit name/avatar)
+- Predictor list: make Edit/Delete buttons more visible with pixel-art icons
 
 **Plans:** 0 plans
 
