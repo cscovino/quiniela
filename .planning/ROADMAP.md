@@ -105,13 +105,21 @@ Plans:
 
 **Goal:** Replace all hardcoded tournament name strings ("FIFA World Cup 2026", "WC26", "Mundial 2026", "Copa Mundial FIFA 2026") with dynamic values from i18n translation files, so the tournament name is centralized and easily changed for future editions.
 
-**Requirements:** TBD
+**Status:** ✅ Complete — 1/1 plans, 516 tests passing, build succeeds
+
 **Depends on:** Phase 4
+
+**Additional work (post-plan):**
+- Remove all "FIFA" brand references from locale files, stories, tests, CSS, and flagMapping.ts
+- Add `locale` prop to TournamentHeader for locale-aware date formatting
+- Fetch tournament doc (dates, status, participantCount) in build-data.ts
+- Add TournamentHeader to home page and tournament page as static HTML
+
 **Plans:** 1 plan
 
 Plans:
 
-- [ ] 05-01-PLAN.md — Add tournament name keys to translations, update NavBar + BaseLayout JSON-LD, verify no hardcoded strings remain
+- [x] 05-01-PLAN.md — Add tournament name keys to translations, update NavBar + BaseLayout JSON-LD, verify no hardcoded strings remain
 
 ### Phase 6: Replace emoji-based predictor avatars with lil_guy pixel art
 
@@ -153,3 +161,23 @@ Plans:
 Plans:
 
 - [ ] 07-01-PLAN.md — Evaluate driver.js (spike: prototype, CSP, bundle, styling) → if approved, integrate ProductTour component, pixel-art popover, persistence, trigger buttons, AGENTS.md
+
+### Phase 8: Fix navigation performance and implement client-side data refresh
+
+**Goal:** Eliminate the 2-second navigation lag by optimizing JS bundle sizes and reducing React island hydration overhead. Implement a silent client-side data refresh pattern so pages show live data without requiring daily rebuilds — without the previous 2s delay from client:idle.
+
+**Requirements:**
+- Profile and measure baseline: navigation timing, JS bundle composition, hydration cost per island
+- Optimize the 353 KB i18n chunk (likely date-fns locale data — lazy-load or tree-shake)
+- Optimize the 182 KB client chunk (React + Firebase — ensure code splitting, lazy-load non-critical modules)
+- Consolidate React islands: merge ToastProvider into layout, remove unnecessary client:* directives
+- Implement silent data refresh islands (LiveMatchList, LiveStandings, LiveRankings) using `client:load` with inline loading skeletons — starts from static HTML, then fetches live data post-hydration
+- Ensure navigation completes in &lt;500ms on mid-tier connection (3G Slow throttled)
+- Verify all 516+ tests still pass, lint clean, build succeeds
+
+**Depends on:** Phase 4
+**Plans:** 1 plan
+
+Plans:
+
+- [ ] 08-01-PLAN.md — Performance audit, bundle optimization, island consolidation, data refresh pattern, verification
