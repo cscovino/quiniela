@@ -47,53 +47,68 @@ Plans:
 
 **Goal:** Create Storybook stories for every missing component so components can be developed in isolation. Fix NavBar scroll-through bug and sticky positioning so background scrolling no longer bleeds through the mobile menu and the header sticks correctly.
 
-**Status:** 🚧 Planning — 7 plans created (Wave 1 ready)
+**Status:** ✅ Complete — 7/7 plans, 516 tests passing, build succeeds
 
 **Depends on:** Phase 1
-**Plans:** 7 plans
+**Plans:** 7/7 plans complete
 
 Plans:
 
-- [ ] 02-01-PLAN.md — NavBar CSS fix (scroll lock + sticky) + 6 NavBar stories
-- [ ] 02-02-PLAN.md — AuthGuard, Toast, ToastProvider, PWAInstall stories
-- [ ] 02-03-PLAN.md — LoginForm, RegisterForm stories
-- [ ] 02-04-PLAN.md — PointsChart, PredictionsUI, PredictionStepFinal, AdminMatchResultForm stories
-- [ ] 02-05-PLAN.md — BestPlayersForm, FinalPhaseForm, GroupPredictionForm, KnockoutBracketForm stories
-- [ ] 02-06-PLAN.md — AdminMatchesPage, AdminMatchList stories
-- [ ] 02-07-PLAN.md — AuthTemplate, PredictionsTemplate stories + Astro page docs
+- [x] 02-01-PLAN.md — NavBar CSS fix (scroll lock + sticky) + 6 NavBar stories
+- [x] 02-02-PLAN.md — AuthGuard, Toast, ToastProvider, PWAInstall stories
+- [x] 02-03-PLAN.md — LoginForm, RegisterForm stories
+- [x] 02-04-PLAN.md — PointsChart, PredictionsUI, PredictionStepFinal, AdminMatchResultForm stories
+- [x] 02-05-PLAN.md — BestPlayersForm, FinalPhaseForm, GroupPredictionForm, KnockoutBracketForm stories
+- [x] 02-06-PLAN.md — AdminMatchesPage, AdminMatchList stories
+- [x] 02-07-PLAN.md — AuthTemplate, PredictionsTemplate stories + Astro page docs
 
 ### Phase 3: Check all LSP diagnostics and fix type errors
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Eliminate all TypeScript errors, Astro diagnostics, and ESLint warnings across the project. Fix `tsconfig.json` to handle TS6 deprecations and exclude build artifacts that cause `astro check` to OOM. Achieve zero diagnostic output from `tsc --noEmit`, `astro check`, and `eslint`.
+
+**Requirements:**
+- Fix TS5101 `baseUrl` deprecation error via `ignoreDeprecations: "6.0"`
+- Exclude build artifact directories (`storybook-static`, `coverage`, `functions/lib`) from TypeScript checking to prevent `astro check` OOM crash
+- Fix ESLint warnings: 2x `react-hooks/exhaustive-deps` in `usePredictionSteps.tsx`, 2x `no-console` in `build-data.ts`
+- Verify: `tsc --noEmit` (0 errors), `astro check` (0 errors, no OOM), `eslint` (0 warnings), `build` (passes), `test:run` (passes)
+
 **Depends on:** Phase 2
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 3 to break down)
+- [ ] 03-01-PLAN.md — Fix tsconfig.json (TS6 deprecation + build artifact exclude), fix ESLint warnings, verify clean diagnostics
 
 ### Phase 4: Add Edit Profile UI to let users update their displayName and avatar from the profile page
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Users can edit their displayName and avatar URL directly from the profile page — changes persist via Firebase Auth updateProfile + Firestore user doc dual-write, with immediate UI feedback through the Zustand store.
+
+**Requirements:**
+- Add `updateUserProfile` helper to auth-helpers.ts (updates Firebase Auth + Firestore)
+- Add `updateProfile` action to the Zustand auth store
+- Create EditProfileForm molecule component with displayName + avatarUrl inputs
+- Wire edit toggle into ProfileTemplate below the UserProfile display
+- Add i18n strings for edit profile (EN + ES)
+- All existing tests pass, build succeeds
+
 **Depends on:** Phase 3
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 4 to break down)
+- [ ] 04-01-PLAN.md — Add updateUserProfile helper + auth store action + EditProfileForm component + ProfileTemplate integration + i18n
 
 ### Phase 5: Replace all hardcoded tournament name strings with dynamic values from translations/config
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Replace all hardcoded tournament name strings ("FIFA World Cup 2026", "WC26", "Mundial 2026", "Copa Mundial FIFA 2026") with dynamic values from i18n translation files, so the tournament name is centralized and easily changed for future editions.
+
+**Requirements:** TBD
 **Depends on:** Phase 4
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 5 to break down)
+- [ ] 05-01-PLAN.md — Add tournament name keys to translations, update NavBar + BaseLayout JSON-LD, verify no hardcoded strings remain
 
 ### Phase 6: Replace emoji-based predictor avatars with lil_guy pixel art
 

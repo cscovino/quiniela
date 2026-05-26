@@ -3,21 +3,21 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-last_updated: "2026-05-26T17:10:00.000Z"
+last_updated: "2026-05-26T21:36:00.000Z"
 progress:
   total_phases: 7
-  completed_phases: 1
-  total_plans: 9
-  completed_plans: 9
-  percent: 14
+  completed_phases: 2
+  total_plans: 16
+  completed_plans: 16
+  percent: 28
 ---
 
 # Project State
 
 ## Current Phase
 
-- **Phase:** 2
-- **Next recommended run:** `/gsd-plan-phase 2`
+- **Phase:** 3
+- **Next recommended run:** `/gsd-plan-phase 3`
 
 ## Phase 1 Summary
 
@@ -32,6 +32,17 @@ All 9 plans executed successfully:
 - 01-08: WC26 tournament gradients
 - 01-09: Documentation updates (README, DESIGN, AGENTS)
 
+## Phase 2 Summary
+
+All 7 plans executed successfully:
+- 02-01: NavBar CSS fix (scroll lock + sticky) + 6 NavBar stories
+- 02-02: AuthGuard, Toast, ToastProvider, PWAInstall stories
+- 02-03: LoginForm, RegisterForm stories
+- 02-04: PointsChart, PredictionsUI, PredictionStepFinal, AdminMatchResultForm stories
+- 02-05: BestPlayersForm, FinalPhaseForm, GroupPredictionForm, KnockoutBracketForm stories
+- 02-06: AdminMatchesPage, AdminMatchList stories
+- 02-07: AuthTemplate, PredictionsTemplate stories + AstroPageComponents.md
+
 ## Accumulated Context
 
 ### Roadmap Evolution
@@ -40,6 +51,7 @@ All 9 plans executed successfully:
 - Phase 1 edited: renamed to "Frontend UX improvements and responsive design fixes" with expanded scope
 - Phase 1 complete: 9/9 plans, 428 tests, build succeeds
 - Phase 2 added: Create stories for all possible components so I can develop focusing in one component and then that would be reflected in all the app, for example the navbar, that now is allowing to scroll the background content and the header is not being sticky
+- Phase 2 complete: 7/7 plans, 516 tests, build succeeds
 - Phase 3 added: Check all LSP diagnostics and fix type errors
 - Phase 4 added: Add Edit Profile UI to let users update their displayName and avatar from the profile page
 - Phase 5 added: Replace all hardcoded tournament name strings with dynamic values from translations/config
