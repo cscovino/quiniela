@@ -196,3 +196,22 @@ Plans:
 - `live-data-service.ts` provides fetchLiveMatches, fetchLiveStandings, fetchLiveRankings
 - Home, Tournament, and Rankings pages wired with Live* v2 components using `client:load`
 - Pages hydrate instantly from static HTML, then silently refresh data post-hydration
+
+### Phase 9: Codebase cleanup: remove dead components, fix import path style, remove React 17 imports
+
+**Goal:** Clean up dead code and standardize import patterns across the codebase. Remove components that only exist in Storybook (no app imports), fix barrel import paths (e.g., `@atoms/Typography` instead of `@atoms/Typography/Typography`), remove unnecessary `import React from 'react'` (React 19 auto-JSX), and fix any broken/misspelled imports.
+
+**Requirements:**
+- Analyze all components for dead code — components only imported in Storybook files should be flagged for removal
+- Scan for import paths with duplicated component name (`@dir/Name/Name` pattern → `@dir/Name`)
+- Remove `import React from 'react'` from all TSX files (React 19 JSX transform)
+- Find and fix any broken imports (typos, wrong paths)
+- Verify all 524+ tests pass, lint clean, build succeeds
+
+**User note:** Analysis first — user will review dead component results before any deletions
+
+**Depends on:** Phase 8
+**Plans:** 1 plan
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 9 to break down)

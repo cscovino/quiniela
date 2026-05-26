@@ -5,11 +5,11 @@ milestone_name: milestone
 status: in_progress
 last_updated: "2026-05-26T21:36:00.000Z"
 progress:
-  total_phases: 7
-  completed_phases: 2
-  total_plans: 16
-  completed_plans: 16
-  percent: 28
+  total_phases: 9
+  completed_phases: 6
+  total_plans: 25
+  completed_plans: 25
+  percent: 66
 ---
 
 # Project State
@@ -58,3 +58,7 @@ All 7 plans executed successfully:
 - Phase 6 added: Replace emoji-based predictor avatars with lil_guy pixel art, refactor PredictorEditor
 - Phase 7 added: Evaluate and integrate driver.js for product tours/onboarding
 - Phase 7 planned: 1 plan covering spike evaluation + conditional integration (ProductTour, persistence, triggers, AGENTS.md)
+- Phase 7 complete: driver.js integrated, ProductTour organism, tours defined, persistence via localStorage
+- Phase 8 added: Fix navigation performance and implement client-side data refresh
+- Phase 8 complete: bundle optimization, prefetching, useLiveData hook, Live* v2 components wired on all pages
+- Phase 9 added: Codebase cleanup: remove dead components, fix import path style, remove React 17 imports
