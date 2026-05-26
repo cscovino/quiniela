@@ -101,7 +101,7 @@ export const NavBar: React.FC<NavBarProps> = ({
 
   return (
     <nav className={`nav-bar ${className}`}>
-      <a href={homeHref} className="nav-bar__brand">
+      <a href={homeHref} className="nav-bar__brand" data-astro-prefetch>
         <Icon name="football" size={24} />
         <span className="nav-bar__title">{translations.brandLabel}</span>
       </a>
@@ -112,6 +112,7 @@ export const NavBar: React.FC<NavBarProps> = ({
             key={link.href}
             href={link.href}
             className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
+            data-astro-prefetch
           >
             {link.label}
           </a>
@@ -120,6 +121,7 @@ export const NavBar: React.FC<NavBarProps> = ({
           <a
             href={adminLink.href}
             className={`nav-bar__link ${adminLink.active ? 'nav-bar__link--active' : ''}`}
+            data-astro-prefetch
           >
             {adminLink.label}
           </a>
@@ -131,6 +133,7 @@ export const NavBar: React.FC<NavBarProps> = ({
           href={otherLocaleHref}
           className={`nav-bar__btn ${locale === 'es' ? 'nav-bar__btn--active' : ''}`}
           aria-label={translations.switchLocale}
+          data-astro-prefetch
         >
           {otherLocaleLabel}
         </a>
@@ -164,7 +167,7 @@ export const NavBar: React.FC<NavBarProps> = ({
             </button>
           </div>
         ) : (
-          <a href={loginHref} className="nav-bar__group--desktop">
+          <a href={loginHref} className="nav-bar__group--desktop" data-astro-prefetch>
             <span className="nav-bar__login-btn">{translations.login}</span>
           </a>
         )}
@@ -190,7 +193,7 @@ export const NavBar: React.FC<NavBarProps> = ({
           {isLoggedIn && (
             <>
               <div className="nav-bar__mobile-cta">
-                <a href={predictionsHref} onClick={closeMenu}>
+                <a href={predictionsHref} onClick={closeMenu} data-astro-prefetch>
                   <span className="nav-bar__cta-btn">{translations.makePredictions}</span>
                 </a>
               </div>
@@ -211,6 +214,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                 href={link.href}
                 className={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
                 onClick={closeMenu}
+                data-astro-prefetch
               >
                 {link.label}
               </a>
@@ -219,7 +223,7 @@ export const NavBar: React.FC<NavBarProps> = ({
 
           {!isLoggedIn && (
             <div className="nav-bar__mobile-cta">
-              <a href={loginHref} onClick={closeMenu}>
+              <a href={loginHref} onClick={closeMenu} data-astro-prefetch>
                 <span className="nav-bar__cta-btn">{translations.login}</span>
               </a>
             </div>
@@ -230,6 +234,7 @@ export const NavBar: React.FC<NavBarProps> = ({
               href={adminLink.href}
               className="nav-bar__mobile-link nav-bar__mobile-link--admin"
               onClick={closeMenu}
+              data-astro-prefetch
             >
               {adminLink.label}
             </a>
