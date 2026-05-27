@@ -1,0 +1,78 @@
+{
+  "phase": "10",
+  "phase_name": "Fix data display issues, unify native buttons with design system Button, fix tour button",
+  "timestamp": "2026-05-27T20:00:00Z",
+  "areas_completed": [
+    "Tournament matches display",
+    "Home upcoming matches",
+    "Tab buttons",
+    "Cache key collision",
+    "Tour component",
+    "Button scope",
+    "LiveStandings",
+    "NavBar buttons",
+    "Error/Loading states",
+    "Today match filter",
+    "Home SSR vs fetch",
+    "Button variants",
+    "CSS cleanup",
+    "Tour icon",
+    "Match filter logic",
+    "LoginForm buttons",
+    "Home page match count",
+    "Icon additions",
+    "Notification/back buttons"
+  ],
+  "areas_remaining": [],
+  "decisions": {
+    "Data Display Fixes": [
+      {"question": "How to handle LiveMatchList on tournament page?", "answer": "showAll prop using fetchAllMatches()", "options_presented": ["showAll prop", "Separate TournamentMatchList", "Pass limit=48"]},
+      {"question": "Home page upcoming matches approach?", "answer": "Rely on live fetch only", "options_presented": ["Fix build-data filter", "Rely on live fetch only", "Both"]},
+      {"question": "Home page SSR vs fetch?", "answer": "SSR + live refresh (still pass initial data)", "options_presented": ["SSR + live refresh", "Client fetch only"]},
+      {"question": "Cache key collision?", "answer": "Fix now — pass unique cacheKeys from Astro pages", "options_presented": ["Yes, fix now", "Not urgent"]},
+      {"question": "LiveStandings cacheKey?", "answer": "Fix cacheKey too", "options_presented": ["Fix cacheKey", "No changes"]},
+      {"question": "Match filter logic?", "answer": "Keep OR logic (today OR upcoming)", "options_presented": ["Combine today + upcoming", "Keep OR logic"]},
+      {"question": "Home page match count?", "answer": "6 matches", "options_presented": ["6", "5", "8"]}
+    ],
+    "Button Unification": [
+      {"question": "Which native buttons to replace?", "answer": "All non-tab buttons", "options_presented": ["All non-tab buttons", "Just prediction-related", "All including NavBar"]},
+      {"question": "Tab buttons?", "answer": "Keep as native (role='tab' pattern)", "options_presented": ["Keep native", "Use Button"]},
+      {"question": "NavBar buttons?", "answer": "Use Button + ghost variant", "options_presented": ["Use Button + ghost", "Leave as native"]},
+      {"question": "Button variants?", "answer": "Specific palette per button type", "options_presented": ["Specific palette", "Keep existing styles"]},
+      {"question": "CSS cleanup?", "answer": "Remove all old button CSS after replacement", "options_presented": ["Clean up old CSS", "Keep old CSS"]},
+      {"question": "LoginForm/RegisterForm toggle buttons?", "answer": "Leave as native", "options_presented": ["Replace with Button", "Leave as native"]},
+      {"question": "Notification/back buttons?", "answer": "Unify everything (bell + back buttons too)", "options_presented": ["Unify everything", "Just what we discussed"]}
+    ],
+    "Tour Button Fix": [
+      {"question": "How to fix ProductTour?", "answer": "Add autoStart={true} to both instances", "options_presented": ["autoStart={true}", "Imperative ref API"]},
+      {"question": "Tour button icon?", "answer": "RobotFace, accent variant, no emoji", "options_presented": ["RobotFace", "WarningDiamond", "Gamepad"]}
+    ],
+    "Icons": [
+      {"question": "Which icons to add?", "answer": "Moon (dark theme), Sparkles (light), PenSquare (edit), Trash (delete), ChevonLeft (back), RobotFace (tour). Login/Logout/Bell exist.", "options_presented": ["Full set", "Different icons"]}
+    ],
+    "Loading States": [
+      {"question": "Error/Loading UI?", "answer": "Skeleton loading states (separate components)", "options_presented": ["Simple error/loading", "Skeleton loading states", "Not needed now"]}
+    ]
+  },
+  "deferred_ideas": [],
+  "canonical_refs": [
+    "src/services/live-data-service.ts",
+    "src/hooks/useLiveData.ts",
+    "src/components/organisms/LiveMatchList/LiveMatchList.tsx",
+    "src/components/organisms/LiveStandings/LiveStandings.tsx",
+    "src/components/organisms/LiveRankings/LiveRankings.tsx",
+    "src/components/organisms/ProductTour/ProductTour.tsx",
+    "src/components/atoms/Button/Button.tsx",
+    "src/components/atoms/Icon/Icon.tsx",
+    "src/pages/[lang]/index.astro",
+    "src/components/pages/TournamentPage.astro",
+    "src/components/pages/RankingsPage.astro",
+    "src/components/templates/PredictionsTemplate/PredictionsTemplate.tsx",
+    "src/components/molecules/PredictorList/PredictorList.tsx",
+    "src/components/organisms/NavBar/NavBar.tsx",
+    "src/components/organisms/PWAInstall/PWAInstall.tsx",
+    "AGENTS.md",
+    ".planning/ROADMAP.md",
+    ".planning/STATE.md"
+  ]
+}

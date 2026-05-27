@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Icon } from '@atoms/Icon';
 import { initAuth } from '@services/auth-bootstrap';
 import { useAuthStore } from '@store/auth-store';
-import { getHomeRoute, getLoginRoute, getOtherLocale, getRoute } from '@utils/i18n';
+import { getHomeRoute, getLoginRoute, getOtherLocale } from '@utils/i18n';
 
 import './NavBar.css';
 
@@ -12,6 +12,7 @@ export interface NavLink {
   href: string;
   label: string;
   active: boolean;
+  auth: boolean;
 }
 
 export interface NavBarTranslations {
@@ -81,7 +82,6 @@ export const NavBar: FC<NavBarProps> = ({
   const otherLocaleLabel = otherLocale.toUpperCase();
   const otherLocaleHref = getHomeRoute(otherLocale);
   const loginHref = getLoginRoute(locale);
-  const predictionsHref = getRoute(locale, 'predictions');
   const homeHref = getHomeRoute(locale);
 
   const closeMenu = () => setMenuOpen(false);
@@ -195,11 +195,6 @@ export const NavBar: FC<NavBarProps> = ({
         <div className="nav-bar__mobile-content">
           {isLoggedIn && (
             <>
-              <div className="nav-bar__mobile-cta">
-                <a href={predictionsHref} onClick={closeMenu} data-astro-prefetch>
-                  <span className="nav-bar__cta-btn">{translations.makePredictions}</span>
-                </a>
-              </div>
               <div className="nav-bar__mobile-user">
                 <Icon name="user" size={18} />
                 <span>{userDisplayName}</span>
@@ -211,17 +206,19 @@ export const NavBar: FC<NavBarProps> = ({
           )}
 
           <div className="nav-bar__mobile-links">
-            {links.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
-                onClick={closeMenu}
-                data-astro-prefetch
-              >
-                {link.label}
-              </a>
-            ))}
+            {links.map((link) =>
+              link.auth && !isLoggedIn ? null : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={`nav-bar__mobile-link ${link.active ? 'nav-bar__mobile-link--active' : ''}`}
+                  onClick={closeMenu}
+                  data-astro-prefetch
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
           </div>
 
           {!isLoggedIn && (

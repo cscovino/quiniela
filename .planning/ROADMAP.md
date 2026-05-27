@@ -216,3 +216,13 @@ Plans:
 Plans:
 - [x] 09-01-PLAN.md — Create barrel files + dead component analysis
 - [x] 09-02-PLAN.md — Import path fixes (React namespace, barrel paths), import ordering ESLint rule, verification
+
+### Phase 10: Fix data display issues, unify native buttons with design system Button, fix tour button not working
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 9
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 10 to break down)
