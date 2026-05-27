@@ -39,3 +39,7 @@ functions/lib/
 
 # OMC
 .omc/
+
+# Planning docs (not committed to repo)
+.planning/
+.scratch/
