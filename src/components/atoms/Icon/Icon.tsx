@@ -1,6 +1,7 @@
 import { Bell } from 'pixelarticons/react/Bell';
 import { Chart } from 'pixelarticons/react/Chart';
 import { Check } from 'pixelarticons/react/Check';
+import { ChevronLeft } from 'pixelarticons/react/ChevronLeft';
 import { Clock } from 'pixelarticons/react/Clock';
 import { Close } from 'pixelarticons/react/Close';
 import { Crown } from 'pixelarticons/react/Crown';
@@ -12,10 +13,15 @@ import { InfoBox } from 'pixelarticons/react/InfoBox';
 import { Login } from 'pixelarticons/react/Login';
 import { Logout } from 'pixelarticons/react/Logout';
 import { Menu } from 'pixelarticons/react/Menu';
+import { Moon } from 'pixelarticons/react/Moon';
+import { PenSquare } from 'pixelarticons/react/PenSquare';
+import { Plus } from 'pixelarticons/react/Plus';
 import { Radio } from 'pixelarticons/react/Radio';
+import { RobotFace } from 'pixelarticons/react/RobotFace';
 import { Sparkle } from 'pixelarticons/react/Sparkle';
 import { SquareAlert } from 'pixelarticons/react/SquareAlert';
 import { Target } from 'pixelarticons/react/Target';
+import { Trash } from 'pixelarticons/react/Trash';
 import { Trophy } from 'pixelarticons/react/Trophy';
 import { User } from 'pixelarticons/react/User';
 import { Zap } from 'pixelarticons/react/Zap';
@@ -24,29 +30,35 @@ import type { CSSProperties, FC } from 'react';
 import './Icon.css';
 
 export type IconName =
-  | 'football'
-  | 'trophy'
-  | 'star'
-  | 'fire'
-  | 'lightning'
-  | 'target'
-  | 'chart'
   | 'bell'
-  | 'user'
-  | 'flag'
+  | 'chart'
   | 'check'
-  | 'x'
+  | 'chevron-left'
   | 'clock'
-  | 'live'
-  | 'award'
+  | 'close'
   | 'crown'
-  | 'menu'
+  | 'eye'
+  | 'fire'
+  | 'flag'
+  | 'football'
+  | 'info'
+  | 'lightning'
+  | 'live'
   | 'login'
   | 'logout'
-  | 'close'
-  | 'info'
+  | 'menu'
+  | 'moon'
+  | 'pen-square'
+  | 'plus'
+  | 'robot-face'
+  | 'sparkles'
+  | 'star'
+  | 'target'
+  | 'trash'
+  | 'trophy'
+  | 'user'
   | 'warning'
-  | 'eye';
+  | 'x';
 
 export interface IconProps {
   name: IconName;
@@ -56,29 +68,35 @@ export interface IconProps {
 }
 
 const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: string }>> = {
-  football: Gamepad,
-  trophy: Trophy,
-  star: Sparkle,
-  fire: Fire,
-  lightning: Zap,
-  target: Target,
-  chart: Chart,
   bell: Bell,
-  user: User,
-  flag: Flag,
+  chart: Chart,
   check: Check,
-  x: Close,
+  'chevron-left': ChevronLeft,
   clock: Clock,
-  live: Radio,
-  award: Crown,
-  crown: Crown,
-  menu: Menu,
   close: Close,
+  crown: Crown,
+  eye: Eye,
+  fire: Fire,
+  flag: Flag,
+  football: Gamepad,
+  info: InfoBox,
+  lightning: Zap,
+  live: Radio,
   login: Login,
   logout: Logout,
-  info: InfoBox,
+  menu: Menu,
+  moon: Moon,
+  'pen-square': PenSquare,
+  plus: Plus,
+  'robot-face': RobotFace,
+  sparkles: Sparkle,
+  star: Sparkle,
+  target: Target,
+  trash: Trash,
+  trophy: Trophy,
+  user: User,
   warning: SquareAlert,
-  eye: Eye,
+  x: Close,
 };
 
 export const Icon: FC<IconProps> = ({ name, size = 24, color, className = '' }) => {
