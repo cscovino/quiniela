@@ -43,6 +43,8 @@ export function usePredictionSteps(
     stepFinalPhaseDesc: string;
     stepBestPlayers: string;
     stepBestPlayersDesc: string;
+    stepDescriptionGroup?: string;
+    stepDescriptionRound?: string;
     feedback: {
       submittedCount: string;
       finalPhaseSubmitted: string;
@@ -52,6 +54,7 @@ export function usePredictionSteps(
   },
   locale: 'en' | 'es',
   selectedPredictorId: string | null,
+  deadline: Date | null = null,
 ): UsePredictionStepsResult {
   const user = useAuthStore((s) => s.user);
 
@@ -79,7 +82,6 @@ export function usePredictionSteps(
     bestScorer?: string;
   } | null>(null);
 
-  // 11.4 State for new flow: group bets and knockout bets by ID
   const [groupBetsByGroupId, setGroupBetsByGroupId] = useState<Record<string, string[]>>({});
   const [knockoutBetsByMatchSlug, setKnockoutBetsByMatchSlug] = useState<Record<string, string>>(
     {},
@@ -141,14 +143,12 @@ export function usePredictionSteps(
         if (cancelled) return;
         setExistingMatchBets(new Set(matchBets.keys()));
 
-        // 11.4 Hydrate group bets by group ID
         const groupBetsRecord: Record<string, string[]> = {};
         groupBets.forEach((positions, groupId) => {
           groupBetsRecord[groupId] = positions;
         });
         setGroupBetsByGroupId(groupBetsRecord);
 
-        // 11.5 Hydrate knockout bets by match slug
         const knockoutBetsRecord: Record<string, string> = {};
         knockoutBets.forEach((winner, slug) => {
           knockoutBetsRecord[slug] = winner;
@@ -250,7 +250,6 @@ export function usePredictionSteps(
     [user, selectedPredictorId, translations, groups.length],
   );
 
-  // New flow handlers
   const handleGroupStepSubmit = useCallback(
     async (
       groupId: string,
@@ -267,7 +266,6 @@ export function usePredictionSteps(
       const errors: string[] = [];
       let successCount = 0;
 
-      // Submit match predictions
       if (Object.keys(data.matchPredictions).length > 0) {
         const matchResult = await predictionService.submitBatchMatchBets(
           user.uid,
@@ -279,7 +277,6 @@ export function usePredictionSteps(
         successCount += matchResult.successCount;
       }
 
-      // Submit group classification
       if (data.classification.length > 0) {
         const groupResult = await predictionService.submitBatchGroupBets(
           user.uid,
@@ -300,7 +297,6 @@ export function usePredictionSteps(
         });
         setSubmittedSteps((prev) => new Set(prev).add(stepIndex));
 
-        // Update local state
         setGroupBetsByGroupId((prev) => ({ ...prev, [groupId]: data.classification }));
         const newMatchBets = new Set(existingMatchBets);
         Object.keys(data.matchPredictions).forEach((id) => newMatchBets.add(id));
@@ -337,7 +333,6 @@ export function usePredictionSteps(
         });
         setSubmittedSteps((prev) => new Set(prev).add(stepIndex));
 
-        // Update local state
         const newKnockoutBets = { ...knockoutBetsByMatchSlug };
         Object.entries(predictions).forEach(([slug, winner]) => {
           newKnockoutBets[slug] = winner;
@@ -350,12 +345,10 @@ export function usePredictionSteps(
     [user, selectedPredictorId, firestoreMatches, translations, knockoutBetsByMatchSlug],
   );
 
-  // Build steps dynamically: groups → knockout rounds → final → best players
   const steps = useMemo(() => {
     const result: PredictionStepModel[] = [];
     let stepIndex = 0;
 
-    // Group steps
     for (const group of groups) {
       const groupMatches = firestoreMatches.filter(
         (m) => m.phase === 'group' && m.groupId === group.slug,
@@ -369,12 +362,21 @@ export function usePredictionSteps(
         existingGroupBet != null &&
         isGroupClassificationComplete(existingGroupBet, group.teams.length);
 
+      const canAdvanceGroup =
+        submittedSteps.has(stepIndex) || isGroupComplete || existingGroupBet != null;
+
+      const stepDescription =
+        translations.stepDescriptionGroup?.replace('{group}', group.name) ||
+        `Predict scores and rank teams for ${group.name}`;
+
       result.push({
         id: `group-${group.slug}`,
         kind: 'group',
         label: group.name,
-        description: `Predict scores and rank teams for ${group.name}`,
+        description: stepDescription,
         isComplete: submittedSteps.has(stepIndex) || isGroupComplete,
+        canAdvance: canAdvanceGroup,
+        deadline,
         content: (
           <PredictionStepGroup
             group={group}
@@ -383,7 +385,7 @@ export function usePredictionSteps(
             existingMatchBets={groupMatchBetIds}
             existingGroupBet={existingGroupBet}
             onSubmit={(data) => handleGroupStepSubmit(group.slug, stepIndex, data)}
-            isDisabled={submitting}
+            isDisabled={submitting || (deadline != null && deadline < new Date())}
             locale={locale}
           />
         ),
@@ -392,7 +394,6 @@ export function usePredictionSteps(
       stepIndex++;
     }
 
-    // Knockout round steps
     for (const phase of KNOCKOUT_PHASES) {
       const phaseMatches = firestoreMatches.filter((m) => m.phase === phase);
       if (phaseMatches.length === 0) continue;
@@ -405,12 +406,23 @@ export function usePredictionSteps(
       const isPhaseComplete =
         existingPhaseBets.size > 0 && phaseMatches.every((m) => existingPhaseBets.has(m.slug));
 
+      const allPicksMade = phaseMatches.every((m) => knockoutBetsByMatchSlug[m.slug]);
+
+      const canAdvanceKnockout = submittedSteps.has(stepIndex) || isPhaseComplete || allPicksMade;
+
+      const roundLabel = KNOCKOUT_PHASE_LABELS[phase]?.toLowerCase() || phase;
+      const stepDescription =
+        translations.stepDescriptionRound?.replace('{round}', roundLabel) ||
+        `Pick winners for the ${roundLabel}`;
+
       result.push({
         id: `knockout-${phase}`,
         kind: 'knockout-round',
         label: KNOCKOUT_PHASE_LABELS[phase] || phase,
-        description: `Pick winners for the ${KNOCKOUT_PHASE_LABELS[phase]?.toLowerCase() || phase}`,
+        description: stepDescription,
         isComplete: submittedSteps.has(stepIndex) || isPhaseComplete,
+        canAdvance: canAdvanceKnockout,
+        deadline,
         content: (
           <PredictionStepKnockoutRound
             phase={phase}
@@ -429,7 +441,7 @@ export function usePredictionSteps(
             existingKnockoutBets={existingPhaseBets}
             previousRoundPredictions={knockoutBetsByMatchSlug}
             onSubmit={(predictions) => handleKnockoutRoundSubmit(phase, stepIndex, predictions)}
-            isDisabled={submitting}
+            isDisabled={submitting || (deadline != null && deadline < new Date())}
           />
         ),
         onSubmit: () => Promise.resolve(),
@@ -437,19 +449,20 @@ export function usePredictionSteps(
       stepIndex++;
     }
 
-    // Final phase step
     result.push({
       id: 'final-positions',
       kind: 'final-positions',
       label: translations.stepFinalPhase,
       description: translations.stepFinalPhaseDesc,
       isComplete: submittedSteps.has(stepIndex) || existingFinalPhase != null,
+      canAdvance: true,
+      deadline,
       content: (
         <PredictionStepFinalPhase
           teams={allTeams}
           existingPrediction={existingFinalPhase || undefined}
           onSubmit={handleFinalPhaseSubmit}
-          isDisabled={submitting}
+          isDisabled={submitting || (deadline != null && deadline < new Date())}
           locale={locale}
         />
       ),
@@ -457,18 +470,19 @@ export function usePredictionSteps(
     });
     stepIndex++;
 
-    // Best players step
     result.push({
       id: 'best-players',
       kind: 'best-players',
       label: translations.stepBestPlayers,
       description: translations.stepBestPlayersDesc,
       isComplete: submittedSteps.has(stepIndex) || existingBestPlayers != null,
+      canAdvance: true,
+      deadline,
       content: (
         <PredictionStepBestPlayers
           existingPrediction={existingBestPlayers || undefined}
           onSubmit={handleBestPlayersSubmit}
-          isDisabled={submitting}
+          isDisabled={submitting || (deadline != null && deadline < new Date())}
         />
       ),
       onSubmit: () => Promise.resolve(),
@@ -488,11 +502,12 @@ export function usePredictionSteps(
     knockoutBetsByMatchSlug,
     allTeams,
     existingFinalPhase,
-    handleFinalPhaseSubmit,
     existingBestPlayers,
+    handleFinalPhaseSubmit,
     handleBestPlayersSubmit,
     handleGroupStepSubmit,
     handleKnockoutRoundSubmit,
+    deadline,
   ]);
 
   const canAdvance = steps[currentStep]?.canAdvance ?? true;

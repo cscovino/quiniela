@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import type { DeadlineInfo } from '@app-types/prediction-steps';
 import { Button } from '@atoms/Button';
 import { Icon } from '@atoms/Icon';
+import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
 
 import '../../templates/PredictionsTemplate/PredictionsTemplate.css';
@@ -12,7 +13,10 @@ export interface PredictionsProgressProps {
   deadlineInfo?: DeadlineInfo;
 }
 
-export const PredictionsProgress: FC<PredictionsProgressProps> = ({ stepCounter, deadlineInfo }) => {
+export const PredictionsProgress: FC<PredictionsProgressProps> = ({
+  stepCounter,
+  deadlineInfo,
+}) => {
   return (
     <div className="predictions-template__step-counter">
       <Typography variant="small">{stepCounter}</Typography>
@@ -66,6 +70,7 @@ export const PredictionsNavigation: FC<PredictionsNavigationProps> = ({
   canAdvance,
   currentStep,
   totalSteps,
+  isSubmitting,
   translations,
 }) => (
   <>
@@ -73,11 +78,12 @@ export const PredictionsNavigation: FC<PredictionsNavigationProps> = ({
       <Button variant="ghost" size="sm" onClick={onBack} disabled={currentStep === 0}>
         <Icon name="chevron-left" size={16} /> {translations.buttonBack}
       </Button>
-      {currentStep < totalSteps - 1 && (
-        <Button variant="primary" size="sm" onClick={onNext} disabled={!canAdvance}>
-          {translations.buttonNext}
-        </Button>
-      )}
+      <Button variant="primary" size="sm" onClick={onNext} disabled={!canAdvance || isSubmitting}>
+        {isSubmitting ? <Spinner size="sm" /> : null}
+        {currentStep < totalSteps - 1
+          ? translations.buttonNext
+          : translations.buttonFinish || 'Finish'}
+      </Button>
     </div>
   </>
 );

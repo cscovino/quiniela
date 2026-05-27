@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from 'react';
 
 import type { PhaseType } from '@app-types/firestore';
 import { Badge } from '@atoms/Badge';
-import { Button } from '@atoms/Button';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
 import { TeamSelector } from '@molecules/TeamSelector';
@@ -39,8 +38,6 @@ export interface PredictionStepKnockoutRoundProps {
     final?: string;
     pickWinner?: string;
     teamsTbd?: string;
-    submitRound?: string;
-    submitting?: string;
     allSubmitted?: string;
   };
 }
@@ -64,8 +61,6 @@ const defaultTranslations = {
   final: 'Final',
   pickWinner: 'Pick the winner',
   teamsTbd: 'Teams TBD',
-  submitRound: 'Submit Round',
-  submitting: 'Submitting...',
   allSubmitted: 'All predictions submitted for this round',
 };
 
@@ -165,10 +160,6 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
     });
   }, [unsubmittedMatches, groupBetsByGroupId, knockoutBetsRecord]);
 
-  const canSubmit = useMemo(() => {
-    return Object.keys(predictions).length > 0 && !isDisabled;
-  }, [predictions, isDisabled]);
-
   const handlePrediction = (matchSlug: string, winner: string) => {
     setPredictions((prev) => ({
       ...prev,
@@ -177,14 +168,12 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   };
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
-    setIsSubmitting(true);
-    try {
-      await onSubmit(predictions);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await onSubmit(predictions);
   };
+
+  void handleSubmit;
+  void isSubmitting;
+  void setIsSubmitting;
 
   const [now, setNow] = useState(0);
 
@@ -282,17 +271,6 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
           </div>
         </div>
       )}
-
-      <div className="prediction-step-knockout-round__actions">
-        <Button
-          variant="primary"
-          size="md"
-          onClick={handleSubmit}
-          disabled={!canSubmit || isSubmitting}
-        >
-          {isSubmitting ? labels.submitting : labels.submitRound}
-        </Button>
-      </div>
     </div>
   );
 };
