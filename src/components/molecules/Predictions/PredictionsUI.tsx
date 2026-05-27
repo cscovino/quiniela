@@ -35,7 +35,13 @@ export interface PredictionsNavigationProps {
   canAdvance: boolean;
   currentStep: number;
   totalSteps: number;
-  translations: { buttonBack: string; buttonNext: string; submitToAdvance: string };
+  isSubmitting?: boolean;
+  submittedSteps?: Set<number>;
+  translations: {
+    buttonBack: string;
+    buttonNext: string;
+    buttonFinish?: string;
+  };
 }
 
 export const PredictionsNavigation: FC<PredictionsNavigationProps> = ({

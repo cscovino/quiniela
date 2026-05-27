@@ -88,7 +88,13 @@ export const FeedbackNone: Story = {
 const navTranslations = {
   buttonBack: 'Back to List',
   buttonNext: 'Next',
-  submitToAdvance: 'Submit current step to continue',
+  buttonFinish: 'Finish',
+};
+
+const navTranslationsWithFinish = {
+  buttonBack: 'Back to List',
+  buttonNext: 'Next Step',
+  buttonFinish: 'Finish',
 };
 
 export const NavigationMiddleStep: Story = {
@@ -105,6 +111,21 @@ export const NavigationMiddleStep: Story = {
   ),
 };
 
+export const NavigationSubmitting: Story = {
+  render: () => (
+    <PredictionsNavigation
+      onBack={() => {}}
+      onNext={() => {}}
+      canAdvance={true}
+      currentStep={2}
+      totalSteps={5}
+      isSubmitting={true}
+      translations={navTranslations}
+      submittedSteps={new Set()}
+    />
+  ),
+};
+
 export const NavigationLastStep: Story = {
   render: () => (
     <PredictionsNavigation
@@ -113,7 +134,7 @@ export const NavigationLastStep: Story = {
       canAdvance={true}
       currentStep={4}
       totalSteps={5}
-      translations={navTranslations}
+      translations={navTranslationsWithFinish}
       submittedSteps={new Set()}
     />
   ),
