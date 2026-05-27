@@ -1,7 +1,8 @@
 import type { FC } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { Predictor } from '@app-types/firestore';
+import type { DeadlineInfo } from '@app-types/prediction-steps';
 import { Button } from '@atoms/Button';
 import { Icon } from '@atoms/Icon';
 import { Spinner } from '@atoms/Spinner';
@@ -18,12 +19,25 @@ import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList
 import { ProductTour, resetTour } from '@organisms/ProductTour';
 import { FIRST_PREDICTOR_TOUR, PREDICTION_WIZARD_TOUR } from '@organisms/ProductTour/tours';
 import { predictorService } from '@services/predictor-service';
+import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
 import { getLoginRoute } from '@utils/i18n';
 
 import './PredictionsTemplate.css';
 
 type PredictorView = 'list' | 'wizard' | 'editor' | 'delete';
+
+function formatDuration(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const parts: string[] = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  parts.push(`${minutes}m`);
+  return parts.join(' ');
+}
 
 export interface PredictionsTemplateProps {
   translations: {
@@ -40,9 +54,14 @@ export interface PredictionsTemplateProps {
     stepBestPlayersDesc: string;
     buttonNext: string;
     buttonBack: string;
-    buttonSubmit: string;
+    buttonSubmit?: string;
+    buttonFinish?: string;
     stepXofY: string;
-    submitToAdvance: string;
+    submitToAdvance?: string;
+    thirdPlaceHeading?: string;
+    thirdPlaceSubtitle?: string;
+    deadlinePassed?: string;
+    deadlineCountdown?: string;
     predictedStandings: string;
     team: string;
     pts: string;
@@ -107,6 +126,43 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
   const [showWizardTour, setShowWizardTour] = useState(false);
   const [showFirstTour, setShowFirstTour] = useState(false);
 
+  // Tournament deadline state
+  const [tournamentDeadline, setTournamentDeadline] = useState<Date | null>(null);
+  const [deadlineLoading, setDeadlineLoading] = useState(true);
+
+  useEffect(() => {
+    tournamentService
+      .getTournament()
+      .then((t) => setTournamentDeadline(t?.deadline?.toDate() || null))
+      .catch(() => {})
+      .finally(() => setDeadlineLoading(false));
+  }, []);
+
+  // Deadline countdown — refresh every 60s
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const deadlineInfo: DeadlineInfo | undefined = useMemo(() => {
+    if (!tournamentDeadline) return undefined;
+    const diff = tournamentDeadline.getTime() - now;
+    const state = diff <= 0 ? 'passed' : 'before';
+    const label =
+      (state === 'passed' ? translations.deadlinePassed : translations.deadlineCountdown) ||
+      'Deadline';
+    const countdownLabel =
+      state === 'before' && diff > 0
+        ? (translations.deadlineCountdown || '{time}').replace('{time}', formatDuration(diff))
+        : undefined;
+    return { deadline: tournamentDeadline, state, label, countdownLabel };
+  }, [tournamentDeadline, now, translations.deadlinePassed, translations.deadlineCountdown]);
+
+  // Third-place confirmation gate (stub — wiring in T-013)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [showThirdPlaceConfirm, _setShowThirdPlaceConfirm] = useState(false);
+
   const {
     loading: stepsLoading,
     steps,
@@ -116,7 +172,8 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     feedback,
     totalSteps,
     canAdvance,
-  } = usePredictionSteps(translations, locale, selectedPredictorId);
+    submitting,
+  } = usePredictionSteps(translations, locale, selectedPredictorId, tournamentDeadline);
 
   useEffect(() => {
     if (!user) {
@@ -251,7 +308,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     loadPredictorEntries();
   };
 
-  const loading = stepsLoading || isAuthLoading || predictorsLoading;
+  const loading = stepsLoading || isAuthLoading || predictorsLoading || deadlineLoading;
 
   if (loading) {
     return (
@@ -395,29 +452,53 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           </Button>
         </header>
 
-        <PredictionsProgress stepCounter={stepCounter} />
-        <PredictionsFeedback feedback={feedback} />
+        {showThirdPlaceConfirm ? (
+          <section className="predictions-template__section">
+            <Typography variant="h2">{translations.thirdPlaceHeading}</Typography>
+            <Typography variant="body">{translations.thirdPlaceSubtitle}</Typography>
+          </section>
+        ) : (
+          <>
+            <PredictionsProgress stepCounter={stepCounter} deadlineInfo={deadlineInfo} />
+            <PredictionsFeedback feedback={feedback} />
 
-        <section className="predictions-template__section">
-          <div className="predictions-template__section-header">
-            <Typography variant="h2">{activeStep.label}</Typography>
-            <Typography variant="body">{activeStep.description}</Typography>
-          </div>
+            <section className="predictions-template__section">
+              <div className="predictions-template__section-header">
+                <Typography variant="h2">{activeStep.label}</Typography>
+                <Typography variant="body">{activeStep.description}</Typography>
+              </div>
 
-          {activeStep.content}
-        </section>
+              {activeStep.content}
+            </section>
 
-        <PredictionsNavigation
-          onBack={handleBackToList}
-          onNext={() => {
-            if (currentStep < totalSteps - 1) setCurrentStep((p) => p + 1);
-          }}
-          canAdvance={canAdvance}
-          currentStep={currentStep}
-          totalSteps={totalSteps}
-          translations={translations}
-          submittedSteps={submittedSteps}
-        />
+            <PredictionsNavigation
+              onBack={
+                currentStep === 0
+                  ? handleBackToList
+                  : () => setCurrentStep((p) => Math.max(0, p - 1))
+              }
+              onNext={async () => {
+                if (currentStep < totalSteps - 1) {
+                  await steps[currentStep].onSubmit();
+                  setCurrentStep((p) => p + 1);
+                } else {
+                  await steps[currentStep].onSubmit();
+                  handleBackToList();
+                }
+              }}
+              canAdvance={canAdvance}
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              isSubmitting={submitting}
+              translations={{
+                buttonBack: translations.buttonBack,
+                buttonNext: translations.buttonNext,
+                buttonFinish: translations.buttonFinish,
+              }}
+              submittedSteps={submittedSteps}
+            />
+          </>
+        )}
       </main>
 
       {showWizardTour && (

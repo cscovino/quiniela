@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 
+import type { DeadlineInfo } from '@app-types/prediction-steps';
 import { Button } from '@atoms/Button';
 import { Icon } from '@atoms/Icon';
 import { Typography } from '@atoms/Typography';
@@ -8,10 +9,25 @@ import '../../templates/PredictionsTemplate/PredictionsTemplate.css';
 
 export interface PredictionsProgressProps {
   stepCounter: string;
+  deadlineInfo?: DeadlineInfo;
 }
 
-export const PredictionsProgress: FC<PredictionsProgressProps> = ({ stepCounter }) => {
-  return <div className="predictions-template__step-counter">{stepCounter}</div>;
+export const PredictionsProgress: FC<PredictionsProgressProps> = ({ stepCounter, deadlineInfo }) => {
+  return (
+    <div className="predictions-template__step-counter">
+      <Typography variant="small">{stepCounter}</Typography>
+      {deadlineInfo && (
+        <Typography variant="small" className="predictions-template__deadline">
+          {deadlineInfo.label}
+        </Typography>
+      )}
+      {deadlineInfo?.countdownLabel && (
+        <Typography variant="small" className="predictions-template__deadline-countdown">
+          {deadlineInfo.countdownLabel}
+        </Typography>
+      )}
+    </div>
+  );
 };
 
 export interface PredictionsFeedbackProps {

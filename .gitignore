@@ -38,8 +38,8 @@ storybook-static
 functions/lib/
 
 # OMC
-.omc/
+.omc/*
 
 # Planning docs (not committed to repo)
-.planning/
-.scratch/
+.planning/*
+.scratch/*
