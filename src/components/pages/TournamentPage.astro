@@ -62,12 +62,19 @@ const matches = buildData.allMatches as unknown as MatchCardProps[];
 
   <section class="tournament-template__standings" data-panel="standings">
     <h2>{t.pages.tournament.groupStage}</h2>
-    <LiveStandings initialGroups={standings} translations={standingsTranslations} client:load />
+    <LiveStandings
+      initialGroups={standings}
+      cacheKey="tournament-standings"
+      translations={standingsTranslations}
+      client:load
+    />
   </section>
 
   <section class="tournament-template__matches" data-panel="matches" hidden>
     <LiveMatchList
       initialMatches={matches}
+      cacheKey="tournament-matches"
+      showAll
       title={t.pages.tournament.allMatches}
       emptyMessage={t.pages.tournament.matchesEmpty}
       translations={matchTranslations}

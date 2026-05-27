@@ -68,11 +68,13 @@ const tournamentInfo = buildData.tournament;
     <section class="home-template__matches">
       <LiveMatchList
         initialMatches={matches}
+        cacheKey="home-matches"
+        limit={6}
         title={t.pages.home.matches.title}
         emptyMessage={t.pages.home.matches.empty}
         translations={matchTranslations}
         locale={locale}
-        client:load
+        client:idle
       />
     </section>
   </main>
