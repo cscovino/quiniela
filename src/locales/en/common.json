@@ -132,9 +132,8 @@
       "stepBestPlayersDesc": "Pick the best goalkeeper and top scorer of the tournament",
       "buttonNext": "Next Step",
       "buttonBack": "Back",
-      "buttonSubmit": "Submit",
+      "buttonFinish": "Finish",
       "stepXofY": "Step {current} of {total}",
-      "submitToAdvance": "Submit your predictions to advance to the next step",
       "predictedStandings": "Predicted Standings",
       "team": "Team",
       "pts": "Pts",
@@ -162,7 +161,19 @@
         "delete": "Delete",
         "empty": "No predictions yet",
         "backToPredictors": "Back to predictions"
-      }
+      },
+      "thirdPlaceHeading": "Third-Placed Teams",
+      "thirdPlaceSubtitle": "Best 8 of 12 third-placed teams advance to Round of 32",
+      "thirdPlaceAdvancing": "Advancing to Round of 32",
+      "thirdPlaceEliminated": "Eliminated",
+      "thirdPlaceBracketSlot": "Match {number}",
+      "thirdPlaceAdjust": "Adjust Group Predictions",
+      "thirdPlaceContinue": "Continue to Knockout",
+      "deadlineCountdown": "Deadline: {time} remaining",
+      "deadlinePassed": "Deadline passed — predictions locked",
+      "captchaError": "Unable to verify CAPTCHA. Please try again.",
+      "stepDescriptionGroup": "Predict scores and rank teams for {group}",
+      "stepDescriptionRound": "Pick winners for {round}"
     }
   }
 }

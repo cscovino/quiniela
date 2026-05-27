@@ -132,9 +132,8 @@
       "stepBestPlayersDesc": "Elige al mejor portero y al máximo goleador del torneo",
       "buttonNext": "Siguiente",
       "buttonBack": "Atrás",
-      "buttonSubmit": "Enviar",
+      "buttonFinish": "Finalizar",
       "stepXofY": "Paso {current} de {total}",
-      "submitToAdvance": "Envía tus predicciones para avanzar al siguiente paso",
       "predictedStandings": "Clasificación Predicha",
       "team": "Equipo",
       "pts": "Pts",
@@ -162,7 +161,19 @@
         "delete": "Eliminar",
         "empty": "Aún no hay predicciones",
         "backToPredictors": "Volver a predicciones"
-      }
+      },
+      "thirdPlaceHeading": "Equipos en Tercer Lugar",
+      "thirdPlaceSubtitle": "Los mejores 8 de 12 equipos en tercer lugar avanzan a Octavos de Final",
+      "thirdPlaceAdvancing": "Avanzan a Octavos de Final",
+      "thirdPlaceEliminated": "Eliminados",
+      "thirdPlaceBracketSlot": "Partido {number}",
+      "thirdPlaceAdjust": "Ajustar Predicciones de Grupos",
+      "thirdPlaceContinue": "Continuar a Eliminatorias",
+      "deadlineCountdown": "Plazo: {time} restante",
+      "deadlinePassed": "Plazo vencido — predicciones bloqueadas",
+      "captchaError": "No se pudo verificar el CAPTCHA. Intenta de nuevo.",
+      "stepDescriptionGroup": "Predice marcadores y clasifica equipos para {group}",
+      "stepDescriptionRound": "Elige ganadores para {round}"
     }
   }
 }
