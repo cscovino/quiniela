@@ -1,0 +1,116 @@
+.third-place-confirmation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--bg-card);
+  border: var(--border-width-md) solid var(--color-accent-500);
+  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.5));
+}
+
+.third-place-confirmation__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--border-width-sm) solid var(--color-accent-500);
+}
+
+.third-place-confirmation__heading {
+  font-family: var(--font-pixel);
+}
+
+.third-place-confirmation__subtitle {
+  color: var(--text-muted);
+}
+
+.third-place-confirmation__advancing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: var(--space-3);
+  border-left: var(--border-width-md) solid var(--color-success);
+}
+
+.third-place-confirmation__section-title {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+}
+
+.third-place-confirmation__section-title--advancing {
+  color: var(--color-success);
+}
+
+.third-place-confirmation__section-title--eliminated {
+  color: var(--color-error);
+}
+
+.third-place-confirmation__eliminated {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: var(--space-3);
+  border-left: var(--border-width-md) solid var(--color-error);
+  opacity: 0.7;
+}
+
+.third-place-confirmation__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.third-place-confirmation__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+}
+
+.third-place-confirmation__rank {
+  min-width: 24px;
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.third-place-confirmation__team-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.third-place-confirmation__group {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.third-place-confirmation__points {
+  margin-left: auto;
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+}
+
+.third-place-confirmation__points--advancing {
+  color: var(--color-gold-500);
+}
+
+.third-place-confirmation__points--eliminated {
+  color: var(--text-muted);
+}
+
+.third-place-confirmation__bracket-slot {
+  width: 100%;
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--color-success);
+  padding-left: calc(var(--space-4) + 24px);
+}
+
+.third-place-confirmation__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--border-width-sm) solid var(--color-accent-500);
+}

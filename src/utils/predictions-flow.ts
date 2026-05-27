@@ -1,4 +1,7 @@
 import type { Match, PhaseType } from '@app-types/firestore';
+import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
+
+import { getCombinationKey, THIRD_PLACE_MATRIX } from '../data/third-place-matrix';
 
 export interface MatchWithId extends Match {
   id: string;
@@ -404,4 +407,71 @@ export function getPredictorProgress(
     finalSubmitted: hasFinalPhase,
     bestPlayersSubmitted: hasBestPlayers,
   };
+}
+
+export function computeThirdPlaceStandings(
+  groupBets: GroupBetRecord,
+  matchPredictions: PredictionRecord,
+  matches: MatchWithId[],
+  teamsMap: Record<string, TeamInfo>,
+  groups: { slug: string }[],
+): ThirdPlacedTeam[] {
+  const thirdPlacedRecords: Array<{
+    teamId: string;
+    teamName: string;
+    groupLetter: string;
+    points: number;
+    goalDifference: number;
+    goalsScored: number;
+  }> = [];
+
+  for (const group of groups) {
+    const positions = groupBets[group.slug];
+    if (!positions || positions.length < 4) continue;
+    const thirdPlaceTeamId = positions[3];
+
+    const standings = calculateGroupStandings(matches, matchPredictions, teamsMap, group.slug);
+    const teamStanding = standings.find((s) => s.teamId === thirdPlaceTeamId);
+    const team = teamsMap[thirdPlaceTeamId];
+
+    thirdPlacedRecords.push({
+      teamId: thirdPlaceTeamId,
+      teamName: team?.name || thirdPlaceTeamId,
+      groupLetter: group.slug,
+      points: teamStanding?.points || 0,
+      goalDifference: (teamStanding?.goalsFor || 0) - (teamStanding?.goalsAgainst || 0),
+      goalsScored: teamStanding?.goalsFor || 0,
+    });
+  }
+
+  thirdPlacedRecords.sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+    if (b.goalsScored !== a.goalsScored) return b.goalsScored - a.goalsScored;
+    return 0;
+  });
+
+  const advancingGroups = thirdPlacedRecords.slice(0, 8).map((r) => r.groupLetter);
+  const combinationKey = getCombinationKey(advancingGroups);
+  const slotMapping = THIRD_PLACE_MATRIX[combinationKey] || {};
+
+  return thirdPlacedRecords.map((record, index) => {
+    const isAdvancing = index < 8;
+    const slot: string | undefined = isAdvancing
+      ? Object.entries(slotMapping).find(([, g]) => g === record.groupLetter)?.[0]
+      : undefined;
+
+    return {
+      rank: index + 1,
+      teamId: record.teamId,
+      teamName: record.teamName,
+      groupLetter: record.groupLetter,
+      points: record.points,
+      goalDifference: record.goalDifference,
+      goalsScored: record.goalsScored,
+      advancing: isAdvancing,
+      bracketSlotLabel: slot ? `Match ${slot.replace('M', '')}` : undefined,
+      bracketMatchSlug: slot ? `r32-${slot.toLowerCase()}` : undefined,
+    };
+  });
 }

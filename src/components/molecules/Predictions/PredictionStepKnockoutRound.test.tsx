@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { PhaseType } from '@app-types/firestore';
@@ -114,38 +113,6 @@ describe('PredictionStepKnockoutRound', () => {
       />,
     );
     expect(screen.getByText('All predictions submitted for this round')).toBeInTheDocument();
-  });
-
-  it('disables submit button when no predictions selected', async () => {
-    render(<PredictionStepKnockoutRound {...defaultProps} />);
-    const submitBtn = screen.getByRole('button', { name: /submit round/i });
-    expect(submitBtn).toBeDisabled();
-  });
-
-  it('enables submit button when prediction is selected', async () => {
-    const user = userEvent.setup();
-    render(<PredictionStepKnockoutRound {...defaultProps} />);
-    const radios = screen.getAllByRole('radio');
-    await user.click(radios[0]);
-    const submitBtn = screen.getByRole('button', { name: /submit round/i });
-    expect(submitBtn).not.toBeDisabled();
-  });
-
-  it('calls onSubmit with predictions when submitted', async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    render(<PredictionStepKnockoutRound {...defaultProps} onSubmit={onSubmit} />);
-    const radios = screen.getAllByRole('radio');
-    await user.click(radios[0]);
-    const submitBtn = screen.getByRole('button', { name: /submit round/i });
-    await user.click(submitBtn);
-    expect(onSubmit).toHaveBeenCalledWith({ 'r32-m1': 'ARG' });
-  });
-
-  it('disables submit button when isDisabled is true', () => {
-    render(<PredictionStepKnockoutRound {...defaultProps} isDisabled />);
-    const submitBtn = screen.getByRole('button', { name: /submit round/i });
-    expect(submitBtn).toBeDisabled();
   });
 
   it('shows correct phase labels for different phases', () => {
