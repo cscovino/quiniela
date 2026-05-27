@@ -46,6 +46,7 @@ export interface PredictionsTemplateProps {
     noMatches: string;
     submitSuccess: string;
     submitError: string;
+    captchaError: string;
     loginRequired: string;
     loginButton: string;
     loading: string;

@@ -18,7 +18,7 @@ import type {
   Match,
   MatchBet,
 } from '../types/firestore';
-import { getDb } from './firebase';
+import { getDb, isAppCheckError } from './firebase';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
@@ -159,6 +159,9 @@ export const predictionService = {
 
       return { success: true };
     } catch (err) {
+      if (isAppCheckError(err)) {
+        return { success: false, error: 'CAPTCHA_ERROR' };
+      }
       return {
         success: false,
         error: err instanceof Error ? err.message : 'Failed to submit prediction',
@@ -232,6 +235,9 @@ export const predictionService = {
 
       return { success: true };
     } catch (err) {
+      if (isAppCheckError(err)) {
+        return { success: false, error: 'CAPTCHA_ERROR' };
+      }
       return {
         success: false,
         error: err instanceof Error ? err.message : 'Failed to submit prediction',
@@ -314,6 +320,13 @@ export const predictionService = {
       }
       return { successCount, errorCount, errors };
     } catch (err) {
+      if (isAppCheckError(err)) {
+        return {
+          successCount: 0,
+          errorCount: Object.keys(predictions).length,
+          errors: ['CAPTCHA_ERROR'],
+        };
+      }
       return {
         successCount: 0,
         errorCount: Object.keys(predictions).length,
@@ -360,6 +373,13 @@ export const predictionService = {
       }
       return { successCount, errorCount: errors.length, errors };
     } catch (err) {
+      if (isAppCheckError(err)) {
+        return {
+          successCount: 0,
+          errorCount: Object.keys(predictions).length,
+          errors: ['CAPTCHA_ERROR'],
+        };
+      }
       return {
         successCount: 0,
         errorCount: Object.keys(predictions).length,
@@ -419,6 +439,13 @@ export const predictionService = {
       }
       return { successCount, errorCount: errors.length, errors };
     } catch (err) {
+      if (isAppCheckError(err)) {
+        return {
+          successCount: 0,
+          errorCount: Object.keys(predictions).length,
+          errors: ['CAPTCHA_ERROR'],
+        };
+      }
       return {
         successCount: 0,
         errorCount: Object.keys(predictions).length,
@@ -462,6 +489,9 @@ export const predictionService = {
 
       return { success: true };
     } catch (err) {
+      if (isAppCheckError(err)) {
+        return { success: false, error: 'CAPTCHA_ERROR' };
+      }
       return {
         success: false,
         error: err instanceof Error ? err.message : 'Failed to submit final phase prediction',
@@ -497,6 +527,9 @@ export const predictionService = {
 
       return { success: true };
     } catch (err) {
+      if (isAppCheckError(err)) {
+        return { success: false, error: 'CAPTCHA_ERROR' };
+      }
       return {
         success: false,
         error: err instanceof Error ? err.message : 'Failed to submit best players prediction',

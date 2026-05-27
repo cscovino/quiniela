@@ -7,6 +7,7 @@ import { predictionService } from '../prediction-service';
 vi.mock('../firebase', () => ({
   getDb: () => 'mock-db',
   initFirebase: vi.fn(() => Promise.resolve()),
+  isAppCheckError: vi.fn(() => false),
 }));
 
 const mockMatch = {

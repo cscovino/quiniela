@@ -26,6 +26,16 @@ const KNOCKOUT_PHASE_LABELS: Record<string, string> = {
   final: 'Final',
 };
 
+function mapErrorToMessage(
+  error: string,
+  translations: { captchaError: string; feedback: { submitFailed: string } },
+): string {
+  if (error === 'CAPTCHA_ERROR') {
+    return translations.captchaError;
+  }
+  return translations.feedback.submitFailed;
+}
+
 export interface UsePredictionStepsResult {
   loading: boolean;
   steps: PredictionStepModel[];
@@ -51,6 +61,7 @@ export function usePredictionSteps(
     stepBestPlayersDesc: string;
     stepDescriptionGroup?: string;
     stepDescriptionRound?: string;
+    captchaError: string;
     feedback: {
       submittedCount: string;
       finalPhaseSubmitted: string;
@@ -204,7 +215,9 @@ export function usePredictionSteps(
         } else {
           setFeedback({
             type: 'error',
-            message: result.error || translations.feedback.submitFailed,
+            message: result.error
+              ? mapErrorToMessage(result.error, translations)
+              : translations.feedback.submitFailed,
           });
         }
       } catch {
@@ -241,7 +254,9 @@ export function usePredictionSteps(
         } else {
           setFeedback({
             type: 'error',
-            message: result.error || translations.feedback.submitFailed,
+            message: result.error
+              ? mapErrorToMessage(result.error, translations)
+              : translations.feedback.submitFailed,
           });
         }
       } catch {
@@ -308,7 +323,13 @@ export function usePredictionSteps(
         Object.keys(data.matchPredictions).forEach((id) => newMatchBets.add(id));
         setExistingMatchBets(newMatchBets);
       }
-      if (errors.length > 0) setFeedback({ type: 'error', message: errors[0] });
+      if (errors.length > 0) {
+        const error = errors[0];
+        setFeedback({
+          type: 'error',
+          message: error === 'CAPTCHA_ERROR' ? translations.captchaError : error,
+        });
+      }
       setTimeout(() => setFeedback(null), 5000);
     },
     [user, selectedPredictorId, firestoreMatches, translations, existingMatchBets],
@@ -345,7 +366,13 @@ export function usePredictionSteps(
         });
         setKnockoutBetsByMatchSlug(newKnockoutBets);
       }
-      if (result.errors.length > 0) setFeedback({ type: 'error', message: result.errors[0] });
+      if (result.errors.length > 0) {
+        const error = result.errors[0];
+        setFeedback({
+          type: 'error',
+          message: error === 'CAPTCHA_ERROR' ? translations.captchaError : error,
+        });
+      }
       setTimeout(() => setFeedback(null), 5000);
     },
     [user, selectedPredictorId, firestoreMatches, translations, knockoutBetsByMatchSlug],

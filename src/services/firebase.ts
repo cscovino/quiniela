@@ -59,6 +59,33 @@ export async function getAppCheckToken(): Promise<string | undefined> {
   }
 }
 
+export async function getFreshAppCheckToken(): Promise<string | undefined> {
+  if (!_appCheck) return undefined;
+  const { getToken } = await import('firebase/app-check');
+  try {
+    const result = await getToken(_appCheck, { forceRefresh: true });
+    return result.token;
+  } catch {
+    return undefined;
+  }
+}
+
+export function isAppCheckError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return (
+      message.includes('app-check') ||
+      message.includes('app check') ||
+      message.includes('captcha') ||
+      message.includes('recaptcha') ||
+      message.includes('token expired') ||
+      message.includes('token invalid') ||
+      message.includes('unavailable')
+    );
+  }
+  return false;
+}
+
 export function getDb(): Firestore {
   if (!_db) {
     ensureApp();
