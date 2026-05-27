@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 
+import { Button } from '@atoms/Button';
 import { Icon } from '@atoms/Icon';
 import { initAuth } from '@services/auth-bootstrap';
 import { useAuthStore } from '@store/auth-store';
@@ -48,6 +49,13 @@ export const NavBar: FC<NavBarProps> = ({
   const logout = useAuthStore((state) => state.logout);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof document !== 'undefined') {
+      return (document.documentElement.getAttribute('data-theme') as 'dark' | 'light') || 'dark';
+    }
+    return 'dark';
+  });
+
   useEffect(() => {
     initAuth();
   }, []);
@@ -87,8 +95,8 @@ export const NavBar: FC<NavBarProps> = ({
   const closeMenu = () => setMenuOpen(false);
 
   const toggleTheme = () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
     try {
       localStorage.setItem('theme', newTheme);
@@ -141,49 +149,47 @@ export const NavBar: FC<NavBarProps> = ({
           {otherLocaleLabel}
         </a>
 
-        <button
-          type="button"
-          className="nav-bar__btn nav-bar__btn--icon"
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={toggleTheme}
           aria-label={translations.toggleTheme}
         >
-          <Icon name="star" size={18} />
-        </button>
+          <Icon name={theme === 'dark' ? 'moon' : 'sparkles'} size={18} />
+        </Button>
 
         {notificationCount > 0 && (
-          <button
-            type="button"
-            className="nav-bar__btn nav-bar__btn--icon nav-bar__btn--notification"
-            aria-label={translations.notifications}
-          >
-            <Icon name="bell" size={18} />
-            <span className="nav-bar__badge">{notificationCount}</span>
-          </button>
+          <Button variant="ghost" size="sm" aria-label={translations.notifications}>
+            <span style={{ position: 'relative' }}>
+              <Icon name="bell" size={18} />
+              <span className="nav-bar__badge">{notificationCount}</span>
+            </span>
+          </Button>
         )}
 
         {isLoggedIn ? (
           <div className="nav-bar__group nav-bar__group--desktop">
             <Icon name="user" size={18} />
             <span className="nav-bar__username">{userDisplayName}</span>
-            <button type="button" className="nav-bar__logout" onClick={handleLogout}>
-              {translations.logout}
-            </button>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <Icon name="logout" size={16} /> {translations.logout}
+            </Button>
           </div>
         ) : (
           <a href={loginHref} className="nav-bar__group--desktop" data-astro-prefetch>
-            <span className="nav-bar__login-btn">{translations.login}</span>
+            <Icon name="login" size={16} /> {translations.login}
           </a>
         )}
 
-        <button
-          type="button"
-          className="nav-bar__btn nav-bar__btn--icon nav-bar__hamburger"
-          onClick={() => setMenuOpen((open) => !open)}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMenuOpen((o) => !o)}
           aria-label={translations.toggleMenu}
           aria-expanded={menuOpen}
         >
           <Icon name={menuOpen ? 'close' : 'menu'} size={20} />
-        </button>
+        </Button>
       </div>
 
       <div
@@ -198,9 +204,9 @@ export const NavBar: FC<NavBarProps> = ({
               <div className="nav-bar__mobile-user">
                 <Icon name="user" size={18} />
                 <span>{userDisplayName}</span>
-                <button type="button" className="nav-bar__logout-btn" onClick={handleLogout}>
-                  {translations.logout}
-                </button>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <Icon name="logout" size={16} /> {translations.logout}
+                </Button>
               </div>
             </>
           )}
@@ -223,8 +229,13 @@ export const NavBar: FC<NavBarProps> = ({
 
           {!isLoggedIn && (
             <div className="nav-bar__mobile-cta">
-              <a href={loginHref} onClick={closeMenu} data-astro-prefetch>
-                <span className="nav-bar__cta-btn">{translations.login}</span>
+              <a
+                href={loginHref}
+                onClick={closeMenu}
+                className="nav-bar__cta-btn"
+                data-astro-prefetch
+              >
+                <Icon name="login" size={16} /> {translations.login}
               </a>
             </div>
           )}

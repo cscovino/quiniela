@@ -1,6 +1,9 @@
 import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { Button } from '@atoms/Button';
+import { Icon } from '@atoms/Icon';
+
 import './PWAInstall.css';
 
 export const PWAInstall: FC = () => {
@@ -40,18 +43,13 @@ export const PWAInstall: FC = () => {
 
   return (
     <div className="pwa-install" role="banner" aria-label="Install application">
-      <button
-        type="button"
-        className="pwa-install__dismiss"
-        onClick={handleDismiss}
-        aria-label="Dismiss"
-      >
-        ×
-      </button>
+      <Button variant="ghost" size="sm" onClick={handleDismiss} aria-label="Dismiss">
+        <Icon name="close" size={14} />
+      </Button>
       <span className="pwa-install__text">Install App</span>
-      <button type="button" className="pwa-install__btn" onClick={handleInstall}>
+      <Button variant="primary" size="sm" onClick={handleInstall}>
         Install
-      </button>
+      </Button>
     </div>
   );
 };
