@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Typography } from '@atoms/Typography/Typography';
-import { Icon } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+import { useEffect, useState } from 'react';
+
+import { Icon } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+
 import './CountdownTimer.css';
 
 export interface CountdownTimerProps {
@@ -33,7 +36,7 @@ function padZero(num: number): string {
   return num.toString().padStart(2, '0');
 }
 
-export const CountdownTimer: React.FC<CountdownTimerProps> = ({
+export const CountdownTimer: FC<CountdownTimerProps> = ({
   targetDate,
   label,
   expiredText = 'Expired',

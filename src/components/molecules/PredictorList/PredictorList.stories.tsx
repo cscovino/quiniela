@@ -1,9 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PredictorList } from './PredictorList';
-import type { Predictor } from '@app-types/firestore';
 import type { Timestamp } from 'firebase/firestore';
 
-const makePredictor = (id: string, name: string, avatar?: { bgColor: string; emoji: string }): Predictor => ({
+import type { Predictor } from '@app-types/firestore';
+
+import { PredictorList } from './PredictorList';
+
+const makePredictor = (
+  id: string,
+  name: string,
+  avatar?: { bgColor: string; emoji: string },
+): Predictor => ({
   id,
   userId: 'user-1',
   name,

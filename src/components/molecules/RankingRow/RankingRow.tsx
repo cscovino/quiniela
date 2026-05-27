@@ -1,9 +1,11 @@
-import React from 'react';
-import { Avatar } from '@atoms/Avatar/Avatar';
-import { PredictorAvatar } from '@atoms/PredictorAvatar/PredictorAvatar';
-import { Typography } from '@atoms/Typography/Typography';
-import { Badge } from '@atoms/Badge/Badge';
-import { Icon } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+
+import { Avatar } from '@atoms/Avatar';
+import { Badge } from '@atoms/Badge';
+import { Icon } from '@atoms/Icon';
+import { PredictorAvatar } from '@atoms/PredictorAvatar';
+import { Typography } from '@atoms/Typography';
+
 import './RankingRow.css';
 
 export interface RankingRowProps {
@@ -18,7 +20,7 @@ export interface RankingRowProps {
   className?: string;
 }
 
-export const RankingRow: React.FC<RankingRowProps> = ({
+export const RankingRow: FC<RankingRowProps> = ({
   position,
   avatarUrl,
   avatar,

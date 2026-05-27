@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PredictionStepGroup } from './PredictionStepGroup';
-import type { MatchWithId } from '@utils/predictions-flow';
 import type { Timestamp } from 'firebase/firestore';
+
+import type { MatchWithId } from '@utils/predictions-flow';
+
+import { PredictionStepGroup } from './PredictionStepGroup';
 
 const makeMatch = (id: string, home: string, away: string): MatchWithId => ({
   id,

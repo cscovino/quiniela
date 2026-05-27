@@ -1,8 +1,9 @@
-import React from 'react';
-import { MatchList, type MatchListProps } from '@organisms/MatchList/MatchList';
+import type { FC } from 'react';
+
 import { useLiveData } from '@hooks/useLiveData';
+import type { MatchCardProps } from '@molecules/MatchCard';
+import { MatchList, type MatchListProps } from '@organisms/MatchList';
 import { fetchLiveMatches } from '@services/live-data-service';
-import type { MatchCardProps } from '@molecules/MatchCard/MatchCard';
 
 export interface LiveMatchListProps extends Omit<MatchListProps, 'matches'> {
   initialMatches: MatchCardProps[];
@@ -10,7 +11,7 @@ export interface LiveMatchListProps extends Omit<MatchListProps, 'matches'> {
   limit?: number;
 }
 
-export const LiveMatchList: React.FC<LiveMatchListProps> = ({
+export const LiveMatchList: FC<LiveMatchListProps> = ({
   initialMatches,
   cacheKey = 'live-matches',
   limit = 5,

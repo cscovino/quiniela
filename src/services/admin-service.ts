@@ -1,6 +1,7 @@
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { getDb } from './firebase';
+import { doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+
 import type { MatchStatus } from '../types/firestore';
+import { getDb } from './firebase';
 
 export const updateMatchResult = async (
   tournamentId: string,

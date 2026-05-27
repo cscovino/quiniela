@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { AuthGuard } from './AuthGuard';
+
 import { useAuthStore } from '@store/auth-store';
+
+import { AuthGuard } from './AuthGuard';
 
 const meta = {
   component: AuthGuard,

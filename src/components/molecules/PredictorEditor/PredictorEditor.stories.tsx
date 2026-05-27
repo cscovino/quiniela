@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PredictorEditor } from './PredictorEditor';
-import type { Predictor } from '@app-types/firestore';
 import type { Timestamp } from 'firebase/firestore';
+
+import type { Predictor } from '@app-types/firestore';
+
+import { PredictorEditor } from './PredictorEditor';
 
 const makePredictor = (overrides: Partial<Predictor> = {}): Predictor => ({
   id: 'user-1-default',

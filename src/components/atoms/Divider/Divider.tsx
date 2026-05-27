@@ -1,4 +1,5 @@
-import React from 'react';
+import type { FC } from 'react';
+
 import './Divider.css';
 
 export interface DividerProps {
@@ -6,6 +7,6 @@ export interface DividerProps {
   className?: string;
 }
 
-export const Divider: React.FC<DividerProps> = ({ orientation = 'horizontal', className = '' }) => {
+export const Divider: FC<DividerProps> = ({ orientation = 'horizontal', className = '' }) => {
   return <div className={`divider divider--${orientation} ${className}`} role="separator" />;
 };

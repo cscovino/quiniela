@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+
 import { TeamFlag } from './TeamFlag';
 
 describe('TeamFlag', () => {

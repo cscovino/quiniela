@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC, FormEvent } from 'react';
+import { useState } from 'react';
+
 import type { Match, MatchStatus } from '@app-types/firestore';
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+
 import './AdminMatchResultForm.css';
 
 export interface AdminMatchResultFormProps {
@@ -12,7 +15,7 @@ export interface AdminMatchResultFormProps {
 
 const MATCH_STATUSES: MatchStatus[] = ['scheduled', 'live', 'finished', 'postponed', 'cancelled'];
 
-export const AdminMatchResultForm: React.FC<AdminMatchResultFormProps> = ({
+export const AdminMatchResultForm: FC<AdminMatchResultFormProps> = ({
   match,
   onSubmit,
   onCancel,
@@ -26,7 +29,7 @@ export const AdminMatchResultForm: React.FC<AdminMatchResultFormProps> = ({
   const [status, setStatus] = useState<MatchStatus>(match.status);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 

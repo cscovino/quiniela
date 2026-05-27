@@ -6,10 +6,32 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  transition: transform var(--duration-fast) var(--ease-out),
-              filter var(--duration-fast) var(--ease-out);
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    filter var(--duration-fast) var(--ease-out);
   text-transform: uppercase;
-  clip-path: polygon(0px 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0px, calc(100% - 8px) 0px, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 4px) calc(100% - 8px), calc(100% - 4px) calc(100% - 4px), calc(100% - 8px) calc(100% - 4px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 4px), 4px calc(100% - 4px), 4px calc(100% - 8px), 0px calc(100% - 8px));
+  clip-path: polygon(
+    0px 8px,
+    4px 8px,
+    4px 4px,
+    8px 4px,
+    8px 0px,
+    calc(100% - 8px) 0px,
+    calc(100% - 8px) 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 8px) calc(100% - 4px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 4px),
+    4px calc(100% - 4px),
+    4px calc(100% - 8px),
+    0px calc(100% - 8px)
+  );
 }
 
 .btn:hover:not(:disabled) {
@@ -119,7 +141,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .btn__content {

@@ -1,5 +1,8 @@
-import React, { useMemo } from 'react';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+import { useMemo } from 'react';
+
+import { Typography } from '@atoms/Typography';
+
 import './PointsChart.css';
 
 export interface PointEntry {
@@ -20,7 +23,7 @@ export interface PointsChartProps {
   className?: string;
 }
 
-export const PointsChart: React.FC<PointsChartProps> = ({ data, translations, className = '' }) => {
+export const PointsChart: FC<PointsChartProps> = ({ data, translations, className = '' }) => {
   const chartData = useMemo(() => {
     if (data.length === 0) return null;
 

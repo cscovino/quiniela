@@ -1,4 +1,5 @@
-import React from 'react';
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, FC, ReactNode } from 'react';
+
 import './Button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'gold' | 'danger' | 'ghost';
@@ -10,22 +11,22 @@ interface BaseProps {
   isLoading?: boolean;
   fullWidth?: boolean;
   className?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 type ButtonAsButton = BaseProps &
-  Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, keyof BaseProps> & {
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof BaseProps> & {
     href?: undefined;
   };
 
 type ButtonAsLink = BaseProps &
-  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof BaseProps | 'href'> & {
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof BaseProps | 'href'> & {
     href: string;
   };
 
 export type ButtonProps = ButtonAsButton | ButtonAsLink;
 
-export const Button: React.FC<ButtonProps> = (props) => {
+export const Button: FC<ButtonProps> = (props) => {
   const {
     variant = 'primary',
     size = 'md',

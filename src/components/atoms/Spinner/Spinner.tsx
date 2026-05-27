@@ -1,4 +1,5 @@
-import React from 'react';
+import type { FC } from 'react';
+
 import './Spinner.css';
 
 export type SpinnerSize = 'sm' | 'md' | 'lg';
@@ -8,7 +9,7 @@ export interface SpinnerProps {
   className?: string;
 }
 
-export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className = '' }) => {
+export const Spinner: FC<SpinnerProps> = ({ size = 'md', className = '' }) => {
   return (
     <div className={`spinner spinner--${size} ${className}`} role="status" aria-label="Loading" />
   );

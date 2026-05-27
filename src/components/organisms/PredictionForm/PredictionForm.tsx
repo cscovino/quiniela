@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { PredictionInput } from '@molecules/PredictionInput/PredictionInput';
-import { TeamSelector } from '@molecules/TeamSelector/TeamSelector';
-import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+import { useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+import { PredictionInput } from '@molecules/PredictionInput';
+import { TeamFlag } from '@molecules/TeamFlag';
+import { TeamSelector } from '@molecules/TeamSelector';
+
 import './PredictionForm.css';
 
 export interface MatchPrediction {
@@ -26,7 +29,7 @@ export interface PredictionFormProps {
   className?: string;
 }
 
-export const PredictionForm: React.FC<PredictionFormProps> = ({
+export const PredictionForm: FC<PredictionFormProps> = ({
   matches,
   onSubmit,
   onPredictionsChange,

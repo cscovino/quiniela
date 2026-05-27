@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
+import type { LoginFormProps } from '@molecules/LoginForm';
+import type { RegisterFormProps } from '@molecules/RegisterForm';
+
 import { AuthTemplate } from './AuthTemplate';
-import type { LoginFormProps } from '@molecules/LoginForm/LoginForm';
-import type { RegisterFormProps } from '@molecules/RegisterForm/RegisterForm';
 
 const meta = {
   component: AuthTemplate,

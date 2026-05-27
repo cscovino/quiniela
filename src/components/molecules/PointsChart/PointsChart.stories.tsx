@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PointsChart, type PointEntry } from './PointsChart';
+
+import { type PointEntry, PointsChart } from './PointsChart';
 
 const meta = {
   component: PointsChart,

@@ -4,6 +4,7 @@ import tsParser from '@typescript-eslint/parser';
 import astroPlugin from 'eslint-plugin-astro';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import type { Linter } from 'eslint';
 
@@ -26,6 +27,7 @@ export default [
       '@typescript-eslint': tsPlugin,
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
+      'simple-import-sort': simpleImportSort,
     },
     rules: {
       ...tsPlugin.configs.recommended.rules,
@@ -38,6 +40,16 @@ export default [
       'operator-linebreak': 'off',
       'no-console': 'warn',
       'react-hooks/set-state-in-effect': 'off',
+      'simple-import-sort/imports': ['error', {
+        groups: [
+          ['^node:'],
+          ['^@?\\w'],
+          ['^@(atoms|molecules|organisms|templates|pages|layouts|styles|utils|hooks|store|services|app-types|locales|lib|\\/)/'],
+          ['^\\.'],
+          ['^\\u0000'],
+        ],
+      }],
+      'simple-import-sort/exports': 'error',
     },
     settings: { react: { version: '19.2' } },
   },

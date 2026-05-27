@@ -1,22 +1,21 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import {
-  UserProfile,
-  type BadgeEarned,
-  type BadgeLocked,
-} from '@organisms/UserProfile/UserProfile';
-import { EditProfileForm } from '@molecules/EditProfileForm/EditProfileForm';
-import { PointsChart } from '@molecules/PointsChart/PointsChart';
-import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList/PredictorList';
-import { Typography } from '@atoms/Typography/Typography';
-import { Spinner } from '@atoms/Spinner/Spinner';
-import { Button } from '@atoms/Button/Button';
-import { tournamentService } from '@services/tournament-service';
+import type { FC } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import { BADGE_DEFINITIONS, getBadgeDescription, getBadgeName } from '@app-types/badges';
+import type { Predictor, PredictorStats } from '@app-types/firestore';
+import { Button } from '@atoms/Button';
+import { Spinner } from '@atoms/Spinner';
+import { Typography } from '@atoms/Typography';
+import { EditProfileForm } from '@molecules/EditProfileForm';
+import type { PointEntry } from '@molecules/PointsChart';
+import { PointsChart } from '@molecules/PointsChart';
+import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList';
+import { type BadgeEarned, type BadgeLocked, UserProfile } from '@organisms/UserProfile';
 import { predictorService } from '@services/predictor-service';
-import { BADGE_DEFINITIONS, getBadgeName, getBadgeDescription } from '@app-types/badges';
+import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
 import { getLoginRoute, getRoute } from '@utils/i18n';
-import type { Predictor, PredictorStats } from '@app-types/firestore';
-import type { PointEntry } from '@molecules/PointsChart/PointsChart';
+
 import './ProfileTemplate.css';
 
 export interface ProfileTemplateProps {
@@ -64,7 +63,7 @@ export interface ProfileTemplateProps {
   className?: string;
 }
 
-export const ProfileTemplate: React.FC<ProfileTemplateProps> = ({
+export const ProfileTemplate: FC<ProfileTemplateProps> = ({
   translations,
   locale = 'en',
   className = '',

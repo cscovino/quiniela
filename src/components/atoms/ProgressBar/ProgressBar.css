@@ -18,11 +18,21 @@
   transition: width var(--duration-slow) var(--ease-out);
 }
 
-.progress-bar__fill--primary { background: var(--color-primary-500); }
-.progress-bar__fill--accent { background: var(--color-accent-500); }
-.progress-bar__fill--success { background: var(--color-success); }
-.progress-bar__fill--warning { background: var(--color-warning); }
-.progress-bar__fill--error { background: var(--color-error); }
+.progress-bar__fill--primary {
+  background: var(--color-primary-500);
+}
+.progress-bar__fill--accent {
+  background: var(--color-accent-500);
+}
+.progress-bar__fill--success {
+  background: var(--color-success);
+}
+.progress-bar__fill--warning {
+  background: var(--color-warning);
+}
+.progress-bar__fill--error {
+  background: var(--color-error);
+}
 
 .progress-bar__label {
   font-family: var(--font-pixel);

@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useCallback } from 'react';
 import { driver, type DriveStep } from 'driver.js';
+import type { FC } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+
 import 'driver.js/dist/driver.css';
 import './ProductTour.css';
 
@@ -55,7 +57,7 @@ export function resetTour(tourId: string): void {
   }
 }
 
-export const ProductTour: React.FC<ProductTourProps> = ({
+export const ProductTour: FC<ProductTourProps> = ({
   tourId,
   steps,
   onComplete,

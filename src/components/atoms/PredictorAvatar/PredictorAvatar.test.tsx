@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { PredictorAvatar } from './PredictorAvatar';
+import { describe, expect, it } from 'vitest';
+
 import type { Predictor } from '@app-types/firestore';
+
+import { PredictorAvatar } from './PredictorAvatar';
 
 const makePredictor = (overrides: Partial<Predictor> = {}): Predictor => ({
   id: 'user-1-default',
@@ -43,15 +45,9 @@ describe('PredictorAvatar', () => {
   });
 
   it('applies size class', () => {
-    const { container: sm } = render(
-      <PredictorAvatar predictor={makePredictor()} size="sm" />,
-    );
-    const { container: md } = render(
-      <PredictorAvatar predictor={makePredictor()} size="md" />,
-    );
-    const { container: lg } = render(
-      <PredictorAvatar predictor={makePredictor()} size="lg" />,
-    );
+    const { container: sm } = render(<PredictorAvatar predictor={makePredictor()} size="sm" />);
+    const { container: md } = render(<PredictorAvatar predictor={makePredictor()} size="md" />);
+    const { container: lg } = render(<PredictorAvatar predictor={makePredictor()} size="lg" />);
 
     expect(sm.firstChild).toHaveClass('predictor-avatar--sm');
     expect(md.firstChild).toHaveClass('predictor-avatar--md');

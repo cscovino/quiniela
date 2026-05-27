@@ -1,4 +1,5 @@
-import React from 'react';
+import type { CSSProperties, FC, ReactNode } from 'react';
+
 import './PixelArt.css';
 
 export type PixelArtName =
@@ -23,7 +24,7 @@ export interface PixelArtProps {
   animated?: boolean;
 }
 
-const spriteMap: Record<PixelArtName, React.ReactNode> = {
+const spriteMap: Record<PixelArtName, ReactNode> = {
   football: (
     <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <rect x="6" y="2" width="4" height="2" />
@@ -219,7 +220,7 @@ const spriteMap: Record<PixelArtName, React.ReactNode> = {
   ),
 };
 
-export const PixelArt: React.FC<PixelArtProps> = ({
+export const PixelArt: FC<PixelArtProps> = ({
   name,
   size = 32,
   className = '',
@@ -238,7 +239,7 @@ export const PixelArt: React.FC<PixelArtProps> = ({
   return (
     <div
       className={`pixel-art pixel-art--${name} ${animationClass} ${className}`}
-      style={{ '--pixel-art-size': `${size}px` } as React.CSSProperties}
+      style={{ '--pixel-art-size': `${size}px` } as CSSProperties}
       role="img"
       aria-label={name}
     >

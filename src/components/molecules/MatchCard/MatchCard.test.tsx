@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+
 import { MatchCard } from './MatchCard';
 
 const mockHomeTeam = { fifaCode: 'ARG', name: 'Argentina' };

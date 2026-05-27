@@ -1,13 +1,14 @@
-import React from 'react';
+import type { ElementType, FC, ReactNode } from 'react';
+
 import './Typography.css';
 
 export type TypographyVariant = 'h1' | 'h2' | 'h3' | 'h4' | 'body' | 'small' | 'caption';
 
 export interface TypographyProps {
   variant?: TypographyVariant;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
-  as?: React.ElementType;
+  as?: ElementType;
 }
 
 const variantMap: Record<TypographyVariant, { tag: string; className: string }> = {
@@ -20,7 +21,7 @@ const variantMap: Record<TypographyVariant, { tag: string; className: string }> 
   caption: { tag: 'span', className: 'typography--caption' },
 };
 
-export const Typography: React.FC<TypographyProps> = ({
+export const Typography: FC<TypographyProps> = ({
   variant = 'body',
   children,
   className = '',

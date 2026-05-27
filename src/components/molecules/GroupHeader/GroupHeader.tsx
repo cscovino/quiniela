@@ -1,7 +1,9 @@
-import React from 'react';
-import { Typography } from '@atoms/Typography/Typography';
-import { Badge } from '@atoms/Badge/Badge';
-import { Icon } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+
+import { Badge } from '@atoms/Badge';
+import { Icon } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+
 import './GroupHeader.css';
 
 export interface GroupStanding {
@@ -27,7 +29,7 @@ export interface GroupHeaderProps {
   className?: string;
 }
 
-export const GroupHeader: React.FC<GroupHeaderProps> = ({
+export const GroupHeader: FC<GroupHeaderProps> = ({
   name,
   standings,
   translations,

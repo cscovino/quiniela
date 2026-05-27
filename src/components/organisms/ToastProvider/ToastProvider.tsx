@@ -1,8 +1,9 @@
-import React from 'react';
-import { ToastContainer } from '@atoms/Toast/Toast';
+import type { FC } from 'react';
+
+import { ToastContainer } from '@atoms/Toast';
 import { useToastStore } from '@store/toast-store';
 
-export const ToastProvider: React.FC = () => {
+export const ToastProvider: FC = () => {
   const toasts = useToastStore((state) => state.toasts);
   const dismissToast = useToastStore((state) => state.dismissToast);
 

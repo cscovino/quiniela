@@ -1,21 +1,24 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList/PredictorList';
-import { PredictorEditor } from '@molecules/PredictorEditor/PredictorEditor';
-import { PredictorDeleteConfirm } from '@molecules/PredictorDeleteConfirm/PredictorDeleteConfirm';
-import { getLoginRoute } from '@utils/i18n';
+import type { FC } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import type { Predictor } from '@app-types/firestore';
+import { Spinner } from '@atoms/Spinner';
+import { Typography } from '@atoms/Typography';
+import { usePredictionSteps } from '@hooks/usePredictionSteps';
 import {
-  PredictionsProgress,
   PredictionsFeedback,
   PredictionsNavigation,
-} from '@molecules/Predictions/PredictionsUI';
-import { Typography } from '@atoms/Typography/Typography';
-import { Spinner } from '@atoms/Spinner/Spinner';
+  PredictionsProgress,
+} from '@molecules/Predictions';
+import { PredictorDeleteConfirm } from '@molecules/PredictorDeleteConfirm';
+import { PredictorEditor } from '@molecules/PredictorEditor';
+import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList';
+import { ProductTour, resetTour } from '@organisms/ProductTour';
+import { FIRST_PREDICTOR_TOUR, PREDICTION_WIZARD_TOUR } from '@organisms/ProductTour/tours';
 import { predictorService } from '@services/predictor-service';
 import { useAuthStore } from '@store/auth-store';
-import type { Predictor } from '@app-types/firestore';
-import { usePredictionSteps } from '@hooks/usePredictionSteps';
-import { ProductTour, resetTour } from '@organisms/ProductTour/ProductTour';
-import { PREDICTION_WIZARD_TOUR, FIRST_PREDICTOR_TOUR } from '@organisms/ProductTour/tours';
+import { getLoginRoute } from '@utils/i18n';
+
 import './PredictionsTemplate.css';
 
 type PredictorView = 'list' | 'wizard' | 'editor' | 'delete';
@@ -81,7 +84,7 @@ const defaultListTranslations = {
   backToPredictors: 'Back to predictions',
 };
 
-export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
+export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
   translations,
   locale = 'en',
   className = '',
@@ -374,7 +377,6 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
     );
   }
 
-  const stepLabels = steps.map((s) => s.label);
   const stepCounter = translations.stepXofY
     .replace('{current}', String(currentStep + 1))
     .replace('{total}', String(totalSteps));
@@ -405,12 +407,7 @@ export const PredictionsTemplate: React.FC<PredictionsTemplateProps> = ({
           </button>
         </header>
 
-        <PredictionsProgress
-          stepLabels={stepLabels}
-          currentStep={currentStep}
-          submittedSteps={submittedSteps}
-          stepCounter={stepCounter}
-        />
+        <PredictionsProgress stepCounter={stepCounter} />
         <PredictionsFeedback feedback={feedback} />
 
         <section className="predictions-template__section">

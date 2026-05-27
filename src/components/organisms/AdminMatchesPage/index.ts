@@ -1,0 +1,1 @@
+export { AdminMatchesPage } from './AdminMatchesPage';

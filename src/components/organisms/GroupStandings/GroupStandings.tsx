@@ -1,7 +1,9 @@
-import React from 'react';
-import { GroupHeader, type GroupStanding } from '@molecules/GroupHeader/GroupHeader';
-import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+
+import { Typography } from '@atoms/Typography';
+import { GroupHeader, type GroupStanding } from '@molecules/GroupHeader';
+import { TeamFlag } from '@molecules/TeamFlag';
+
 import './GroupStandings.css';
 
 export interface GroupStandingsProps {
@@ -18,7 +20,7 @@ export interface GroupStandingsProps {
   className?: string;
 }
 
-export const GroupStandings: React.FC<GroupStandingsProps> = ({
+export const GroupStandings: FC<GroupStandingsProps> = ({
   groups,
   translations,
   className = '',

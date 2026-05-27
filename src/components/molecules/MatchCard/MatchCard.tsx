@@ -1,9 +1,11 @@
-import React from 'react';
-import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
-import { Badge } from '@atoms/Badge/Badge';
-import { Typography } from '@atoms/Typography/Typography';
-import { Icon, type IconName } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+
+import { Badge } from '@atoms/Badge';
+import { Icon, type IconName } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+import { TeamFlag } from '@molecules/TeamFlag';
 import { getDateLocale } from '@utils/i18n';
+
 import './MatchCard.css';
 
 export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'cancelled';
@@ -61,7 +63,7 @@ const getStatusConfig = (
   return config[status];
 };
 
-export const MatchCard: React.FC<MatchCardProps> = ({
+export const MatchCard: FC<MatchCardProps> = ({
   homeTeam,
   awayTeam,
   date,

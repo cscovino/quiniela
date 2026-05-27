@@ -1,23 +1,24 @@
 import {
-  doc,
-  setDoc,
-  getDoc,
-  serverTimestamp,
   collection,
-  query,
-  where,
+  doc,
+  getDoc,
   getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
-import { getDb } from './firebase';
+
 import type {
-  MatchBet,
-  KnockoutBet,
-  GroupBet,
-  Match,
-  FinalPhaseBet,
   BestPlayersBet,
+  FinalPhaseBet,
+  GroupBet,
+  KnockoutBet,
+  Match,
+  MatchBet,
 } from '../types/firestore';
+import { getDb } from './firebase';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 

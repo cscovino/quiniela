@@ -1,6 +1,7 @@
 import { collectionGroup, getDocs, query, where } from 'firebase/firestore';
-import { getDb } from './firebase';
+
 import type { PredictorStats } from '../types/firestore';
+import { getDb } from './firebase';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 

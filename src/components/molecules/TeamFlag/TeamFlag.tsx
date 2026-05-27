@@ -1,5 +1,7 @@
-import React from 'react';
+import type { FC } from 'react';
+
 import { getFlagClass } from '@utils/flagMapping';
+
 import './TeamFlag.css';
 
 export interface TeamFlagProps {
@@ -11,7 +13,7 @@ export interface TeamFlagProps {
   noTruncate?: boolean;
 }
 
-export const TeamFlag: React.FC<TeamFlagProps> = ({
+export const TeamFlag: FC<TeamFlagProps> = ({
   fifaCode,
   size = 'md',
   showName = false,

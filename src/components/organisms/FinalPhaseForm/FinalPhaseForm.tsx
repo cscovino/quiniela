@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+import { useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+import { TeamFlag } from '@molecules/TeamFlag';
+
 import './FinalPhaseForm.css';
 
 export interface FinalPhaseFormProps {
@@ -20,7 +23,7 @@ const POSITION_KEYS: ('first' | 'second' | 'third' | 'fourth')[] = [
   'fourth',
 ];
 
-export const FinalPhaseForm: React.FC<FinalPhaseFormProps> = ({
+export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
   teams,
   onSubmit,
   existingPrediction,

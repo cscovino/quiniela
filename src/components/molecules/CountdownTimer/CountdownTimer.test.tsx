@@ -1,5 +1,6 @@
-import { render, screen, act } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
+
 import { CountdownTimer } from './CountdownTimer';
 
 describe('CountdownTimer', () => {

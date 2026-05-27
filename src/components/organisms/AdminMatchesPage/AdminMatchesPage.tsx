@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { AdminMatchList } from '@organisms/AdminMatchList/AdminMatchList';
-import { Typography } from '@atoms/Typography/Typography';
-import { Button } from '@atoms/Button/Button';
-import { updateMatchResult } from '@services/admin-service';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import type { FC } from 'react';
+import { useEffect, useState } from 'react';
+
 import type { Match, MatchStatus } from '@app-types/firestore';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+import { AdminMatchList } from '@organisms/AdminMatchList';
+import { updateMatchResult } from '@services/admin-service';
 import { getDb } from '@services/firebase';
 import { useAuthStore } from '@store/auth-store';
 import { getLoginRoute } from '@utils/i18n';
+
 import './AdminMatchesPage.css';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
-export const AdminMatchesPage: React.FC = () => {
+export const AdminMatchesPage: FC = () => {
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
   const [matches, setMatches] = useState<(Match & { id: string })[]>([]);

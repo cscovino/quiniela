@@ -1,17 +1,16 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
-import type { GroupForPrediction } from '@organisms/GroupPredictionForm/GroupPredictionForm';
-import { tournamentService } from '@services/tournament-service';
-import { predictionService } from '@services/prediction-service';
-import { useAuthStore } from '@store/auth-store';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import type { Match } from '@app-types/firestore';
+import { PredictionStepGroup } from '@molecules/Predictions';
+import { PredictionStepKnockoutRound } from '@molecules/Predictions';
+import { PredictionStepBestPlayers, PredictionStepFinalPhase } from '@molecules/Predictions';
+import type { GroupForPrediction } from '@organisms/GroupPredictionForm';
+import { predictionService } from '@services/prediction-service';
+import { tournamentService } from '@services/tournament-service';
+import { useAuthStore } from '@store/auth-store';
 import { isGroupClassificationComplete, KNOCKOUT_PHASES } from '@utils/predictions-flow';
+
 import type { PredictionStepModel } from '../types/prediction-steps';
-import { PredictionStepGroup } from '@molecules/Predictions/PredictionStepGroup';
-import { PredictionStepKnockoutRound } from '@molecules/Predictions/PredictionStepKnockoutRound';
-import {
-  PredictionStepFinalPhase,
-  PredictionStepBestPlayers,
-} from '@molecules/Predictions/PredictionStepFinal';
 
 const KNOCKOUT_PHASE_LABELS: Record<string, string> = {
   'round-of-32': 'Round of 32',

@@ -1,7 +1,9 @@
-import React from 'react';
-import { FinalPhaseForm } from '@organisms/FinalPhaseForm/FinalPhaseForm';
-import { BestPlayersForm } from '@organisms/BestPlayersForm/BestPlayersForm';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+
+import { Typography } from '@atoms/Typography';
+import { BestPlayersForm } from '@organisms/BestPlayersForm';
+import { FinalPhaseForm } from '@organisms/FinalPhaseForm';
+
 import '../../templates/PredictionsTemplate/PredictionsTemplate.css';
 
 export interface PredictionStepFinalPhaseProps {
@@ -17,7 +19,7 @@ export interface PredictionStepFinalPhaseProps {
   locale: 'en' | 'es';
 }
 
-export const PredictionStepFinalPhase: React.FC<PredictionStepFinalPhaseProps> = ({
+export const PredictionStepFinalPhase: FC<PredictionStepFinalPhaseProps> = ({
   teams,
   existingPrediction,
   onSubmit,
@@ -50,7 +52,7 @@ export interface PredictionStepBestPlayersProps {
   isDisabled: boolean;
 }
 
-export const PredictionStepBestPlayers: React.FC<PredictionStepBestPlayersProps> = ({
+export const PredictionStepBestPlayers: FC<PredictionStepBestPlayersProps> = ({
   existingPrediction,
   onSubmit,
   isDisabled,

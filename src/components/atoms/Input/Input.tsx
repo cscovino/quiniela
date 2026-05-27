@@ -1,16 +1,18 @@
-import React from 'react';
+import type { FC, InputHTMLAttributes } from 'react';
+import { useId } from 'react';
+
 import './Input.css';
 
 export type InputVariant = 'default' | 'error' | 'success';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   variant?: InputVariant;
   label?: string;
   error?: string;
   helperText?: string;
 }
 
-export const Input: React.FC<InputProps> = ({
+export const Input: FC<InputProps> = ({
   variant = 'default',
   label,
   error,
@@ -19,7 +21,7 @@ export const Input: React.FC<InputProps> = ({
   className = '',
   ...props
 }) => {
-  const generatedId = React.useId();
+  const generatedId = useId();
   const inputId = id || generatedId;
   const hasError = variant === 'error' || error;
 

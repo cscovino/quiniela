@@ -1,12 +1,14 @@
-import React from 'react';
+import type { FC, InputHTMLAttributes } from 'react';
+import { useId } from 'react';
+
 import './Radio.css';
 
-export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
 }
 
-export const Radio: React.FC<RadioProps> = ({ label, id, className = '', ...props }) => {
-  const generatedId = React.useId();
+export const Radio: FC<RadioProps> = ({ label, id, className = '', ...props }) => {
+  const generatedId = useId();
   const radioId = id || generatedId;
 
   return (

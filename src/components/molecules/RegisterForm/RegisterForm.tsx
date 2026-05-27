@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Input } from '@atoms/Input/Input';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC, FormEvent } from 'react';
+import { useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Input } from '@atoms/Input';
+import { Typography } from '@atoms/Typography';
 import { useAuthStore } from '@store/auth-store';
+
 import './RegisterForm.css';
 
 export interface RegisterFormProps {
@@ -32,7 +35,7 @@ export interface RegisterFormProps {
   className?: string;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({
+export const RegisterForm: FC<RegisterFormProps> = ({
   translations,
   onLoginClick,
   redirectUrl = '/es/predicciones',
@@ -48,7 +51,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const error = useAuthStore((s) => s.error);
   const clearError = useAuthStore((s) => s.clearError);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     clearError();
 

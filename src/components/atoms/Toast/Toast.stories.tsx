@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
 import { ToastContainer } from './Toast';
 
 const meta = {

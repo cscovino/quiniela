@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
 import { UserProfile } from './UserProfile';
 
 const translations = {

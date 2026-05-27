@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { Toast } from '@atoms/Toast/Toast';
+
+import type { Toast } from '@atoms/Toast';
 
 interface ToastState {
   toasts: Toast[];

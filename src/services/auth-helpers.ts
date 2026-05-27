@@ -1,26 +1,27 @@
 import {
+  type Auth,
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
-  GoogleAuthProvider,
   signOut,
-  sendPasswordResetEmail,
   updateProfile,
-  type UserCredential,
-  type Auth,
   type User as FirebaseUser,
+  type UserCredential,
 } from 'firebase/auth';
 import {
   doc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-  getDoc,
   type Firestore,
+  getDoc,
+  serverTimestamp,
+  setDoc,
   type Timestamp,
+  updateDoc,
 } from 'firebase/firestore';
-import { getAuthInstance, getDb, initFirebase } from './firebase';
+
 import type { User, UserRole } from '../types/firestore';
+import { getAuthInstance, getDb, initFirebase } from './firebase';
 
 let googleProvider: GoogleAuthProvider | null = null;
 

@@ -1,4 +1,5 @@
-import React from 'react';
+import type { CSSProperties, FC } from 'react';
+
 import './ProgressBar.css';
 
 export type ProgressBarVariant = 'primary' | 'accent' | 'success' | 'warning' | 'error';
@@ -11,7 +12,7 @@ export interface ProgressBarProps {
   className?: string;
 }
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({
+export const ProgressBar: FC<ProgressBarProps> = ({
   value,
   max = 100,
   variant = 'primary',
@@ -30,7 +31,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       <div className="progress-bar__track">
         <div
           className={`progress-bar__fill progress-bar__fill--${variant}`}
-          style={{ '--progress-width': `${percentage}%` } as React.CSSProperties}
+          style={{ '--progress-width': `${percentage}%` } as CSSProperties}
         />
       </div>
       {showLabel && <span className="progress-bar__label">{Math.round(percentage)}%</span>}

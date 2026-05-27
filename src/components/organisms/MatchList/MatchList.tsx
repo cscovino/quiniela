@@ -1,6 +1,8 @@
-import React from 'react';
-import { MatchCard, type MatchCardProps } from '@molecules/MatchCard/MatchCard';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+
+import { Typography } from '@atoms/Typography';
+import { MatchCard, type MatchCardProps } from '@molecules/MatchCard';
+
 import './MatchList.css';
 
 export interface MatchListProps {
@@ -13,7 +15,7 @@ export interface MatchListProps {
   className?: string;
 }
 
-export const MatchList: React.FC<MatchListProps> = ({
+export const MatchList: FC<MatchListProps> = ({
   matches,
   title,
   emptyMessage = 'No matches available',

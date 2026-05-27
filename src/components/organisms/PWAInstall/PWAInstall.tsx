@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
 import './PWAInstall.css';
 
-export const PWAInstall: React.FC = () => {
+export const PWAInstall: FC = () => {
   const [showPrompt, setShowPrompt] = useState(false);
   const deferredPrompt = useRef<BeforeInstallPromptEvent | null>(null);
 

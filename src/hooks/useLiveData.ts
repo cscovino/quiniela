@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const dataCache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_TTL = 60_000; // 1 minute

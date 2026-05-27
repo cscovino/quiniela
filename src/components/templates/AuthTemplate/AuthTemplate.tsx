@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { LoginForm, type LoginFormProps } from '@molecules/LoginForm/LoginForm';
-import { RegisterForm, type RegisterFormProps } from '@molecules/RegisterForm/RegisterForm';
-import { PixelArt } from '@atoms/PixelArt/PixelArt';
+import type { FC } from 'react';
+import { useState } from 'react';
+
+import { PixelArt } from '@atoms/PixelArt';
+import { LoginForm, type LoginFormProps } from '@molecules/LoginForm';
+import { RegisterForm, type RegisterFormProps } from '@molecules/RegisterForm';
 import { getRoute } from '@utils/i18n';
+
 import './AuthTemplate.css';
 
 export interface AuthTemplateProps {
@@ -15,7 +18,7 @@ export interface AuthTemplateProps {
   className?: string;
 }
 
-export const AuthTemplate: React.FC<AuthTemplateProps> = ({
+export const AuthTemplate: FC<AuthTemplateProps> = ({
   translations,
   initialMode = 'login',
   locale = 'es',

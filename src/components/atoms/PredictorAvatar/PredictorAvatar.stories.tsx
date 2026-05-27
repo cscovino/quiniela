@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PredictorAvatar } from './PredictorAvatar';
-import type { Predictor } from '@app-types/firestore';
 import type { Timestamp } from 'firebase/firestore';
+
+import type { Predictor } from '@app-types/firestore';
+
+import { PredictorAvatar } from './PredictorAvatar';
 
 const makePredictor = (overrides: Partial<Predictor> = {}): Predictor => ({
   id: 'user-1-default',
@@ -67,15 +69,27 @@ export const Sizes: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
       <PredictorAvatar
-        predictor={makePredictor({ id: 'sm-1', name: 'Small', avatar: { bgColor: '#E63946', emoji: '⚽' } })}
+        predictor={makePredictor({
+          id: 'sm-1',
+          name: 'Small',
+          avatar: { bgColor: '#E63946', emoji: '⚽' },
+        })}
         size="sm"
       />
       <PredictorAvatar
-        predictor={makePredictor({ id: 'md-1', name: 'Medium', avatar: { bgColor: '#2D6A4F', emoji: '🏆' } })}
+        predictor={makePredictor({
+          id: 'md-1',
+          name: 'Medium',
+          avatar: { bgColor: '#2D6A4F', emoji: '🏆' },
+        })}
         size="md"
       />
       <PredictorAvatar
-        predictor={makePredictor({ id: 'lg-1', name: 'Large', avatar: { bgColor: '#F4A261', emoji: '🥅' } })}
+        predictor={makePredictor({
+          id: 'lg-1',
+          name: 'Large',
+          avatar: { bgColor: '#F4A261', emoji: '🥅' },
+        })}
         size="lg"
       />
     </div>

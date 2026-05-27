@@ -1,9 +1,9 @@
-import esCommon from '@locales/es/common.json';
-import enCommon from '@locales/en/common.json';
-import esAuth from '@locales/es/auth.json';
-import enAuth from '@locales/en/auth.json';
-import esAdmin from '@locales/es/admin.json';
 import enAdmin from '@locales/en/admin.json';
+import enAuth from '@locales/en/auth.json';
+import enCommon from '@locales/en/common.json';
+import esAdmin from '@locales/es/admin.json';
+import esAuth from '@locales/es/auth.json';
+import esCommon from '@locales/es/common.json';
 
 export type Locale = 'en' | 'es';
 

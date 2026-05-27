@@ -1,7 +1,9 @@
-import React from 'react';
-import { Typography } from '@atoms/Typography/Typography';
-import { Badge } from '@atoms/Badge/Badge';
-import { Icon } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+
+import { Badge } from '@atoms/Badge';
+import { Icon } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+
 import './ScoreDisplay.css';
 
 export interface ScoreDisplayProps {
@@ -13,7 +15,7 @@ export interface ScoreDisplayProps {
   className?: string;
 }
 
-export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
+export const ScoreDisplay: FC<ScoreDisplayProps> = ({
   homeScore,
   awayScore,
   pointsEarned = 0,

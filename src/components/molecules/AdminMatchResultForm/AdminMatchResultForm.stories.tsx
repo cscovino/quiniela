@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { AdminMatchResultForm } from './AdminMatchResultForm';
+
 import type { Match } from '@app-types/firestore';
+
+import { AdminMatchResultForm } from './AdminMatchResultForm';
 
 const mockMatch = {
   id: 'match-123',
@@ -33,7 +35,9 @@ export const ScheduledMatch: Story = {
 
 export const FinishedWithScores: Story = {
   args: {
-    match: { ...mockMatch, status: 'finished' as const, result: { home: 2, away: 1 } } as Match & { id: string },
+    match: { ...mockMatch, status: 'finished' as const, result: { home: 2, away: 1 } } as Match & {
+      id: string;
+    },
     onSubmit: () => {},
     onCancel: () => {},
   },
@@ -49,7 +53,11 @@ export const Postponed: Story = {
 
 export const ValidationError: Story = {
   args: {
-    match: { ...mockMatch, status: 'finished' as const, result: { home: null, away: null } } as Match & { id: string },
+    match: {
+      ...mockMatch,
+      status: 'finished' as const,
+      result: { home: null, away: null },
+    } as Match & { id: string },
     onSubmit: () => {},
     onCancel: () => {},
   },

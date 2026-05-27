@@ -1,5 +1,5 @@
-import type { RankingsTableProps } from '@organisms/RankingsTable/RankingsTable';
-import type { GroupStandingsProps } from '@organisms/GroupStandings/GroupStandings';
+import type { GroupStandingsProps } from '@organisms/GroupStandings';
+import type { RankingsTableProps } from '@organisms/RankingsTable';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 

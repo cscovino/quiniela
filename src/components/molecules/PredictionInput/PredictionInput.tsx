@@ -1,6 +1,8 @@
-import React from 'react';
-import { Input } from '@atoms/Input/Input';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+
+import { Input } from '@atoms/Input';
+import { Typography } from '@atoms/Typography';
+
 import './PredictionInput.css';
 
 export interface PredictionInputProps {
@@ -13,7 +15,7 @@ export interface PredictionInputProps {
   className?: string;
 }
 
-export const PredictionInput: React.FC<PredictionInputProps> = ({
+export const PredictionInput: FC<PredictionInputProps> = ({
   homeTeamName,
   awayTeamName,
   homeScore = 0,

@@ -1,9 +1,11 @@
-import { collection, collectionGroup, getDocs, query, orderBy, where } from 'firebase/firestore';
+import { collection, collectionGroup, getDocs, orderBy, query, where } from 'firebase/firestore';
+
+import type { MatchCardProps } from '@molecules/MatchCard';
+import type { GroupStandingsProps } from '@organisms/GroupStandings';
+import type { RankingEntry } from '@organisms/RankingsTable';
+
+import type { GroupStandings, Match, PredictorStats, Team } from '../types/firestore';
 import { getDb } from './firebase';
-import type { Match, Team, GroupStandings, PredictorStats } from '../types/firestore';
-import type { MatchCardProps } from '@molecules/MatchCard/MatchCard';
-import type { GroupStandingsProps } from '@organisms/GroupStandings/GroupStandings';
-import type { RankingEntry } from '@organisms/RankingsTable/RankingsTable';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 

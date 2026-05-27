@@ -1,10 +1,12 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PredictionStepKnockoutRound } from './PredictionStepKnockoutRound';
-import type { KnockoutRoundMatch } from './PredictionStepKnockoutRound';
-import type { GroupBetRecord } from '@utils/predictions-flow';
+import { describe, expect, it, vi } from 'vitest';
+
 import type { PhaseType } from '@app-types/firestore';
+import type { GroupBetRecord } from '@utils/predictions-flow';
+
+import type { KnockoutRoundMatch } from './PredictionStepKnockoutRound';
+import { PredictionStepKnockoutRound } from './PredictionStepKnockoutRound';
 
 const makeMatch = (
   slug: string,

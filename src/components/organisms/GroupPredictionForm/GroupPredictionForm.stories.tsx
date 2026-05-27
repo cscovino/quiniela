@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { GroupPredictionForm, type GroupForPrediction } from './GroupPredictionForm';
+
+import { type GroupForPrediction, GroupPredictionForm } from './GroupPredictionForm';
 
 const meta = {
   component: GroupPredictionForm,

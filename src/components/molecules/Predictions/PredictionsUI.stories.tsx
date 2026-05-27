@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import {
-  PredictionsProgress,
-  PredictionsFeedback,
-  PredictionsNavigation,
-} from './PredictionsUI';
+
+import { PredictionsFeedback, PredictionsNavigation, PredictionsProgress } from './PredictionsUI';
 
 const meta = {
   component: PredictionsProgress,
@@ -72,9 +69,7 @@ export const LastStep: Story = {
 
 export const FeedbackSuccess: Story = {
   render: () => (
-    <PredictionsFeedback
-      feedback={{ type: 'success', message: 'Group A predictions saved!' }}
-    />
+    <PredictionsFeedback feedback={{ type: 'success', message: 'Group A predictions saved!' }} />
   ),
 };
 

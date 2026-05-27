@@ -1,49 +1,22 @@
-import React from 'react';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+
+import { Typography } from '@atoms/Typography';
+
 import '../../templates/PredictionsTemplate/PredictionsTemplate.css';
 
 export interface PredictionsProgressProps {
-  stepLabels: string[];
-  currentStep: number;
-  submittedSteps: Set<number>;
   stepCounter: string;
 }
 
-export const PredictionsProgress: React.FC<PredictionsProgressProps> = ({
-  stepLabels,
-  currentStep,
-  submittedSteps,
-  stepCounter,
-}) => {
-  // 11.7 Compact variant for >8 steps
-  const isCompact = stepLabels.length > 8;
-  return (
-    <>
-      <div
-        className={`predictions-template__progress ${isCompact ? 'predictions-template__progress--compact' : ''}`}
-      >
-        {stepLabels.map((label, index) => (
-          <div
-            key={label}
-            className={`predictions-template__progress-step ${index === currentStep ? 'active' : ''} ${submittedSteps.has(index) ? 'completed' : ''}`}
-          >
-            <span className="predictions-template__progress-number">
-              {submittedSteps.has(index) ? '✓' : index + 1}
-            </span>
-            <span className="predictions-template__progress-label">{label}</span>
-          </div>
-        ))}
-      </div>
-      <div className="predictions-template__step-counter">{stepCounter}</div>
-    </>
-  );
+export const PredictionsProgress: FC<PredictionsProgressProps> = ({ stepCounter }) => {
+  return <div className="predictions-template__step-counter">{stepCounter}</div>;
 };
 
 export interface PredictionsFeedbackProps {
   feedback: { type: 'success' | 'error'; message: string } | null;
 }
 
-export const PredictionsFeedback: React.FC<PredictionsFeedbackProps> = ({ feedback }) => {
+export const PredictionsFeedback: FC<PredictionsFeedbackProps> = ({ feedback }) => {
   if (!feedback) return null;
   return (
     <div
@@ -61,17 +34,15 @@ export interface PredictionsNavigationProps {
   currentStep: number;
   totalSteps: number;
   translations: { buttonBack: string; buttonNext: string; submitToAdvance: string };
-  submittedSteps: Set<number>;
 }
 
-export const PredictionsNavigation: React.FC<PredictionsNavigationProps> = ({
+export const PredictionsNavigation: FC<PredictionsNavigationProps> = ({
   onBack,
   onNext,
   canAdvance,
   currentStep,
   totalSteps,
   translations,
-  submittedSteps,
 }) => (
   <>
     <div className="predictions-template__navigation">
@@ -94,10 +65,5 @@ export const PredictionsNavigation: React.FC<PredictionsNavigationProps> = ({
         </button>
       )}
     </div>
-    {!submittedSteps.has(currentStep) && (
-      <div className="predictions-template__hint">
-        <Typography variant="small">{translations.submitToAdvance}</Typography>
-      </div>
-    )}
   </>
 );

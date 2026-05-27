@@ -118,71 +118,6 @@
   border-image: var(--gradient-wc26-trophy) 1;
 }
 
-.predictions-template__progress {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  justify-content: center;
-  flex-wrap: wrap;
-  align-items: stretch;
-}
-
-/* 11.7 Compact variant for >8 steps */
-.predictions-template__progress--compact {
-  flex-direction: row;
-  gap: var(--space-1);
-}
-
-.predictions-template__progress--compact .predictions-template__progress-step {
-  padding: var(--space-1) var(--space-2);
-  flex: 0 0 auto;
-}
-
-.predictions-template__progress--compact .predictions-template__progress-label {
-  font-size: var(--text-xs);
-}
-
-.predictions-template__progress-step {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border: var(--border-pixel-sm);
-  background: var(--bg-input);
-  color: var(--text-muted);
-  transition: all var(--duration-normal) var(--ease-out);
-  justify-content: center;
-}
-
-.predictions-template__progress-step.active {
-  background: var(--color-accent-500);
-  border-color: var(--color-accent-700);
-  color: var(--text-inverse);
-}
-
-.predictions-template__progress-step.completed {
-  background: linear-gradient(135deg, var(--bg-card-hover), var(--bg-card));
-  border-color: var(--color-success-border);
-  color: var(--color-success);
-}
-
-.predictions-template__progress-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  font-family: var(--font-pixel);
-  font-size: var(--text-xs);
-  background: rgba(0, 0, 0, 0.2);
-  border: var(--border-pixel-sm);
-}
-
-.predictions-template__progress-label {
-  font-family: var(--font-pixel);
-  font-size: var(--text-xs);
-}
-
 .predictions-template__step-counter {
   text-align: center;
   font-family: var(--font-pixel);
@@ -201,15 +136,6 @@
 
 .predictions-template__navigation button {
   width: 100%;
-}
-
-.predictions-template__hint {
-  text-align: center;
-  padding: var(--space-3);
-  background: var(--color-warning-bg);
-  border: var(--border-pixel-sm);
-  border-color: var(--color-warning-border);
-  color: var(--color-warning);
 }
 
 .predictions-template__predicted-standings {
@@ -280,26 +206,6 @@
 
 /* Mobile: compact progress indicator */
 @media (max-width: 480px) {
-  .predictions-template__progress {
-    flex-direction: row;
-    gap: var(--space-1);
-  }
-
-  .predictions-template__progress-step {
-    padding: var(--space-1) var(--space-2);
-    flex: 0 0 auto;
-  }
-
-  .predictions-template__progress-label {
-    display: none;
-  }
-
-  .predictions-template__progress-number {
-    width: 20px;
-    height: 20px;
-    font-size: var(--text-xs);
-  }
-
   .predictions-template__navigation {
     flex-direction: column;
     gap: var(--space-2);
@@ -309,7 +215,28 @@
     font-family: var(--font-pixel);
     border: var(--border-width-md) solid;
     padding: var(--space-2) var(--space-4);
-    clip-path: polygon(0px 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0px, calc(100% - 8px) 0px, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 4px) calc(100% - 8px), calc(100% - 4px) calc(100% - 4px), calc(100% - 8px) calc(100% - 4px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 4px), 4px calc(100% - 4px), 4px calc(100% - 8px), 0px calc(100% - 8px));
+    clip-path: polygon(
+      0px 8px,
+      4px 8px,
+      4px 4px,
+      8px 4px,
+      8px 0px,
+      calc(100% - 8px) 0px,
+      calc(100% - 8px) 4px,
+      calc(100% - 4px) 4px,
+      calc(100% - 4px) 8px,
+      100% 8px,
+      100% calc(100% - 8px),
+      calc(100% - 4px) calc(100% - 8px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 8px) calc(100% - 4px),
+      calc(100% - 8px) 100%,
+      8px 100%,
+      8px calc(100% - 4px),
+      4px calc(100% - 4px),
+      4px calc(100% - 8px),
+      0px calc(100% - 8px)
+    );
   }
 }
 
@@ -326,20 +253,6 @@
 
   .predictions-template__header h1 {
     font-size: var(--heading-md);
-  }
-
-  .predictions-template__progress {
-    flex-direction: row;
-    gap: var(--space-2);
-    align-items: stretch;
-  }
-
-  .predictions-template__progress-step {
-    justify-content: flex-start;
-  }
-
-  .predictions-template__progress-label {
-    font-size: var(--text-xs);
   }
 
   .predictions-template__navigation {

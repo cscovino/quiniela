@@ -1,11 +1,14 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { PredictionInput } from '@molecules/PredictionInput/PredictionInput';
-import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
-import { Badge } from '@atoms/Badge/Badge';
+import type { FC } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+
+import { Badge } from '@atoms/Badge';
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+import { PredictionInput } from '@molecules/PredictionInput';
+import { TeamFlag } from '@molecules/TeamFlag';
+import type { MatchWithId, PredictionRecord, TeamInfo } from '@utils/predictions-flow';
 import { calculateGroupStandings, isGroupClassificationComplete } from '@utils/predictions-flow';
-import type { MatchWithId, TeamInfo, PredictionRecord } from '@utils/predictions-flow';
+
 import './PredictionStepGroup.css';
 
 export interface GroupForStep {
@@ -53,7 +56,7 @@ const defaultTranslations = {
   pts: 'Pts',
 };
 
-export const PredictionStepGroup: React.FC<PredictionStepGroupProps> = ({
+export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   group,
   groupMatches,
   teamsMap,
@@ -104,9 +107,7 @@ export const PredictionStepGroup: React.FC<PredictionStepGroupProps> = ({
 
   const allMatchesFilled = useMemo(() => {
     return unsubmittedMatches.every(
-      (m) =>
-        matchPredictions[m.id]?.home != null &&
-        matchPredictions[m.id]?.away != null,
+      (m) => matchPredictions[m.id]?.home != null && matchPredictions[m.id]?.away != null,
     );
   }, [unsubmittedMatches, matchPredictions]);
 
@@ -116,15 +117,12 @@ export const PredictionStepGroup: React.FC<PredictionStepGroupProps> = ({
 
   const canSubmit = allMatchesFilled && classificationComplete && !isDisabled;
 
-  const handleMatchChange = useCallback(
-    (matchId: string, home: number, away: number) => {
-      setMatchPredictions((prev) => ({
-        ...prev,
-        [matchId]: { home, away },
-      }));
-    },
-    [],
-  );
+  const handleMatchChange = useCallback((matchId: string, home: number, away: number) => {
+    setMatchPredictions((prev) => ({
+      ...prev,
+      [matchId]: { home, away },
+    }));
+  }, []);
 
   const handleTeamPositionChange = useCallback(
     (teamFifaCode: string, position: string) => {
@@ -207,10 +205,16 @@ export const PredictionStepGroup: React.FC<PredictionStepGroupProps> = ({
           <div className="prediction-step-group__matches">
             {unsubmittedMatches.map((match) => {
               const homeTeam = match.homeTeamId
-                ? teamsMap[match.homeTeamId] || { fifaCode: match.homeTeamId.toUpperCase(), name: match.homeTeamId }
+                ? teamsMap[match.homeTeamId] || {
+                    fifaCode: match.homeTeamId.toUpperCase(),
+                    name: match.homeTeamId,
+                  }
                 : { fifaCode: 'TBD', name: 'TBD' };
               const awayTeam = match.awayTeamId
-                ? teamsMap[match.awayTeamId] || { fifaCode: match.awayTeamId.toUpperCase(), name: match.awayTeamId }
+                ? teamsMap[match.awayTeamId] || {
+                    fifaCode: match.awayTeamId.toUpperCase(),
+                    name: match.awayTeamId,
+                  }
                 : { fifaCode: 'TBD', name: 'TBD' };
               const disabled = isMatchDisabled(match.id);
 

@@ -1,8 +1,10 @@
-import React from 'react';
-import { Avatar } from '@atoms/Avatar/Avatar';
-import { StatCard } from '@molecules/StatCard/StatCard';
-import { Typography } from '@atoms/Typography/Typography';
-import { Icon, type IconName } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+
+import { Avatar } from '@atoms/Avatar';
+import { Icon, type IconName } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+import { StatCard } from '@molecules/StatCard';
+
 import './UserProfile.css';
 
 export interface BadgeEarned {
@@ -48,7 +50,7 @@ export interface UserProfileProps {
   className?: string;
 }
 
-export const UserProfile: React.FC<UserProfileProps> = ({
+export const UserProfile: FC<UserProfileProps> = ({
   displayName,
   avatarUrl,
   favoriteTeam,

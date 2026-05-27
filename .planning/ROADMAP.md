@@ -214,5 +214,5 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Create barrel files + dead component analysis
-- [ ] 09-02-PLAN.md — Import path fixes, React import removal, verification
+- [x] 09-01-PLAN.md — Create barrel files + dead component analysis
+- [x] 09-02-PLAN.md — Import path fixes (React namespace, barrel paths), import ordering ESLint rule, verification

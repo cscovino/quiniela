@@ -1,6 +1,9 @@
-import React, { useEffect, useCallback } from 'react';
-import { Typography } from '@atoms/Typography/Typography';
-import { Icon, type IconName } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+import { useCallback, useEffect } from 'react';
+
+import { Icon, type IconName } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+
 import './Toast.css';
 
 export interface Toast {
@@ -23,7 +26,7 @@ const ICON_MAP: Record<string, IconName> = {
   warning: 'warning',
 };
 
-export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onDismiss }) => {
+export const ToastContainer: FC<ToastContainerProps> = ({ toasts, onDismiss }) => {
   const handleDismiss = useCallback(
     (id: string) => {
       onDismiss(id);

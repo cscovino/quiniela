@@ -1,7 +1,7 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { PixelArt } from './PixelArt';
+
 import type { PixelArtName } from './PixelArt';
+import { PixelArt } from './PixelArt';
 
 const meta: Meta<typeof PixelArt> = {
   title: 'Design System/Pixel Art',

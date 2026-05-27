@@ -1,7 +1,7 @@
-import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { getFirestore, type Firestore } from 'firebase/firestore';
-import { getAuth, setPersistence, browserLocalPersistence, type Auth } from 'firebase/auth';
-import { initializeAppCheck, ReCaptchaV3Provider, type AppCheck } from 'firebase/app-check';
+import { type FirebaseApp, initializeApp } from 'firebase/app';
+import { type AppCheck, initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+import { type Auth, browserLocalPersistence, getAuth, setPersistence } from 'firebase/auth';
+import { type Firestore, getFirestore } from 'firebase/firestore';
 import type { Messaging } from 'firebase/messaging';
 
 const firebaseConfig = {

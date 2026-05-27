@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PredictionStepFinalPhase, PredictionStepBestPlayers } from './PredictionStepFinal';
+
+import { PredictionStepBestPlayers, PredictionStepFinalPhase } from './PredictionStepFinal';
 
 const meta = {
   component: PredictionStepFinalPhase,
@@ -33,12 +34,7 @@ export const FinalPhaseWithTeams: Story = {
 
 export const FinalPhaseEmpty: Story = {
   render: () => (
-    <PredictionStepFinalPhase
-      teams={[]}
-      onSubmit={async () => {}}
-      isDisabled={false}
-      locale="en"
-    />
+    <PredictionStepFinalPhase teams={[]} onSubmit={async () => {}} isDisabled={false} locale="en" />
   ),
 };
 
@@ -66,12 +62,7 @@ export const FinalPhaseDisabled: Story = {
 };
 
 export const BestPlayersEmpty: Story = {
-  render: () => (
-    <PredictionStepBestPlayers
-      onSubmit={async () => {}}
-      isDisabled={false}
-    />
-  ),
+  render: () => <PredictionStepBestPlayers onSubmit={async () => {}} isDisabled={false} />,
 };
 
 export const BestPlayersWithExisting: Story = {
@@ -85,12 +76,7 @@ export const BestPlayersWithExisting: Story = {
 };
 
 export const BestPlayersDisabled: Story = {
-  render: () => (
-    <PredictionStepBestPlayers
-      onSubmit={async () => {}}
-      isDisabled={true}
-    />
-  ),
+  render: () => <PredictionStepBestPlayers onSubmit={async () => {}} isDisabled={true} />,
 };
 
 export const BestPlayersPartial: Story = {

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+
 import { ProfileTemplate } from './ProfileTemplate';
 
 const translations = {

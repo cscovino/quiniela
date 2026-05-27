@@ -1,7 +1,9 @@
-import React from 'react';
-import { PredictionForm, type PredictionFormProps } from '@organisms/PredictionForm/PredictionForm';
-import { CountdownTimer } from '@molecules/CountdownTimer/CountdownTimer';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+
+import { Typography } from '@atoms/Typography';
+import { CountdownTimer } from '@molecules/CountdownTimer';
+import { PredictionForm, type PredictionFormProps } from '@organisms/PredictionForm';
+
 import './PredictionTemplate.css';
 
 export interface PredictionTemplateProps {
@@ -15,7 +17,7 @@ export interface PredictionTemplateProps {
   className?: string;
 }
 
-export const PredictionTemplate: React.FC<PredictionTemplateProps> = ({
+export const PredictionTemplate: FC<PredictionTemplateProps> = ({
   formProps,
   deadline,
   translations,

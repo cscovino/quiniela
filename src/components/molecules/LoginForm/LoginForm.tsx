@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Input } from '@atoms/Input/Input';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC, FormEvent } from 'react';
+import { useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Input } from '@atoms/Input';
+import { Typography } from '@atoms/Typography';
 import { useAuthStore } from '@store/auth-store';
+
 import './LoginForm.css';
 
 export interface LoginFormProps {
@@ -34,7 +37,7 @@ export interface LoginFormProps {
   className?: string;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({
+export const LoginForm: FC<LoginFormProps> = ({
   translations,
   onRegisterClick,
   redirectUrl = '/es/predicciones',
@@ -51,7 +54,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const error = useAuthStore((s) => s.error);
   const clearError = useAuthStore((s) => s.clearError);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     clearError();
     if (!email.trim()) {

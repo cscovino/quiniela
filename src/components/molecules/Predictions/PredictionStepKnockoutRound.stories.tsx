@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PredictionStepKnockoutRound } from './PredictionStepKnockoutRound';
-import type { GroupBetRecord } from '@utils/predictions-flow';
-import type { KnockoutRoundMatch } from './PredictionStepKnockoutRound';
+
 import type { PhaseType } from '@app-types/firestore';
+import type { GroupBetRecord } from '@utils/predictions-flow';
+
+import type { KnockoutRoundMatch } from './PredictionStepKnockoutRound';
+import { PredictionStepKnockoutRound } from './PredictionStepKnockoutRound';
 
 const makeMatch = (
   slug: string,

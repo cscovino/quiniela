@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useAuthStore, __resetAuthStore } from '../auth-store';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import * as authHelpers from '../../services/auth-helpers';
+import { __resetAuthStore, useAuthStore } from '../auth-store';
 
 vi.mock('../../services/auth-helpers', () => ({
   loginWithEmail: vi.fn(),

@@ -1,25 +1,27 @@
 import {
   collection,
-  doc,
-  getDocs,
-  getDoc,
-  setDoc,
   deleteDoc,
-  serverTimestamp,
+  doc,
+  getDoc,
+  getDocs,
   query,
+  serverTimestamp,
+  setDoc,
+  type Timestamp,
   where,
   writeBatch,
-  type Timestamp,
 } from 'firebase/firestore';
-import { getDb } from './firebase';
-import { predictionService } from './prediction-service';
-import { tournamentService } from './tournament-service';
+
 import type { Predictor, PredictorStats } from '@app-types/firestore';
 import {
   getPredictorProgress,
   type GroupBetRecord,
   type KnockoutBetRecord,
 } from '@utils/predictions-flow';
+
+import { getDb } from './firebase';
+import { predictionService } from './prediction-service';
+import { tournamentService } from './tournament-service';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import React from 'react';
-import { NavBar } from './NavBar';
+import { useState } from 'react';
+
 import { useAuthStore } from '@store/auth-store';
+
+import { NavBar } from './NavBar';
 
 const meta = {
   component: NavBar,
@@ -79,7 +81,7 @@ export const MobileMenuOpen: Story = {
   decorators: [
     (Story) => {
       const NavBarWrapper = () => {
-        const [open, setOpen] = React.useState(false);
+        const [open, setOpen] = useState(false);
         return (
           <>
             <button onClick={() => setOpen(true)}>Open Menu</button>

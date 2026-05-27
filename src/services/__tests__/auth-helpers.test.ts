@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as authHelpers from '../auth-helpers';
 import * as firebaseAuth from 'firebase/auth';
 import * as firebaseFirestore from 'firebase/firestore';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import * as authHelpers from '../auth-helpers';
 
 vi.mock('../firebase', () => ({
   getAuthInstance: () => ({

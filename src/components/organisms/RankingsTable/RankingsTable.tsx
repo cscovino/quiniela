@@ -1,7 +1,9 @@
-import React from 'react';
-import { RankingRow } from '@molecules/RankingRow/RankingRow';
-import { Typography } from '@atoms/Typography/Typography';
-import { Button } from '@atoms/Button/Button';
+import type { FC } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+import { RankingRow } from '@molecules/RankingRow';
+
 import './RankingsTable.css';
 
 export interface RankingEntry {
@@ -26,7 +28,7 @@ export interface RankingsTableProps {
   className?: string;
 }
 
-export const RankingsTable: React.FC<RankingsTableProps> = ({
+export const RankingsTable: FC<RankingsTableProps> = ({
   rankings,
   currentUserId,
   title = 'Global Rankings',

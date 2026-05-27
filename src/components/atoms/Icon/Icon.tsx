@@ -1,25 +1,26 @@
-import React from 'react';
-import { Trophy } from 'pixelarticons/react/Trophy';
-import { Fire } from 'pixelarticons/react/Fire';
-import { Zap } from 'pixelarticons/react/Zap';
-import { Target } from 'pixelarticons/react/Target';
-import { Chart } from 'pixelarticons/react/Chart';
 import { Bell } from 'pixelarticons/react/Bell';
-import { User } from 'pixelarticons/react/User';
-import { Flag } from 'pixelarticons/react/Flag';
+import { Chart } from 'pixelarticons/react/Chart';
 import { Check } from 'pixelarticons/react/Check';
 import { Clock } from 'pixelarticons/react/Clock';
-import { Radio } from 'pixelarticons/react/Radio';
 import { Close } from 'pixelarticons/react/Close';
+import { Crown } from 'pixelarticons/react/Crown';
+import { Eye } from 'pixelarticons/react/Eye';
+import { Fire } from 'pixelarticons/react/Fire';
+import { Flag } from 'pixelarticons/react/Flag';
+import { Gamepad } from 'pixelarticons/react/Gamepad';
+import { InfoBox } from 'pixelarticons/react/InfoBox';
 import { Login } from 'pixelarticons/react/Login';
 import { Logout } from 'pixelarticons/react/Logout';
-import { Gamepad } from 'pixelarticons/react/Gamepad';
-import { Eye } from 'pixelarticons/react/Eye';
-import { Sparkle } from 'pixelarticons/react/Sparkle';
-import { Crown } from 'pixelarticons/react/Crown';
 import { Menu } from 'pixelarticons/react/Menu';
-import { InfoBox } from 'pixelarticons/react/InfoBox';
+import { Radio } from 'pixelarticons/react/Radio';
+import { Sparkle } from 'pixelarticons/react/Sparkle';
 import { SquareAlert } from 'pixelarticons/react/SquareAlert';
+import { Target } from 'pixelarticons/react/Target';
+import { Trophy } from 'pixelarticons/react/Trophy';
+import { User } from 'pixelarticons/react/User';
+import { Zap } from 'pixelarticons/react/Zap';
+import type { CSSProperties, FC } from 'react';
+
 import './Icon.css';
 
 export type IconName =
@@ -54,7 +55,7 @@ export interface IconProps {
   className?: string;
 }
 
-const iconMap: Record<IconName, React.FC<{ size?: number; color?: string; className?: string }>> = {
+const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: string }>> = {
   football: Gamepad,
   trophy: Trophy,
   star: Sparkle,
@@ -80,13 +81,13 @@ const iconMap: Record<IconName, React.FC<{ size?: number; color?: string; classN
   eye: Eye,
 };
 
-export const Icon: React.FC<IconProps> = ({ name, size = 24, color, className = '' }) => {
+export const Icon: FC<IconProps> = ({ name, size = 24, color, className = '' }) => {
   const Component = iconMap[name];
 
   return (
     <span
       className={`icon ${className}`}
-      style={color ? ({ '--icon-color': color } as React.CSSProperties) : undefined}
+      style={color ? ({ '--icon-color': color } as CSSProperties) : undefined}
       role="img"
       aria-label={name}
     >

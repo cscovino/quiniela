@@ -1,7 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import { TeamSelector } from '@molecules/TeamSelector/TeamSelector';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+import { useMemo, useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+import { TeamSelector } from '@molecules/TeamSelector';
+
 import './KnockoutBracketForm.css';
 
 export interface KnockoutMatch {
@@ -23,7 +26,7 @@ export interface KnockoutBracketFormProps {
   className?: string;
 }
 
-export const KnockoutBracketForm: React.FC<KnockoutBracketFormProps> = ({
+export const KnockoutBracketForm: FC<KnockoutBracketFormProps> = ({
   matches,
   onSubmit,
   existingBets,

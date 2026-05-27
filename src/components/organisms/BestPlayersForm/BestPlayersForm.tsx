@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+import { useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+
 import './BestPlayersForm.css';
 
 export interface BestPlayersFormProps {
@@ -10,7 +13,7 @@ export interface BestPlayersFormProps {
   className?: string;
 }
 
-export const BestPlayersForm: React.FC<BestPlayersFormProps> = ({
+export const BestPlayersForm: FC<BestPlayersFormProps> = ({
   onSubmit,
   existingPrediction,
   isDisabled = false,

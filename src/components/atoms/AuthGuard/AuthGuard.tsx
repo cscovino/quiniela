@@ -1,18 +1,20 @@
-import React from 'react';
+import type { FC, ReactNode } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Spinner } from '@atoms/Spinner';
+import { Typography } from '@atoms/Typography';
 import { useAuthStore } from '@store/auth-store';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
-import { Spinner } from '@atoms/Spinner/Spinner';
+
 import './AuthGuard.css';
 
 export interface AuthGuardProps {
-  children: React.ReactNode;
+  children: ReactNode;
   loginUrl?: string;
   message?: string;
   loadingMessage?: string;
 }
 
-export const AuthGuard: React.FC<AuthGuardProps> = ({
+export const AuthGuard: FC<AuthGuardProps> = ({
   children,
   loginUrl = '/es/login',
   message,

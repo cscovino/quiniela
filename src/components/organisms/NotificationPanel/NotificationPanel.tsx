@@ -1,7 +1,9 @@
-import React from 'react';
-import { Typography } from '@atoms/Typography/Typography';
-import { Icon } from '@atoms/Icon/Icon';
-import { Button } from '@atoms/Button/Button';
+import type { FC } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Icon } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+
 import './NotificationPanel.css';
 
 export type NotificationType = 'match_start' | 'result_posted' | 'badge_earned' | 'ranking_change';
@@ -34,7 +36,7 @@ const typeIcons: Record<NotificationType, string> = {
   ranking_change: 'chart',
 };
 
-export const NotificationPanel: React.FC<NotificationPanelProps> = ({
+export const NotificationPanel: FC<NotificationPanelProps> = ({
   notifications,
   onMarkAsRead,
   onClearAll,

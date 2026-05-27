@@ -1,12 +1,14 @@
-import React from 'react';
+import type { FC, InputHTMLAttributes } from 'react';
+import { useId } from 'react';
+
 import './Checkbox.css';
 
-export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({ label, id, className = '', ...props }) => {
-  const generatedId = React.useId();
+export const Checkbox: FC<CheckboxProps> = ({ label, id, className = '', ...props }) => {
+  const generatedId = useId();
   const checkboxId = id || generatedId;
 
   return (

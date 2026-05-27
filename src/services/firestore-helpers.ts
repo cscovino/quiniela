@@ -1,24 +1,25 @@
 import {
   collection,
-  doc,
   type CollectionReference,
+  doc,
   type DocumentReference,
 } from 'firebase/firestore';
-import { getDb } from './firebase';
+
 import type {
-  Tournament,
   Group,
-  Team,
+  GroupBet,
+  GroupStandings,
+  KnockoutBet,
   Match,
   MatchBet,
-  GroupBet,
-  KnockoutBet,
-  GroupStandings,
-  User,
+  Notification,
   Predictor,
   PredictorStats,
-  Notification,
+  Team,
+  Tournament,
+  User,
 } from '../types/firestore';
+import { getDb } from './firebase';
 
 export const collections = {
   users: () => collection(getDb(), 'users') as CollectionReference<User>,

@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Icon } from '@atoms/Icon/Icon';
-import { useAuthStore } from '@store/auth-store';
+import type { FC } from 'react';
+import { useEffect, useState } from 'react';
+
+import { Icon } from '@atoms/Icon';
 import { initAuth } from '@services/auth-bootstrap';
+import { useAuthStore } from '@store/auth-store';
 import { getHomeRoute, getLoginRoute, getOtherLocale, getRoute } from '@utils/i18n';
+
 import './NavBar.css';
 
 export interface NavLink {
@@ -32,7 +35,7 @@ export interface NavBarProps {
   className?: string;
 }
 
-export const NavBar: React.FC<NavBarProps> = ({
+export const NavBar: FC<NavBarProps> = ({
   links,
   adminLink,
   locale,

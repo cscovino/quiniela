@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { Typography } from '@atoms/Typography/Typography';
-import { AdminMatchResultForm } from '@molecules/AdminMatchResultForm/AdminMatchResultForm';
+import type { FC } from 'react';
+import { useState } from 'react';
+
 import type { Match, MatchStatus } from '@app-types/firestore';
+import { Typography } from '@atoms/Typography';
+import { AdminMatchResultForm } from '@molecules/AdminMatchResultForm';
+
 import './AdminMatchList.css';
 
 export interface AdminMatchListProps {
@@ -24,7 +27,7 @@ const PHASE_ORDER: Record<string, number> = {
   final: 7,
 };
 
-export const AdminMatchList: React.FC<AdminMatchListProps> = ({ matches, onUpdateResult }) => {
+export const AdminMatchList: FC<AdminMatchListProps> = ({ matches, onUpdateResult }) => {
   const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
 
   const groupedByPhase = matches.reduce<Record<string, (Match & { id: string })[]>>(

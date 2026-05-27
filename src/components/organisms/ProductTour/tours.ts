@@ -2,13 +2,6 @@ import type { TourStepConfig } from './ProductTour';
 
 export const PREDICTION_WIZARD_TOUR: TourStepConfig[] = [
   {
-    element: '.predictions-template__progress',
-    title: 'Prediction Stages',
-    description:
-      'Work through each stage: group matches, knockout rounds, final phase, and best players. Complete each step to advance.',
-    side: 'bottom',
-  },
-  {
     element: '.predictions-template__section',
     title: 'Make Your Predictions',
     description:

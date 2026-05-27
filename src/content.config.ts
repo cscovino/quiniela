@@ -1,5 +1,5 @@
-import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { defineCollection, z } from 'astro:content';
 
 const teamsCollection = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/teams' }),

@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { Input } from '@atoms/Input/Input';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
-import { useAuthStore } from '@store/auth-store';
+import type { FC, FormEvent } from 'react';
+import { useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Input } from '@atoms/Input';
+import { Typography } from '@atoms/Typography';
 import { updateUserProfile } from '@services/auth-helpers';
+import { useAuthStore } from '@store/auth-store';
+
 import './EditProfileForm.css';
 
 export interface EditProfileFormProps {
@@ -25,7 +28,7 @@ export interface EditProfileFormProps {
   className?: string;
 }
 
-export const EditProfileForm: React.FC<EditProfileFormProps> = ({
+export const EditProfileForm: FC<EditProfileFormProps> = ({
   translations,
   onCancel,
   onSaved,
@@ -39,7 +42,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 

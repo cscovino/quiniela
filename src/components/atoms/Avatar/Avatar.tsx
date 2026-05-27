@@ -1,4 +1,5 @@
-import React from 'react';
+import type { FC } from 'react';
+
 import './Avatar.css';
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -11,7 +12,7 @@ export interface AvatarProps {
   className?: string;
 }
 
-export const Avatar: React.FC<AvatarProps> = ({ src, alt, name, size = 'md', className = '' }) => {
+export const Avatar: FC<AvatarProps> = ({ src, alt, name, size = 'md', className = '' }) => {
   const initials = name
     ? name
         .split(' ')

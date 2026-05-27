@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { predictionService } from '../prediction-service';
 import * as firebaseFirestore from 'firebase/firestore';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { predictionService } from '../prediction-service';
 
 vi.mock('../firebase', () => ({
   getDb: () => 'mock-db',
@@ -405,7 +406,14 @@ describe('prediction-service', () => {
       vi.mocked(firebaseFirestore.getDoc)
         .mockResolvedValueOnce({
           exists: () => true,
-          data: () => ({ userId: 'other-user', first: 'arg', second: 'fra', third: 'bra', fourth: 'ger', points: 0 }),
+          data: () => ({
+            userId: 'other-user',
+            first: 'arg',
+            second: 'fra',
+            third: 'bra',
+            fourth: 'ger',
+            points: 0,
+          }),
         } as any)
         .mockResolvedValueOnce({
           exists: () => true,

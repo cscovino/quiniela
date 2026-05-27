@@ -4,20 +4,21 @@ import {
   doc,
   getDoc,
   getDocs,
-  query,
-  where,
   orderBy,
+  query,
   type QueryConstraint,
+  where,
 } from 'firebase/firestore';
-import { getDb } from './firebase';
+
 import type {
-  Tournament,
   Group,
-  Team,
-  Match,
   GroupStandings,
+  Match,
   PredictorStats,
+  Team,
+  Tournament,
 } from '../types/firestore';
+import { getDb } from './firebase';
 
 const TOURNAMENT_ID = 'world-cup-2026';
 

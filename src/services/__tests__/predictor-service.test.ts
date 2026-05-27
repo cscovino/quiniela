@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { predictorService } from '../predictor-service';
 import * as firebaseFirestore from 'firebase/firestore';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { predictorService } from '../predictor-service';
 
 vi.mock('../firebase', () => ({
   getDb: () => 'mock-db',

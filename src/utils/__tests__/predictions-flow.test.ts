@@ -1,14 +1,15 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import type { GroupBetRecord, KnockoutBetRecord, MatchWithId } from '../predictions-flow';
 import {
-  getGroupMatches,
-  calculateGroupStandings,
-  isGroupMatchesComplete,
-  isGroupClassificationComplete,
-  buildKnockoutBracket,
-  getPredictorProgress,
   BRACKET_MAP,
+  buildKnockoutBracket,
+  calculateGroupStandings,
+  getGroupMatches,
+  getPredictorProgress,
+  isGroupClassificationComplete,
+  isGroupMatchesComplete,
 } from '../predictions-flow';
-import type { MatchWithId, GroupBetRecord, KnockoutBetRecord } from '../predictions-flow';
 
 const makeMatch = (
   id: string,

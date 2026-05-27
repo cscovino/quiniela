@@ -1,6 +1,8 @@
-import React from 'react';
-import { Typography } from '@atoms/Typography/Typography';
-import { Icon, type IconName } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+
+import { Icon, type IconName } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+
 import './StatCard.css';
 
 export interface StatCardProps {
@@ -11,7 +13,7 @@ export interface StatCardProps {
   className?: string;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({
+export const StatCard: FC<StatCardProps> = ({
   label,
   value,
   icon,

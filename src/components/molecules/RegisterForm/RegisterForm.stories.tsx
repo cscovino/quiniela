@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { RegisterForm } from './RegisterForm';
+
 import { useAuthStore } from '@store/auth-store';
+
+import { RegisterForm } from './RegisterForm';
 
 const meta = {
   component: RegisterForm,

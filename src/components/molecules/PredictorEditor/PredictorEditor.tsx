@@ -1,21 +1,53 @@
-import React, { useState } from 'react';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
-import { Input } from '@atoms/Input/Input';
+import type { FC } from 'react';
+import { useState } from 'react';
+
 import type { Predictor } from '@app-types/firestore';
+import { Button } from '@atoms/Button';
+import { Input } from '@atoms/Input';
+import { Typography } from '@atoms/Typography';
+
 import './PredictorEditor.css';
 
 const EMOJI_OPTIONS = [
-  '⚽', '🏆', '🥅', '🎯', '⭐', '🔥',
-  '🇦🇷', '🇧🇷', '🇩🇪', '🇫🇷', '🇪🇸', '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  '🇵🇹', '🇮🇹', '🇲🇽', '🇺🇸', '🇨🇦', '🇯🇵',
-  '🦁', '🐉', '🦅', '🐺', '🦊', '🐻',
+  '⚽',
+  '🏆',
+  '🥅',
+  '🎯',
+  '⭐',
+  '🔥',
+  '🇦🇷',
+  '🇧🇷',
+  '🇩🇪',
+  '🇫🇷',
+  '🇪🇸',
+  '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  '🇵🇹',
+  '🇮🇹',
+  '🇲🇽',
+  '🇺🇸',
+  '🇨🇦',
+  '🇯🇵',
+  '🦁',
+  '🐉',
+  '🦅',
+  '🐺',
+  '🦊',
+  '🐻',
 ];
 
 const COLOR_OPTIONS = [
-  '#E63946', '#2D6A4F', '#06D6A0', '#7B2D8E',
-  '#F4A261', '#D4AF37', '#1D3557', '#457B9D',
-  '#A8DADC', '#E76F51', '#264653', '#6A0572',
+  '#E63946',
+  '#2D6A4F',
+  '#06D6A0',
+  '#7B2D8E',
+  '#F4A261',
+  '#D4AF37',
+  '#1D3557',
+  '#457B9D',
+  '#A8DADC',
+  '#E76F51',
+  '#264653',
+  '#6A0572',
 ];
 
 export interface PredictorEditorProps {
@@ -47,7 +79,7 @@ const t = {
   cancel: 'Cancel',
 };
 
-export const PredictorEditor: React.FC<PredictorEditorProps> = ({
+export const PredictorEditor: FC<PredictorEditorProps> = ({
   mode,
   predictor,
   onSave,
@@ -104,7 +136,11 @@ export const PredictorEditor: React.FC<PredictorEditorProps> = ({
 
       <div className="predictor-editor__field">
         <span className="predictor-editor__label">{labels.emojiLabel}</span>
-        <div className="predictor-editor__emoji-grid" role="radiogroup" aria-label={labels.emojiLabel}>
+        <div
+          className="predictor-editor__emoji-grid"
+          role="radiogroup"
+          aria-label={labels.emojiLabel}
+        >
           {EMOJI_OPTIONS.map((emoji) => (
             <button
               key={emoji}
@@ -122,7 +158,11 @@ export const PredictorEditor: React.FC<PredictorEditorProps> = ({
 
       <div className="predictor-editor__field">
         <span className="predictor-editor__label">{labels.colorLabel}</span>
-        <div className="predictor-editor__color-grid" role="radiogroup" aria-label={labels.colorLabel}>
+        <div
+          className="predictor-editor__color-grid"
+          role="radiogroup"
+          aria-label={labels.colorLabel}
+        >
           {COLOR_OPTIONS.map((color) => (
             <button
               key={color}

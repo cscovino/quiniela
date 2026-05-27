@@ -1,5 +1,5 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+
 import './DesignTokens.css';
 
 const meta: Meta = {

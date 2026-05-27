@@ -1,11 +1,12 @@
 import { create } from 'zustand';
+
 import {
   loginWithEmail,
-  registerWithEmail,
   loginWithGoogle,
   logout,
-  resetPassword,
   onAuthStateChanged,
+  registerWithEmail,
+  resetPassword,
 } from '../services/auth-helpers';
 import type { User } from '../types/firestore';
 

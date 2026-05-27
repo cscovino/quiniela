@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
 import { MatchCard } from './MatchCard';
 
 const translations = {

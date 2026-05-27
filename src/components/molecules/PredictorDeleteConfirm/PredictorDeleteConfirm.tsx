@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
-import { Input } from '@atoms/Input/Input';
+import type { FC } from 'react';
+import { useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Input } from '@atoms/Input';
+import { Typography } from '@atoms/Typography';
+
 import './PredictorDeleteConfirm.css';
 
 export interface PredictorDeleteConfirmProps {
@@ -21,14 +24,15 @@ export interface PredictorDeleteConfirmProps {
 
 const t = {
   title: 'Delete prediction',
-  confirmText: 'This will permanently delete all predictions for this predictor. This action cannot be undone.',
+  confirmText:
+    'This will permanently delete all predictions for this predictor. This action cannot be undone.',
   typeName: 'Type the name to confirm',
   placeholder: 'Enter predictor name',
   confirmButton: 'Delete',
   cancelButton: 'Cancel',
 };
 
-export const PredictorDeleteConfirm: React.FC<PredictorDeleteConfirmProps> = ({
+export const PredictorDeleteConfirm: FC<PredictorDeleteConfirmProps> = ({
   predictorName,
   onConfirm,
   onCancel,
@@ -45,7 +49,12 @@ export const PredictorDeleteConfirm: React.FC<PredictorDeleteConfirmProps> = ({
   };
 
   return (
-    <div className="predictor-delete-confirm" role="dialog" aria-modal="true" aria-label={labels.title}>
+    <div
+      className="predictor-delete-confirm"
+      role="dialog"
+      aria-modal="true"
+      aria-label={labels.title}
+    >
       <div className="predictor-delete-confirm__content">
         <Typography variant="h3">{labels.title}</Typography>
         <Typography variant="body">{labels.confirmText}</Typography>

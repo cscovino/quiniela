@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { PredictionsTemplate } from './PredictionsTemplate';
+
 import { useAuthStore } from '@store/auth-store';
+
+import { PredictionsTemplate } from './PredictionsTemplate';
 
 const meta = {
   component: PredictionsTemplate,

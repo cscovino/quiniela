@@ -1,7 +1,10 @@
-import React from 'react';
-import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
-import { Radio } from '@atoms/Radio/Radio';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+import { useId } from 'react';
+
+import { Radio } from '@atoms/Radio';
+import { Typography } from '@atoms/Typography';
+import { TeamFlag } from '@molecules/TeamFlag';
+
 import './TeamSelector.css';
 
 export interface TeamOption {
@@ -18,7 +21,7 @@ export interface TeamSelectorProps {
   className?: string;
 }
 
-export const TeamSelector: React.FC<TeamSelectorProps> = ({
+export const TeamSelector: FC<TeamSelectorProps> = ({
   options,
   value,
   onChange,
@@ -26,7 +29,7 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
   disabled = false,
   className = '',
 }) => {
-  const uniqueId = React.useId();
+  const uniqueId = useId();
 
   return (
     <div className={`team-selector ${className}`}>

@@ -1,7 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
+import type { FC } from 'react';
+import { useMemo, useState } from 'react';
+
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+import { TeamFlag } from '@molecules/TeamFlag';
+
 import './GroupPredictionForm.css';
 
 export interface GroupForPrediction {
@@ -18,7 +21,7 @@ export interface GroupPredictionFormProps {
   className?: string;
 }
 
-export const GroupPredictionForm: React.FC<GroupPredictionFormProps> = ({
+export const GroupPredictionForm: FC<GroupPredictionFormProps> = ({
   groups,
   onSubmit,
   existingBets,

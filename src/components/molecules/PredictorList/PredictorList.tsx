@@ -1,8 +1,10 @@
-import React from 'react';
-import { PredictorAvatar } from '@atoms/PredictorAvatar/PredictorAvatar';
-import { Typography } from '@atoms/Typography/Typography';
-import { Badge } from '@atoms/Badge/Badge';
+import type { FC } from 'react';
+
 import type { Predictor } from '@app-types/firestore';
+import { Badge } from '@atoms/Badge';
+import { PredictorAvatar } from '@atoms/PredictorAvatar';
+import { Typography } from '@atoms/Typography';
+
 import './PredictorList.css';
 
 export interface PredictorListEntry {
@@ -37,7 +39,7 @@ const t = {
   empty: 'No predictions yet',
 };
 
-export const PredictorList: React.FC<PredictorListProps> = ({
+export const PredictorList: FC<PredictorListProps> = ({
   predictors,
   onSelect,
   onEdit,
@@ -78,7 +80,7 @@ export const PredictorList: React.FC<PredictorListProps> = ({
                   </Badge>
                 )}
                 {points != null && (
-                  <Badge variant="gold">
+                  <Badge variant="warning">
                     {points} {labels.points}
                   </Badge>
                 )}

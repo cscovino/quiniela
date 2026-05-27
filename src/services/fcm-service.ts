@@ -1,5 +1,6 @@
+import { deleteDoc, doc, setDoc } from 'firebase/firestore';
 import { getToken } from 'firebase/messaging';
-import { doc, setDoc, deleteDoc } from 'firebase/firestore';
+
 import { getDb, getMessagingInstance } from './firebase';
 
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_FIREBASE_VAPID_PUBLIC_KEY || '';

@@ -1,5 +1,7 @@
-import React from 'react';
+import type { FC } from 'react';
+
 import type { Predictor } from '@app-types/firestore';
+
 import './PredictorAvatar.css';
 
 export type PredictorAvatarSize = 'sm' | 'md' | 'lg';
@@ -39,7 +41,7 @@ function getFallbackColor(id: string): string {
   return FALLBACK_COLORS[hash % FALLBACK_COLORS.length];
 }
 
-export const PredictorAvatar: React.FC<PredictorAvatarProps> = ({
+export const PredictorAvatar: FC<PredictorAvatarProps> = ({
   predictor,
   size = 'md',
   className = '',

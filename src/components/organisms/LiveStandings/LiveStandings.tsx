@@ -1,6 +1,7 @@
-import React from 'react';
-import { GroupStandings, type GroupStandingsProps } from '@organisms/GroupStandings/GroupStandings';
+import type { FC } from 'react';
+
 import { useLiveData } from '@hooks/useLiveData';
+import { GroupStandings, type GroupStandingsProps } from '@organisms/GroupStandings';
 import { fetchLiveStandings } from '@services/live-data-service';
 
 export interface LiveStandingsProps extends Omit<GroupStandingsProps, 'groups'> {
@@ -8,7 +9,7 @@ export interface LiveStandingsProps extends Omit<GroupStandingsProps, 'groups'> 
   cacheKey?: string;
 }
 
-export const LiveStandings: React.FC<LiveStandingsProps> = ({
+export const LiveStandings: FC<LiveStandingsProps> = ({
   initialGroups,
   cacheKey = 'live-standings',
   ...rest

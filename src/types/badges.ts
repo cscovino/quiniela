@@ -1,4 +1,4 @@
-import type { IconName } from '@atoms/Icon/Icon';
+import type { IconName } from '@atoms/Icon';
 
 export interface BadgeDefinition {
   id: string;

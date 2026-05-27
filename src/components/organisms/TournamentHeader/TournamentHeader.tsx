@@ -1,6 +1,8 @@
-import React from 'react';
-import { Typography } from '@atoms/Typography/Typography';
-import { Icon } from '@atoms/Icon/Icon';
+import type { FC } from 'react';
+
+import { Icon } from '@atoms/Icon';
+import { Typography } from '@atoms/Typography';
+
 import './TournamentHeader.css';
 
 export type TournamentStatus = 'draft' | 'active' | 'finished';
@@ -18,7 +20,7 @@ export interface TournamentHeaderProps {
   };
 }
 
-export const TournamentHeader: React.FC<TournamentHeaderProps> = ({
+export const TournamentHeader: FC<TournamentHeaderProps> = ({
   name,
   startDate,
   endDate,

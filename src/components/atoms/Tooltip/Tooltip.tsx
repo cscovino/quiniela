@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import type { FC, ReactNode } from 'react';
+import { useState } from 'react';
+
 import './Tooltip.css';
 
 export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
@@ -6,11 +8,11 @@ export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 export interface TooltipProps {
   content: string;
   position?: TooltipPosition;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
-export const Tooltip: React.FC<TooltipProps> = ({
+export const Tooltip: FC<TooltipProps> = ({
   content,
   position = 'top',
   children,

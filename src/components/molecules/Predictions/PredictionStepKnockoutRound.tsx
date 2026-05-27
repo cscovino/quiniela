@@ -1,12 +1,15 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { TeamSelector } from '@molecules/TeamSelector/TeamSelector';
-import { TeamFlag } from '@molecules/TeamFlag/TeamFlag';
-import { Button } from '@atoms/Button/Button';
-import { Typography } from '@atoms/Typography/Typography';
-import { Badge } from '@atoms/Badge/Badge';
+import type { FC } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
 import type { PhaseType } from '@app-types/firestore';
+import { Badge } from '@atoms/Badge';
+import { Button } from '@atoms/Button';
+import { Typography } from '@atoms/Typography';
+import { TeamFlag } from '@molecules/TeamFlag';
+import { TeamSelector } from '@molecules/TeamSelector';
 import type { GroupBetRecord } from '@utils/predictions-flow';
 import { BRACKET_MAP } from '@utils/predictions-flow';
+
 import './PredictionStepKnockoutRound.css';
 
 export interface KnockoutRoundMatch {
@@ -92,7 +95,7 @@ function resolveTeamFromBracket(
   return null;
 }
 
-export const PredictionStepKnockoutRound: React.FC<PredictionStepKnockoutRoundProps> = ({
+export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> = ({
   phase,
   roundMatches,
   groupBetsByGroupId,

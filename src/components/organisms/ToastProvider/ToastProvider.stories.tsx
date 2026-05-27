@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import React from 'react';
-import { ToastProvider } from './ToastProvider';
+
 import { useToastStore } from '@store/toast-store';
+
+import { ToastProvider } from './ToastProvider';
 
 const meta = {
   component: ToastProvider,
