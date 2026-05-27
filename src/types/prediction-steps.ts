@@ -2,6 +2,28 @@ import type { ReactNode } from 'react';
 
 export type PredictionStepKind = 'group' | 'knockout-round' | 'final-positions' | 'best-players';
 
+export interface ThirdPlacedTeam {
+  rank: number;
+  teamId: string;
+  teamName: string;
+  groupLetter: string;
+  points: number;
+  goalDifference: number;
+  goalsScored: number;
+  advancing: boolean;
+  bracketSlotLabel?: string; // e.g. "Match 74" if advancing
+  bracketMatchSlug?: string; // e.g. "r32-m3" if advancing
+}
+
+export type DeadlineState = 'before' | 'passed';
+
+export interface DeadlineInfo {
+  deadline: Date;
+  state: DeadlineState;
+  label: string;
+  countdownLabel?: string;
+}
+
 export interface PredictionStepModel {
   id: string;
   kind: PredictionStepKind;
@@ -9,6 +31,7 @@ export interface PredictionStepModel {
   description: string;
   isComplete: boolean;
   canAdvance?: boolean;
+  deadline?: Date;
   content: ReactNode;
   onSubmit: () => Promise<void>;
 }

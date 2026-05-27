@@ -17,6 +17,7 @@ export interface Tournament {
   name: string;
   startDate: Timestamp;
   endDate: Timestamp;
+  deadline?: Timestamp; // NEW — prediction submission deadline
   status: TournamentStatus;
   phases: { name: PhaseType; order: number }[];
   createdAt: Timestamp;
