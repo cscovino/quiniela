@@ -55,8 +55,8 @@ describe('PredictionStepKnockoutRound', () => {
   it('renders all unsubmitted matches', () => {
     render(<PredictionStepKnockoutRound {...defaultProps} />);
     expect(screen.getByText('Round of 32')).toBeInTheDocument();
-    expect(screen.getAllByText('arg').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('bra').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/arg/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/bra/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows TBD when teams are not resolved', () => {

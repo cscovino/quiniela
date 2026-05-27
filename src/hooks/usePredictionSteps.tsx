@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { Match } from '@app-types/firestore';
+import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 import { PredictionStepGroup } from '@molecules/Predictions';
 import { PredictionStepKnockoutRound } from '@molecules/Predictions';
 import { PredictionStepBestPlayers, PredictionStepFinalPhase } from '@molecules/Predictions';
@@ -8,7 +9,11 @@ import type { GroupForPrediction } from '@organisms/GroupPredictionForm';
 import { predictionService } from '@services/prediction-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
-import { isGroupClassificationComplete, KNOCKOUT_PHASES } from '@utils/predictions-flow';
+import {
+  computeThirdPlaceStandings,
+  isGroupClassificationComplete,
+  KNOCKOUT_PHASES,
+} from '@utils/predictions-flow';
 
 import type { PredictionStepModel } from '../types/prediction-steps';
 
@@ -35,6 +40,7 @@ export interface UsePredictionStepsResult {
   teamsMap: Record<string, { fifaCode: string; name: string }>;
   groups: GroupForPrediction[];
   firestoreMatches: (Match & { id: string })[];
+  thirdPlaceTeams: ThirdPlacedTeam[];
 }
 
 export function usePredictionSteps(
@@ -415,6 +421,11 @@ export function usePredictionSteps(
         translations.stepDescriptionRound?.replace('{round}', roundLabel) ||
         `Pick winners for the ${roundLabel}`;
 
+      const thirdPlaceTeams: ThirdPlacedTeam[] =
+        phase === 'round-of-32'
+          ? computeThirdPlaceStandings(groupBetsByGroupId, {}, firestoreMatches, teamsMap, groups)
+          : [];
+
       result.push({
         id: `knockout-${phase}`,
         kind: 'knockout-round',
@@ -442,6 +453,7 @@ export function usePredictionSteps(
             previousRoundPredictions={knockoutBetsByMatchSlug}
             onSubmit={(predictions) => handleKnockoutRoundSubmit(phase, stepIndex, predictions)}
             isDisabled={submitting || (deadline != null && deadline < new Date())}
+            thirdPlaceTeams={thirdPlaceTeams}
           />
         ),
         onSubmit: () => Promise.resolve(),
@@ -512,6 +524,11 @@ export function usePredictionSteps(
 
   const canAdvance = steps[currentStep]?.canAdvance ?? true;
 
+  const thirdPlaceTeams = useMemo(
+    () => computeThirdPlaceStandings(groupBetsByGroupId, {}, firestoreMatches, teamsMap, groups),
+    [groupBetsByGroupId, firestoreMatches, teamsMap, groups],
+  );
+
   return {
     loading,
     steps,
@@ -526,5 +543,6 @@ export function usePredictionSteps(
     teamsMap,
     groups,
     firestoreMatches,
+    thirdPlaceTeams,
   };
 }

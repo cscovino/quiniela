@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import type { PhaseType } from '@app-types/firestore';
+import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 import { Badge } from '@atoms/Badge';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
@@ -29,6 +30,7 @@ export interface PredictionStepKnockoutRoundProps {
   previousRoundPredictions: Record<string, string>;
   onSubmit: (predictions: Record<string, string>) => Promise<void>;
   isDisabled: boolean;
+  thirdPlaceTeams?: ThirdPlacedTeam[];
   translations?: {
     roundOf32?: string;
     roundOf16?: string;
@@ -98,6 +100,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   previousRoundPredictions,
   onSubmit,
   isDisabled,
+  thirdPlaceTeams = [],
   translations = {},
 }) => {
   const labels = { ...defaultTranslations, ...translations };
@@ -127,6 +130,13 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   }, [previousRoundPredictions, existingKnockoutBets, predictions]);
 
   const resolvedMatches = useMemo(() => {
+    const advancingGroupSet = new Set(
+      thirdPlaceTeams.filter((t) => t.advancing).map((t) => t.groupLetter),
+    );
+
+    const isThirdPlaceSlot = (source: { from: string; groupId?: string; position?: number }) =>
+      phase === 'round-of-32' && source.from === 'group' && source.position === 3;
+
     return unsubmittedMatches.map((match) => {
       const bracketEntry = BRACKET_MAP[match.slug];
       if (!bracketEntry) {
@@ -139,16 +149,41 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
         };
       }
 
-      const homeTeam = resolveTeamFromBracket(
-        { source: bracketEntry.home.source },
-        groupBetsByGroupId,
-        knockoutBetsRecord,
-      );
-      const awayTeam = resolveTeamFromBracket(
-        { source: bracketEntry.away.source },
-        groupBetsByGroupId,
-        knockoutBetsRecord,
-      );
+      let homeTeam: { fifaCode: string; name: string } | null = null;
+      if (isThirdPlaceSlot(bracketEntry.home.source)) {
+        const groupId = bracketEntry.home.source.groupId || '';
+        if (advancingGroupSet.has(groupId)) {
+          const positions = groupBetsByGroupId[groupId];
+          if (positions && positions.length >= 4) {
+            const teamId = positions[2];
+            homeTeam = { fifaCode: teamId.toUpperCase(), name: teamId };
+          }
+        }
+      } else {
+        homeTeam = resolveTeamFromBracket(
+          { source: bracketEntry.home.source },
+          groupBetsByGroupId,
+          knockoutBetsRecord,
+        );
+      }
+
+      let awayTeam: { fifaCode: string; name: string } | null = null;
+      if (isThirdPlaceSlot(bracketEntry.away.source)) {
+        const groupId = bracketEntry.away.source.groupId || '';
+        if (advancingGroupSet.has(groupId)) {
+          const positions = groupBetsByGroupId[groupId];
+          if (positions && positions.length >= 4) {
+            const teamId = positions[2];
+            awayTeam = { fifaCode: teamId.toUpperCase(), name: teamId };
+          }
+        }
+      } else {
+        awayTeam = resolveTeamFromBracket(
+          { source: bracketEntry.away.source },
+          groupBetsByGroupId,
+          knockoutBetsRecord,
+        );
+      }
 
       return {
         ...match,
@@ -158,7 +193,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
         tbdAway: awayTeam ? undefined : 'TBD',
       };
     });
-  }, [unsubmittedMatches, groupBetsByGroupId, knockoutBetsRecord]);
+  }, [unsubmittedMatches, groupBetsByGroupId, knockoutBetsRecord, thirdPlaceTeams, phase]);
 
   const handlePrediction = (matchSlug: string, winner: string) => {
     setPredictions((prev) => ({
@@ -232,7 +267,8 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
                 ) : (
                   <div className="prediction-step-knockout-round__tbd">
                     <Typography variant="small">
-                      {match.tbdHome || 'TBD'} vs {match.tbdAway || 'TBD'}
+                      {match.homeTeam?.name || match.tbdHome || 'TBD'} vs{' '}
+                      {match.awayTeam?.name || match.tbdAway || 'TBD'}
                     </Typography>
                     <Typography
                       variant="caption"

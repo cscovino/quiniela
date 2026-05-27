@@ -22,3 +22,4 @@ export {
   PredictionsProgress,
   type PredictionsProgressProps,
 } from './PredictionsUI';
+export { ThirdPlaceConfirmation, type ThirdPlaceConfirmationProps } from './ThirdPlaceConfirmation';

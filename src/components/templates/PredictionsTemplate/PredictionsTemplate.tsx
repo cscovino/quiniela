@@ -12,6 +12,7 @@ import {
   PredictionsFeedback,
   PredictionsNavigation,
   PredictionsProgress,
+  ThirdPlaceConfirmation,
 } from '@molecules/Predictions';
 import { PredictorDeleteConfirm } from '@molecules/PredictorDeleteConfirm';
 import { PredictorEditor } from '@molecules/PredictorEditor';
@@ -159,10 +160,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     return { deadline: tournamentDeadline, state, label, countdownLabel };
   }, [tournamentDeadline, now, translations.deadlinePassed, translations.deadlineCountdown]);
 
-  // Third-place confirmation gate (stub — wiring in T-013)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [showThirdPlaceConfirm, _setShowThirdPlaceConfirm] = useState(false);
-
   const {
     loading: stepsLoading,
     steps,
@@ -173,7 +170,40 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     totalSteps,
     canAdvance,
     submitting,
+    thirdPlaceTeams,
+    groups,
   } = usePredictionSteps(translations, locale, selectedPredictorId, tournamentDeadline);
+
+  const [showThirdPlaceConfirm, setShowThirdPlaceConfirm] = useState(false);
+  const [confirmedThirdPlace, setConfirmedThirdPlace] = useState(false);
+
+  const groupsCount = groups.length;
+
+  useEffect(() => {
+    if (confirmedThirdPlace) {
+      setConfirmedThirdPlace(false);
+      return;
+    }
+    const lastGroupStep = groupsCount - 1;
+    if (
+      currentStep === lastGroupStep &&
+      !showThirdPlaceConfirm &&
+      steps[lastGroupStep]?.isComplete
+    ) {
+      setShowThirdPlaceConfirm(true);
+    }
+  }, [currentStep, groupsCount, showThirdPlaceConfirm, confirmedThirdPlace, steps]);
+
+  const handleThirdPlaceAdjust = () => {
+    setShowThirdPlaceConfirm(false);
+    setCurrentStep(groupsCount - 1);
+  };
+
+  const handleThirdPlaceContinue = () => {
+    setShowThirdPlaceConfirm(false);
+    setConfirmedThirdPlace(true);
+    setCurrentStep(groupsCount);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -454,8 +484,22 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
 
         {showThirdPlaceConfirm ? (
           <section className="predictions-template__section">
-            <Typography variant="h2">{translations.thirdPlaceHeading}</Typography>
-            <Typography variant="body">{translations.thirdPlaceSubtitle}</Typography>
+            <ThirdPlaceConfirmation
+              rankedTeams={thirdPlaceTeams}
+              onAdjust={handleThirdPlaceAdjust}
+              onContinue={handleThirdPlaceContinue}
+              translations={{
+                heading: translations.thirdPlaceHeading || 'Third-Placed Teams Qualification',
+                subtitle:
+                  translations.thirdPlaceSubtitle ||
+                  'Best 8 of 12 third-placed teams advance to Round of 32',
+                advancing: 'Advancing to Round of 32',
+                eliminated: 'Eliminated',
+                bracketSlot: 'Match',
+                adjust: translations.predictedStandings || 'Adjust Group Predictions',
+                continue: translations.buttonNext || 'Continue',
+              }}
+            />
           </section>
         ) : (
           <>
