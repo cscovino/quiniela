@@ -17,7 +17,7 @@ import { Moon } from 'pixelarticons/react/Moon';
 import { PenSquare } from 'pixelarticons/react/PenSquare';
 import { Plus } from 'pixelarticons/react/Plus';
 import { Radio } from 'pixelarticons/react/Radio';
-import { RobotFace } from 'pixelarticons/react/RobotFace';
+import { Robot } from 'pixelarticons/react/Robot';
 import { Sparkle } from 'pixelarticons/react/Sparkle';
 import { SquareAlert } from 'pixelarticons/react/SquareAlert';
 import { Target } from 'pixelarticons/react/Target';
@@ -30,6 +30,7 @@ import type { CSSProperties, FC } from 'react';
 import './Icon.css';
 
 export type IconName =
+  | 'award'
   | 'bell'
   | 'chart'
   | 'check'
@@ -50,7 +51,7 @@ export type IconName =
   | 'moon'
   | 'pen-square'
   | 'plus'
-  | 'robot-face'
+  | 'robot'
   | 'sparkles'
   | 'star'
   | 'target'
@@ -68,6 +69,7 @@ export interface IconProps {
 }
 
 const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: string }>> = {
+  award: Crown,
   bell: Bell,
   chart: Chart,
   check: Check,
@@ -88,7 +90,7 @@ const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: 
   moon: Moon,
   'pen-square': PenSquare,
   plus: Plus,
-  'robot-face': RobotFace,
+  robot: Robot,
   sparkles: Sparkle,
   star: Sparkle,
   target: Target,

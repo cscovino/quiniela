@@ -391,7 +391,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
             }}
             aria-label="Start guided tour"
           >
-            <Icon name="robot-face" size={16} /> Tour
+            <Icon name="robot" size={16} /> Tour
           </Button>
         </header>
 

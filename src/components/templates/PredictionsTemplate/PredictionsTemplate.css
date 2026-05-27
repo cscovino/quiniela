@@ -18,39 +18,7 @@
   gap: var(--space-2);
 }
 
-.predictions-template__tour-btn {
-  align-self: flex-start;
-  background: var(--color-accent-500);
-  border: 2px solid var(--color-quaternary-500);
-  padding: var(--space-2) var(--space-3);
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  color: #fff;
-  cursor: pointer;
-  transition: background var(--duration-normal) var(--ease-out);
-}
 
-.predictions-template__tour-btn:hover {
-  background: var(--color-accent-600);
-}
-
-.predictions-template__back-btn {
-  align-self: flex-start;
-  background: none;
-  border: var(--border-pixel-sm);
-  padding: var(--space-2) var(--space-4);
-  font-family: var(--font-pixel);
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all var(--duration-normal) var(--ease-out);
-}
-
-.predictions-template__back-btn:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-primary);
-  border-color: var(--color-accent-500);
-}
 
 .predictions-template__header h1 {
   font-size: var(--heading-xs);
@@ -134,10 +102,6 @@
   border-top: var(--border-pixel-sm);
 }
 
-.predictions-template__navigation button {
-  width: 100%;
-}
-
 .predictions-template__predicted-standings {
   display: flex;
   flex-direction: column;
@@ -204,39 +168,10 @@
   color: var(--color-accent-500);
 }
 
-/* Mobile: compact progress indicator */
 @media (max-width: 480px) {
   .predictions-template__navigation {
     flex-direction: column;
     gap: var(--space-2);
-  }
-
-  .predictions-template__navigation button {
-    font-family: var(--font-pixel);
-    border: var(--border-width-md) solid;
-    padding: var(--space-2) var(--space-4);
-    clip-path: polygon(
-      0px 8px,
-      4px 8px,
-      4px 4px,
-      8px 4px,
-      8px 0px,
-      calc(100% - 8px) 0px,
-      calc(100% - 8px) 4px,
-      calc(100% - 4px) 4px,
-      calc(100% - 4px) 8px,
-      100% 8px,
-      100% calc(100% - 8px),
-      calc(100% - 4px) calc(100% - 8px),
-      calc(100% - 4px) calc(100% - 4px),
-      calc(100% - 8px) calc(100% - 4px),
-      calc(100% - 8px) 100%,
-      8px 100%,
-      8px calc(100% - 4px),
-      4px calc(100% - 4px),
-      4px calc(100% - 8px),
-      0px calc(100% - 8px)
-    );
   }
 }
 
@@ -258,10 +193,6 @@
   .predictions-template__navigation {
     flex-direction: row;
     gap: var(--space-4);
-  }
-
-  .predictions-template__navigation button {
-    width: auto;
   }
 
   .predictions-template__predicted-table {
