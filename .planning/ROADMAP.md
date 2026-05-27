@@ -226,3 +226,16 @@ Plans:
 
 Plans:
 - [ ] TBD (run /gsd-plan-phase 10 to break down)
+
+### Phase 11: Refactor the Predictions wizard: matches score predictions editable until tournament start deadline; default all matches to draw for predicted standings; predicted standings pre-fill selects editable until deadline; Next button submits prediction (no separate submit button); Back button navigates to previous step, not predictions list; fix untranslated locale strings; fix CAPTCHA failing after 2 groups; fix duplicate Group H header text; pre-fill elimination round with predicted classification; populate knockout bracket fixture data (teams, dates, locations) from web source
+
+**Goal:** Refactor Predictions wizard to support editable scores until deadline, fix scoring defaults, improve navigation (Next=Save, Back=preserve), audit locale/CAPTCHA/headers, fix knockout bracket assignments.
+**Requirements**: A, B, C, D, E, F, G, H, I
+**Depends on:** Phase 10
+**Plans:** 4 plans
+
+Plans:
+- [ ] 11-01-PLAN.md — Editable scores: service layer (merge writes) + group form fixes (isMatchDisabled, allPredictions, duplicate header)
+- [ ] 11-02-PLAN.md — Editable knockout form + bracket team assignment fix
+- [ ] 11-03-PLAN.md — Navigation improvements (Next=Save, Back=preserve) + CAPTCHA flash fix
+- [ ] 11-04-PLAN.md — Locale audit: missing predictions translations, replace hardcoded strings
