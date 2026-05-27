@@ -1,5 +1,7 @@
 import type { FC } from 'react';
 
+import { Button } from '@atoms/Button';
+import { Icon } from '@atoms/Icon';
 import { Typography } from '@atoms/Typography';
 
 import '../../templates/PredictionsTemplate/PredictionsTemplate.css';
@@ -46,23 +48,13 @@ export const PredictionsNavigation: FC<PredictionsNavigationProps> = ({
 }) => (
   <>
     <div className="predictions-template__navigation">
-      <button
-        type="button"
-        className="predictions-template__nav-btn"
-        onClick={onBack}
-        disabled={currentStep === 0}
-      >
-        {translations.buttonBack}
-      </button>
+      <Button variant="ghost" size="sm" onClick={onBack} disabled={currentStep === 0}>
+        <Icon name="chevron-left" size={16} /> {translations.buttonBack}
+      </Button>
       {currentStep < totalSteps - 1 && (
-        <button
-          type="button"
-          className="predictions-template__nav-btn predictions-template__nav-btn--primary"
-          onClick={onNext}
-          disabled={!canAdvance}
-        >
+        <Button variant="primary" size="sm" onClick={onNext} disabled={!canAdvance}>
           {translations.buttonNext}
-        </button>
+        </Button>
       )}
     </div>
   </>

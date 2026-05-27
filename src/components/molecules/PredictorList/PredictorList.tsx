@@ -2,6 +2,8 @@ import type { FC } from 'react';
 
 import type { Predictor } from '@app-types/firestore';
 import { Badge } from '@atoms/Badge';
+import { Button } from '@atoms/Button';
+import { Icon } from '@atoms/Icon';
 import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Typography } from '@atoms/Typography';
 
@@ -88,43 +90,35 @@ export const PredictorList: FC<PredictorListProps> = ({
             </div>
           </div>
           <div className="predictor-list__card-actions">
-            <button
-              type="button"
-              className="predictor-list__action-btn"
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(predictor.id);
               }}
               aria-label={`Edit name and avatar for ${predictor.name}`}
             >
-              <span className="pix pix-edit" />
-              Edit Profile
-            </button>
-            <button
-              type="button"
-              className="predictor-list__action-btn predictor-list__action-btn--danger"
+              <Icon name="pen-square" size={16} /> Edit Profile
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(predictor.id);
               }}
               aria-label={`Delete ${predictor.name}`}
             >
-              <span className="pix pix-trash" />
-              {labels.delete}
-            </button>
+              <Icon name="trash" size={16} /> {labels.delete}
+            </Button>
           </div>
         </div>
       ))}
 
-      <button
-        type="button"
-        className="predictor-list__create-card"
-        onClick={onCreate}
-        aria-label={labels.newButton}
-      >
-        <span className="predictor-list__create-icon">+</span>
-        <Typography variant="body">{labels.newButton}</Typography>
-      </button>
+      <Button variant="primary" fullWidth onClick={onCreate} aria-label={labels.newButton}>
+        <Icon name="plus" size={18} /> {labels.newButton}
+      </Button>
     </div>
   );
 };

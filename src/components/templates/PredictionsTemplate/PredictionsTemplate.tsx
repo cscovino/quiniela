@@ -2,6 +2,8 @@ import type { FC } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
 import type { Predictor } from '@app-types/firestore';
+import { Button } from '@atoms/Button';
+import { Icon } from '@atoms/Icon';
 import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
 import { usePredictionSteps } from '@hooks/usePredictionSteps';
@@ -268,11 +270,9 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
         <div className="predictions-template__auth-required">
           <Typography variant="h1">{translations.title}</Typography>
           <Typography variant="body">{translations.loginRequired}</Typography>
-          <a href={getLoginRoute(locale)}>
-            <button type="button" className="predictions-template__login-btn">
-              {translations.loginButton}
-            </button>
-          </a>
+          <Button href={getLoginRoute(locale)} variant="primary">
+            <Icon name="login" size={18} /> {translations.loginButton}
+          </Button>
         </div>
       </div>
     );
@@ -331,13 +331,9 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       <div className={`predictions-template ${className}`}>
         <main className="predictions-template__content">
           <header className="predictions-template__header">
-            <button
-              type="button"
-              className="predictions-template__back-btn"
-              onClick={handleBackToList}
-            >
-              ← {listTranslations.backToPredictors}
-            </button>
+            <Button variant="ghost" size="sm" onClick={handleBackToList}>
+              <Icon name="chevron-left" size={16} /> {listTranslations.backToPredictors}
+            </Button>
           </header>
 
           <PredictorEditor
@@ -357,13 +353,9 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       <div className={`predictions-template ${className}`}>
         <main className="predictions-template__content">
           <header className="predictions-template__header">
-            <button
-              type="button"
-              className="predictions-template__back-btn"
-              onClick={handleBackToList}
-            >
-              ← {listTranslations.backToPredictors}
-            </button>
+            <Button variant="ghost" size="sm" onClick={handleBackToList}>
+              <Icon name="chevron-left" size={16} /> {listTranslations.backToPredictors}
+            </Button>
           </header>
 
           <PredictorDeleteConfirm
@@ -387,24 +379,20 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     <div className={`predictions-template ${className}`}>
       <main className="predictions-template__content">
         <header className="predictions-template__header">
-          <button
-            type="button"
-            className="predictions-template__back-btn"
-            onClick={handleBackToList}
-          >
-            ← {listTranslations.backToPredictors}
-          </button>
-          <button
-            type="button"
-            className="predictions-template__tour-btn"
+          <Button variant="ghost" size="sm" onClick={handleBackToList}>
+            <Icon name="chevron-left" size={16} /> {listTranslations.backToPredictors}
+          </Button>
+          <Button
+            variant="accent"
+            size="sm"
             onClick={() => {
               resetTour('prediction-wizard');
               setShowWizardTour(true);
             }}
             aria-label="Start guided tour"
           >
-            🎮 Tour
-          </button>
+            <Icon name="robot-face" size={16} /> Tour
+          </Button>
         </header>
 
         <PredictionsProgress stepCounter={stepCounter} />
@@ -438,6 +426,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           steps={PREDICTION_WIZARD_TOUR}
           onComplete={() => setShowWizardTour(false)}
           onClose={() => setShowWizardTour(false)}
+          autoStart={true}
         />
       )}
 
@@ -447,6 +436,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           steps={FIRST_PREDICTOR_TOUR}
           onComplete={() => setShowFirstTour(false)}
           onClose={() => setShowFirstTour(false)}
+          autoStart={true}
         />
       )}
     </div>
