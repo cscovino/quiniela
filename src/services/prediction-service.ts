@@ -4,6 +4,7 @@ import {
   getDoc,
   getDocs,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
   where,
@@ -151,10 +152,12 @@ export const predictionService = {
       };
 
       const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'bets', betId);
-      await setDoc(betRef, {
-        ...betData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+      await runTransaction(getDb(), async (txn) => {
+        txn.set(betRef, {
+          ...betData,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
       });
 
       return { success: true };

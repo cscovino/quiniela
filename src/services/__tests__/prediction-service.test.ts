@@ -10,6 +10,27 @@ vi.mock('../firebase', () => ({
   isAppCheckError: vi.fn(() => false),
 }));
 
+// Mock runTransaction for submitMatchBet (SEC-08)
+// Uses inline mock factory to avoid setDoc being undefined in the mock body
+vi.mock('firebase/firestore', () => {
+  const setDoc = vi.fn();
+  return {
+    doc: vi.fn(),
+    collection: vi.fn(),
+    getDoc: vi.fn(),
+    getDocs: vi.fn(),
+    query: vi.fn(),
+    where: vi.fn(),
+    setDoc,
+    writeBatch: vi.fn(() => ({ set: vi.fn(), commit: vi.fn(() => Promise.resolve()) })),
+    serverTimestamp: vi.fn(() => 'mock-timestamp'),
+    runTransaction: vi.fn(async (_db, callback) => {
+      const txn = { set: vi.fn((ref, data) => setDoc(ref, data)) };
+      await callback(txn);
+    }),
+  };
+});
+
 const mockMatch = {
   id: 'match-1',
   slug: 'arg-vs-fra',
