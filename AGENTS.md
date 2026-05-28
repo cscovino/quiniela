@@ -109,6 +109,13 @@ The app uses [driver.js](https://driverjs.com/) (~8KB gzipped, MIT, zero deps) f
 - **pre-commit:** `lint-staged` runs ESLint + Prettier on staged files
 - **commit-msg:** `commitlint` enforces conventional commits
 
+## Commit Style
+
+- Single-line title only (no body/description)
+- No Co-Authored-By or other trailers
+- No references to plans, phases, milestones, or planning artifacts
+- No code comments mentioning plans, phases, milestones, or planning context
+
 ## Testing
 
 - Vitest with jsdom environment
