@@ -18,6 +18,8 @@
     "firebase:firestore": "firebase deploy --only firestore",
     "test": "vitest",
     "test:run": "vitest run --passWithNoTests",
+    "test:functions": "vitest run --project functions",
+    "test:rules": "firebase emulators:exec --only firestore \"pnpm exec vitest run --project rules\"",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\" --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,astro,css,json}\"",
@@ -33,6 +35,11 @@
       "eslint --fix",
       "prettier --write",
       "pnpm test:run"
+    ],
+    "functions/**/*.ts": [
+      "eslint --fix",
+      "prettier --write",
+      "pnpm test:functions"
     ]
   },
   "dependencies": {
@@ -54,6 +61,7 @@
     "@commitlint/cli": "^21.0.1",
     "@commitlint/config-conventional": "^21.0.1",
     "@eslint/js": "^10.0.1",
+    "@firebase/rules-unit-testing": "^5.0.1",
     "@storybook/addon-docs": "^10.4.0",
     "@storybook/addon-vitest": "^10.4.0",
     "@storybook/react-vite": "^10.4.0",
@@ -68,6 +76,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-simple-import-sort": "^13.0.0",
+    "firebase-tools": "^15.0.0",
     "globals": "^17.6.0",
     "happy-dom": "^20.9.0",
     "husky": "^9.1.7",
@@ -85,6 +94,10 @@
     "overrides": {
       "yaml@>=2.0.0 <2.8.3": ">=2.8.3",
       "uuid": ">=11.1.1"
+    },
+    "onlyBuiltDependencies": ["sharp"],
+    "minimumReleaseAge": {
+      "firebase-tools": "0"
     }
   }
 }

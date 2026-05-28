@@ -100,6 +100,27 @@ export default defineConfig({
           },
         },
       },
+      {
+        test: {
+          name: 'functions',
+          environment: 'node',
+          include: ['functions/src/**/__tests__/**/*.test.ts'],
+          globals: true,
+          coverage: {
+            thresholds: { lines: 60 },
+            include: ['functions/src/**'],
+            exclude: ['functions/src/**/__tests__/**', 'functions/lib/**'],
+          },
+        },
+      },
+      {
+        test: {
+          name: 'rules',
+          environment: 'node',
+          include: ['firestore/__tests__/**/*.rules.test.ts'],
+          globals: true,
+        },
+      },
     ],
   },
   resolve: {

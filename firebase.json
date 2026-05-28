@@ -95,5 +95,13 @@
   },
   "storage": {
     "rules": "storage/storage.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": false
+    }
   }
 }
