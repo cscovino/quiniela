@@ -16,10 +16,16 @@ export const mockDb = {
 };
 
 // Must be top-level (hoisted by Vitest before module imports)
-const mockAppCheck = vi.fn(() => ({ verifyToken: vi.fn() }));
+// vi.hoisted() is evaluated in the hoisting phase, before vi.mock evaluation,
+// so the nestedVerifyToken ref can be safely shared between the mock and test code.
+const { nestedVerifyToken: _mockAppCheckVerifyToken } = vi.hoisted(() => ({
+  nestedVerifyToken: vi.fn(),
+}));
+
 vi.mock('firebase-admin', () => {
+  const fn = _mockAppCheckVerifyToken;
   const ns = {
-    appCheck: mockAppCheck,
+    appCheck: vi.fn(() => ({ verifyToken: fn })),
     firestore: Object.assign(
       vi.fn(() => mockDb),
       {
