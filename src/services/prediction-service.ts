@@ -198,6 +198,9 @@ export const predictionService = {
 
       return { success: true };
     } catch (err) {
+      if (isAppCheckError(err)) {
+        return { success: false, error: 'CAPTCHA_ERROR' };
+      }
       return {
         success: false,
         error: err instanceof Error ? err.message : 'Failed to submit prediction',
