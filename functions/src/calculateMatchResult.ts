@@ -1,6 +1,6 @@
-import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import * as functions from 'firebase-functions/v1';
 
 const db = admin.firestore();
 
@@ -32,7 +32,7 @@ interface BetData {
   updatedAt: admin.firestore.Timestamp;
 }
 
-function calculatePoints(
+export function calculatePoints(
   betHome: number,
   betAway: number,
   actualHome: number,
@@ -41,7 +41,8 @@ function calculatePoints(
   const isExact = betHome === actualHome && betAway === actualAway;
 
   const betOutcome = betHome > betAway ? 'home' : betHome < betAway ? 'away' : 'draw';
-  const actualOutcome = actualHome > actualAway ? 'home' : actualHome < actualAway ? 'away' : 'draw';
+  const actualOutcome =
+    actualHome > actualAway ? 'home' : actualHome < actualAway ? 'away' : 'draw';
   const isWinner = betOutcome === actualOutcome;
 
   return {
@@ -79,9 +80,7 @@ export const calculateMatchResult = functions.firestore
     const actualHome = after.result.home;
     const actualAway = after.result.away;
 
-    functions.logger.log(
-      `Calculating points for match ${matchId}: ${actualHome}-${actualAway}`,
-    );
+    functions.logger.log(`Calculating points for match ${matchId}: ${actualHome}-${actualAway}`);
 
     const betsSnapshot = await db
       .collection(`tournaments/${tournamentId}/bets`)
