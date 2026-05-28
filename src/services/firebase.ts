@@ -25,8 +25,16 @@ function ensureApp(): FirebaseApp {
     app = initializeApp(firebaseConfig);
 
     if (typeof window !== 'undefined') {
+      // App Check debug provider for non-PROD (dev/CI)
+      // Must be set BEFORE initializeAppCheck() — Firebase reads this global at init
+      if (!import.meta.env.PROD) {
+        const debugToken = import.meta.env.PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN;
+        // @ts-expect-error — Firebase reads this global at App Check init
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken || true;
+      }
+
       const recaptchaKey = import.meta.env.PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY;
-      if (recaptchaKey && import.meta.env.PROD) {
+      if (recaptchaKey) {
         _appCheck = initializeAppCheck(app, {
           provider: new ReCaptchaV3Provider(recaptchaKey),
           isTokenAutoRefreshEnabled: true,
