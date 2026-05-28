@@ -502,6 +502,7 @@ export function usePredictionSteps(
           existingPrediction={existingFinalPhase || undefined}
           onSubmit={handleFinalPhaseSubmit}
           isDisabled={submitting || (deadline != null && deadline < new Date())}
+          isSubmitting={submitting}
           locale={locale}
         />
       ),
@@ -522,6 +523,7 @@ export function usePredictionSteps(
           existingPrediction={existingBestPlayers || undefined}
           onSubmit={handleBestPlayersSubmit}
           isDisabled={submitting || (deadline != null && deadline < new Date())}
+          isSubmitting={submitting}
         />
       ),
       onSubmit: () => Promise.resolve(),

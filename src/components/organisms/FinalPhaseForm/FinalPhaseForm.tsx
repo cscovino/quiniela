@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useState } from 'react';
 
 import { Button } from '@atoms/Button';
+import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
 
@@ -12,6 +13,7 @@ export interface FinalPhaseFormProps {
   onSubmit: (data: { first?: string; second?: string; third?: string; fourth?: string }) => void;
   existingPrediction?: { first?: string; second?: string; third?: string; fourth?: string };
   isDisabled?: boolean;
+  isSubmitting?: boolean;
   className?: string;
 }
 
@@ -28,6 +30,7 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
   onSubmit,
   existingPrediction,
   isDisabled = false,
+  isSubmitting = false,
   className = '',
 }) => {
   const [selections, setSelections] = useState({
@@ -120,8 +123,9 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
           variant="primary"
           size="md"
           onClick={handleSubmit}
-          disabled={isDisabled || !isComplete || !isUnique}
+          disabled={isDisabled || isSubmitting || !isComplete || !isUnique}
         >
+          {isSubmitting ? <Spinner size="sm" /> : null}
           Submit Final Phase
         </Button>
       </div>

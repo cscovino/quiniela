@@ -39,3 +39,12 @@ export const OnlyGoalkeeper: Story = {
     isDisabled: false,
   },
 };
+
+export const Submitting: Story = {
+  args: {
+    existingPrediction: { bestGoalkeeper: 'Emiliano Martinez', bestScorer: 'Kylian Mbappe' },
+    onSubmit: () => {},
+    isDisabled: false,
+    isSubmitting: true,
+  },
+};

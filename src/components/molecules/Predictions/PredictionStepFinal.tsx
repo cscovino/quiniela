@@ -16,6 +16,7 @@ export interface PredictionStepFinalPhaseProps {
     fourth?: string;
   }) => Promise<void>;
   isDisabled: boolean;
+  isSubmitting?: boolean;
   locale: 'en' | 'es';
 }
 
@@ -24,6 +25,7 @@ export const PredictionStepFinalPhase: FC<PredictionStepFinalPhaseProps> = ({
   existingPrediction,
   onSubmit,
   isDisabled,
+  isSubmitting = false,
   locale,
 }) => (
   <>
@@ -33,6 +35,7 @@ export const PredictionStepFinalPhase: FC<PredictionStepFinalPhaseProps> = ({
         onSubmit={onSubmit}
         existingPrediction={existingPrediction}
         isDisabled={isDisabled}
+        isSubmitting={isSubmitting}
       />
     ) : (
       <div className="predictions-template__empty">
@@ -50,16 +53,19 @@ export interface PredictionStepBestPlayersProps {
   existingPrediction?: { bestGoalkeeper?: string; bestScorer?: string };
   onSubmit: (data: { bestGoalkeeper?: string; bestScorer?: string }) => Promise<void>;
   isDisabled: boolean;
+  isSubmitting?: boolean;
 }
 
 export const PredictionStepBestPlayers: FC<PredictionStepBestPlayersProps> = ({
   existingPrediction,
   onSubmit,
   isDisabled,
+  isSubmitting = false,
 }) => (
   <BestPlayersForm
     onSubmit={onSubmit}
     existingPrediction={existingPrediction}
     isDisabled={isDisabled}
+    isSubmitting={isSubmitting}
   />
 );

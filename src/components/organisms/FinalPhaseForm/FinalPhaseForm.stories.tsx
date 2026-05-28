@@ -54,3 +54,13 @@ export const Disabled: Story = {
     isDisabled: true,
   },
 };
+
+export const Submitting: Story = {
+  args: {
+    teams: mockTeams,
+    existingPrediction: { first: 'ARG', second: 'BRA', third: 'FRA', fourth: 'GER' },
+    onSubmit: () => {},
+    isDisabled: false,
+    isSubmitting: true,
+  },
+};

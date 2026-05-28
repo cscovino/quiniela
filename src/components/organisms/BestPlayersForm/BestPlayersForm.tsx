@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useState } from 'react';
 
 import { Button } from '@atoms/Button';
+import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
 
 import './BestPlayersForm.css';
@@ -10,6 +11,7 @@ export interface BestPlayersFormProps {
   onSubmit: (data: { bestGoalkeeper?: string; bestScorer?: string }) => void;
   existingPrediction?: { bestGoalkeeper?: string; bestScorer?: string };
   isDisabled?: boolean;
+  isSubmitting?: boolean;
   className?: string;
 }
 
@@ -17,6 +19,7 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
   onSubmit,
   existingPrediction,
   isDisabled = false,
+  isSubmitting = false,
   className = '',
 }) => {
   const [bestGoalkeeper, setBestGoalkeeper] = useState(existingPrediction?.bestGoalkeeper || '');
@@ -70,8 +73,9 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
           variant="primary"
           size="md"
           onClick={handleSubmit}
-          disabled={isDisabled || (!bestGoalkeeper && !bestScorer)}
+          disabled={isDisabled || isSubmitting || (!bestGoalkeeper && !bestScorer)}
         >
+          {isSubmitting ? <Spinner size="sm" /> : null}
           Submit Best Players
         </Button>
       </div>
