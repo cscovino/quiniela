@@ -19,11 +19,10 @@ import {
   type KnockoutBetRecord,
 } from '@utils/predictions-flow';
 
+import { TOURNAMENT_ID } from '../config/tournament';
 import { getDb } from './firebase';
 import { predictionService } from './prediction-service';
 import { tournamentService } from './tournament-service';
-
-const TOURNAMENT_ID = 'world-cup-2026';
 
 const MAX_NAME_LENGTH = 40;
 const BG_COLOR_REGEX = /^#[0-9a-f]{6}$/i;

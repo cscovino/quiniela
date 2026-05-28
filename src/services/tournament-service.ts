@@ -10,6 +10,7 @@ import {
   where,
 } from 'firebase/firestore';
 
+import { TOURNAMENT_ID } from '../config/tournament';
 import type {
   Group,
   GroupStandings,
@@ -19,8 +20,6 @@ import type {
   Tournament,
 } from '../types/firestore';
 import { getDb } from './firebase';
-
-const TOURNAMENT_ID = 'world-cup-2026';
 
 const db = () => getDb();
 

@@ -18,7 +18,7 @@ beforeAll(async () => {
   env = await initializeTestEnvironment({
     projectId: 'demo-quiniela-final-phase',
     firestore: {
-      rules: readFileSync(resolve(__dirname, '../../firestore.rules'), 'utf8'),
+      rules: readFileSync(resolve(__dirname, '../../firestore/firestore.rules'), 'utf8'),
       host: '127.0.0.1',
       port: 8080,
     },

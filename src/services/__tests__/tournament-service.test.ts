@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { tournamentService } from '../tournament-service';
 
+const TEST_TOURNAMENT_ID = 'world-cup-2026';
+
 vi.mock('../firebase', () => ({
   getDb: () => 'mock-db',
   initFirebase: vi.fn(() => Promise.resolve()),
@@ -47,7 +49,7 @@ describe('tournament-service', () => {
 
   describe('getTournament', () => {
     it('returns tournament data when exists', async () => {
-      const mockTournament = { id: 'world-cup-2026', name: 'World Cup 2026' };
+      const mockTournament = { id: TEST_TOURNAMENT_ID, name: 'World Cup 2026' };
       vi.mocked(firebaseFirestore.getDoc).mockResolvedValue({
         exists: () => true,
         data: () => mockTournament,
@@ -228,11 +230,11 @@ describe('tournament-service', () => {
       vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({
         docs: [
           {
-            ref: { path: 'users/user-1/predictors/user-1-default/stats/world-cup-2026' },
+            ref: { path: `users/user-1/predictors/user-1-default/stats/${TEST_TOURNAMENT_ID}` },
             data: () => ({ ...mockPredictorStats, totalPoints: 150 }),
           },
           {
-            ref: { path: 'users/user-2/predictors/user-2-default/stats/world-cup-2026' },
+            ref: { path: `users/user-2/predictors/user-2-default/stats/${TEST_TOURNAMENT_ID}` },
             data: () => ({ ...mockPredictorStats, totalPoints: 100 }),
           },
         ],

@@ -11,7 +11,9 @@ pnpm dev          # Start dev server
 pnpm build        # Production build
 pnpm preview      # Preview production build
 pnpm test         # Vitest watch mode
-pnpm test:run     # Run tests once
+pnpm test:run     # Run tests once (unit + storybook + functions; excludes rules)
+pnpm test:functions  # Run Cloud Functions unit tests (offline, no emulator)
+pnpm test:rules      # Run Firestore security rules tests (starts emulator one-shot)
 pnpm lint         # ESLint check
 pnpm lint:fix     # ESLint + fix
 pnpm format       # Prettier
@@ -113,6 +115,14 @@ The app uses [driver.js](https://driverjs.com/) (~8KB gzipped, MIT, zero deps) f
 - Setup file: `src/test/setup.ts`
 - Pattern: `src/**/*.test.{ts,tsx}`
 - Aliases in `vitest.config.ts` only resolve `@/`, not component aliases
+
+**Cloud Functions & Rules tests:** Functions unit tests live in `functions/src/__tests__/`
+and `functions/src/api/__tests__/` — they run offline with `vi.fn()` stubs, no emulator
+needed, and are included in `pnpm test:run`. Firestore Security Rules tests live in
+`firestore/__tests__/` — they require the Firestore emulator and run via `pnpm test:rules`
+(lifecycle handled automatically by `firebase emulators:exec`). Functions tests are wired
+to lint-staged for `functions/**/*.ts` staged files; rules tests are excluded from
+lint-staged (emulator startup is too slow for pre-commit).
 
 ## Key Decisions
 

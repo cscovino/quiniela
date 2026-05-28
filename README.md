@@ -82,7 +82,7 @@ public/
 - **Zustand** - State management
 - **TypeScript** - Type safety
 - **Zod** - Content collection validation
-- **Vitest** - Testing (356 tests)
+- **Vitest** - Testing (574+ tests)
 - **ESLint + Prettier** - Code quality
 - **Husky + Commitlint** - Git hooks
 - **Storybook** - Component documentation
@@ -95,7 +95,9 @@ public/
 | `pnpm build` | Build for production |
 | `pnpm preview` | Preview production build |
 | `pnpm test` | Run tests in watch mode |
-| `pnpm test:run` | Run tests once |
+| `pnpm test:run` | Run tests once (unit + storybook + functions; excludes rules — needs emulator) |
+| `pnpm test:functions` | Run Cloud Functions unit tests (offline, no emulator) |
+| `pnpm test:rules` | Run Firestore Security Rules tests (starts emulator, one-shot) |
 | `pnpm lint` | Lint code |
 | `pnpm lint:fix` | Lint and fix |
 | `pnpm format` | Format code |
@@ -103,6 +105,36 @@ public/
 | `pnpm seed` | Seed Firestore with tournament data |
 | `pnpm set-admin <uid>` | Promote user to admin |
 | `node scripts/generate-content.mjs` | Generate content collection files |
+
+## 🧪 Testing Cloud Functions & Rules
+
+### Unit tests (offline — no emulator needed)
+
+```bash
+pnpm test:functions            # Run once
+pnpm test:functions --watch    # Watch mode
+pnpm test:functions --coverage  # With coverage (60% line threshold)
+```
+
+Cloud Functions unit tests use `firebase-functions-test` v3 offline mode with `vi.fn()` stubs — no emulator required. They live in `functions/src/__tests__/` and `functions/src/api/__tests__/` and are included in `pnpm test:run`.
+
+### Security rules tests (requires Firestore emulator)
+
+```bash
+pnpm test:rules
+```
+
+**Prerequisite:** Java JRE must be available (`java -version` to check). Download the emulator binary with `firebase setup:emulators:firestore` if missing.
+
+`pnpm test:rules` starts the emulator, runs the suite, and shuts down — no long-running process needed.
+
+### All tests (excluding rules)
+
+```bash
+pnpm test:run
+```
+
+Runs the full offline suite (unit + storybook + functions). Rules tests are excluded from `test:run` because the emulator adds ~30s startup overhead.
 
 ## 🎨 Design System
 

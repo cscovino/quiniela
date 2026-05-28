@@ -11,6 +11,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 
+import { TOURNAMENT_ID } from '../config/tournament';
 import type {
   BestPlayersBet,
   FinalPhaseBet,
@@ -20,8 +21,6 @@ import type {
   MatchBet,
 } from '../types/firestore';
 import { getDb, isAppCheckError } from './firebase';
-
-const TOURNAMENT_ID = 'world-cup-2026';
 
 interface BetValidationResult {
   valid: boolean;

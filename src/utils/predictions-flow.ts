@@ -1,7 +1,19 @@
 import type { Match, PhaseType } from '@app-types/firestore';
 import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 
-import { getCombinationKey, THIRD_PLACE_MATRIX } from '../data/third-place-matrix';
+import type { ThirdPlaceMapping } from '../data/third-place-matrix';
+import { getCombinationKey } from '../data/third-place-matrix';
+import { loadThirdPlaceMatrix } from '../services/third-place-matrix-loader';
+
+let _thirdPlaceMatrix: Record<string, ThirdPlaceMapping> = {};
+
+export async function ensureThirdPlaceMatrix(): Promise<void> {
+  if (Object.keys(_thirdPlaceMatrix).length > 0) return;
+  const matrix = await loadThirdPlaceMatrix();
+  if (Object.keys(matrix).length > 0) {
+    _thirdPlaceMatrix = matrix;
+  }
+}
 
 export interface MatchWithId extends Match {
   id: string;
@@ -453,7 +465,7 @@ export function computeThirdPlaceStandings(
 
   const advancingGroups = thirdPlacedRecords.slice(0, 8).map((r) => r.groupLetter);
   const combinationKey = getCombinationKey(advancingGroups);
-  const slotMapping = THIRD_PLACE_MATRIX[combinationKey] || {};
+  const slotMapping = _thirdPlaceMatrix?.[combinationKey] || {};
 
   return thirdPlacedRecords.map((record, index) => {
     const isAdvancing = index < 8;

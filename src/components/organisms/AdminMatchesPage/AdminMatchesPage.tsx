@@ -13,7 +13,7 @@ import { getLoginRoute } from '@utils/i18n';
 
 import './AdminMatchesPage.css';
 
-const TOURNAMENT_ID = 'world-cup-2026';
+import { TOURNAMENT_ID } from '@/config/tournament';
 
 export const AdminMatchesPage: FC = () => {
   const user = useAuthStore((s) => s.user);

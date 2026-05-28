@@ -1,56 +1,66 @@
-import firebaseFunctionsTest from 'firebase-functions-test';
 import { vi } from 'vitest';
 
-// Mock batch object — exported so test files can assert on calls
+process.env.GCLOUD_PROJECT = 'fake-project-id';
+process.env.FIREBASE_CONFIG = JSON.stringify({ projectId: 'fake-project-id' });
+
+const mockFirestore = vi.fn(() => ({
+  collection: vi.fn(() => ({
+    doc: vi.fn(() => ({ set: vi.fn(), get: vi.fn() })),
+    where: vi.fn(() => ({ get: vi.fn() })),
+  })),
+  batch: vi.fn(() => ({
+    update: vi.fn(),
+    set: vi.fn(),
+    commit: vi.fn(),
+  })),
+}));
+
+vi.mock('firebase-admin', () => ({
+  __esModule: true,
+  default: {
+    firestore: mockFirestore,
+    app: { firestore: mockFirestore },
+  },
+  firestore: mockFirestore,
+}));
+
 export const mockBatch = {
   update: vi.fn(),
   set: vi.fn(),
   commit: vi.fn().mockResolvedValue(undefined),
 };
 
-// Mock database — exported so test files can stub collection queries
 export const mockDb = {
   collection: vi.fn(),
   batch: vi.fn(() => mockBatch),
   doc: vi.fn(),
 };
 
-// Must be top-level (hoisted by Vitest before module imports)
-// vi.hoisted() is evaluated in the hoisting phase, before vi.mock evaluation,
-// so the nestedVerifyToken ref can be safely shared between the mock and test code.
-const { nestedVerifyToken: _mockAppCheckVerifyToken } = vi.hoisted(() => ({
-  nestedVerifyToken: vi.fn(),
-}));
-
-vi.mock('firebase-admin', () => {
-  const fn = _mockAppCheckVerifyToken;
-  const ns = {
-    appCheck: vi.fn(() => ({ verifyToken: fn })),
-    firestore: Object.assign(
-      vi.fn(() => mockDb),
-      {
-        Timestamp: {
-          now: vi.fn(() => ({ seconds: 1700000000, nanoseconds: 0 })),
-          fromMillis: vi.fn((ms: number) => ({
-            seconds: Math.floor(ms / 1000),
-            nanoseconds: 0,
-          })),
-          fromDate: vi.fn((d: Date) => ({
-            seconds: Math.floor(d.getTime() / 1000),
-            nanoseconds: 0,
-          })),
-        },
-        FieldValue: {
-          serverTimestamp: vi.fn(() => 'srv-ts'),
-          increment: vi.fn((n: number) => n),
-          arrayUnion: vi.fn(),
-        },
-      },
-    ),
-  };
-  return { __esModule: true, default: ns, ...ns };
-});
-
-// firebase-functions-test offline instance (no project config, no credentials)
-export const fft = firebaseFunctionsTest({ projectId: 'fake-project-id' });
-export const cleanup = () => fft.cleanup();
+export const fft = {
+  wrap: (fn: unknown) => fn,
+  firestore: {
+    makeDocumentSnapshot: (data: unknown, path: string) => ({
+      data: () => data,
+      ref: { id: path.split('/').pop(), name: path },
+    }),
+    makeChange: (
+      beforeSnap: { data: () => unknown; ref: { id: string; name: string } },
+      afterSnap: { data: () => unknown; ref: { id: string; name: string } },
+    ) => {
+      return {
+        before: { data: () => beforeSnap.data() },
+        after: { data: () => afterSnap.data() },
+      };
+    },
+  },
+  makeChange: (
+    beforeSnap: { data: () => unknown; ref: { id: string; name: string } },
+    afterSnap: { data: () => unknown; ref: { id: string; name: string } },
+  ) => {
+    return {
+      before: { data: () => beforeSnap.data() },
+      after: { data: () => afterSnap.data() },
+    };
+  },
+  cleanup: () => {},
+};

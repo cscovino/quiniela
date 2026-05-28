@@ -1,6 +1,6 @@
-import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import * as functions from 'firebase-functions/v1';
 
 const db = admin.firestore();
 
@@ -43,6 +43,22 @@ const BADGE_CONDITIONS: BadgeCondition[] = [
   },
 ];
 
+export function getBadgeAwards(
+  beforeBadges: Record<string, string>,
+  afterStats: PredictorStatsData,
+): Record<string, string> {
+  const existingBadges = beforeBadges || {};
+  const newBadges: Record<string, string> = { ...existingBadges };
+
+  for (const { badgeId, check } of BADGE_CONDITIONS) {
+    if (!existingBadges[badgeId] && check(afterStats)) {
+      newBadges[badgeId] = new Date().toISOString();
+    }
+  }
+
+  return newBadges;
+}
+
 export const checkAndAwardBadges = functions.firestore
   .document('users/{userId}/predictors/{predictorId}/stats/{tournamentId}')
   .onUpdate(async (change, context) => {
@@ -50,22 +66,20 @@ export const checkAndAwardBadges = functions.firestore
     const after = change.after.data() as PredictorStatsData;
 
     const existingBadges = before.badgesAwarded || {};
-    const newBadges: Record<string, string> = { ...existingBadges };
-    let awardedAny = false;
+    const newBadges = getBadgeAwards(existingBadges, after);
 
-    for (const { badgeId, check } of BADGE_CONDITIONS) {
-      if (!existingBadges[badgeId] && check(after)) {
-        newBadges[badgeId] = new Date().toISOString();
-        awardedAny = true;
+    const awardedAny = Object.keys(newBadges).some((k) => !existingBadges[k]);
 
+    if (!awardedAny) {
+      return null;
+    }
+
+    for (const [badgeId] of Object.entries(newBadges)) {
+      if (!existingBadges[badgeId]) {
         functions.logger.log(
           `Awarding badge ${badgeId} to predictor ${context.params.predictorId}`,
         );
       }
-    }
-
-    if (!awardedAny) {
-      return null;
     }
 
     await change.after.ref.update({
@@ -76,9 +90,7 @@ export const checkAndAwardBadges = functions.firestore
 
     for (const [badgeId] of Object.entries(newBadges)) {
       if (!existingBadges[badgeId]) {
-        const notificationRef = db
-          .collection(`users/${context.params.userId}/notifications`)
-          .doc();
+        const notificationRef = db.collection(`users/${context.params.userId}/notifications`).doc();
 
         notificationBatch.set(notificationRef, {
           type: 'badge_earned',

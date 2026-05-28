@@ -1,7 +1,7 @@
 import type { GroupStandingsProps } from '@organisms/GroupStandings';
 import type { RankingsTableProps } from '@organisms/RankingsTable';
 
-const TOURNAMENT_ID = 'world-cup-2026';
+import { TOURNAMENT_ID } from '../config/tournament';
 
 interface TeamData {
   fifaCode: string;

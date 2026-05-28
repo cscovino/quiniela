@@ -1,6 +1,6 @@
-import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import * as functions from 'firebase-functions/v1';
 
 const db = admin.firestore();
 
@@ -28,6 +28,65 @@ interface PredictorStatsData {
   lastUpdated: admin.firestore.Timestamp;
 }
 
+export function computeStatsFromBets(bets: BetData[]): {
+  totalPoints: number;
+  exactBets: number;
+  winnerBets: number;
+  totalBets: number;
+  accuracy: number;
+  currentStreak: number;
+  maxStreak: number;
+  pointsHistory: { points: number; matchId: string }[];
+} {
+  let totalPoints = 0;
+  let exactBets = 0;
+  let winnerBets = 0;
+  let totalBets = 0;
+  let currentStreak = 0;
+  let maxStreak = 0;
+  let tempStreak = 0;
+  const pointsHistory: { points: number; matchId: string }[] = [];
+
+  for (const data of bets) {
+    totalBets += 1;
+    totalPoints += data.points;
+
+    if (data.isExact) exactBets += 1;
+    if (data.isWinner) winnerBets += 1;
+
+    if (data.points > 0) {
+      tempStreak += 1;
+      if (tempStreak > maxStreak) {
+        maxStreak = tempStreak;
+      }
+    } else {
+      tempStreak = 0;
+    }
+
+    currentStreak = tempStreak;
+
+    if (data.points > 0) {
+      pointsHistory.push({
+        points: data.points,
+        matchId: data.matchId,
+      });
+    }
+  }
+
+  const accuracy = totalBets > 0 ? winnerBets / totalBets : 0;
+
+  return {
+    totalPoints,
+    exactBets,
+    winnerBets,
+    totalBets,
+    accuracy,
+    currentStreak,
+    maxStreak,
+    pointsHistory,
+  };
+}
+
 export const updatePredictorStats = functions.firestore
   .document('tournaments/{tournamentId}/bets/{betId}')
   .onUpdate(async (change, context) => {
@@ -50,44 +109,9 @@ export const updatePredictorStats = functions.firestore
       .where('predictorId', '==', predictorId)
       .get();
 
-    let totalPoints = 0;
-    let exactBets = 0;
-    let winnerBets = 0;
-    let totalBets = 0;
-    let currentStreak = 0;
-    let maxStreak = 0;
-    let tempStreak = 0;
-    const pointsHistory: { timestamp: admin.firestore.Timestamp; points: number; matchId: string }[] = [];
+    const bets: BetData[] = allBetsSnapshot.docs.map((doc) => doc.data() as BetData);
 
-    for (const bet of allBetsSnapshot.docs) {
-      const data = bet.data() as BetData;
-      totalBets += 1;
-      totalPoints += data.points;
-
-      if (data.isExact) exactBets += 1;
-      if (data.isWinner) winnerBets += 1;
-
-      if (data.points > 0) {
-        tempStreak += 1;
-        if (tempStreak > maxStreak) {
-          maxStreak = tempStreak;
-        }
-      } else {
-        tempStreak = 0;
-      }
-
-      currentStreak = tempStreak;
-
-      if (data.points > 0) {
-        pointsHistory.push({
-          timestamp: admin.firestore.Timestamp.now(),
-          points: data.points,
-          matchId: data.matchId,
-        });
-      }
-    }
-
-    const accuracy = totalBets > 0 ? winnerBets / totalBets : 0;
+    const computed = computeStatsFromBets(bets);
 
     const statsRef = db
       .collection(`users/${userId}/predictors/${predictorId}/stats`)
@@ -99,17 +123,22 @@ export const updatePredictorStats = functions.firestore
       ? (statsDoc.data() as PredictorStatsData).badgesAwarded || {}
       : {};
 
+    const pointsHistory = computed.pointsHistory.map((p) => ({
+      ...p,
+      timestamp: admin.firestore.Timestamp.now(),
+    }));
+
     await statsRef.set(
       {
         predictorId,
         tournamentId,
-        totalPoints,
-        exactBets,
-        winnerBets,
-        totalBets,
-        accuracy,
-        currentStreak,
-        maxStreak,
+        totalPoints: computed.totalPoints,
+        exactBets: computed.exactBets,
+        winnerBets: computed.winnerBets,
+        totalBets: computed.totalBets,
+        accuracy: computed.accuracy,
+        currentStreak: computed.currentStreak,
+        maxStreak: computed.maxStreak,
         pointsHistory,
         badgesAwarded: existingBadges,
         lastUpdated: FieldValue.serverTimestamp(),
@@ -118,7 +147,7 @@ export const updatePredictorStats = functions.firestore
     );
 
     functions.logger.log(
-      `Stats updated: ${totalPoints}pts, ${exactBets} exact, ${winnerBets} winner, ${accuracy.toFixed(2)} accuracy`,
+      `Stats updated: ${computed.totalPoints}pts, ${computed.exactBets} exact, ${computed.winnerBets} winner, ${computed.accuracy.toFixed(2)} accuracy`,
     );
 
     return null;

@@ -3,6 +3,7 @@ const CACHE_NAME = 'quiniela-v5';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/fonts/PressStart2P.woff2',
+  '/data/third-place-matrix.json',
 ];
 
 self.addEventListener('install', (event) => {

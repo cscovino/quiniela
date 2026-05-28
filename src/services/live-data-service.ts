@@ -4,10 +4,9 @@ import type { MatchCardProps } from '@molecules/MatchCard';
 import type { GroupStandingsProps } from '@organisms/GroupStandings';
 import type { RankingEntry } from '@organisms/RankingsTable';
 
+import { TOURNAMENT_ID } from '../config/tournament';
 import type { GroupStandings, Match, PredictorStats, Team } from '../types/firestore';
 import { getDb } from './firebase';
-
-const TOURNAMENT_ID = 'world-cup-2026';
 
 async function getTeamsMap(): Promise<Map<string, Team>> {
   const snapshot = await getDocs(collection(getDb(), 'tournaments', TOURNAMENT_ID, 'teams'));
