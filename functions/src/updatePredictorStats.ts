@@ -80,7 +80,7 @@ export const updatePredictorStats = functions.firestore
 
       if (data.points > 0) {
         pointsHistory.push({
-          timestamp: new Date() as unknown as admin.firestore.Timestamp,
+          timestamp: admin.firestore.Timestamp.now(),
           points: data.points,
           matchId: data.matchId,
         });
