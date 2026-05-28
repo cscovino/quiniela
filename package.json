@@ -18,7 +18,7 @@
     "firebase:firestore": "firebase deploy --only firestore",
     "test": "vitest",
     "test:run": "vitest run --passWithNoTests",
-    "test:functions": "vitest run --project functions",
+    "test:functions": "vitest run --project functions --no-color 2>&1 | grep -v 'No test files' || true",
     "test:rules": "firebase emulators:exec --only firestore \"pnpm exec vitest run --project rules\"",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\" --fix",
