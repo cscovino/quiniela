@@ -160,6 +160,10 @@
         "empty": "Aún no hay predicciones",
         "backToPredictors": "Volver a predicciones"
       },
+      "predictorEditor": {
+        "favouriteTeamLabel": "Equipo Favorito",
+        "noFavouriteTeam": "Sin favorito"
+      },
       "thirdPlaceHeading": "Equipos en Tercer Lugar",
       "thirdPlaceSubtitle": "Los mejores 8 de 12 equipos en tercer lugar avanzan a Octavos de Final",
       "thirdPlaceAdvancing": "Avanzan a Octavos de Final",

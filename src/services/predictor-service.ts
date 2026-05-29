@@ -51,7 +51,12 @@ export const predictorService = {
     return snapshot.docs.map((doc) => doc.data() as Predictor);
   },
 
-  async createPredictor(userId: string, name: string, avatarUrl?: string): Promise<Predictor> {
+  async createPredictor(
+    userId: string,
+    name: string,
+    avatarUrl?: string,
+    favouriteTeamId?: string,
+  ): Promise<Predictor> {
     const nameError = validateName(name);
     if (nameError) throw new Error(nameError);
 
@@ -61,6 +66,7 @@ export const predictorService = {
       userId,
       name,
       ...(avatarUrl && { avatarUrl }),
+      ...(favouriteTeamId && { favouriteTeamId }),
     };
 
     await setDoc(doc(getDb(), 'users', userId, 'predictors', predictorId), {
@@ -83,7 +89,11 @@ export const predictorService = {
   async updatePredictor(
     userId: string,
     predictorId: string,
-    patch: { name?: string; avatar?: { bgColor: string; emoji: string } },
+    patch: {
+      name?: string;
+      avatar?: { bgColor: string; emoji: string };
+      favouriteTeamId?: string | null;
+    },
   ): Promise<void> {
     if (patch.name !== undefined) {
       const nameError = validateName(patch.name);

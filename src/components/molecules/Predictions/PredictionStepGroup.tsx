@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Badge } from '@atoms/Badge';
 import { Button } from '@atoms/Button';
@@ -87,7 +87,9 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   const [classification, setClassification] = useState<string[]>(
     existingGroupBet ? [...existingGroupBet] : group.teams.map((t) => t.fifaCode),
   );
+  const [isClassificationManual, setIsClassificationManual] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isFirstRender = useRef(true);
 
   const allPredictions = useMemo(() => {
     const combined: PredictionRecord = {};
@@ -117,6 +119,22 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
     return isGroupClassificationComplete(classification, group.teams.length);
   }, [classification, group.teams.length]);
 
+  const standingsOrder = useMemo(() => {
+    return standings.map((s) => s.teamId);
+  }, [standings]);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (isClassificationManual) return;
+    if (existingGroupBet) return;
+    if (standingsOrder.length === group.teams.length && standingsOrder.every(Boolean)) {
+      setClassification(standingsOrder);
+    }
+  }, [standingsOrder, isClassificationManual, existingGroupBet, group.teams.length]);
+
   const handleMatchChange = useCallback((matchId: string, home: number, away: number) => {
     setMatchPredictions((prev) => ({
       ...prev,
@@ -126,6 +144,7 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
 
   const handleTeamPositionChange = useCallback(
     (teamFifaCode: string, position: string) => {
+      setIsClassificationManual(true);
       setClassification((prev) => {
         const next = [...prev];
         const currentPos = next.indexOf(teamFifaCode);
@@ -143,6 +162,13 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
     },
     [group.teams.length],
   );
+
+  const handleSyncFromStandings = useCallback(() => {
+    setIsClassificationManual(false);
+    if (standingsOrder.length === group.teams.length && standingsOrder.every(Boolean)) {
+      setClassification(standingsOrder);
+    }
+  }, [standingsOrder, group.teams.length]);
 
   const canSubmit = allMatchesFilled && classificationComplete && !isSubmitting;
 
@@ -273,7 +299,14 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
 
       {existingGroupBet == null && (
         <section className="prediction-step-group__section">
-          <Typography variant="h3">{labels.classification}</Typography>
+          <div className="prediction-step-group__classification-header">
+            <Typography variant="h3">{labels.classification}</Typography>
+            {isClassificationManual && (
+              <Button variant="ghost" size="sm" onClick={handleSyncFromStandings}>
+                Sync from scores
+              </Button>
+            )}
+          </div>
           <div className="prediction-step-group__classification">
             <div className="prediction-step-group__row prediction-step-group__row--header">
               <span className="prediction-step-group__col team">{labels.team}</span>

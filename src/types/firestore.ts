@@ -61,6 +61,7 @@ export interface Predictor {
   name: string;
   avatarUrl?: string;
   avatar?: { bgColor: string; emoji: string };
+  favouriteTeamId?: string;
   createdAt: Timestamp;
 }
 

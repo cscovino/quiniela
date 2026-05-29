@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { Predictor } from '@app-types/firestore';
 import { Button } from '@atoms/Button';
@@ -53,7 +53,12 @@ const COLOR_OPTIONS = [
 export interface PredictorEditorProps {
   mode: 'create' | 'edit';
   predictor?: Predictor;
-  onSave: (data: { name: string; avatar: { bgColor: string; emoji: string } }) => Promise<void>;
+  teams?: { fifaCode: string; name: string }[];
+  onSave: (data: {
+    name: string;
+    avatar: { bgColor: string; emoji: string };
+    favouriteTeamId?: string;
+  }) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
   translations?: {
@@ -63,6 +68,8 @@ export interface PredictorEditorProps {
     namePlaceholder?: string;
     emojiLabel?: string;
     colorLabel?: string;
+    favouriteTeamLabel?: string;
+    noFavouriteTeam?: string;
     save?: string;
     cancel?: string;
   };
@@ -75,6 +82,8 @@ const t = {
   namePlaceholder: 'Enter predictor name',
   emojiLabel: 'Emoji',
   colorLabel: 'Color',
+  favouriteTeamLabel: 'Favorite Team',
+  noFavouriteTeam: 'No favorite',
   save: 'Save',
   cancel: 'Cancel',
 };
@@ -82,6 +91,7 @@ const t = {
 export const PredictorEditor: FC<PredictorEditorProps> = ({
   mode,
   predictor,
+  teams,
   onSave,
   onCancel,
   isSubmitting = false,
@@ -93,7 +103,13 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
   const [selectedColor, setSelectedColor] = useState(
     predictor?.avatar?.bgColor || COLOR_OPTIONS[0],
   );
+  const [favouriteTeamId, setFavouriteTeamId] = useState(predictor?.favouriteTeamId || '');
   const [error, setError] = useState<string | null>(null);
+
+  const sortedTeams = useMemo(() => {
+    if (!teams) return [];
+    return [...teams].sort((a, b) => a.name.localeCompare(b.name));
+  }, [teams]);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -104,6 +120,7 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
     await onSave({
       name: name.trim(),
       avatar: { bgColor: selectedColor, emoji: selectedEmoji },
+      favouriteTeamId: favouriteTeamId || undefined,
     });
   };
 
@@ -186,6 +203,25 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
         </div>
         <Typography variant="body">{name || labels.namePlaceholder}</Typography>
       </div>
+
+      {sortedTeams.length > 0 && (
+        <div className="predictor-editor__field">
+          <span className="predictor-editor__label">{labels.favouriteTeamLabel}</span>
+          <select
+            className="predictor-editor__select"
+            value={favouriteTeamId}
+            onChange={(e) => setFavouriteTeamId(e.target.value)}
+            aria-label={labels.favouriteTeamLabel}
+          >
+            <option value="">{labels.noFavouriteTeam}</option>
+            {sortedTeams.map((team) => (
+              <option key={team.fifaCode} value={team.fifaCode}>
+                {team.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="predictor-editor__actions">
         <Button variant="primary" onClick={handleSave} isDisabled={isSubmitting}>

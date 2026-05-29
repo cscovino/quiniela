@@ -80,6 +80,13 @@
   color: var(--color-gold-500);
 }
 
+.prediction-step-group__classification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
 .prediction-step-group__classification {
   display: flex;
   flex-direction: column;

@@ -160,6 +160,10 @@
         "empty": "No predictions yet",
         "backToPredictors": "Back to predictions"
       },
+      "predictorEditor": {
+        "favouriteTeamLabel": "Favorite Team",
+        "noFavouriteTeam": "No favorite"
+      },
       "thirdPlaceHeading": "Third-Placed Teams",
       "thirdPlaceSubtitle": "Best 8 of 12 third-placed teams advance to Round of 32",
       "thirdPlaceAdvancing": "Advancing to Round of 32",

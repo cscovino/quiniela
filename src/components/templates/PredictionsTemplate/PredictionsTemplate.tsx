@@ -92,6 +92,10 @@ export interface PredictionsTemplateProps {
       empty?: string;
       backToPredictors?: string;
     };
+    predictorEditor?: {
+      favouriteTeamLabel?: string;
+      noFavouriteTeam?: string;
+    };
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -173,6 +177,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     submitting,
     thirdPlaceTeams,
     groups,
+    allTeams,
   } = usePredictionSteps(translations, locale, selectedPredictorId, tournamentDeadline);
 
   const [showThirdPlaceConfirm, setShowThirdPlaceConfirm] = useState(false);
@@ -278,15 +283,31 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
   const handleCreatePredictor = async (data: {
     name: string;
     avatar: { bgColor: string; emoji: string };
+    favouriteTeamId?: string;
   }) => {
     if (!user) return;
     setIsSubmitting(true);
     try {
-      const np = await predictorService.createPredictor(user.uid, data.name);
-      if (data.avatar) {
-        await predictorService.updatePredictor(user.uid, np.id, { avatar: data.avatar });
+      const np = await predictorService.createPredictor(
+        user.uid,
+        data.name,
+        undefined,
+        data.favouriteTeamId,
+      );
+      const updates: {
+        avatar?: { bgColor: string; emoji: string };
+        favouriteTeamId?: string;
+        name?: string;
+      } = {};
+      if (data.avatar) updates.avatar = data.avatar;
+      if (data.favouriteTeamId) updates.favouriteTeamId = data.favouriteTeamId;
+      if (Object.keys(updates).length > 0) {
+        await predictorService.updatePredictor(user.uid, np.id, updates);
       }
-      setPredictors((prev) => [...prev, { ...np, avatar: data.avatar }]);
+      setPredictors((prev) => [
+        ...prev,
+        { ...np, avatar: data.avatar, favouriteTeamId: data.favouriteTeamId },
+      ]);
       await loadPredictorEntries();
       setView('list');
     } finally {
@@ -297,6 +318,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
   const handleUpdatePredictor = async (data: {
     name: string;
     avatar: { bgColor: string; emoji: string };
+    favouriteTeamId?: string;
   }) => {
     if (!user || !editingPredictor) return;
     setIsSubmitting(true);
@@ -304,10 +326,13 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       await predictorService.updatePredictor(user.uid, editingPredictor.id, {
         name: data.name,
         avatar: data.avatar,
+        favouriteTeamId: data.favouriteTeamId || null,
       });
       setPredictors((prev) =>
         prev.map((p) =>
-          p.id === editingPredictor.id ? { ...p, name: data.name, avatar: data.avatar } : p,
+          p.id === editingPredictor.id
+            ? { ...p, name: data.name, avatar: data.avatar, favouriteTeamId: data.favouriteTeamId }
+            : p,
         ),
       );
       await loadPredictorEntries();
@@ -428,9 +453,15 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           <PredictorEditor
             mode={editingPredictor ? 'edit' : 'create'}
             predictor={editingPredictor || undefined}
+            teams={allTeams}
             onSave={editingPredictor ? handleUpdatePredictor : handleCreatePredictor}
             onCancel={handleBackToList}
             isSubmitting={isSubmitting}
+            translations={{
+              favouriteTeamLabel:
+                translations.predictorEditor?.favouriteTeamLabel || 'Favorite Team',
+              noFavouriteTeam: translations.predictorEditor?.noFavouriteTeam || 'No favorite',
+            }}
           />
         </main>
       </div>
