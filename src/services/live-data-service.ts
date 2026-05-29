@@ -148,6 +148,71 @@ export async function fetchLiveStandings(): Promise<GroupStandingsProps['groups'
   });
 }
 
+const RANKINGS_SNAPSHOT_KEY = 'quiniela_rankings_snapshot';
+
+function loadPreviousRankings(): Map<string, number> {
+  try {
+    const stored = localStorage.getItem(RANKINGS_SNAPSHOT_KEY);
+    if (!stored) return new Map();
+    const parsed = JSON.parse(stored) as [string, number][];
+    return new Map(parsed);
+  } catch {
+    return new Map();
+  }
+}
+
+function storeRankingsSnapshot(entries: { userId: string; position: number }[]): void {
+  try {
+    const data: [string, number][] = entries.map((e) => [e.userId, e.position]);
+    localStorage.setItem(RANKINGS_SNAPSHOT_KEY, JSON.stringify(data));
+  } catch {
+    // storage unavailable
+  }
+}
+
+function computeRankChange(
+  index: number,
+  userId: string,
+  prevMap: Map<string, number>,
+): 'up' | 'down' | 'same' | undefined {
+  const prevPos = prevMap.get(userId);
+  if (prevPos == null) return undefined;
+  if (prevPos < index + 1) return 'down';
+  if (prevPos > index + 1) return 'up';
+  return 'same';
+}
+
+async function fetchPredictionsCounts(predictorIds: string[]): Promise<Map<string, number>> {
+  if (predictorIds.length === 0) return new Map();
+  try {
+    const matchesRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches');
+    const matchesSnap = await getDocs(matchesRef);
+    const now = new Date();
+    const futureMatchIds = matchesSnap.docs
+      .map((d) => ({ id: d.id, ...d.data() }) as { id: string; date: { toDate: () => Date } })
+      .filter((d) => d.date.toDate() > now)
+      .sort((a, b) => a.date.toDate().getTime() - b.date.toDate().getTime())
+      .slice(0, 6)
+      .map((d) => d.id);
+
+    if (futureMatchIds.length === 0) return new Map();
+
+    const betsRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'bets');
+    const betsQuery = query(betsRef, where('matchId', 'in', futureMatchIds));
+    const betsSnap = await getDocs(betsQuery);
+
+    const counts = new Map<string, number>();
+    for (const doc of betsSnap.docs) {
+      const bet = doc.data() as { predictorId: string };
+      counts.set(bet.predictorId, (counts.get(bet.predictorId) || 0) + 1);
+    }
+
+    return counts;
+  } catch {
+    return new Map();
+  }
+}
+
 export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
   const statsRef = collectionGroup(getDb(), 'stats');
   const q = query(statsRef, where('__name__', '==', TOURNAMENT_ID));
@@ -191,7 +256,13 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
     avatarUrlMap.set(p.id, p.avatarUrl);
   }
 
-  return sorted.map((s) => {
+  const predictorIds = sorted.map((s) => s.predictorId);
+  const [predictionsCounts, prevRankings] = await Promise.all([
+    fetchPredictionsCounts(predictorIds),
+    Promise.resolve(loadPreviousRankings()),
+  ]);
+
+  const entries: RankingEntry[] = sorted.map((s, index) => {
     const key = `users/${s.userId}/predictors/${s.predictorId}`;
     return {
       userId: s.userId,
@@ -201,6 +272,13 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
       points: s.totalPoints,
       accuracy: Math.round(s.accuracy * 100),
       streak: s.currentStreak,
+      badges: s.badgesAwarded ?? undefined,
+      rankChange: computeRankChange(index, s.userId, prevRankings),
+      predictionsCount: predictionsCounts.get(s.predictorId) ?? 0,
     };
   });
+
+  storeRankingsSnapshot(entries.map((e, i) => ({ userId: e.userId, position: i + 1 })));
+
+  return entries;
 }

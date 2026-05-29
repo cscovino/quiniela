@@ -4,9 +4,33 @@ import userEvent from '@testing-library/user-event';
 import { RankingsTable } from './RankingsTable';
 
 const mockRankings = [
-  { userId: 'user-1', displayName: 'Carlos', points: 120, accuracy: 0.85, streak: 7 },
-  { userId: 'user-2', displayName: 'Maria', points: 98, accuracy: 0.78, streak: 4 },
-  { userId: 'user-3', displayName: 'Juan', points: 87, accuracy: 0.72, streak: 2 },
+  {
+    userId: 'user-1',
+    displayName: 'Carlos',
+    points: 120,
+    accuracy: 85,
+    streak: 7,
+    rankChange: 'up' as const,
+    predictionsCount: 4,
+  },
+  {
+    userId: 'user-2',
+    displayName: 'Maria',
+    points: 98,
+    accuracy: 78,
+    streak: 4,
+    rankChange: 'same' as const,
+    predictionsCount: 3,
+  },
+  {
+    userId: 'user-3',
+    displayName: 'Juan',
+    points: 87,
+    accuracy: 72,
+    streak: 2,
+    rankChange: 'down' as const,
+    predictionsCount: 1,
+  },
 ];
 
 describe('RankingsTable', () => {

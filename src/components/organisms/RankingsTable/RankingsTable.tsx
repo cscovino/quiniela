@@ -15,6 +15,9 @@ export interface RankingEntry {
   points: number;
   accuracy: number;
   streak: number;
+  badges?: Record<string, string>;
+  rankChange?: 'up' | 'down' | 'same';
+  predictionsCount?: number;
 }
 
 export interface RankingsTableProps {
@@ -61,6 +64,9 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             points={entry.points}
             accuracy={entry.accuracy}
             streak={entry.streak}
+            badges={entry.badges}
+            rankChange={entry.rankChange}
+            predictionsCount={entry.predictionsCount}
             isCurrentUser={entry.userId === currentUserId}
           />
         ))}
