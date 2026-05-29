@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 
+import { BADGE_DEFINITIONS } from '@app-types/badges';
 import type { Predictor } from '@app-types/firestore';
 import { Badge } from '@atoms/Badge';
 import { Button } from '@atoms/Button';
@@ -14,6 +15,7 @@ export interface PredictorListEntry {
   points?: number;
   groupsDone?: number;
   groupsTotal?: number;
+  badgesAwarded?: Record<string, string>;
 }
 
 export interface PredictorListProps {
@@ -59,7 +61,7 @@ export const PredictorList: FC<PredictorListProps> = ({
         </div>
       )}
 
-      {predictors.map(({ predictor, points, groupsDone, groupsTotal }) => (
+      {predictors.map(({ predictor, points, groupsDone, groupsTotal, badgesAwarded }) => (
         <div
           key={predictor.id}
           className="predictor-list__card"
@@ -89,6 +91,22 @@ export const PredictorList: FC<PredictorListProps> = ({
               </div>
             </div>
           </div>
+          {badgesAwarded && Object.keys(badgesAwarded).length > 0 && (
+            <div className="predictor-list__card-badges">
+              {Object.keys(badgesAwarded).map((badgeId) => {
+                const def = BADGE_DEFINITIONS.find((b) => b.id === badgeId);
+                return (
+                  <span
+                    key={badgeId}
+                    className="predictor-list__badge-icon"
+                    title={def?.name.en || badgeId}
+                  >
+                    <Icon name={def?.icon || 'star'} size={14} />
+                  </span>
+                );
+              })}
+            </div>
+          )}
           <div className="predictor-list__card-actions">
             <Button
               variant="secondary"

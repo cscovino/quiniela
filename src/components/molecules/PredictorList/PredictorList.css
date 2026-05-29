@@ -57,6 +57,24 @@
   align-items: center;
 }
 
+.predictor-list__card-badges {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 var(--space-2);
+}
+
+.predictor-list__badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-accent-500);
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.2));
+}
+
 .predictor-list__card-actions {
   display: flex;
   gap: var(--space-2);

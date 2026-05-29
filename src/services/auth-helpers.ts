@@ -47,7 +47,6 @@ export const updateUserProfile = async (
   data: {
     displayName?: string;
     avatarUrl?: string | null;
-    favoriteTeamId?: string | null;
   },
 ): Promise<void> => {
   const authUser = getCurrentUser();
@@ -64,7 +63,6 @@ export const updateUserProfile = async (
   const firestoreData: Record<string, unknown> = {};
   if (data.displayName !== undefined) firestoreData.displayName = data.displayName;
   if (data.avatarUrl !== undefined) firestoreData.avatarUrl = data.avatarUrl || null;
-  if (data.favoriteTeamId !== undefined) firestoreData.favoriteTeamId = data.favoriteTeamId || null;
 
   if (Object.keys(firestoreData).length > 0) {
     await updateDoc(doc(ensureDb(), 'users', uid), firestoreData);

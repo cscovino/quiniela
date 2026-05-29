@@ -236,9 +236,10 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       const results = await predictorService.getUserPredictorsWithStats(user.uid);
       const entries: PredictorListEntry[] = results.map((r) => ({
         predictor: r,
-        points: r.stats?.points,
+        points: r.stats?.totalPoints,
         groupsDone: r.progress.groupsSubmitted,
         groupsTotal: r.progress.totalGroups,
+        badgesAwarded: r.stats?.badgesAwarded,
       }));
       setPredictorEntries(entries);
     } catch {

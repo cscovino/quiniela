@@ -112,9 +112,7 @@
       "displayNameLabel": "Nombre",
       "displayNameRequired": "El nombre es obligatorio",
       "avatarUrlLabel": "URL del Avatar",
-      "avatarUrlHint": "URL de tu imagen de avatar (opcional)",
-      "favoriteTeamLabel": "Equipo Favorito",
-      "favoriteTeamHint": "ej. Argentina (opcional)"
+      "avatarUrlHint": "URL de tu imagen de avatar (opcional)"
     },
     "predictions": {
       "title": "Predicciones - Quiniela",

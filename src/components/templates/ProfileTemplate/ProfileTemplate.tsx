@@ -7,7 +7,7 @@ import { Button } from '@atoms/Button';
 import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
 import { EditProfileForm } from '@molecules/EditProfileForm';
-import type { PointEntry } from '@molecules/PointsChart';
+import type { PredictorSeries } from '@molecules/PointsChart';
 import { PointsChart } from '@molecules/PointsChart';
 import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList';
 import { type BadgeEarned, type BadgeLocked, UserProfile } from '@organisms/UserProfile';
@@ -48,8 +48,6 @@ export interface ProfileTemplateProps {
     displayNameRequired?: string;
     avatarUrlLabel?: string;
     avatarUrlHint?: string;
-    favoriteTeamLabel?: string;
-    favoriteTeamHint?: string;
     predictorList?: {
       newButton?: string;
       progress?: string;
@@ -75,7 +73,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
   const [rank, setRank] = useState(0);
   const [badges, setBadges] = useState<BadgeEarned[]>([]);
   const [lockedBadges, setLockedBadges] = useState<BadgeLocked[]>([]);
-  const [pointsHistory, setPointsHistory] = useState<PointEntry[]>([]);
+  const [chartSeriesData, setChartSeriesData] = useState<PredictorSeries[]>([]);
   const [predictors, setPredictors] = useState<Predictor[]>([]);
   const [predictorEntries, setPredictorEntries] = useState<PredictorListEntry[]>([]);
   const [selectedPredictorId, setSelectedPredictorId] = useState<string | null>(null);
@@ -117,9 +115,10 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
       const results = await predictorService.getUserPredictorsWithStats(user.uid);
       const entries: PredictorListEntry[] = results.map((r) => ({
         predictor: r,
-        points: r.stats?.points,
+        points: r.stats?.totalPoints,
         groupsDone: r.progress.groupsSubmitted,
         groupsTotal: r.progress.totalGroups,
+        badgesAwarded: r.stats?.badgesAwarded,
       }));
       setPredictorEntries(entries);
     } catch {
@@ -138,6 +137,53 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
       cancelled = true;
     };
   }, [loadPredictorEntries]);
+
+  useEffect(() => {
+    if (!user || predictors.length === 0) {
+      setChartSeriesData([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchChartData = async () => {
+      const results = await Promise.all(
+        predictors.map((p) =>
+          tournamentService
+            .getPredictorStats(user.uid, p.id)
+            .then((stats) => ({ predictor: p, stats }))
+            .catch(() => ({ predictor: p, stats: null })),
+        ),
+      );
+
+      if (cancelled) return;
+
+      const seriesData: PredictorSeries[] = results
+        .filter(
+          (r): r is { predictor: Predictor; stats: NonNullable<typeof r.stats> } =>
+            r.stats !== null && !!r.stats.pointsHistory && r.stats.pointsHistory.length > 0,
+        )
+        .map(({ predictor, stats }) => ({
+          id: predictor.id,
+          name: predictor.name,
+          color: '',
+          data: (stats.pointsHistory || []).map((entry) => ({
+            date: entry.timestamp?.toDate?.() ?? new Date(),
+            points: entry.points,
+            cumulative: 0,
+            matchId: entry.matchId,
+          })),
+        }));
+
+      setChartSeriesData(seriesData);
+    };
+
+    fetchChartData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, predictors]);
 
   useEffect(() => {
     if (!user || !selectedPredictorId) {
@@ -169,14 +215,6 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
             earnedAt: new Date(statsResult.value.badgesAwarded[badgeId]),
           }));
           setBadges(earnedBadges);
-
-          const history: PointEntry[] = (statsResult.value.pointsHistory || []).map((entry) => ({
-            date: entry.timestamp?.toDate?.() ?? new Date(),
-            points: entry.points,
-            cumulative: 0,
-            matchId: entry.matchId,
-          }));
-          setPointsHistory(history);
 
           const lockedBadgeDefs = BADGE_DEFINITIONS.filter((b) => !earnedBadgeIds.includes(b.id));
           const locked: BadgeLocked[] = lockedBadgeDefs.map((def) => ({
@@ -272,8 +310,6 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
                 displayNameRequired: translations.displayNameRequired || 'Display name is required',
                 avatarUrlLabel: translations.avatarUrlLabel || 'Avatar URL',
                 avatarUrlHint: translations.avatarUrlHint || '',
-                favoriteTeamLabel: translations.favoriteTeamLabel || 'Favorite Team',
-                favoriteTeamHint: translations.favoriteTeamHint || '',
                 saveProfile: translations.saveProfile || 'Save Changes',
                 cancelEditing: translations.cancelEditing || 'Cancel',
                 saving: translations.saving || 'Saving...',
@@ -333,7 +369,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
 
         <section className="profile-template__points-chart">
           <PointsChart
-            data={pointsHistory}
+            series={chartSeriesData}
             translations={{
               title: translations.pointsChart,
               noData: translations.noPointsData,

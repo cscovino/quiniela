@@ -15,8 +15,6 @@ export interface EditProfileFormProps {
     displayNameRequired: string;
     avatarUrlLabel: string;
     avatarUrlHint: string;
-    favoriteTeamLabel: string;
-    favoriteTeamHint: string;
     saveProfile: string;
     cancelEditing: string;
     saving: string;
@@ -38,7 +36,6 @@ export const EditProfileForm: FC<EditProfileFormProps> = ({
   const setUser = useAuthStore((s) => s.setUser);
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || '');
-  const [favoriteTeam, setFavoriteTeam] = useState(user?.favoriteTeamId || '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,13 +53,11 @@ export const EditProfileForm: FC<EditProfileFormProps> = ({
       await updateUserProfile(user!.uid, {
         displayName: displayName.trim(),
         avatarUrl: avatarUrl.trim() || null,
-        favoriteTeamId: favoriteTeam.trim() || null,
       });
       setUser({
         ...user!,
         displayName: displayName.trim(),
         avatarUrl: avatarUrl.trim() || undefined,
-        favoriteTeamId: favoriteTeam.trim() || undefined,
       });
       onSaved();
     } catch {
@@ -96,14 +91,6 @@ export const EditProfileForm: FC<EditProfileFormProps> = ({
         onChange={(e) => setAvatarUrl(e.target.value)}
         helperText={translations.avatarUrlHint}
         autoComplete="url"
-      />
-
-      <Input
-        type="text"
-        label={translations.favoriteTeamLabel}
-        value={favoriteTeam}
-        onChange={(e) => setFavoriteTeam(e.target.value)}
-        helperText={translations.favoriteTeamHint}
       />
 
       <div className="edit-profile-form__actions">

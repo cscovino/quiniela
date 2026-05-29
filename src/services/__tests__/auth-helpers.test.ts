@@ -69,7 +69,7 @@ describe('auth-helpers', () => {
       ).rejects.toThrow('Email already in use');
     });
 
-    it('uses optional avatarUrl and favoriteTeamId', async () => {
+    it('uses optional avatarUrl', async () => {
       vi.mocked(firebaseAuth.createUserWithEmailAndPassword).mockResolvedValue(
         mockCredential as any,
       );
@@ -81,13 +81,11 @@ describe('auth-helpers', () => {
         'password123',
         'Test User',
         'https://example.com/avatar.jpg',
-        'argentina',
       );
 
       const callArgs = vi.mocked(firebaseFirestore.setDoc).mock.calls[0][1];
       expect(callArgs).toMatchObject({
         avatarUrl: 'https://example.com/avatar.jpg',
-        favoriteTeamId: 'argentina',
       });
     });
   });
