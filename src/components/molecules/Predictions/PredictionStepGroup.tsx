@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Badge } from '@atoms/Badge';
+import { Button } from '@atoms/Button';
 import { Typography } from '@atoms/Typography';
 import { PredictionInput } from '@molecules/PredictionInput';
 import { TeamFlag } from '@molecules/TeamFlag';
@@ -86,6 +87,7 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   const [classification, setClassification] = useState<string[]>(
     existingGroupBet ? [...existingGroupBet] : group.teams.map((t) => t.fifaCode),
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const allPredictions = useMemo(() => {
     const combined: PredictionRecord = {};
@@ -142,23 +144,27 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
     [group.teams.length],
   );
 
+  const canSubmit = allMatchesFilled && classificationComplete && !isSubmitting;
+
   const handleSubmit = async () => {
-    const cleanedPredictions: Record<string, { home: number; away: number }> = {};
-    for (const [id, pred] of Object.entries(matchPredictions)) {
-      if (pred.home != null && pred.away != null) {
-        cleanedPredictions[id] = { home: pred.home, away: pred.away };
+    if (!canSubmit) return;
+    setIsSubmitting(true);
+    try {
+      const cleanedPredictions: Record<string, { home: number; away: number }> = {};
+      for (const [id, pred] of Object.entries(matchPredictions)) {
+        if (pred.home != null && pred.away != null) {
+          cleanedPredictions[id] = { home: pred.home, away: pred.away };
+        }
       }
+
+      await onSubmit({
+        matchPredictions: cleanedPredictions,
+        classification,
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    await onSubmit({
-      matchPredictions: cleanedPredictions,
-      classification,
-    });
   };
-
-  void handleSubmit;
-  void allMatchesFilled;
-  void classificationComplete;
 
   const isMatchDisabled = (matchId: string) => {
     if (isDisabled) return true;
@@ -310,6 +316,20 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
             </Typography>
           )}
         </section>
+      )}
+
+      {(unsubmittedMatches.length > 0 || existingGroupBet == null) && (
+        <div className="prediction-step-group__actions">
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            disabled={!canSubmit}
+            onClick={handleSubmit}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </Button>
+        </div>
       )}
 
       {existingGroupBet != null && (

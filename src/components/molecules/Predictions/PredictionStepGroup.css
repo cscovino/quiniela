@@ -133,6 +133,12 @@
 }
 
 @media (max-width: 480px) {
+  .prediction-step-group__col.position {
+    width: auto;
+    flex: 1;
+    min-width: 80px;
+  }
+
   .prediction-step-group__select {
     min-height: 48px;
     max-width: 100%;

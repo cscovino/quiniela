@@ -171,7 +171,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
           setBadges(earnedBadges);
 
           const history: PointEntry[] = (statsResult.value.pointsHistory || []).map((entry) => ({
-            date: entry.timestamp.toDate(),
+            date: entry.timestamp?.toDate?.() ?? new Date(),
             points: entry.points,
             cumulative: 0,
             matchId: entry.matchId,

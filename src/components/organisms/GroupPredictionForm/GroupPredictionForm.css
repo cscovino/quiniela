@@ -95,6 +95,16 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 480px) {
+  .group-prediction-form__row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .group-prediction-form__select {
+    max-width: 100%;
+  }
+}
+
 .group-prediction-form__actions {
   display: flex;
   justify-content: center;

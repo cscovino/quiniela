@@ -114,6 +114,12 @@ export async function fetchLiveStandings(): Promise<GroupStandingsProps['groups'
     groupsMap.set(d.id, { name: data.name, order: data.order ?? 999 });
   });
 
+  const groupsOrderMap = new Map<string, number>();
+  groupsSnapshot.docs.forEach((d) => {
+    const data = d.data() as { slug: string; name: string; order: number };
+    groupsOrderMap.set(data.name, data.order ?? 999);
+  });
+
   const standings: GroupStandingsProps['groups'] = snapshot.docs.map((d) => {
     const data = d.data() as GroupStandings;
     const group = groupsMap.get(data.groupId);
@@ -136,8 +142,8 @@ export async function fetchLiveStandings(): Promise<GroupStandingsProps['groups'
   });
 
   return standings.sort((a, b) => {
-    const aOrder = groupsMap.get(a.name)?.order ?? 999;
-    const bOrder = groupsMap.get(b.name)?.order ?? 999;
+    const aOrder = groupsOrderMap.get(a.name) ?? 999;
+    const bOrder = groupsOrderMap.get(b.name) ?? 999;
     return aOrder - bOrder;
   });
 }

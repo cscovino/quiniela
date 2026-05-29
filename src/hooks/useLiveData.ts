@@ -34,6 +34,15 @@ export function useLiveData<T>(
     fetcher()
       .then((freshData) => {
         if (cancelled || !mountedRef.current) return;
+        if (
+          Array.isArray(freshData) &&
+          freshData.length === 0 &&
+          Array.isArray(initialData) &&
+          initialData.length > 0
+        ) {
+          setLoading(false);
+          return;
+        }
         dataCache.set(cacheKey, { data: freshData, timestamp: Date.now() });
         setData(freshData);
         setLoading(false);
