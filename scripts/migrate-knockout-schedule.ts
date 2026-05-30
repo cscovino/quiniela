@@ -1,33 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  getDocs,
-  collection,
-  updateDoc,
-  writeBatch,
-  connectFirestoreEmulator,
-} from 'firebase/firestore';
+import admin from 'firebase-admin';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-if (process.env.USE_FIREBASE_EMULATOR === 'true') {
-  connectFirestoreEmulator(db, '127.0.0.1', 8080);
-  console.log('Connected to Firebase Emulator');
-}
 
 const TOURNAMENT_ID = 'world-cup-2026';
 
@@ -36,6 +9,34 @@ const IS_EMULATOR = process.env.USE_FIREBASE_EMULATOR === 'true';
 // (and when not pointed at the emulator) the script runs read-only and logs the
 // changes it WOULD make, so an accidental run can never mutate prod data.
 const DRY_RUN = !IS_EMULATOR && !process.argv.includes('--execute');
+
+// Uses the Admin SDK so writes bypass Firestore security rules (match writes are
+// admin-only). Mirrors src/lib/firebase-admin.ts: service-account JSON in prod,
+// project id + emulator host when targeting the emulator, ADC otherwise.
+function initAdmin(): admin.app.App {
+  if (admin.apps.length > 0) return admin.apps[0] as admin.app.App;
+
+  if (IS_EMULATOR) {
+    process.env.FIRESTORE_EMULATOR_HOST ??= '127.0.0.1:8080';
+    const projectId =
+      process.env.PUBLIC_FIREBASE_PROJECT_ID ?? process.env.FIREBASE_PROJECT_ID ?? 'demo-quiniela';
+    console.log(`Connected to Firebase Emulator (${process.env.FIRESTORE_EMULATOR_HOST})`);
+    return admin.initializeApp({ projectId });
+  }
+
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    return admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  }
+
+  // Fall back to Application Default Credentials (`gcloud auth application-default login`).
+  console.warn(
+    'WARNING: FIREBASE_SERVICE_ACCOUNT not set — falling back to Application Default Credentials.',
+  );
+  return admin.initializeApp({ credential: admin.credential.applicationDefault() });
+}
+
+const db = admin.firestore(initAdmin());
 
 type Phase = 'round-of-32' | 'round-of-16' | 'quarterfinals' | 'semifinals' | 'third-place' | 'final';
 
@@ -120,23 +121,21 @@ const R32_MATCHES = EXPECTED_KNOCKOUT_MATCHES.filter(m => m.phase === 'round-of-
 const GROUP_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 
 function matchRef(slug: string) {
-  return doc(db, 'tournaments', TOURNAMENT_ID, 'matches', slug);
+  return db.doc(`tournaments/${TOURNAMENT_ID}/matches/${slug}`);
 }
 
 async function getMatch(slug: string): Promise<MatchDoc | null> {
-  const snap = await getDoc(matchRef(slug));
-  return snap.exists() ? (snap.data() as MatchDoc) : null;
+  const snap = await matchRef(slug).get();
+  return snap.exists ? (snap.data() as MatchDoc) : null;
 }
 
 async function getAllMatches(): Promise<MatchDoc[]> {
-  const snap = await getDocs(collection(db, 'tournaments', TOURNAMENT_ID, 'matches'));
-  return snap.docs.map(d => d.data() as MatchDoc);
+  const snap = await db.collection(`tournaments/${TOURNAMENT_ID}/matches`).get();
+  return snap.docs.map((d) => d.data() as MatchDoc);
 }
 
 async function getGroupStandings(groupId: string): Promise<GroupStanding[]> {
-  const snap = await getDocs(
-    collection(db, 'tournaments', TOURNAMENT_ID, 'group_standings'),
-  );
+  const snap = await db.collection(`tournaments/${TOURNAMENT_ID}/group_standings`).get();
   for (const d of snap.docs) {
     const data = d.data();
     if (data.groupId === groupId) {
@@ -213,7 +212,7 @@ async function phase1Verify() {
     if (issues.length > 0) {
       console.log(`  ${DRY_RUN ? 'WOULD FIX' : 'FIXING'} ${expected.slug}: ${issues.join(', ')}`);
       if (!DRY_RUN) {
-        await updateDoc(matchRef(expected.slug), {
+        await matchRef(expected.slug).update({
           tbdHome: expected.tbdHome,
           tbdAway: expected.tbdAway,
           tbd: true,
@@ -266,7 +265,7 @@ async function phase2FillTeams() {
   console.log(`Top 8 third-place groups: ${advancingGroups.join(', ')}`);
   console.log(`Third-place slots assigned via matrix: ${Object.keys(thirdPlaceMapping).length}`);
 
-  const batch = writeBatch(db);
+  const batch = db.batch();
   let updateCount = 0;
 
   for (const match of R32_MATCHES) {
@@ -277,7 +276,7 @@ async function phase2FillTeams() {
       continue;
     }
 
-    let awayTeamId: string | null = null;
+    let awayTeamId: string | null;
     const mSlot = Object.entries(THIRD_PLACE_SLOTS).find(([, s]) => s === slug)?.[0];
 
     if (mSlot) {
