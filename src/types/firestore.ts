@@ -53,6 +53,11 @@ export interface Match {
   predictionDeadline: Timestamp;
   pointsCalculated?: boolean;
   createdAt: Timestamp;
+  // Knockout placeholder slot labels, present until the teams are resolved
+  // (e.g. "1A", "3C/D/E", "W-R32-1", "L-SF-1"). See src/utils/knockout-slot.ts.
+  tbd?: boolean;
+  tbdHome?: string;
+  tbdAway?: string;
 }
 
 export interface Predictor {

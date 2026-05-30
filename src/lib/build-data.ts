@@ -21,6 +21,8 @@ interface MatchData {
   status: string;
   predictionDeadline: { toDate: () => Date };
   pointsCalculated?: boolean;
+  tbdHome?: string;
+  tbdAway?: string;
 }
 
 interface StandingData {
@@ -151,6 +153,8 @@ function rawMatchesFromSnap(matchesSnap: QuerySnapshotLike): (MatchData & { id: 
 type MatchView = {
   homeTeam: { fifaCode: string; name: string };
   awayTeam: { fifaCode: string; name: string };
+  homePlaceholder?: string;
+  awayPlaceholder?: string;
   date: Date;
   status: string;
   stadium: string;
@@ -177,6 +181,9 @@ function toMatchView(m: MatchData & { id: string }, teams: Record<string, TeamDa
   return {
     homeTeam,
     awayTeam,
+    // Knockout slot label shown when the team isn't decided yet.
+    homePlaceholder: m.homeTeamId ? undefined : m.tbdHome,
+    awayPlaceholder: m.awayTeamId ? undefined : m.tbdAway,
     date: m.date.toDate(),
     status: m.status,
     stadium: m.stadium,

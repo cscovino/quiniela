@@ -45,6 +45,9 @@ function toMatchCardProps(match: Match & { id: string }, teams: Map<string, Team
       fifaCode: awayTeam.fifaCode,
       name: awayTeam.name,
     },
+    // Knockout slot label shown when the team isn't decided yet.
+    homePlaceholder: match.homeTeamId ? undefined : match.tbdHome,
+    awayPlaceholder: match.awayTeamId ? undefined : match.tbdAway,
     date: match.date.toDate(),
     status: match.status,
     stadium: match.stadium,

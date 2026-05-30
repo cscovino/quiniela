@@ -85,6 +85,41 @@ describe('MatchCard', () => {
     expect(screen.getByText('Azteca Stadium')).toBeInTheDocument();
   });
 
+  it('renders formatted placeholder labels instead of teams when undecided', () => {
+    render(
+      <MatchCard
+        homeTeam={{ fifaCode: 'TBD', name: 'TBD' }}
+        awayTeam={{ fifaCode: 'TBD', name: 'TBD' }}
+        homePlaceholder="W-R32-1"
+        awayPlaceholder="W-R32-2"
+        date={mockDate}
+        status="scheduled"
+        phase="Round of 16"
+        translations={translations}
+      />,
+    );
+    expect(screen.getByText('Winner R32-1')).toBeInTheDocument();
+    expect(screen.getByText('Winner R32-2')).toBeInTheDocument();
+    expect(screen.queryByText('TBD')).not.toBeInTheDocument();
+  });
+
+  it('localizes placeholder labels', () => {
+    render(
+      <MatchCard
+        homeTeam={{ fifaCode: 'TBD', name: 'TBD' }}
+        awayTeam={{ fifaCode: 'TBD', name: 'TBD' }}
+        homePlaceholder="1A"
+        awayPlaceholder="3C/D/E"
+        date={mockDate}
+        status="scheduled"
+        locale="es"
+        translations={translations}
+      />,
+    );
+    expect(screen.getByText('1º Grupo A')).toBeInTheDocument();
+    expect(screen.getByText('3º C/D/E')).toBeInTheDocument();
+  });
+
   it('is clickable when onClick is provided', () => {
     const handleClick = vi.fn();
     render(

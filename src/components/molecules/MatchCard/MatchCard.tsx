@@ -5,6 +5,7 @@ import { Icon, type IconName } from '@atoms/Icon';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
 import { getDateLocale } from '@utils/i18n';
+import { formatKnockoutSlot } from '@utils/knockout-slot';
 
 import './MatchCard.css';
 
@@ -23,6 +24,13 @@ export interface MatchResult {
 export interface MatchCardProps {
   homeTeam: Team;
   awayTeam: Team;
+  /**
+   * Raw knockout slot code (e.g. "1A", "W-R32-1") shown in place of the home
+   * team when it isn't decided yet. Rendered via formatKnockoutSlot(). When set,
+   * it takes precedence over homeTeam (which would just be the "TBD" fallback).
+   */
+  homePlaceholder?: string;
+  awayPlaceholder?: string;
   date: Date;
   status: MatchStatus;
   result?: MatchResult;
@@ -66,6 +74,8 @@ const getStatusConfig = (
 export const MatchCard: FC<MatchCardProps> = ({
   homeTeam,
   awayTeam,
+  homePlaceholder,
+  awayPlaceholder,
   date,
   status,
   result,
@@ -91,6 +101,28 @@ export const MatchCard: FC<MatchCardProps> = ({
 
   const flagSize = compact ? 'sm' : 'md';
 
+  const renderTeam = (team: Team, placeholder?: string) => {
+    if (placeholder) {
+      const label = formatKnockoutSlot(placeholder, locale);
+      return (
+        <div className="match-card__placeholder" aria-label={label}>
+          <Typography variant="small" className="match-card__placeholder-label">
+            {label}
+          </Typography>
+        </div>
+      );
+    }
+    return (
+      <TeamFlag
+        fifaCode={team.fifaCode}
+        name={team.name}
+        size={flagSize}
+        showName
+        noTruncate={compact}
+      />
+    );
+  };
+
   return (
     <div
       className={`match-card ${compact ? 'match-card--compact' : ''} ${className}`}
@@ -106,13 +138,7 @@ export const MatchCard: FC<MatchCardProps> = ({
 
       <div className="match-card__teams">
         <div className="match-card__team match-card__team--home">
-          <TeamFlag
-            fifaCode={homeTeam.fifaCode}
-            name={homeTeam.name}
-            size={flagSize}
-            showName
-            noTruncate={compact}
-          />
+          {renderTeam(homeTeam, homePlaceholder)}
           {result && (
             <Typography variant={compact ? 'h3' : 'h2'} className="match-card__score">
               {result.home}
@@ -130,13 +156,7 @@ export const MatchCard: FC<MatchCardProps> = ({
               {result.away}
             </Typography>
           )}
-          <TeamFlag
-            fifaCode={awayTeam.fifaCode}
-            name={awayTeam.name}
-            size={flagSize}
-            showName
-            noTruncate={compact}
-          />
+          {renderTeam(awayTeam, awayPlaceholder)}
         </div>
       </div>
 

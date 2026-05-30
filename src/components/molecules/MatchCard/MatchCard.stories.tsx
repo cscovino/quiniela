@@ -42,6 +42,31 @@ export const Finished: Story = {
 export const Postponed: Story = { args: { ...args, status: 'postponed' } };
 export const Cancelled: Story = { args: { ...args, status: 'cancelled' } };
 
+// Knockout match whose teams aren't decided yet — shows formatted slot labels.
+export const UndecidedKnockout: Story = {
+  args: {
+    ...args,
+    status: 'scheduled',
+    phase: 'Round of 32',
+    homeTeam: { fifaCode: 'TBD', name: 'TBD' },
+    awayTeam: { fifaCode: 'TBD', name: 'TBD' },
+    homePlaceholder: '1A',
+    awayPlaceholder: '3C/D/E',
+  },
+};
+
+export const UndecidedProgression: Story = {
+  args: {
+    ...args,
+    status: 'scheduled',
+    phase: 'Final',
+    homeTeam: { fifaCode: 'TBD', name: 'TBD' },
+    awayTeam: { fifaCode: 'TBD', name: 'TBD' },
+    homePlaceholder: 'W-SF-1',
+    awayPlaceholder: 'W-SF-2',
+  },
+};
+
 export const AllStatuses: Story = {
   render: () => (
     <div
