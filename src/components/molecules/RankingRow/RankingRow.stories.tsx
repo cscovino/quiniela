@@ -19,7 +19,6 @@ export const FirstPlace: Story = {
     streak: 7,
     badges: { 'first-blood': '2026-05-01', 'on-fire': '2026-05-15' },
     rankChange: 'up',
-    predictionsCount: 4,
   },
 };
 
@@ -32,7 +31,6 @@ export const CurrentUser: Story = {
     streak: 3,
     isCurrentUser: true,
     rankChange: 'down',
-    predictionsCount: 2,
   },
 };
 
@@ -47,7 +45,6 @@ export const FullTable: Story = {
         streak={7}
         badges={{ 'first-blood': '2026-05-01', 'on-fire': '2026-05-15' }}
         rankChange="up"
-        predictionsCount={4}
       />
       <RankingRow
         position={2}
@@ -57,7 +54,6 @@ export const FullTable: Story = {
         streak={4}
         badges={{ consistent: '2026-05-10' }}
         rankChange="same"
-        predictionsCount={3}
       />
       <RankingRow
         position={3}
@@ -66,16 +62,8 @@ export const FullTable: Story = {
         accuracy={72}
         streak={2}
         rankChange="down"
-        predictionsCount={1}
       />
-      <RankingRow
-        position={4}
-        displayName="Ana"
-        points={65}
-        accuracy={65}
-        streak={0}
-        predictionsCount={0}
-      />
+      <RankingRow position={4} displayName="Ana" points={65} accuracy={65} streak={0} />
       <RankingRow
         position={5}
         displayName="You"
@@ -84,7 +72,6 @@ export const FullTable: Story = {
         streak={3}
         isCurrentUser
         rankChange="up"
-        predictionsCount={2}
       />
     </div>
   ),

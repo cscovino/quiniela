@@ -71,18 +71,4 @@ describe('RankingRow', () => {
     expect(badges).toBeInTheDocument();
     expect(badges?.children.length).toBe(2);
   });
-
-  it('shows predictions count', () => {
-    render(
-      <RankingRow
-        position={5}
-        displayName="Carlos"
-        points={45}
-        accuracy={85}
-        streak={3}
-        predictionsCount={4}
-      />,
-    );
-    expect(screen.getByText('4')).toBeInTheDocument();
-  });
 });

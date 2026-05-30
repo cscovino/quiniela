@@ -31,7 +31,6 @@ export interface RankingEntry {
   streak: number;
   badges?: Record<string, string>;
   rankChange?: 'up' | 'down' | 'same';
-  predictionsCount?: number;
   todayMatchBets?: TodayMatchBet[];
 }
 
@@ -90,7 +89,6 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             streak={entry.streak}
             badges={entry.badges}
             rankChange={entry.rankChange}
-            predictionsCount={entry.predictionsCount}
             todayMatchBets={entry.todayMatchBets}
             isCurrentUser={entry.userId === currentUserId}
             locale={locale}

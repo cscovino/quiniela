@@ -23,7 +23,6 @@ export interface RankingRowProps {
   streak: number;
   badges?: Record<string, string>;
   rankChange?: 'up' | 'down' | 'same';
-  predictionsCount?: number;
   todayMatchBets?: TodayMatchBet[];
   isCurrentUser?: boolean;
   locale?: 'en' | 'es';
@@ -40,21 +39,19 @@ const RANK_ARROW: Record<string, IconName> = {
 // badge names in badges.ts, rather than threaded through the catalog.
 const STAT_LABELS: Record<
   'en' | 'es',
-  { points: string; today: string; accuracy: string; streak: string; predictions: string }
+  { points: string; today: string; accuracy: string; streak: string }
 > = {
   en: {
     points: 'Total points',
     today: "Today's points",
     accuracy: 'Accuracy',
     streak: 'Current streak',
-    predictions: 'Upcoming predictions',
   },
   es: {
     points: 'Puntos totales',
     today: 'Puntos de hoy',
     accuracy: 'Precisión',
     streak: 'Racha actual',
-    predictions: 'Predicciones próximas',
   },
 };
 
@@ -69,7 +66,6 @@ export const RankingRow: FC<RankingRowProps> = ({
   streak,
   badges,
   rankChange,
-  predictionsCount,
   todayMatchBets,
   isCurrentUser = false,
   locale = 'en',
@@ -150,12 +146,6 @@ export const RankingRow: FC<RankingRowProps> = ({
           <Tooltip className="ranking-row__stat" content={statLabels.streak} position="top">
             <Icon name="fire" size={14} />
             <Typography variant="small">{streak}</Typography>
-          </Tooltip>
-        )}
-        {predictionsCount != null && (
-          <Tooltip className="ranking-row__stat" content={statLabels.predictions} position="top">
-            <Icon name="clock" size={14} />
-            <Typography variant="small">{predictionsCount}</Typography>
           </Tooltip>
         )}
       </div>

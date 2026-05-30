@@ -11,7 +11,6 @@ const mockRankings = [
     accuracy: 85,
     streak: 7,
     rankChange: 'up' as const,
-    predictionsCount: 4,
   },
   {
     userId: 'user-2',
@@ -20,7 +19,6 @@ const mockRankings = [
     accuracy: 78,
     streak: 4,
     rankChange: 'same' as const,
-    predictionsCount: 3,
   },
   {
     userId: 'user-3',
@@ -29,7 +27,6 @@ const mockRankings = [
     accuracy: 72,
     streak: 2,
     rankChange: 'down' as const,
-    predictionsCount: 1,
   },
 ];
 

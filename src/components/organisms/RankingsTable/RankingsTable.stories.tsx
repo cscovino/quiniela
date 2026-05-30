@@ -19,7 +19,6 @@ const mockRankings = [
     streak: 7,
     badges: { 'first-blood': '2026-05-01', 'on-fire': '2026-05-15' },
     rankChange: 'up' as const,
-    predictionsCount: 4,
   },
   {
     userId: 'user-2',
@@ -29,7 +28,6 @@ const mockRankings = [
     streak: 4,
     badges: { consistent: '2026-05-10' },
     rankChange: 'same' as const,
-    predictionsCount: 3,
   },
   {
     userId: 'user-3',
@@ -38,7 +36,6 @@ const mockRankings = [
     accuracy: 72,
     streak: 2,
     rankChange: 'down' as const,
-    predictionsCount: 1,
   },
   {
     userId: 'user-4',
@@ -46,7 +43,6 @@ const mockRankings = [
     points: 65,
     accuracy: 65,
     streak: 0,
-    predictionsCount: 0,
   },
   {
     userId: 'user-5',
@@ -54,7 +50,6 @@ const mockRankings = [
     points: 45,
     accuracy: 55,
     streak: 1,
-    predictionsCount: 2,
   },
 ];
 

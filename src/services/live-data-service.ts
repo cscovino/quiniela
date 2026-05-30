@@ -186,37 +186,6 @@ function computeRankChange(
   return 'same';
 }
 
-async function fetchPredictionsCounts(predictorIds: string[]): Promise<Map<string, number>> {
-  if (predictorIds.length === 0) return new Map();
-  try {
-    const matchesRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches');
-    const matchesSnap = await getDocs(matchesRef);
-    const now = new Date();
-    const futureMatchIds = matchesSnap.docs
-      .map((d) => ({ id: d.id, ...d.data() }) as { id: string; date: { toDate: () => Date } })
-      .filter((d) => d.date.toDate() > now)
-      .sort((a, b) => a.date.toDate().getTime() - b.date.toDate().getTime())
-      .slice(0, 6)
-      .map((d) => d.id);
-
-    if (futureMatchIds.length === 0) return new Map();
-
-    const betsRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'bets');
-    const betsQuery = query(betsRef, where('matchId', 'in', futureMatchIds));
-    const betsSnap = await getDocs(betsQuery);
-
-    const counts = new Map<string, number>();
-    for (const doc of betsSnap.docs) {
-      const bet = doc.data() as { predictorId: string };
-      counts.set(bet.predictorId, (counts.get(bet.predictorId) || 0) + 1);
-    }
-
-    return counts;
-  } catch {
-    return new Map();
-  }
-}
-
 async function fetchTodayBets(): Promise<{
   matchList: TodayMatchBet[];
   predictorBets: Map<string, TodayMatchBet[]>;
@@ -338,9 +307,7 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
 
   const sorted = apiStats.slice(0, limit);
 
-  const predictorIds = sorted.map((s) => s.predictorId);
-  const [predictionsCounts, prevRankings, todayBets] = await Promise.all([
-    fetchPredictionsCounts(predictorIds),
+  const [prevRankings, todayBets] = await Promise.all([
     Promise.resolve(loadPreviousRankings()),
     fetchTodayBets(),
   ]);
@@ -372,7 +339,6 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
       streak: s.currentStreak,
       badges: s.badgesAwarded ?? undefined,
       rankChange: computeRankChange(index, s.userId, prevRankings),
-      predictionsCount: predictionsCounts.get(s.predictorId) ?? 0,
       todayMatchBets: todayBets.predictorBets.get(s.predictorId),
     };
   });
