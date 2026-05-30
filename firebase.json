@@ -32,6 +32,11 @@
     "trailingSlash": false,
     "redirects": [
       {
+        "source": "/",
+        "destination": "/es",
+        "type": 302
+      },
+      {
         "source": "/admin",
         "destination": "/admin/matches",
         "type": 302
