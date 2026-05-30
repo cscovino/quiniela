@@ -80,18 +80,20 @@ export const RankingRow: FC<RankingRowProps> = ({
         ) : (
           <Avatar src={avatarUrl} name={displayName} size="sm" />
         )}
-        <Typography variant="small" className="ranking-row__name">
-          {displayName}
-        </Typography>
-        {earnedBadges.length > 0 && (
-          <div className="ranking-row__badges">
-            {earnedBadges.map((def) => (
-              <span key={def!.id} className="ranking-row__badge" title={def!.name.en}>
-                <Icon name={def!.icon} size={12} />
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="ranking-row__user-text">
+          <Typography variant="small" className="ranking-row__name">
+            {displayName}
+          </Typography>
+          {earnedBadges.length > 0 && (
+            <div className="ranking-row__badges">
+              {earnedBadges.map((def) => (
+                <span key={def!.id} className="ranking-row__badge" title={def!.name.en}>
+                  <Icon name={def!.icon} size={12} />
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="ranking-row__stats">

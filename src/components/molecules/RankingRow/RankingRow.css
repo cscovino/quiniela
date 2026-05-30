@@ -72,6 +72,19 @@
   min-width: 0;
 }
 
+/* Avatar keeps a fixed size so the name always starts at the same x. */
+.ranking-row__user > :first-child {
+  flex-shrink: 0;
+}
+
+/* Name + badges. Inline on desktop; stacked (badges below name) on mobile. */
+.ranking-row__user-text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
 .ranking-row__badges {
   display: flex;
   align-items: center;
@@ -213,6 +226,15 @@
 
   .ranking-row__name {
     font-size: var(--text-sm);
+  }
+
+  /* Stack badges beneath the name; reserve height so badge-less rows align. */
+  .ranking-row__user-text {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    min-height: 34px;
   }
 
   .ranking-row__match-predictions {
