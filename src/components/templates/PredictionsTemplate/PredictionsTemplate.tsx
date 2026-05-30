@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Predictor } from '@app-types/firestore';
 import type { DeadlineInfo } from '@app-types/prediction-steps';
@@ -184,6 +184,10 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
   const [showWizardTour, setShowWizardTour] = useState(false);
   const [showFirstTour, setShowFirstTour] = useState(false);
 
+  // Scroll back to the top of the step content when advancing, so the user
+  // lands on the first prediction input rather than wherever they scrolled to.
+  const stepTopRef = useRef<HTMLDivElement>(null);
+
   // Tournament deadline state
   const [tournamentDeadline, setTournamentDeadline] = useState<Date | null>(null);
   const [deadlineLoading, setDeadlineLoading] = useState(true);
@@ -263,6 +267,11 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       setShowThirdPlaceConfirm(true);
     }
   }, [currentStep, groupsCount, showThirdPlaceConfirm, confirmedThirdPlace, steps]);
+
+  useEffect(() => {
+    if (view !== 'wizard') return;
+    stepTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [currentStep, showThirdPlaceConfirm, view]);
 
   const handleThirdPlaceAdjust = () => {
     setShowThirdPlaceConfirm(false);
@@ -613,6 +622,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           </section>
         ) : (
           <>
+            <div ref={stepTopRef} />
             <PredictionsProgress stepCounter={stepCounter} deadlineInfo={deadlineInfo} />
             <PredictionsFeedback feedback={feedback} />
 
