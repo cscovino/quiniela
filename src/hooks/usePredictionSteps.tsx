@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Match } from '@app-types/firestore';
 import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
@@ -29,7 +29,7 @@ import {
   KNOCKOUT_PHASES,
 } from '@utils/predictions-flow';
 
-import type { PredictionStepModel } from '../types/prediction-steps';
+import type { PredictionStepModel, PredictionStepState } from '../types/prediction-steps';
 
 const KNOCKOUT_PHASE_LABELS: Record<string, string> = {
   'round-of-32': 'Round of 32',
@@ -60,6 +60,8 @@ export interface UsePredictionStepsResult {
   submitting: boolean;
   totalSteps: number;
   canAdvance: boolean;
+  /** Runs the current step's registered submit (saves whatever is entered). */
+  submitCurrentStep: () => Promise<void>;
   allTeams: { fifaCode: string; name: string }[];
   teamsMap: Record<string, { fifaCode: string; name: string }>;
   groups: GroupForPrediction[];
@@ -105,7 +107,26 @@ export function usePredictionSteps(
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
     null,
   );
-  const [existingMatchBets, setExistingMatchBets] = useState<Set<string>>(new Set());
+  // Saved match scores keyed by match id; predictions stay editable and prefilled
+  // from these until the deadline, so we keep the values (not just the ids).
+  const [existingMatchValues, setExistingMatchValues] = useState<
+    Record<string, { home: number; away: number }>
+  >({});
+
+  // A single "Next" button drives each step: steps register their submit handler
+  // (in a ref, no re-render) and report whether the user may advance.
+  const stepSubmitRef = useRef<Record<number, () => Promise<void>>>({});
+  const [stepCanAdvance, setStepCanAdvance] = useState<Record<number, boolean>>({});
+
+  const registerStepState = useCallback(
+    (idx: number) => (state: PredictionStepState) => {
+      stepSubmitRef.current[idx] = state.submit;
+      setStepCanAdvance((prev) =>
+        prev[idx] === state.canAdvance ? prev : { ...prev, [idx]: state.canAdvance },
+      );
+    },
+    [],
+  );
   const [existingFinalPhase, setExistingFinalPhase] = useState<{
     first?: string;
     second?: string;
@@ -180,7 +201,7 @@ export function usePredictionSteps(
       .getExistingBets(user.uid, selectedPredictorId)
       .then(({ matchBets, groupBets, finalPhase, bestPlayers, knockoutBets }) => {
         if (cancelled) return;
-        setExistingMatchBets(new Set(matchBets.keys()));
+        setExistingMatchValues(Object.fromEntries(matchBets));
 
         const groupBetsRecord: Record<string, string[]> = {};
         groupBets.forEach((positions, groupId) => {
@@ -341,9 +362,7 @@ export function usePredictionSteps(
         setSubmittedSteps((prev) => new Set(prev).add(stepIndex));
 
         setGroupBetsByGroupId((prev) => ({ ...prev, [groupId]: data.classification }));
-        const newMatchBets = new Set(existingMatchBets);
-        Object.keys(data.matchPredictions).forEach((id) => newMatchBets.add(id));
-        setExistingMatchBets(newMatchBets);
+        setExistingMatchValues((prev) => ({ ...prev, ...data.matchPredictions }));
       }
       if (errors.length > 0) {
         const error = errors[0];
@@ -354,7 +373,7 @@ export function usePredictionSteps(
       }
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, selectedPredictorId, firestoreMatches, translations, existingMatchBets],
+    [user, selectedPredictorId, firestoreMatches, translations],
   );
 
   const handleKnockoutRoundSubmit = useCallback(
@@ -405,13 +424,11 @@ export function usePredictionSteps(
     let stepIndex = 0;
 
     for (const group of groups) {
+      const idx = stepIndex;
       const groupMatches = firestoreMatches.filter(
         (m) => m.phase === 'group' && m.groupId === group.slug,
       );
       const existingGroupBet = groupBetsByGroupId[group.slug] || null;
-      const groupMatchBetIds = new Set(
-        groupMatches.filter((m) => existingMatchBets.has(m.id)).map((m) => m.id),
-      );
 
       const isGroupComplete =
         existingGroupBet != null &&
@@ -437,11 +454,12 @@ export function usePredictionSteps(
             group={group}
             groupMatches={groupMatches.map((m) => ({ ...m, id: m.slug }))}
             teamsMap={teamsMap}
-            existingMatchBets={groupMatchBetIds}
+            existingMatchValues={existingMatchValues}
             existingGroupBet={existingGroupBet}
-            onSubmit={(data) => handleGroupStepSubmit(group.slug, stepIndex, data)}
+            onSubmit={(data) => handleGroupStepSubmit(group.slug, idx, data)}
             isDisabled={submitting || (deadline != null && deadline < new Date())}
             locale={locale}
+            onStateChange={registerStepState(idx)}
             translations={translations.groupStep}
           />
         ),
@@ -453,6 +471,7 @@ export function usePredictionSteps(
     for (const phase of KNOCKOUT_PHASES) {
       const phaseMatches = firestoreMatches.filter((m) => m.phase === phase);
       if (phaseMatches.length === 0) continue;
+      const idx = stepIndex;
 
       const phaseSlugSet = new Set(phaseMatches.map((m) => m.slug));
       const existingPhaseBets = new Set(
@@ -501,9 +520,10 @@ export function usePredictionSteps(
             groupBetsByGroupId={groupBetsByGroupId}
             existingKnockoutBets={existingPhaseBets}
             previousRoundPredictions={knockoutBetsByMatchSlug}
-            onSubmit={(predictions) => handleKnockoutRoundSubmit(phase, stepIndex, predictions)}
+            onSubmit={(predictions) => handleKnockoutRoundSubmit(phase, idx, predictions)}
             isDisabled={submitting || (deadline != null && deadline < new Date())}
             thirdPlaceTeams={thirdPlaceTeams}
+            onStateChange={registerStepState(idx)}
             translations={translations.knockoutStep}
           />
         ),
@@ -512,6 +532,7 @@ export function usePredictionSteps(
       stepIndex++;
     }
 
+    const finalIdx = stepIndex;
     result.push({
       id: 'final-positions',
       kind: 'final-positions',
@@ -528,6 +549,7 @@ export function usePredictionSteps(
           isDisabled={submitting || (deadline != null && deadline < new Date())}
           isSubmitting={submitting}
           locale={locale}
+          onStateChange={registerStepState(finalIdx)}
           translations={translations.finalPhaseStep}
         />
       ),
@@ -535,6 +557,7 @@ export function usePredictionSteps(
     });
     stepIndex++;
 
+    const bestIdx = stepIndex;
     result.push({
       id: 'best-players',
       kind: 'best-players',
@@ -549,6 +572,7 @@ export function usePredictionSteps(
           onSubmit={handleBestPlayersSubmit}
           isDisabled={submitting || (deadline != null && deadline < new Date())}
           isSubmitting={submitting}
+          onStateChange={registerStepState(bestIdx)}
           translations={translations.bestPlayersStep}
         />
       ),
@@ -564,7 +588,7 @@ export function usePredictionSteps(
     locale,
     groups,
     firestoreMatches,
-    existingMatchBets,
+    existingMatchValues,
     groupBetsByGroupId,
     knockoutBetsByMatchSlug,
     allTeams,
@@ -574,10 +598,20 @@ export function usePredictionSteps(
     handleBestPlayersSubmit,
     handleGroupStepSubmit,
     handleKnockoutRoundSubmit,
+    registerStepState,
     deadline,
   ]);
 
-  const canAdvance = steps[currentStep]?.canAdvance ?? true;
+  // Allow advancing when either the saved data already satisfies the step
+  // (model fallback) or the live form reports it is ready to submit.
+  const canAdvance =
+    (steps[currentStep]?.canAdvance ?? false) || (stepCanAdvance[currentStep] ?? false);
+
+  // Stable dispatcher for the wizard's single Next button: persists the current
+  // step using the handler each step registered via onStateChange.
+  const submitCurrentStep = useCallback(async () => {
+    await stepSubmitRef.current[currentStep]?.();
+  }, [currentStep]);
 
   const thirdPlaceTeams = useMemo(
     () => computeThirdPlaceStandings(groupBetsByGroupId, {}, firestoreMatches, teamsMap, groups),
@@ -594,6 +628,7 @@ export function usePredictionSteps(
     submitting,
     totalSteps: steps.length,
     canAdvance,
+    submitCurrentStep,
     allTeams,
     teamsMap,
     groups,

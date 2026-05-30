@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Badge } from '@atoms/Badge';
+import type { RegisterStepState } from '@app-types/prediction-steps';
 import { Button } from '@atoms/Button';
 import { Typography } from '@atoms/Typography';
 import { PredictionInput } from '@molecules/PredictionInput';
@@ -21,7 +21,8 @@ export interface PredictionStepGroupProps {
   group: GroupForStep;
   groupMatches: MatchWithId[];
   teamsMap: Record<string, TeamInfo>;
-  existingMatchBets: Set<string>;
+  /** Already-saved scores per match id; used to prefill the (still editable) inputs. */
+  existingMatchValues: Record<string, { home: number; away: number }>;
   existingGroupBet: string[] | null;
   onSubmit: (data: {
     matchPredictions: Record<string, { home: number; away: number }>;
@@ -29,6 +30,8 @@ export interface PredictionStepGroupProps {
   }) => Promise<void>;
   isDisabled: boolean;
   locale: 'en' | 'es';
+  /** When provided, the step reports its submit/validity upward and hides its own button. */
+  onStateChange?: RegisterStepState;
   translations?: {
     heading?: string;
     matches?: string;
@@ -78,31 +81,23 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   group,
   groupMatches,
   teamsMap,
-  existingMatchBets,
+  existingMatchValues,
   existingGroupBet,
   onSubmit,
   isDisabled,
+  onStateChange,
   translations = {},
 }) => {
   const labels = { ...defaultTranslations, ...translations };
 
-  const unsubmittedMatches = useMemo(
-    () => groupMatches.filter((m) => !existingMatchBets.has(m.id)),
-    [groupMatches, existingMatchBets],
-  );
-
-  const submittedMatches = useMemo(
-    () => groupMatches.filter((m) => existingMatchBets.has(m.id)),
-    [groupMatches, existingMatchBets],
-  );
-
+  // Every match stays editable until the deadline; prefill from any saved bet.
   const initialScores = useMemo(() => {
     const scores: Record<string, { home: number; away: number }> = {};
-    unsubmittedMatches.forEach((m) => {
-      scores[m.id] = { home: 0, away: 0 };
+    groupMatches.forEach((m) => {
+      scores[m.id] = existingMatchValues[m.id] ?? { home: 0, away: 0 };
     });
     return scores;
-  }, [unsubmittedMatches]);
+  }, [groupMatches, existingMatchValues]);
 
   const [matchPredictions, setMatchPredictions] =
     useState<Record<string, { home?: number; away?: number }>>(initialScores);
@@ -113,18 +108,25 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isFirstRender = useRef(true);
 
+  // Re-sync local state when the saved bet changes (e.g. after a save or
+  // switching predictor) so edits reflect the latest persisted values.
+  useEffect(() => {
+    setMatchPredictions(initialScores);
+  }, [initialScores]);
+
+  useEffect(() => {
+    if (existingGroupBet) setClassification([...existingGroupBet]);
+  }, [existingGroupBet]);
+
   const allPredictions = useMemo(() => {
     const combined: PredictionRecord = {};
-    for (const match of submittedMatches) {
-      combined[match.id] = { home: 0, away: 0 };
-    }
     for (const [id, pred] of Object.entries(matchPredictions)) {
       if (pred.home != null && pred.away != null) {
         combined[id] = { home: pred.home, away: pred.away };
       }
     }
     return combined;
-  }, [submittedMatches, matchPredictions]);
+  }, [matchPredictions]);
 
   const standings = useMemo(
     () => calculateGroupStandings(groupMatches, allPredictions, teamsMap, group.slug),
@@ -132,10 +134,10 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   );
 
   const allMatchesFilled = useMemo(() => {
-    return unsubmittedMatches.every(
+    return groupMatches.every(
       (m) => matchPredictions[m.id]?.home != null && matchPredictions[m.id]?.away != null,
     );
-  }, [unsubmittedMatches, matchPredictions]);
+  }, [groupMatches, matchPredictions]);
 
   const classificationComplete = useMemo(() => {
     return isGroupClassificationComplete(classification, group.teams.length);
@@ -192,23 +194,34 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
     }
   }, [standingsOrder, group.teams.length]);
 
-  const canSubmit = allMatchesFilled && classificationComplete && !isSubmitting;
+  const canSubmit = allMatchesFilled && classificationComplete;
+
+  const buildSubmitData = useCallback(() => {
+    const cleanedPredictions: Record<string, { home: number; away: number }> = {};
+    for (const [id, pred] of Object.entries(matchPredictions)) {
+      if (pred.home != null && pred.away != null) {
+        cleanedPredictions[id] = { home: pred.home, away: pred.away };
+      }
+    }
+    return { matchPredictions: cleanedPredictions, classification };
+  }, [matchPredictions, classification]);
+
+  // Keep the wizard's shared Next button in sync with this step's state.
+  useEffect(() => {
+    onStateChange?.({
+      canAdvance: canSubmit && !isDisabled,
+      submit: async () => {
+        if (!canSubmit || isDisabled) return;
+        await onSubmit(buildSubmitData());
+      },
+    });
+  }, [canSubmit, isDisabled, onSubmit, buildSubmitData, onStateChange]);
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setIsSubmitting(true);
     try {
-      const cleanedPredictions: Record<string, { home: number; away: number }> = {};
-      for (const [id, pred] of Object.entries(matchPredictions)) {
-        if (pred.home != null && pred.away != null) {
-          cleanedPredictions[id] = { home: pred.home, away: pred.away };
-        }
-      }
-
-      await onSubmit({
-        matchPredictions: cleanedPredictions,
-        classification,
-      });
+      await onSubmit(buildSubmitData());
     } finally {
       setIsSubmitting(false);
     }
@@ -216,7 +229,6 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
 
   const isMatchDisabled = (matchId: string) => {
     if (isDisabled) return true;
-    if (existingMatchBets.has(matchId)) return true;
     const match = groupMatches.find((m) => m.id === matchId);
     if (!match) return true;
     if (match.status === 'finished' || match.status === 'live') return true;
@@ -226,11 +238,11 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
 
   return (
     <div className="prediction-step-group">
-      {unsubmittedMatches.length > 0 && (
+      {groupMatches.length > 0 && (
         <section className="prediction-step-group__section">
           <Typography variant="h3">{labels.matches}</Typography>
           <div className="prediction-step-group__matches">
-            {unsubmittedMatches.map((match) => {
+            {groupMatches.map((match) => {
               const homeTeam = match.homeTeamId
                 ? teamsMap[match.homeTeamId] || {
                     fifaCode: match.homeTeamId.toUpperCase(),
@@ -272,7 +284,7 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
               );
             })}
           </div>
-          {!allMatchesFilled && unsubmittedMatches.length > 0 && (
+          {!allMatchesFilled && groupMatches.length > 0 && (
             <Typography variant="caption" className="prediction-step-group__hint">
               {labels.hintFillAllMatches}
             </Typography>
@@ -319,107 +331,76 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
         </section>
       )}
 
-      {existingGroupBet == null && (
-        <section className="prediction-step-group__section">
-          <div className="prediction-step-group__classification-header">
-            <Typography variant="h3">{labels.classification}</Typography>
-            {isClassificationManual && (
-              <Button variant="ghost" size="sm" onClick={handleSyncFromStandings}>
-                {labels.syncFromScores}
-              </Button>
-            )}
-          </div>
-          <div className="prediction-step-group__classification">
-            <div className="prediction-step-group__row prediction-step-group__row--header">
-              <span className="prediction-step-group__col team">{labels.team}</span>
-              <span className="prediction-step-group__col position">{labels.position}</span>
-            </div>
-            {group.teams.map((team) => {
-              const currentPosition = classification.indexOf(team.fifaCode);
-              const positionValue = currentPosition !== -1 ? (currentPosition + 1).toString() : '';
-
-              return (
-                <div key={team.fifaCode} className="prediction-step-group__row">
-                  <span className="prediction-step-group__col team">
-                    <TeamFlag fifaCode={team.fifaCode} size="sm" />
-                    {team.name}
-                  </span>
-                  <span className="prediction-step-group__col position">
-                    <select
-                      className="prediction-step-group__select"
-                      value={positionValue}
-                      onChange={(e) => handleTeamPositionChange(team.fifaCode, e.target.value)}
-                      disabled={isDisabled}
-                      aria-label={`Position for ${team.name}`}
-                    >
-                      <option value="">{labels.selectOption}</option>
-                      {Array.from({ length: group.teams.length }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
-                          {i === 0
-                            ? labels.ordinal1
-                            : i === 1
-                              ? labels.ordinal2
-                              : i === 2
-                                ? labels.ordinal3
-                                : labels.ordinalOther}
-                        </option>
-                      ))}
-                    </select>
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          {!classificationComplete && classification.length > 0 && (
-            <Typography variant="caption" className="prediction-step-group__hint">
-              {labels.hintRankAllTeams}
-            </Typography>
+      <section className="prediction-step-group__section">
+        <div className="prediction-step-group__classification-header">
+          <Typography variant="h3">{labels.classification}</Typography>
+          {isClassificationManual && !isDisabled && (
+            <Button variant="ghost" size="sm" onClick={handleSyncFromStandings}>
+              {labels.syncFromScores}
+            </Button>
           )}
-        </section>
-      )}
+        </div>
+        <div className="prediction-step-group__classification">
+          <div className="prediction-step-group__row prediction-step-group__row--header">
+            <span className="prediction-step-group__col team">{labels.team}</span>
+            <span className="prediction-step-group__col position">{labels.position}</span>
+          </div>
+          {group.teams.map((team) => {
+            const currentPosition = classification.indexOf(team.fifaCode);
+            const positionValue = currentPosition !== -1 ? (currentPosition + 1).toString() : '';
 
-      {(unsubmittedMatches.length > 0 || existingGroupBet == null) && (
+            return (
+              <div key={team.fifaCode} className="prediction-step-group__row">
+                <span className="prediction-step-group__col team">
+                  <TeamFlag fifaCode={team.fifaCode} size="sm" />
+                  {team.name}
+                </span>
+                <span className="prediction-step-group__col position">
+                  <select
+                    className="prediction-step-group__select"
+                    value={positionValue}
+                    onChange={(e) => handleTeamPositionChange(team.fifaCode, e.target.value)}
+                    disabled={isDisabled}
+                    aria-label={`Position for ${team.name}`}
+                  >
+                    <option value="">{labels.selectOption}</option>
+                    {Array.from({ length: group.teams.length }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                        {i === 0
+                          ? labels.ordinal1
+                          : i === 1
+                            ? labels.ordinal2
+                            : i === 2
+                              ? labels.ordinal3
+                              : labels.ordinalOther}
+                      </option>
+                    ))}
+                  </select>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        {!classificationComplete && classification.length > 0 && (
+          <Typography variant="caption" className="prediction-step-group__hint">
+            {labels.hintRankAllTeams}
+          </Typography>
+        )}
+      </section>
+
+      {!onStateChange && (
         <div className="prediction-step-group__actions">
           <Button
             type="button"
             variant="primary"
             size="md"
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSubmitting}
             onClick={handleSubmit}
           >
             {isSubmitting ? labels.submitting : labels.submit}
           </Button>
         </div>
-      )}
-
-      {existingGroupBet != null && (
-        <section className="prediction-step-group__section">
-          <Badge variant="success">{labels.classificationSubmitted}</Badge>
-          {standings.length > 0 && (
-            <table className="prediction-step-group__standings">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>{labels.team}</th>
-                  <th>{labels.pts}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {standings.slice(0, 4).map((s, i) => (
-                  <tr key={s.teamId}>
-                    <td>{i + 1}</td>
-                    <td className="prediction-step-group__team-cell">
-                      <TeamFlag fifaCode={s.fifaCode} size="sm" />
-                      {s.fifaCode}
-                    </td>
-                    <td>{existingGroupBet.indexOf(s.teamId) + 1}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
       )}
     </div>
   );

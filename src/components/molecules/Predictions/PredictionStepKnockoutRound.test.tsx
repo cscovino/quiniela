@@ -52,7 +52,7 @@ describe('PredictionStepKnockoutRound', () => {
     expect(screen.getByText('Round of 32')).toBeInTheDocument();
   });
 
-  it('renders all unsubmitted matches', () => {
+  it('renders all matches', () => {
     render(<PredictionStepKnockoutRound {...defaultProps} />);
     expect(screen.getByText('Round of 32')).toBeInTheDocument();
     expect(screen.getAllByText(/arg/).length).toBeGreaterThanOrEqual(1);
@@ -81,38 +81,29 @@ describe('PredictionStepKnockoutRound', () => {
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
   });
 
-  it('filters out already submitted matches', () => {
+  it('keeps already-saved matches editable (no filtering)', () => {
+    // Predictions stay editable until the deadline; a saved pick must still render
+    // its match so the user can change it.
     render(
       <PredictionStepKnockoutRound
         {...defaultProps}
-        existingKnockoutBets={new Set(['r32-m1'])}
         previousRoundPredictions={{ 'r32-m1': 'arg' }}
       />,
     );
-    expect(screen.queryByText('arg')).not.toBeInTheDocument();
+    expect(screen.getAllByText(/arg/).length).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows submitted predictions list', () => {
+  it('renders every match even when all have saved picks', () => {
     render(
       <PredictionStepKnockoutRound
         {...defaultProps}
-        existingKnockoutBets={new Set(['r32-m1'])}
-        previousRoundPredictions={{ 'r32-m1': 'arg' }}
-      />,
-    );
-    expect(screen.getByText('Submitted predictions:')).toBeInTheDocument();
-    expect(screen.getByText('r32-m1')).toBeInTheDocument();
-  });
-
-  it('shows all submitted badge when no unsubmitted matches', () => {
-    render(
-      <PredictionStepKnockoutRound
-        {...defaultProps}
-        existingKnockoutBets={new Set(['r32-m1', 'r32-m2'])}
         previousRoundPredictions={{ 'r32-m1': 'arg', 'r32-m2': 'bra' }}
       />,
     );
-    expect(screen.getByText('All predictions submitted for this round')).toBeInTheDocument();
+    // No "all submitted" lock; match content still renders so it stays editable.
+    expect(screen.queryByText('All predictions submitted for this round')).not.toBeInTheDocument();
+    expect(screen.getByText('Round of 32')).toBeInTheDocument();
+    expect(screen.getAllByText(/bra/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows correct phase labels for different phases', () => {

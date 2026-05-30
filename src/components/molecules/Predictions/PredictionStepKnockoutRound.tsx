@@ -2,8 +2,7 @@ import type { FC } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import type { PhaseType } from '@app-types/firestore';
-import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
-import { Badge } from '@atoms/Badge';
+import type { RegisterStepState, ThirdPlacedTeam } from '@app-types/prediction-steps';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
 import { TeamSelector } from '@molecules/TeamSelector';
@@ -26,11 +25,14 @@ export interface PredictionStepKnockoutRoundProps {
   phase: PhaseType;
   roundMatches: KnockoutRoundMatch[];
   groupBetsByGroupId: GroupBetRecord;
-  existingKnockoutBets: Set<string>;
+  /** Slugs already saved for this round — kept for compatibility; prefill uses previousRoundPredictions. */
+  existingKnockoutBets?: Set<string>;
   previousRoundPredictions: Record<string, string>;
   onSubmit: (predictions: Record<string, string>) => Promise<void>;
   isDisabled: boolean;
   thirdPlaceTeams?: ThirdPlacedTeam[];
+  /** When provided, the step reports its submit/validity to the wizard's Next button. */
+  onStateChange?: RegisterStepState;
   translations?: {
     roundOf32?: string;
     roundOf16?: string;
@@ -103,38 +105,39 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   phase,
   roundMatches,
   groupBetsByGroupId,
-  existingKnockoutBets,
   previousRoundPredictions,
   onSubmit,
   isDisabled,
   thirdPlaceTeams = [],
+  onStateChange,
   translations = {},
 }) => {
   const labels = { ...defaultTranslations, ...translations };
-  const [predictions, setPredictions] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const phaseLabel = getPhaseLabel(phase, labels);
 
-  const unsubmittedMatches = useMemo(
-    () => roundMatches.filter((m) => !existingKnockoutBets.has(m.slug)),
-    [roundMatches, existingKnockoutBets],
-  );
-
-  const submittedMatches = useMemo(
-    () => roundMatches.filter((m) => existingKnockoutBets.has(m.slug)),
-    [roundMatches, existingKnockoutBets],
-  );
-
-  const knockoutBetsRecord = useMemo(() => {
-    const record: Record<string, string> = { ...previousRoundPredictions };
-    existingKnockoutBets.forEach((slug) => {
-      if (predictions[slug]) {
-        record[slug] = predictions[slug];
+  // Prefill picks for this round from any saved bets so they stay editable.
+  const initialPredictions = useMemo(() => {
+    const seed: Record<string, string> = {};
+    roundMatches.forEach((m) => {
+      if (previousRoundPredictions[m.slug]) {
+        seed[m.slug] = previousRoundPredictions[m.slug];
       }
     });
-    return record;
-  }, [previousRoundPredictions, existingKnockoutBets, predictions]);
+    return seed;
+  }, [roundMatches, previousRoundPredictions]);
+
+  const [predictions, setPredictions] = useState<Record<string, string>>(initialPredictions);
+
+  useEffect(() => {
+    setPredictions(initialPredictions);
+  }, [initialPredictions]);
+
+  // Merge this round's live picks over previous-round results so winner-of slots resolve.
+  const knockoutBetsRecord = useMemo(
+    () => ({ ...previousRoundPredictions, ...predictions }),
+    [previousRoundPredictions, predictions],
+  );
 
   const resolvedMatches = useMemo(() => {
     const advancingGroupSet = new Set(
@@ -144,7 +147,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
     const isThirdPlaceSlot = (source: { from: string; groupId?: string; position?: number }) =>
       phase === 'round-of-32' && source.from === 'group' && source.position === 3;
 
-    return unsubmittedMatches.map((match) => {
+    return roundMatches.map((match) => {
       const bracketEntry = BRACKET_MAP[match.slug];
       if (!bracketEntry) {
         return {
@@ -200,7 +203,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
         tbdAway: awayTeam ? undefined : 'TBD',
       };
     });
-  }, [unsubmittedMatches, groupBetsByGroupId, knockoutBetsRecord, thirdPlaceTeams, phase]);
+  }, [roundMatches, groupBetsByGroupId, knockoutBetsRecord, thirdPlaceTeams, phase]);
 
   const handlePrediction = (matchSlug: string, winner: string) => {
     setPredictions((prev) => ({
@@ -208,14 +211,6 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
       [matchSlug]: winner,
     }));
   };
-
-  const handleSubmit = async () => {
-    await onSubmit(predictions);
-  };
-
-  void handleSubmit;
-  void isSubmitting;
-  void setIsSubmitting;
 
   const [now, setNow] = useState(0);
 
@@ -226,19 +221,28 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   }, []);
 
   const isMatchDisabled = (match: KnockoutRoundMatch) => {
-    if (isDisabled || isSubmitting) return true;
+    if (isDisabled) return true;
     if (!match.homeTeam || !match.awayTeam) return true;
     if (match.predictionDeadline.getTime() <= now) return true;
     return false;
   };
 
-  if (unsubmittedMatches.length === 0) {
-    return (
-      <div className="prediction-step-knockout-round prediction-step-knockout-round--empty">
-        <Badge variant="success">{labels.allSubmitted}</Badge>
-      </div>
-    );
-  }
+  // A round can advance once every match with resolved teams has a pick.
+  const canAdvance = useMemo(() => {
+    const playable = resolvedMatches.filter((m) => m.homeTeam != null && m.awayTeam != null);
+    if (playable.length === 0) return true;
+    return playable.every((m) => predictions[m.slug]);
+  }, [resolvedMatches, predictions]);
+
+  useEffect(() => {
+    onStateChange?.({
+      canAdvance: canAdvance && !isDisabled,
+      submit: async () => {
+        if (Object.keys(predictions).length === 0) return;
+        await onSubmit(predictions);
+      },
+    });
+  }, [canAdvance, isDisabled, predictions, onSubmit, onStateChange]);
 
   return (
     <div className="prediction-step-knockout-round">
@@ -300,20 +304,6 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
           );
         })}
       </div>
-
-      {submittedMatches.length > 0 && (
-        <div className="prediction-step-knockout-round__submitted">
-          <Typography variant="small">{labels.submittedPredictions}</Typography>
-          <div className="prediction-step-knockout-round__submitted-list">
-            {submittedMatches.map((match) => (
-              <div key={match.slug} className="prediction-step-knockout-round__submitted-item">
-                <Typography variant="caption">{match.slug}</Typography>
-                <Badge variant="success">✓</Badge>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

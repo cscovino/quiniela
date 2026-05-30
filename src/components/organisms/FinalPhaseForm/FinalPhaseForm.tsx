@@ -1,6 +1,7 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import type { RegisterStepState } from '@app-types/prediction-steps';
 import { Button } from '@atoms/Button';
 import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
@@ -14,6 +15,8 @@ export interface FinalPhaseFormProps {
   existingPrediction?: { first?: string; second?: string; third?: string; fourth?: string };
   isDisabled?: boolean;
   isSubmitting?: boolean;
+  /** When provided, the form reports its submit to the wizard's Next button and hides its own. */
+  onStateChange?: RegisterStepState;
   className?: string;
   translations?: {
     firstPlace?: string;
@@ -49,6 +52,7 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
   existingPrediction,
   isDisabled = false,
   isSubmitting = false,
+  onStateChange,
   className = '',
   translations = {},
 }) => {
@@ -93,6 +97,20 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
     ).size ===
     [selections.first, selections.second, selections.third, selections.fourth].filter(Boolean)
       .length;
+
+  const canSubmit = !!isComplete && isUnique && !isDisabled;
+
+  useEffect(() => {
+    // Optional step: always advanceable, but only persist when fully valid.
+    onStateChange?.({
+      canAdvance: true,
+      submit: async () => {
+        if (!canSubmit) return;
+        handleSubmit();
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canSubmit, selections, onStateChange]);
 
   return (
     <div className={`final-phase-form ${className}`}>
@@ -144,17 +162,19 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
         </div>
       )}
 
-      <div className="final-phase-form__actions">
-        <Button
-          variant="primary"
-          size="md"
-          onClick={handleSubmit}
-          disabled={isDisabled || isSubmitting || !isComplete || !isUnique}
-        >
-          {isSubmitting ? <Spinner size="sm" /> : null}
-          {labels.submit}
-        </Button>
-      </div>
+      {!onStateChange && (
+        <div className="final-phase-form__actions">
+          <Button
+            variant="primary"
+            size="md"
+            onClick={handleSubmit}
+            disabled={isDisabled || isSubmitting || !isComplete || !isUnique}
+          >
+            {isSubmitting ? <Spinner size="sm" /> : null}
+            {labels.submit}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

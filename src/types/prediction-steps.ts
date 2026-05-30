@@ -24,6 +24,16 @@ export interface DeadlineInfo {
   countdownLabel?: string;
 }
 
+// Reported by a step's form up to the wizard so a single "Next" button can both
+// persist the current step and advance. `submit` saves whatever is currently
+// entered; `canAdvance` gates the Next button.
+export interface PredictionStepState {
+  canAdvance: boolean;
+  submit: () => Promise<void>;
+}
+
+export type RegisterStepState = (state: PredictionStepState) => void;
+
 export interface PredictionStepModel {
   id: string;
   kind: PredictionStepKind;

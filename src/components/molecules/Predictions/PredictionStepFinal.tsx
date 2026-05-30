@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 
+import type { RegisterStepState } from '@app-types/prediction-steps';
 import { Typography } from '@atoms/Typography';
 import { BestPlayersForm, type BestPlayersFormProps } from '@organisms/BestPlayersForm';
 import { FinalPhaseForm, type FinalPhaseFormProps } from '@organisms/FinalPhaseForm';
@@ -18,6 +19,7 @@ export interface PredictionStepFinalPhaseProps {
   isDisabled: boolean;
   isSubmitting?: boolean;
   locale: 'en' | 'es';
+  onStateChange?: RegisterStepState;
   translations?: {
     teamsSoon?: string;
     form?: FinalPhaseFormProps['translations'];
@@ -31,6 +33,7 @@ export const PredictionStepFinalPhase: FC<PredictionStepFinalPhaseProps> = ({
   isDisabled,
   isSubmitting = false,
   locale,
+  onStateChange,
   translations = {},
 }) => {
   const teamsSoon =
@@ -45,6 +48,7 @@ export const PredictionStepFinalPhase: FC<PredictionStepFinalPhaseProps> = ({
           existingPrediction={existingPrediction}
           isDisabled={isDisabled}
           isSubmitting={isSubmitting}
+          onStateChange={onStateChange}
           translations={translations.form}
         />
       ) : (
@@ -61,6 +65,7 @@ export interface PredictionStepBestPlayersProps {
   onSubmit: (data: { bestGoalkeeper?: string; bestScorer?: string }) => Promise<void>;
   isDisabled: boolean;
   isSubmitting?: boolean;
+  onStateChange?: RegisterStepState;
   translations?: BestPlayersFormProps['translations'];
 }
 
@@ -69,6 +74,7 @@ export const PredictionStepBestPlayers: FC<PredictionStepBestPlayersProps> = ({
   onSubmit,
   isDisabled,
   isSubmitting = false,
+  onStateChange,
   translations,
 }) => (
   <BestPlayersForm
@@ -76,6 +82,7 @@ export const PredictionStepBestPlayers: FC<PredictionStepBestPlayersProps> = ({
     existingPrediction={existingPrediction}
     isDisabled={isDisabled}
     isSubmitting={isSubmitting}
+    onStateChange={onStateChange}
     translations={translations}
   />
 );

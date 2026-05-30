@@ -1,6 +1,7 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import type { RegisterStepState } from '@app-types/prediction-steps';
 import { Button } from '@atoms/Button';
 import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
@@ -12,6 +13,8 @@ export interface BestPlayersFormProps {
   existingPrediction?: { bestGoalkeeper?: string; bestScorer?: string };
   isDisabled?: boolean;
   isSubmitting?: boolean;
+  /** When provided, the form reports its submit to the wizard's Next button and hides its own. */
+  onStateChange?: RegisterStepState;
   className?: string;
   translations?: {
     bestGoalkeeper?: string;
@@ -39,6 +42,7 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
   existingPrediction,
   isDisabled = false,
   isSubmitting = false,
+  onStateChange,
   className = '',
   translations = {},
 }) => {
@@ -54,6 +58,18 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
       ...(bestScorer && { bestScorer }),
     });
   };
+
+  useEffect(() => {
+    // Optional step: always advanceable, but only persist when both are filled.
+    onStateChange?.({
+      canAdvance: true,
+      submit: async () => {
+        if (isDisabled || (!bestGoalkeeper && !bestScorer)) return;
+        handleSubmit();
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bestGoalkeeper, bestScorer, isDisabled, onStateChange]);
 
   return (
     <div className={`best-players-form ${className}`}>
@@ -89,17 +105,19 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
         </div>
       </div>
 
-      <div className="best-players-form__actions">
-        <Button
-          variant="primary"
-          size="md"
-          onClick={handleSubmit}
-          disabled={isDisabled || isSubmitting || (!bestGoalkeeper && !bestScorer)}
-        >
-          {isSubmitting ? <Spinner size="sm" /> : null}
-          {labels.submit}
-        </Button>
-      </div>
+      {!onStateChange && (
+        <div className="best-players-form__actions">
+          <Button
+            variant="primary"
+            size="md"
+            onClick={handleSubmit}
+            disabled={isDisabled || isSubmitting || (!bestGoalkeeper && !bestScorer)}
+          >
+            {isSubmitting ? <Spinner size="sm" /> : null}
+            {labels.submit}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

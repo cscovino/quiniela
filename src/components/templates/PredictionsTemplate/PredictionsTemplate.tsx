@@ -226,6 +226,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     feedback,
     totalSteps,
     canAdvance,
+    submitCurrentStep,
     submitting,
     thirdPlaceTeams,
     groups,
@@ -631,11 +632,16 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
                   : () => setCurrentStep((p) => Math.max(0, p - 1))
               }
               onNext={async () => {
+                // Single button: save the current step, then advance (or finish).
+                await submitCurrentStep();
+                // Leaving the last group: saving marks it complete and the
+                // third-place confirmation effect takes over advancing.
+                if (groupsCount > 0 && currentStep === groupsCount - 1) {
+                  return;
+                }
                 if (currentStep < totalSteps - 1) {
-                  await steps[currentStep].onSubmit();
                   setCurrentStep((p) => p + 1);
                 } else {
-                  await steps[currentStep].onSubmit();
                   handleBackToList();
                 }
               }}
