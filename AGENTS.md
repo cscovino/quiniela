@@ -22,6 +22,8 @@ pnpm build-storybook  # Build Storybook static
 pnpm seed         # Seed Firestore with tournament data
 pnpm set-admin    # Promote user to admin
 node scripts/generate-content.mjs  # Generate content collection files
+pnpm migrate:knockout          # Phase 1: verify/fix knockout bracket tbdHome/tbdAway in Firestore
+pnpm migrate:knockout:phase2   # Phase 2: fill R32 team IDs from group standings + third-place matrix
 ```
 
 **Verification order:** `lint → test:run → build`

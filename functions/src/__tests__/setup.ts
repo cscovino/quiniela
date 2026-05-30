@@ -15,13 +15,19 @@ const mockFirestore = vi.fn(() => ({
   })),
 }));
 
+const mockAppCheck = vi.fn(() => ({ verifyToken: vi.fn() }));
+
 vi.mock('firebase-admin', () => ({
   __esModule: true,
   default: {
     firestore: mockFirestore,
     app: { firestore: mockFirestore },
+    appCheck: mockAppCheck,
+    initializeApp: vi.fn(),
   },
   firestore: mockFirestore,
+  appCheck: mockAppCheck,
+  initializeApp: vi.fn(),
 }));
 
 export const mockBatch = {

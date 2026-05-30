@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { resolve } from 'path';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
@@ -104,6 +104,10 @@ export default defineConfig({
         test: {
           name: 'functions',
           environment: 'node',
+          // Registers the firebase-admin mock before any source module is
+          // imported, so top-level `admin.firestore()` calls don't hit the real
+          // SDK (which throws "default Firebase app does not exist").
+          setupFiles: ['functions/src/__tests__/setup.ts'],
           include: ['functions/src/**/__tests__/**/*.test.ts'],
           globals: true,
           coverage: {
