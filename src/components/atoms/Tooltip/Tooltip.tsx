@@ -14,17 +14,18 @@ export interface TooltipProps {
   label?: string;
 }
 
-// Gap between the trigger and the tooltip, in px (matches --space-2).
+// Gap between trigger and bubble, and minimum margin from the viewport edge (px).
 const GAP = 8;
+const MARGIN = 8;
 
 /**
  * Tooltip that works with mouse, keyboard AND touch:
  * - desktop: shows on hover/focus
- * - mobile: tap toggles it; tapping elsewhere (or scrolling) dismisses it
+ * - mobile: tap shows it; tapping elsewhere (or scrolling / Escape) dismisses it
  *
- * The bubble is rendered with `position: fixed` (coordinates computed from the
- * trigger) so it is never clipped by an ancestor with `overflow: hidden/auto`
- * (e.g. the horizontally-scrollable ranking row).
+ * The bubble uses `position: fixed` with coordinates measured from the trigger,
+ * so it is never clipped by an ancestor with `overflow: hidden/auto` (e.g. the
+ * horizontally-scrollable ranking row), and it is clamped to stay on screen.
  */
 export const Tooltip: FC<TooltipProps> = ({
   content,
@@ -34,27 +35,48 @@ export const Tooltip: FC<TooltipProps> = ({
   label,
 }) => {
   const [visible, setVisible] = useState(false);
-  const [coords, setCoords] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [box, setBox] = useState<{ top: number; left: number } | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const tipRef = useRef<HTMLSpanElement>(null);
   const tooltipId = useId();
 
-  const place = useCallback(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    if (position === 'bottom') setCoords({ top: r.bottom + GAP, left: r.left + r.width / 2 });
-    else if (position === 'left') setCoords({ top: r.top + r.height / 2, left: r.left - GAP });
-    else if (position === 'right') setCoords({ top: r.top + r.height / 2, left: r.right + GAP });
-    else setCoords({ top: r.top - GAP, left: r.left + r.width / 2 }); // top
-  }, [position]);
+  const show = useCallback(() => setVisible(true), []);
+  const hide = useCallback(() => {
+    setVisible(false);
+    setBox(null);
+  }, []);
 
-  const show = useCallback(() => {
-    place();
-    setVisible(true);
-  }, [place]);
-  const hide = useCallback(() => setVisible(false), []);
+  // Measure the rendered bubble and place it relative to the trigger, clamped to
+  // the viewport. Runs after the (hidden) bubble mounts so we know its size.
+  useEffect(() => {
+    if (!visible) return;
+    const anchor = wrapperRef.current?.getBoundingClientRect();
+    const tip = tipRef.current;
+    if (!anchor || !tip) return;
+    const { width: w, height: h } = tip.getBoundingClientRect();
 
-  // While open, dismiss on an outside tap/click, on scroll, or on resize.
+    let top: number;
+    let left: number;
+    if (position === 'bottom') {
+      top = anchor.bottom + GAP;
+      left = anchor.left + anchor.width / 2 - w / 2;
+    } else if (position === 'left') {
+      top = anchor.top + anchor.height / 2 - h / 2;
+      left = anchor.left - GAP - w;
+    } else if (position === 'right') {
+      top = anchor.top + anchor.height / 2 - h / 2;
+      left = anchor.right + GAP;
+    } else {
+      top = anchor.top - GAP - h;
+      left = anchor.left + anchor.width / 2 - w / 2;
+    }
+
+    left = Math.max(MARGIN, Math.min(left, window.innerWidth - w - MARGIN));
+    top = Math.max(MARGIN, Math.min(top, window.innerHeight - h - MARGIN));
+    setBox({ top, left });
+  }, [visible, position]);
+
+  // While open, dismiss on an outside tap, on scroll, or on resize.
   useEffect(() => {
     if (!visible) return;
     const onPointerDown = (e: Event) => {
@@ -71,7 +93,10 @@ export const Tooltip: FC<TooltipProps> = ({
     };
   }, [visible, hide]);
 
-  const style: CSSProperties = { top: `${coords.top}px`, left: `${coords.left}px` };
+  // Hidden until measured, so it never flashes at the wrong spot.
+  const style: CSSProperties = box
+    ? { top: `${box.top}px`, left: `${box.left}px` }
+    : { visibility: 'hidden' };
 
   return (
     <div
@@ -80,15 +105,14 @@ export const Tooltip: FC<TooltipProps> = ({
       tabIndex={0}
       role="button"
       aria-label={label ?? content}
-      aria-describedby={visible ? tooltipId : undefined}
+      aria-describedby={visible && box ? tooltipId : undefined}
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}
       onBlur={hide}
       onClick={(e) => {
         // Show on tap/click. A tap also fires mouseenter, so toggling here would
-        // immediately re-hide it; instead we open on interaction and dismiss via
-        // outside tap / scroll / Escape.
+        // immediately re-hide it; we open on interaction and dismiss elsewhere.
         e.stopPropagation();
         show();
       }}
@@ -99,6 +123,7 @@ export const Tooltip: FC<TooltipProps> = ({
       {children}
       {visible && (
         <span
+          ref={tipRef}
           id={tooltipId}
           className={`tooltip tooltip--${position}`}
           role="tooltip"

@@ -22,19 +22,3 @@
   z-index: var(--z-tooltip);
   pointer-events: none;
 }
-
-.tooltip--top {
-  transform: translate(-50%, -100%);
-}
-
-.tooltip--bottom {
-  transform: translate(-50%, 0);
-}
-
-.tooltip--left {
-  transform: translate(-100%, -50%);
-}
-
-.tooltip--right {
-  transform: translate(0, -50%);
-}

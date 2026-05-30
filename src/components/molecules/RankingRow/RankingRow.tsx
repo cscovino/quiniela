@@ -36,6 +36,28 @@ const RANK_ARROW: Record<string, IconName> = {
   same: 'chevron-right',
 };
 
+// Localized labels for the stat icons (shown as tooltips). Kept here, like the
+// badge names in badges.ts, rather than threaded through the catalog.
+const STAT_LABELS: Record<
+  'en' | 'es',
+  { points: string; today: string; accuracy: string; streak: string; predictions: string }
+> = {
+  en: {
+    points: 'Total points',
+    today: "Today's points",
+    accuracy: 'Accuracy',
+    streak: 'Current streak',
+    predictions: 'Upcoming predictions',
+  },
+  es: {
+    points: 'Puntos totales',
+    today: 'Puntos de hoy',
+    accuracy: 'Precisión',
+    streak: 'Racha actual',
+    predictions: 'Predicciones próximas',
+  },
+};
+
 export const RankingRow: FC<RankingRowProps> = ({
   position,
   avatarUrl,
@@ -54,6 +76,7 @@ export const RankingRow: FC<RankingRowProps> = ({
   className = '',
 }) => {
   const predictorLike = avatar ? { id: displayName, name: displayName, avatar } : undefined;
+  const statLabels = STAT_LABELS[locale];
 
   const earnedBadges = badges
     ? Object.keys(badges)
@@ -105,31 +128,35 @@ export const RankingRow: FC<RankingRowProps> = ({
       </div>
 
       <div className="ranking-row__stats">
-        <div className="ranking-row__stat">
+        <Tooltip className="ranking-row__stat" content={statLabels.points} position="top">
           <Icon name="star" size={14} />
           <Typography variant="small">{points}</Typography>
-        </div>
+        </Tooltip>
         {todayPoints != null && (
-          <div className="ranking-row__stat ranking-row__stat--today">
+          <Tooltip
+            className="ranking-row__stat ranking-row__stat--today"
+            content={statLabels.today}
+            position="top"
+          >
             <Icon name="zap" size={14} />
             <Typography variant="small">+{todayPoints}</Typography>
-          </div>
+          </Tooltip>
         )}
-        <div className="ranking-row__stat">
+        <Tooltip className="ranking-row__stat" content={statLabels.accuracy} position="top">
           <Icon name="target" size={14} />
           <Typography variant="small">{accuracy}%</Typography>
-        </div>
+        </Tooltip>
         {streak > 0 && (
-          <div className="ranking-row__stat">
+          <Tooltip className="ranking-row__stat" content={statLabels.streak} position="top">
             <Icon name="fire" size={14} />
             <Typography variant="small">{streak}</Typography>
-          </div>
+          </Tooltip>
         )}
         {predictionsCount != null && (
-          <div className="ranking-row__stat">
+          <Tooltip className="ranking-row__stat" content={statLabels.predictions} position="top">
             <Icon name="clock" size={14} />
             <Typography variant="small">{predictionsCount}</Typography>
-          </div>
+          </Tooltip>
         )}
       </div>
 
