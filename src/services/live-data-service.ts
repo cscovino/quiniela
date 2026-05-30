@@ -1,12 +1,13 @@
-import { collection, collectionGroup, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 
 import type { MatchCardProps } from '@molecules/MatchCard';
 import type { GroupStandingsProps } from '@organisms/GroupStandings';
-import type { RankingEntry } from '@organisms/RankingsTable';
+import type { RankingEntry, TodayMatchBet } from '@organisms/RankingsTable';
 
 import { TOURNAMENT_ID } from '../config/tournament';
-import type { GroupStandings, Match, PredictorStats, Team } from '../types/firestore';
+import type { GroupStandings, Match, Team } from '../types/firestore';
 import { getDb } from './firebase';
+import { fetchRankingsFromApi } from './rankings-api';
 
 async function getTeamsMap(): Promise<Map<string, Team>> {
   const snapshot = await getDocs(collection(getDb(), 'tournaments', TOURNAMENT_ID, 'teams'));
@@ -213,68 +214,163 @@ async function fetchPredictionsCounts(predictorIds: string[]): Promise<Map<strin
   }
 }
 
-export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
-  const statsRef = collectionGroup(getDb(), 'stats');
-  const q = query(statsRef, where('__name__', '==', TOURNAMENT_ID));
-  const snapshot = await getDocs(q);
+async function fetchTodayBets(): Promise<{
+  matchList: TodayMatchBet[];
+  predictorBets: Map<string, TodayMatchBet[]>;
+}> {
+  try {
+    const teams = await getTeamsMap();
+    const matchesRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches');
+    const matchesSnap = await getDocs(matchesRef);
 
-  const allStats: (PredictorStats & { userId: string; predictorId: string })[] = [];
-  for (const doc of snapshot.docs) {
-    const refPath = doc.ref.path;
-    const pathParts = refPath.split('/');
-    allStats.push({
-      ...(doc.data() as PredictorStats),
-      userId: pathParts[1],
-      predictorId: pathParts[3],
-    });
-  }
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(todayStart);
+    todayEnd.setDate(todayEnd.getDate() + 1);
 
-  const sorted = allStats.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, limit);
+    const todayMatchIds: string[] = [];
+    const todayMatches = new Map<
+      string,
+      {
+        homeTeam: string;
+        awayTeam: string;
+        status: string;
+        actualHome?: number;
+        actualAway?: number;
+      }
+    >();
 
-  const predictorRefs = new Set<string>();
-  for (const s of sorted) {
-    predictorRefs.add(`users/${s.userId}/predictors/${s.predictorId}`);
-  }
+    for (const doc of matchesSnap.docs) {
+      const data = doc.data() as Match;
+      const matchDate = data.date.toDate();
+      if (matchDate >= todayStart && matchDate < todayEnd) {
+        todayMatchIds.push(doc.id);
+        const home = data.homeTeamId
+          ? (teams.get(data.homeTeamId.toLowerCase())?.fifaCode ?? data.homeTeamId.toUpperCase())
+          : 'TBD';
+        const away = data.awayTeamId
+          ? (teams.get(data.awayTeamId.toLowerCase())?.fifaCode ?? data.awayTeamId.toUpperCase())
+          : 'TBD';
+        todayMatches.set(doc.id, {
+          homeTeam: home,
+          awayTeam: away,
+          status: data.status,
+          actualHome: data.result.home ?? undefined,
+          actualAway: data.result.away ?? undefined,
+        });
+      }
+    }
 
-  const predictorDocs = await Promise.all(
-    Array.from(predictorRefs).map(async (ref) => {
-      const { getDoc, doc: firestoreDoc } = await import('firebase/firestore');
-      const snap = await getDoc(firestoreDoc(getDb(), ref));
-      const data = snap.exists() ? snap.data() : null;
-      return {
-        id: ref,
-        name: (data?.name as string) || null,
-        avatarUrl: (data?.avatarUrl as string | null) || null,
+    if (todayMatchIds.length === 0) {
+      return { matchList: [], predictorBets: new Map() };
+    }
+
+    const betsRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'bets');
+    const betsQuery = query(betsRef, where('matchId', 'in', todayMatchIds));
+    const betsSnap = await getDocs(betsQuery);
+
+    const predictorBets = new Map<string, TodayMatchBet[]>();
+    const matchList: TodayMatchBet[] = [];
+
+    for (const todayId of todayMatchIds) {
+      const info = todayMatches.get(todayId)!;
+      matchList.push({
+        matchId: todayId,
+        homeTeam: info.homeTeam,
+        awayTeam: info.awayTeam,
+        homeScore: 0,
+        awayScore: 0,
+        status: info.status,
+        actualHome: info.actualHome,
+        actualAway: info.actualAway,
+      });
+    }
+
+    for (const doc of betsSnap.docs) {
+      const bet = doc.data() as {
+        matchId: string;
+        predictorId: string;
+        homeScore: number;
+        awayScore: number;
+        isExact?: boolean;
+        isWinner?: boolean;
       };
-    }),
-  );
+      const info = todayMatches.get(bet.matchId);
+      if (!info) continue;
 
-  const nameMap = new Map<string, string>();
-  const avatarUrlMap = new Map<string, string | null>();
-  for (const p of predictorDocs) {
-    nameMap.set(p.id, p.name || p.id.split('/').pop() || 'Unknown');
-    avatarUrlMap.set(p.id, p.avatarUrl);
+      const entry: TodayMatchBet = {
+        matchId: bet.matchId,
+        homeTeam: info.homeTeam,
+        awayTeam: info.awayTeam,
+        homeScore: bet.homeScore,
+        awayScore: bet.awayScore,
+        status: info.status,
+        actualHome: info.actualHome,
+        actualAway: info.actualAway,
+        isExact: bet.isExact,
+        isWinner: bet.isWinner,
+      };
+
+      const existing = predictorBets.get(bet.predictorId) || [];
+      existing.push(entry);
+      predictorBets.set(bet.predictorId, existing);
+    }
+
+    return { matchList, predictorBets };
+  } catch {
+    return { matchList: [], predictorBets: new Map() };
   }
+}
+
+export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
+  // Heavy work (collectionGroup stats scan + per-predictor profile reads) runs
+  // server-side in the cached `/api/rankings` function. On any failure we return
+  // an empty array; useLiveData keeps the server-rendered initial rankings.
+  let apiStats;
+  try {
+    apiStats = await fetchRankingsFromApi();
+  } catch {
+    return [];
+  }
+
+  const sorted = apiStats.slice(0, limit);
 
   const predictorIds = sorted.map((s) => s.predictorId);
-  const [predictionsCounts, prevRankings] = await Promise.all([
+  const [predictionsCounts, prevRankings, todayBets] = await Promise.all([
     fetchPredictionsCounts(predictorIds),
     Promise.resolve(loadPreviousRankings()),
+    fetchTodayBets(),
   ]);
 
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(todayStart);
+  todayEnd.setDate(todayEnd.getDate() + 1);
+
   const entries: RankingEntry[] = sorted.map((s, index) => {
-    const key = `users/${s.userId}/predictors/${s.predictorId}`;
+    const todayPoints =
+      s.pointsHistory?.reduce((sum, entry) => {
+        const entryDate = new Date(entry.timestamp);
+        if (entryDate >= todayStart && entryDate < todayEnd) {
+          return sum + entry.points;
+        }
+        return sum;
+      }, 0) ?? undefined;
+
     return {
       userId: s.userId,
       predictorId: s.predictorId,
-      displayName: nameMap.get(key) || s.predictorId,
-      avatarUrl: avatarUrlMap.get(key) || undefined,
+      displayName: s.displayName || s.predictorId,
+      avatarUrl: s.avatarUrl || undefined,
+      avatar: s.avatar || undefined,
       points: s.totalPoints,
+      todayPoints,
       accuracy: Math.round(s.accuracy * 100),
       streak: s.currentStreak,
       badges: s.badgesAwarded ?? undefined,
       rankChange: computeRankChange(index, s.userId, prevRankings),
       predictionsCount: predictionsCounts.get(s.predictorId) ?? 0,
+      todayMatchBets: todayBets.predictorBets.get(s.predictorId),
     };
   });
 

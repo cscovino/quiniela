@@ -79,3 +79,97 @@ export const Empty: Story = {
     rankings: [],
   },
 };
+
+const mockTodayBets = [
+  {
+    matchId: 'match-1',
+    homeTeam: 'ARG',
+    awayTeam: 'BRA',
+    homeScore: 2,
+    awayScore: 1,
+    status: 'scheduled' as const,
+  },
+  {
+    matchId: 'match-2',
+    homeTeam: 'GER',
+    awayTeam: 'ESP',
+    homeScore: 1,
+    awayScore: 0,
+    status: 'scheduled' as const,
+  },
+  {
+    matchId: 'match-3',
+    homeTeam: 'FRA',
+    awayTeam: 'ENG',
+    homeScore: 0,
+    awayScore: 0,
+    status: 'scheduled' as const,
+  },
+];
+
+const mockTodayBetsWithResults = [
+  {
+    matchId: 'match-1',
+    homeTeam: 'ARG',
+    awayTeam: 'BRA',
+    homeScore: 2,
+    awayScore: 1,
+    status: 'finished' as const,
+    actualHome: 2,
+    actualAway: 1,
+    isExact: true,
+    isWinner: true,
+  },
+  {
+    matchId: 'match-2',
+    homeTeam: 'GER',
+    awayTeam: 'ESP',
+    homeScore: 1,
+    awayScore: 0,
+    status: 'finished' as const,
+    actualHome: 1,
+    actualAway: 1,
+    isExact: false,
+    isWinner: true,
+  },
+  {
+    matchId: 'match-3',
+    homeTeam: 'FRA',
+    awayTeam: 'ENG',
+    homeScore: 1,
+    awayScore: 2,
+    status: 'finished' as const,
+    actualHome: 0,
+    actualAway: 1,
+    isExact: false,
+    isWinner: false,
+  },
+];
+
+export const WithTodayPredictions: Story = {
+  args: {
+    rankings: mockRankings.map((r, i) => ({
+      ...r,
+      todayMatchBets: mockTodayBets.map((bet) => ({
+        ...bet,
+        homeScore: bet.homeScore + i,
+        awayScore: bet.awayScore + (i % 2),
+      })),
+      todayPoints: i * 3,
+    })),
+  },
+};
+
+export const WithFinishedResults: Story = {
+  args: {
+    rankings: mockRankings.map((r, i) => ({
+      ...r,
+      todayMatchBets: mockTodayBetsWithResults.map((bet) => ({
+        ...bet,
+        homeScore: bet.homeScore + (i % 3 === 0 ? 1 : 0),
+      })),
+      todayPoints: i === 0 ? 5 : i === 1 ? 3 : 0,
+    })),
+    currentUserId: 'user-2',
+  },
+};

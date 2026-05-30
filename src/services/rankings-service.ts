@@ -1,42 +1,33 @@
-import { collectionGroup, getDocs, query, where } from 'firebase/firestore';
-
-import { TOURNAMENT_ID } from '../config/tournament';
 import type { PredictorStats } from '../types/firestore';
-import { getDb } from './firebase';
+import { fetchRankingsFromApi } from './rankings-api';
 
 export const rankingsService = {
-  getAllPredictorStats: async (
-    tournamentId: string = TOURNAMENT_ID,
-  ): Promise<(PredictorStats & { userId: string; predictorId: string })[]> => {
-    const statsRef = collectionGroup(getDb(), 'stats');
-    const q = query(statsRef, where('__name__', '==', tournamentId));
-
-    const snapshot = await getDocs(q);
-
-    const allStats: (PredictorStats & { userId: string; predictorId: string })[] = [];
-
-    for (const doc of snapshot.docs) {
-      const refPath = doc.ref.path;
-      const pathParts = refPath.split('/');
-
-      const userId = pathParts[1];
-      const predictorId = pathParts[3];
-
-      allStats.push({
-        ...(doc.data() as PredictorStats),
-        userId,
-        predictorId,
-      });
-    }
-
-    return allStats.sort((a, b) => b.totalPoints - a.totalPoints);
+  // Routed through the cached `/api/rankings` function (Admin SDK) rather than a
+  // client `collectionGroup('stats')` query — see rankings-api.ts. Already sorted
+  // by totalPoints descending.
+  getAllPredictorStats: async (): Promise<
+    (PredictorStats & { userId: string; predictorId: string })[]
+  > => {
+    const apiStats = await fetchRankingsFromApi();
+    return apiStats.map(
+      (s) =>
+        ({
+          userId: s.userId,
+          predictorId: s.predictorId,
+          totalPoints: s.totalPoints,
+          accuracy: s.accuracy,
+          currentStreak: s.currentStreak,
+          exactBets: s.exactBets,
+          badgesAwarded: s.badgesAwarded,
+          pointsHistory: s.pointsHistory,
+        }) as unknown as PredictorStats & { userId: string; predictorId: string },
+    );
   },
 
   getTopPredictors: async (
-    tournamentId: string = TOURNAMENT_ID,
     limitCount: number = 20,
   ): Promise<(PredictorStats & { userId: string; predictorId: string })[]> => {
-    const stats = await rankingsService.getAllPredictorStats(tournamentId);
+    const stats = await rankingsService.getAllPredictorStats();
     return stats.slice(0, limitCount);
   },
 };

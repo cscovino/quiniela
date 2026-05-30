@@ -1,6 +1,5 @@
 import {
   collection,
-  collectionGroup,
   doc,
   getDoc,
   getDocs,
@@ -20,6 +19,7 @@ import type {
   Tournament,
 } from '../types/firestore';
 import { getDb } from './firebase';
+import { fetchRankingsFromApi } from './rankings-api';
 
 const db = () => getDb();
 
@@ -74,30 +74,25 @@ export const tournamentService = {
     return snapshot.exists() ? (snapshot.data() as PredictorStats) : null;
   },
 
-  getAllPredictorStats: async (
-    tournamentId: string = TOURNAMENT_ID,
-  ): Promise<(PredictorStats & { userId: string; predictorId: string })[]> => {
-    const statsRef = collectionGroup(db(), 'stats');
-    const q = query(statsRef, where('__name__', '==', tournamentId));
-
-    const snapshot = await getDocs(q);
-
-    const allStats: (PredictorStats & { userId: string; predictorId: string })[] = [];
-
-    for (const doc of snapshot.docs) {
-      const refPath = doc.ref.path;
-      const pathParts = refPath.split('/');
-
-      const userId = pathParts[1];
-      const predictorId = pathParts[3];
-
-      allStats.push({
-        ...(doc.data() as PredictorStats),
-        userId,
-        predictorId,
-      });
-    }
-
-    return allStats.sort((a, b) => b.totalPoints - a.totalPoints);
+  getAllPredictorStats: async (): Promise<
+    (PredictorStats & { userId: string; predictorId: string })[]
+  > => {
+    // Routed through the cached `/api/rankings` function (Admin SDK) instead of a
+    // client `collectionGroup('stats')` query, which Firestore rules don't permit
+    // and which incurred N+1 reads. Results are already sorted by totalPoints desc.
+    const apiStats = await fetchRankingsFromApi();
+    return apiStats.map(
+      (s) =>
+        ({
+          userId: s.userId,
+          predictorId: s.predictorId,
+          totalPoints: s.totalPoints,
+          accuracy: s.accuracy,
+          currentStreak: s.currentStreak,
+          exactBets: s.exactBets,
+          badgesAwarded: s.badgesAwarded,
+          pointsHistory: s.pointsHistory,
+        }) as unknown as PredictorStats & { userId: string; predictorId: string },
+    );
   },
 };

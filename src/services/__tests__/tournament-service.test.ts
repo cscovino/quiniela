@@ -9,6 +9,7 @@ const TEST_TOURNAMENT_ID = 'world-cup-2026';
 vi.mock('../firebase', () => ({
   getDb: () => 'mock-db',
   initFirebase: vi.fn(() => Promise.resolve()),
+  getAppCheckToken: vi.fn(() => Promise.resolve('test-token')),
 }));
 
 const mockTeam = {
@@ -223,36 +224,45 @@ describe('tournament-service', () => {
   });
 
   describe('getAllPredictorStats', () => {
-    it('returns all predictor stats sorted by points', async () => {
-      vi.mocked(firebaseFirestore.collectionGroup).mockReturnValue({} as any);
-      vi.mocked(firebaseFirestore.query).mockReturnValue({} as any);
-      vi.mocked(firebaseFirestore.where).mockReturnValue({} as any);
-      vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({
-        docs: [
+    it('returns all predictor stats from the rankings API (already sorted)', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => [
           {
-            ref: { path: `users/user-1/predictors/user-1-default/stats/${TEST_TOURNAMENT_ID}` },
-            data: () => ({ ...mockPredictorStats, totalPoints: 150 }),
+            userId: 'user-1',
+            predictorId: 'user-1-default',
+            totalPoints: 150,
+            accuracy: 0.85,
+            currentStreak: 3,
+            exactBets: 5,
+            badgesAwarded: {},
+            pointsHistory: [],
           },
           {
-            ref: { path: `users/user-2/predictors/user-2-default/stats/${TEST_TOURNAMENT_ID}` },
-            data: () => ({ ...mockPredictorStats, totalPoints: 100 }),
+            userId: 'user-2',
+            predictorId: 'user-2-default',
+            totalPoints: 100,
+            accuracy: 0.8,
+            currentStreak: 1,
+            exactBets: 2,
+            badgesAwarded: {},
+            pointsHistory: [],
           },
         ],
-      } as any);
+      });
+      vi.stubGlobal('fetch', fetchMock);
 
       const result = await tournamentService.getAllPredictorStats();
 
+      expect(fetchMock).toHaveBeenCalledWith('/api/rankings', expect.any(Object));
       expect(result).toHaveLength(2);
       expect(result[0].totalPoints).toBeGreaterThanOrEqual(result[1].totalPoints);
       expect(result[0].userId).toBe('user-1');
       expect(result[1].userId).toBe('user-2');
     });
 
-    it('returns empty array when no stats', async () => {
-      vi.mocked(firebaseFirestore.collectionGroup).mockReturnValue({} as any);
-      vi.mocked(firebaseFirestore.query).mockReturnValue({} as any);
-      vi.mocked(firebaseFirestore.where).mockReturnValue({} as any);
-      vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({ docs: [] } as any);
+    it('returns empty array when the API returns no stats', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
 
       const result = await tournamentService.getAllPredictorStats();
 

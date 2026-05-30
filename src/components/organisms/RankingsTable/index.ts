@@ -1,2 +1,2 @@
-export type { RankingEntry, RankingsTableProps } from './RankingsTable';
+export type { RankingEntry, RankingsTableProps, TodayMatchBet } from './RankingsTable';
 export { RankingsTable } from './RankingsTable';

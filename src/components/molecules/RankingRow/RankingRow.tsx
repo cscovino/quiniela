@@ -2,10 +2,12 @@ import type { FC } from 'react';
 
 import { getBadgeDefinition } from '@app-types/badges';
 import { Avatar } from '@atoms/Avatar';
-import { Badge } from '@atoms/Badge';
+import type { IconName } from '@atoms/Icon';
 import { Icon } from '@atoms/Icon';
 import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Typography } from '@atoms/Typography';
+import { TeamFlag } from '@molecules/TeamFlag';
+import type { TodayMatchBet } from '@organisms/RankingsTable';
 
 import './RankingRow.css';
 
@@ -15,19 +17,21 @@ export interface RankingRowProps {
   avatar?: { bgColor: string; emoji: string };
   displayName: string;
   points: number;
+  todayPoints?: number;
   accuracy: number;
   streak: number;
   badges?: Record<string, string>;
   rankChange?: 'up' | 'down' | 'same';
   predictionsCount?: number;
+  todayMatchBets?: TodayMatchBet[];
   isCurrentUser?: boolean;
   className?: string;
 }
 
-const RANK_ARROW: Record<string, string> = {
-  up: '\u2191',
-  down: '\u2193',
-  same: '\u2192',
+const RANK_ARROW: Record<string, IconName> = {
+  up: 'chevron-up',
+  down: 'chevron-down',
+  same: 'chevron-right',
 };
 
 export const RankingRow: FC<RankingRowProps> = ({
@@ -36,23 +40,16 @@ export const RankingRow: FC<RankingRowProps> = ({
   avatar,
   displayName,
   points,
+  todayPoints,
   accuracy,
   streak,
   badges,
   rankChange,
   predictionsCount,
+  todayMatchBets,
   isCurrentUser = false,
   className = '',
 }) => {
-  const getPositionBadge = () => {
-    if (position === 1) return { variant: 'accent' as const, icon: 'trophy' };
-    if (position === 2) return { variant: 'info' as const, icon: 'trophy' };
-    if (position === 3) return { variant: 'success' as const, icon: 'trophy' };
-    return null;
-  };
-
-  const positionBadge = getPositionBadge();
-
   const predictorLike = avatar ? { id: displayName, name: displayName, avatar } : undefined;
 
   const earnedBadges = badges
@@ -69,16 +66,12 @@ export const RankingRow: FC<RankingRowProps> = ({
             className={`ranking-row__rank-change ranking-row__rank-change--${rankChange}`}
             aria-label={rankChange}
           >
-            {RANK_ARROW[rankChange]}
+            <Icon name={RANK_ARROW[rankChange]} size={14} />
           </span>
         )}
-        {positionBadge ? (
-          <Badge variant={positionBadge.variant} size="sm">
-            <Icon name={positionBadge.icon} size={12} />#{position}
-          </Badge>
-        ) : (
-          <Typography variant="small">#{position}</Typography>
-        )}
+        <span className={`ranking-row__position-number ranking-row__position--${position}`}>
+          #{position}
+        </span>
       </div>
 
       <div className="ranking-row__user">
@@ -106,6 +99,12 @@ export const RankingRow: FC<RankingRowProps> = ({
           <Icon name="star" size={14} />
           <Typography variant="small">{points}</Typography>
         </div>
+        {todayPoints != null && (
+          <div className="ranking-row__stat ranking-row__stat--today">
+            <Icon name="zap" size={14} />
+            <Typography variant="small">+{todayPoints}</Typography>
+          </div>
+        )}
         <div className="ranking-row__stat">
           <Icon name="target" size={14} />
           <Typography variant="small">{accuracy}%</Typography>
@@ -123,6 +122,35 @@ export const RankingRow: FC<RankingRowProps> = ({
           </div>
         )}
       </div>
+
+      {todayMatchBets && todayMatchBets.length > 0 && (
+        <div className="ranking-row__match-predictions">
+          {todayMatchBets.map((bet) => {
+            const isFinished = bet.status === 'finished';
+            const isCorrect = bet.isExact;
+            const isPartial = !isCorrect && bet.isWinner;
+            let resultClass = '';
+            if (isFinished && isCorrect) resultClass = 'ranking-row__match-prediction--correct';
+            else if (isFinished && isPartial)
+              resultClass = 'ranking-row__match-prediction--partial';
+            else if (isFinished) resultClass = 'ranking-row__match-prediction--wrong';
+
+            return (
+              <span
+                key={bet.matchId}
+                className={`ranking-row__match-prediction ${resultClass}`}
+                title={`${bet.homeTeam} vs ${bet.awayTeam}${isFinished ? ` — actual: ${bet.actualHome}-${bet.actualAway}` : ''}`}
+              >
+                <TeamFlag fifaCode={bet.homeTeam} size="sm" />
+                <span className="ranking-row__match-score">
+                  {bet.homeScore}-{bet.awayScore}
+                </span>
+                <TeamFlag fifaCode={bet.awayTeam} size="sm" />
+              </span>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

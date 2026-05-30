@@ -6,6 +6,19 @@ import { RankingRow } from '@molecules/RankingRow';
 
 import './RankingsTable.css';
 
+export interface TodayMatchBet {
+  matchId: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore: number;
+  awayScore: number;
+  status: string;
+  actualHome?: number;
+  actualAway?: number;
+  isExact?: boolean;
+  isWinner?: boolean;
+}
+
 export interface RankingEntry {
   userId: string;
   predictorId?: string;
@@ -13,11 +26,13 @@ export interface RankingEntry {
   avatar?: { bgColor: string; emoji: string };
   displayName: string;
   points: number;
+  todayPoints?: number;
   accuracy: number;
   streak: number;
   badges?: Record<string, string>;
   rankChange?: 'up' | 'down' | 'same';
   predictionsCount?: number;
+  todayMatchBets?: TodayMatchBet[];
 }
 
 export interface RankingsTableProps {
@@ -62,11 +77,13 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             avatar={entry.avatar}
             displayName={entry.displayName}
             points={entry.points}
+            todayPoints={entry.todayPoints}
             accuracy={entry.accuracy}
             streak={entry.streak}
             badges={entry.badges}
             rankChange={entry.rankChange}
             predictionsCount={entry.predictionsCount}
+            todayMatchBets={entry.todayMatchBets}
             isCurrentUser={entry.userId === currentUserId}
           />
         ))}

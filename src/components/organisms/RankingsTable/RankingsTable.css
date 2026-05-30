@@ -8,6 +8,23 @@
   box-shadow: var(--shadow-md);
 }
 
+@media (max-width: 480px) {
+  .rankings-table {
+    padding: var(--space-2);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .rankings-table::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rankings-table__list {
+    min-width: 600px;
+  }
+}
+
 .rankings-table--empty {
   align-items: center;
   justify-content: center;

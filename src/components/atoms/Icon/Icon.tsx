@@ -1,7 +1,10 @@
 import { Bell } from 'pixelarticons/react/Bell';
 import { Chart } from 'pixelarticons/react/Chart';
 import { Check } from 'pixelarticons/react/Check';
+import { ChevronDown2 } from 'pixelarticons/react/ChevronDown2';
 import { ChevronLeft } from 'pixelarticons/react/ChevronLeft';
+import { ChevronRight2 } from 'pixelarticons/react/ChevronRight2';
+import { ChevronUp2 } from 'pixelarticons/react/ChevronUp2';
 import { Clock } from 'pixelarticons/react/Clock';
 import { Close } from 'pixelarticons/react/Close';
 import { Crown } from 'pixelarticons/react/Crown';
@@ -34,7 +37,10 @@ export type IconName =
   | 'bell'
   | 'chart'
   | 'check'
+  | 'chevron-down'
   | 'chevron-left'
+  | 'chevron-right'
+  | 'chevron-up'
   | 'clock'
   | 'close'
   | 'crown'
@@ -59,7 +65,8 @@ export type IconName =
   | 'trophy'
   | 'user'
   | 'warning'
-  | 'x';
+  | 'x'
+  | 'zap';
 
 export interface IconProps {
   name: IconName;
@@ -73,7 +80,10 @@ const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: 
   bell: Bell,
   chart: Chart,
   check: Check,
+  'chevron-down': ChevronDown2,
   'chevron-left': ChevronLeft,
+  'chevron-right': ChevronRight2,
+  'chevron-up': ChevronUp2,
   clock: Clock,
   close: Close,
   crown: Crown,
@@ -99,6 +109,7 @@ const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: 
   user: User,
   warning: SquareAlert,
   x: Close,
+  zap: Zap,
 };
 
 export const Icon: FC<IconProps> = ({ name, size = 24, color, className = '' }) => {
