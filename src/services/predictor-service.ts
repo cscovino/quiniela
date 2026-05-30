@@ -2,6 +2,9 @@ import {
   collection,
   deleteDoc,
   doc,
+  type DocumentData,
+  type DocumentReference,
+  type Firestore,
   getDoc,
   getDocs,
   query,
@@ -26,6 +29,24 @@ import { tournamentService } from './tournament-service';
 
 const MAX_NAME_LENGTH = 40;
 const BG_COLOR_REGEX = /^#[0-9a-f]{6}$/i;
+
+// Firestore caps a single writeBatch at 500 operations. Delete in chunks so a
+// predictor with many bets can still be removed without the batch failing.
+const FIRESTORE_BATCH_LIMIT = 500;
+
+async function deleteRefsInChunks(
+  db: Firestore,
+  refs: DocumentReference<DocumentData>[],
+): Promise<number> {
+  for (let i = 0; i < refs.length; i += FIRESTORE_BATCH_LIMIT) {
+    const batch = writeBatch(db);
+    for (const ref of refs.slice(i, i + FIRESTORE_BATCH_LIMIT)) {
+      batch.delete(ref);
+    }
+    await batch.commit();
+  }
+  return refs.length;
+}
 
 function validateName(name: string): string | null {
   if (!name || name.trim().length === 0) return 'Name cannot be empty';
@@ -119,33 +140,36 @@ export const predictorService = {
     const betsRef = collection(db, 'tournaments', TOURNAMENT_ID, 'bets');
     const betsQuery = query(betsRef, where('predictorId', '==', predictorId));
     const betsSnap = await getDocs(betsQuery);
-    const betsBatch = writeBatch(db);
-    betsSnap.docs.forEach((d) => betsBatch.delete(d.ref));
-    if (betsSnap.size > 0) {
-      await betsBatch.commit();
-      deletedCounts.bets = betsSnap.size;
+    const betsDeleted = await deleteRefsInChunks(
+      db,
+      betsSnap.docs.map((d) => d.ref),
+    );
+    if (betsDeleted > 0) {
+      deletedCounts.bets = betsDeleted;
     }
 
     // 2. group_bets where predictorId == …
     const groupBetsRef = collection(db, 'tournaments', TOURNAMENT_ID, 'group_bets');
     const groupBetsQuery = query(groupBetsRef, where('predictorId', '==', predictorId));
     const groupBetsSnap = await getDocs(groupBetsQuery);
-    const groupBetsBatch = writeBatch(db);
-    groupBetsSnap.docs.forEach((d) => groupBetsBatch.delete(d.ref));
-    if (groupBetsSnap.size > 0) {
-      await groupBetsBatch.commit();
-      deletedCounts.group_bets = groupBetsSnap.size;
+    const groupBetsDeleted = await deleteRefsInChunks(
+      db,
+      groupBetsSnap.docs.map((d) => d.ref),
+    );
+    if (groupBetsDeleted > 0) {
+      deletedCounts.group_bets = groupBetsDeleted;
     }
 
     // 3. knockout_bets where predictorId == …
     const knockoutBetsRef = collection(db, 'tournaments', TOURNAMENT_ID, 'knockout_bets');
     const knockoutBetsQuery = query(knockoutBetsRef, where('predictorId', '==', predictorId));
     const knockoutBetsSnap = await getDocs(knockoutBetsQuery);
-    const knockoutBetsBatch = writeBatch(db);
-    knockoutBetsSnap.docs.forEach((d) => knockoutBetsBatch.delete(d.ref));
-    if (knockoutBetsSnap.size > 0) {
-      await knockoutBetsBatch.commit();
-      deletedCounts.knockout_bets = knockoutBetsSnap.size;
+    const knockoutBetsDeleted = await deleteRefsInChunks(
+      db,
+      knockoutBetsSnap.docs.map((d) => d.ref),
+    );
+    if (knockoutBetsDeleted > 0) {
+      deletedCounts.knockout_bets = knockoutBetsDeleted;
     }
 
     // 4. final_phase_bets/{predictorId}

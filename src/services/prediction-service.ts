@@ -4,7 +4,6 @@ import {
   getDoc,
   getDocs,
   query,
-  runTransaction,
   serverTimestamp,
   setDoc,
   where,
@@ -97,20 +96,25 @@ const validateKnockoutBet = async (
   return { valid: true };
 };
 
+// Returns true if any match in the group has already kicked off (live/finished),
+// in which case group rankings may no longer be submitted/changed.
+const hasGroupStarted = async (groupId: string): Promise<boolean> => {
+  const matchesRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches');
+  const q = query(matchesRef, where('groupId', '==', groupId));
+  const matchesSnap = await getDocs(q);
+  return matchesSnap.docs.some((matchDoc) => {
+    const match = matchDoc.data() as Match;
+    return match.status === 'live' || match.status === 'finished';
+  });
+};
+
 const validateGroupBet = async (
   groupId: string,
   userId: string,
   predictorId: string,
 ): Promise<BetValidationResult> => {
-  const matchesRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches');
-  const q = query(matchesRef, where('groupId', '==', groupId));
-  const matchesSnap = await getDocs(q);
-
-  for (const matchDoc of matchesSnap.docs) {
-    const match = matchDoc.data() as Match;
-    if (match.status === 'live' || match.status === 'finished') {
-      return { valid: false, reason: 'A match in this group has already started' };
-    }
+  if (await hasGroupStarted(groupId)) {
+    return { valid: false, reason: 'A match in this group has already started' };
   }
 
   const betId = `${predictorId}-${groupId}`;
@@ -151,12 +155,10 @@ export const predictionService = {
       };
 
       const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'bets', betId);
-      await runTransaction(getDb(), async (txn) => {
-        txn.set(betRef, {
-          ...betData,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
+      await setDoc(betRef, {
+        ...betData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
 
       return { success: true };
@@ -353,6 +355,13 @@ export const predictionService = {
     for (const [groupId, positions] of Object.entries(predictions)) {
       if (!positions || positions.length !== 4) {
         errors.push(`Group ${groupId} must have exactly 4 teams ranked`);
+        continue;
+      }
+
+      // Mirror the single-submission deadline guard: reject groups whose matches
+      // have already started so the batch path can't bypass validation.
+      if (await hasGroupStarted(groupId)) {
+        errors.push(`A match in group ${groupId} has already started`);
         continue;
       }
 

@@ -295,6 +295,8 @@ describe('prediction-service', () => {
         commit: vi.fn(() => Promise.resolve()),
       };
       vi.mocked(firebaseFirestore.writeBatch).mockReturnValue(mockBatch as any);
+      // hasGroupStarted query: no matches have started.
+      vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({ docs: [] } as any);
 
       const result = await predictionService.submitBatchGroupBets('user-1', 'user-1-default', {
         A: ['argentina', 'france', 'brazil', 'germany'],
@@ -311,6 +313,7 @@ describe('prediction-service', () => {
         commit: vi.fn(() => Promise.resolve()),
       };
       vi.mocked(firebaseFirestore.writeBatch).mockReturnValue(mockBatch as any);
+      vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({ docs: [] } as any);
 
       const result = await predictionService.submitBatchGroupBets('user-1', 'user-1-default', {
         A: ['argentina', 'france'],
@@ -320,6 +323,27 @@ describe('prediction-service', () => {
       expect(result.successCount).toBe(1);
       expect(result.errorCount).toBe(1);
       expect(result.errors[0]).toContain('must have exactly 4 teams');
+    });
+
+    it('rejects a group whose matches have already started', async () => {
+      const mockBatch = {
+        set: vi.fn(),
+        commit: vi.fn(() => Promise.resolve()),
+      };
+      vi.mocked(firebaseFirestore.writeBatch).mockReturnValue(mockBatch as any);
+      // hasGroupStarted query: group A has a live match.
+      vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({
+        docs: [{ data: () => ({ ...mockMatch, status: 'live' }) }],
+      } as any);
+
+      const result = await predictionService.submitBatchGroupBets('user-1', 'user-1-default', {
+        A: ['argentina', 'france', 'brazil', 'germany'],
+      });
+
+      expect(result.successCount).toBe(0);
+      expect(result.errorCount).toBe(1);
+      expect(result.errors[0]).toContain('already started');
+      expect(mockBatch.set).not.toHaveBeenCalled();
     });
   });
 
