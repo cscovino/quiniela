@@ -4,6 +4,13 @@
   gap: var(--space-2);
   min-width: 0;
   max-width: 100%;
+}
+
+/* Size containment is only needed when a name/code is shown (the @container
+   queries below switch between them). Applying it to the flag-only variant
+   collapses the wrapper to 0 width in a flex row, so the flag overflows and
+   overlaps the adjacent label. */
+.team-flag--with-name {
   container-type: inline-size;
   container-name: teamflag;
 }

@@ -23,9 +23,11 @@ export const TeamFlag: FC<TeamFlagProps> = ({
 }) => {
   const flagClass = getFlagClass(fifaCode);
 
+  const showsName = showName && !!name;
+
   return (
     <div
-      className={`team-flag team-flag--${size} ${noTruncate ? 'team-flag--no-truncate' : ''} ${className}`}
+      className={`team-flag team-flag--${size} ${showsName ? 'team-flag--with-name' : ''} ${noTruncate ? 'team-flag--no-truncate' : ''} ${className}`}
     >
       <span
         className={`flag-icon ${flagClass}`}
