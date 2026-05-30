@@ -11,17 +11,13 @@
 @media (max-width: 480px) {
   .rankings-table {
     padding: var(--space-2);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
 
-  .rankings-table::-webkit-scrollbar {
-    display: none;
-  }
-
+  /* Each row scrolls horizontally on its own (with frozen position + predictor
+     columns), so the table container itself must NOT scroll — that keeps the
+     title and pagination fixed in place. */
   .rankings-table__list {
-    min-width: 600px;
+    min-width: 0;
   }
 }
 

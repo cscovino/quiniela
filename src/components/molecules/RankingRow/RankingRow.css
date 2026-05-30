@@ -8,35 +8,6 @@
   transition: background var(--duration-fast) var(--ease-out);
 }
 
-@media (max-width: 480px) {
-  .ranking-row {
-    display: grid;
-    grid-template-columns: 60px minmax(100px, 1fr) auto auto;
-    gap: var(--space-2);
-    padding: var(--space-2);
-    min-width: 600px;
-  }
-
-  .ranking-row__position {
-    justify-content: flex-start;
-  }
-
-  .ranking-row__user {
-    min-width: 0;
-  }
-
-  .ranking-row__stats {
-    gap: var(--space-2);
-  }
-
-  .ranking-row__match-predictions {
-    padding: 0 0 0 var(--space-2);
-    margin-top: 0;
-    border-top: none;
-    border-left: var(--border-width-sm) solid var(--border-color);
-  }
-}
-
 .ranking-row:hover {
   background: var(--bg-card-hover);
 }
@@ -61,15 +32,15 @@
 }
 
 .ranking-row__position--1 {
-  color: #FFD700;
+  color: #ffd700;
 }
 
 .ranking-row__position--2 {
-  color: #C0C0C0;
+  color: #c0c0c0;
 }
 
 .ranking-row__position--3 {
-  color: #CD7F32;
+  color: #cd7f32;
 }
 
 .ranking-row__rank-change {
@@ -138,17 +109,6 @@
   font-weight: var(--font-weight-bold);
 }
 
-@media (max-width: 360px) {
-  .ranking-row {
-    grid-template-columns: 50px minmax(80px, 1fr) auto auto;
-    min-width: 500px;
-  }
-
-  .ranking-row__position {
-    min-width: 50px;
-  }
-}
-
 .ranking-row__match-predictions {
   display: flex;
   flex-wrap: wrap;
@@ -198,10 +158,16 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Mobile: the row becomes the horizontal scroll container, with the position
+   and predictor (avatar + name) columns frozen to the left via position: sticky
+   while stats and match predictions scroll. Placed last so these rules win over
+   the base .ranking-row__* declarations above when the viewport is small. */
 @media (max-width: 480px) {
   .ranking-row {
-    gap: var(--space-2);
-    padding: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: var(--space-2) 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -211,35 +177,65 @@
     display: none;
   }
 
-  .ranking-row__stats {
-    gap: var(--space-2);
+  .ranking-row > * {
     flex-shrink: 0;
   }
 
-  .ranking-row__match-predictions {
-    flex-shrink: 0;
-    padding: 0 0 0 var(--space-2);
-    margin-top: 0;
-    border-top: none;
-    border-left: var(--border-width-sm) solid var(--border-color);
+  .ranking-row__position {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 56px;
+    min-width: 56px;
+    padding: 0 var(--space-1);
+    justify-content: center;
+    background: inherit;
+  }
+
+  .ranking-row__user {
+    position: sticky;
+    left: 56px;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 132px;
+    min-width: 132px;
+    flex: 0 0 auto;
+    padding: 0 var(--space-2);
+    background: inherit;
+    box-shadow: 1px 0 0 var(--border-color);
+  }
+
+  .ranking-row__stats {
+    gap: var(--space-3);
+    padding-left: var(--space-2);
   }
 
   .ranking-row__name {
     font-size: var(--text-sm);
   }
+
+  .ranking-row__match-predictions {
+    padding: 0 0 0 var(--space-2);
+    margin-top: 0;
+    border-top: none;
+    border-left: var(--border-width-sm) solid var(--border-color);
+  }
 }
 
 @media (max-width: 360px) {
-  .ranking-row {
-    padding: var(--space-2);
-    gap: var(--space-1);
+  .ranking-row__position {
+    width: 48px;
+    min-width: 48px;
   }
 
-  .ranking-row__position {
-    min-width: 32px;
+  .ranking-row__user {
+    left: 48px;
+    width: 116px;
+    min-width: 116px;
   }
 
   .ranking-row__stats {
-    gap: var(--space-1);
+    gap: var(--space-2);
   }
 }
