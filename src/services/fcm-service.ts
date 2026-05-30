@@ -5,10 +5,23 @@ import { getDb, getMessagingInstance } from './firebase';
 
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_FIREBASE_VAPID_PUBLIC_KEY || '';
 
+// An empty VAPID key is accepted by getToken() but yields tokens that can never
+// receive messages — fail loudly here instead of registering a dead token.
+function assertVapidKey(): boolean {
+  if (!VAPID_PUBLIC_KEY) {
+    console.warn(
+      '[fcm] VITE_FIREBASE_VAPID_PUBLIC_KEY is not set — push notifications are disabled.',
+    );
+    return false;
+  }
+  return true;
+}
+
 export const fcmService = {
   async requestPermission(userId: string): Promise<string | null> {
     if (!('Notification' in window)) return null;
     if (!('serviceWorker' in navigator)) return null;
+    if (!assertVapidKey()) return null;
 
     const msg = await getMessagingInstance();
     if (!msg) return null;
@@ -76,6 +89,7 @@ export const fcmService = {
   },
 
   async getCurrentToken(): Promise<string | null> {
+    if (!assertVapidKey()) return null;
     const msg = await getMessagingInstance();
     if (!msg) return null;
     try {

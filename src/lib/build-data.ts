@@ -91,16 +91,16 @@ async function createAdminDb(): Promise<DbClient> {
 }
 
 async function createWebDb(): Promise<DbClient> {
-  const { initializeApp } = await import('firebase/app');
+  const { getApp, getApps, initializeApp } = await import('firebase/app');
   const f = await import('firebase/firestore');
-  const app = initializeApp({
-    apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
-    authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.PUBLIC_FIREBASE_APP_ID,
-  });
+  const { getPublicFirebaseConfig } = await import('../config/firebase-config');
+  // Use a dedicated NAMED app so build-time fetching never collides with the
+  // runtime default app ("Firebase App named '[DEFAULT]' already exists"), and
+  // reuse the shared config so it can't drift from src/services/firebase.ts.
+  const BUILD_APP_NAME = 'build-web';
+  const app = getApps().some((a) => a.name === BUILD_APP_NAME)
+    ? getApp(BUILD_APP_NAME)
+    : initializeApp(getPublicFirebaseConfig(), BUILD_APP_NAME);
   const db = f.getFirestore(app);
   return {
     query: async (path: string, opts?: QueryOptions): Promise<QuerySnapshotLike> => {

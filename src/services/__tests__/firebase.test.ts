@@ -15,8 +15,10 @@ describe('isAppCheckError', () => {
     expect(isAppCheckError(new Error('Recaptcha token invalid'))).toBe(true);
   });
 
-  it('returns true for unavailable errors', () => {
-    expect(isAppCheckError(new Error('service unavailable'))).toBe(true);
+  it('returns false for "unavailable" errors (generic Firestore network outages)', () => {
+    // UNAVAILABLE is returned for transient connectivity issues, not App Check
+    // failures — it must not be mis-surfaced to users as a CAPTCHA error.
+    expect(isAppCheckError(new Error('service unavailable'))).toBe(false);
   });
 
   it('returns false for non-app-check errors', () => {

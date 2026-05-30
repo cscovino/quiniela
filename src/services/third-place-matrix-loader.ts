@@ -1,7 +1,6 @@
 import type { CombinationKey, ThirdPlaceMapping } from '../data/third-place-matrix';
 
 let cachedMatrix: Record<CombinationKey, ThirdPlaceMapping> | null = null;
-let failedOnce = false;
 
 function getUrl(): string {
   const base = import.meta.env.BASE_URL || '/';
@@ -11,12 +10,13 @@ function getUrl(): string {
 
 export async function loadThirdPlaceMatrix(): Promise<Record<CombinationKey, ThirdPlaceMapping>> {
   if (cachedMatrix) return cachedMatrix;
-  if (failedOnce) return {};
 
+  // A failed load returns an empty matrix but does NOT latch — a later call
+  // retries, so a single transient fetch error can't permanently disable the
+  // third-place bracket for the rest of the session.
   try {
     const res = await fetch(getUrl(), { cache: 'force-cache' });
     if (!res.ok) {
-      failedOnce = true;
       console.warn(`Failed to load third-place matrix: ${res.status} ${res.statusText}`);
       return {};
     }
@@ -24,7 +24,6 @@ export async function loadThirdPlaceMatrix(): Promise<Record<CombinationKey, Thi
     cachedMatrix = (await res.json()) as Record<CombinationKey, ThirdPlaceMapping>;
     return cachedMatrix;
   } catch {
-    failedOnce = true;
     console.warn('Failed to load third-place matrix — fetch unavailable');
     return {};
   }
