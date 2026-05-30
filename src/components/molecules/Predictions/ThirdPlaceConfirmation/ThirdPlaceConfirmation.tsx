@@ -18,6 +18,9 @@ export interface ThirdPlaceConfirmationProps {
     bracketSlot: string;
     adjust: string;
     continue: string;
+    group?: string;
+    pts?: string;
+    pt?: string;
   };
 }
 
@@ -29,6 +32,9 @@ const defaultTranslations = {
   bracketSlot: 'Match',
   adjust: 'Adjust Group Predictions',
   continue: 'Continue to Knockout',
+  group: 'Group',
+  pts: 'pts',
+  pt: 'pt',
 };
 
 export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
@@ -64,9 +70,11 @@ export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
             <div key={team.teamId} className="third-place-confirmation__row">
               <span className="third-place-confirmation__rank">{index + 1}.</span>
               <span className="third-place-confirmation__team-name">{team.teamName}</span>
-              <span className="third-place-confirmation__group">(Group {team.groupLetter})</span>
+              <span className="third-place-confirmation__group">
+                ({t.group} {team.groupLetter})
+              </span>
               <span className="third-place-confirmation__points third-place-confirmation__points--advancing">
-                {team.points} pts
+                {team.points} {team.points === 1 ? t.pt : t.pts}
               </span>
               {team.bracketSlotLabel && (
                 <span className="third-place-confirmation__bracket-slot">
@@ -92,9 +100,11 @@ export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
                 {advancing.length + index + 1}.
               </span>
               <span className="third-place-confirmation__team-name">{team.teamName}</span>
-              <span className="third-place-confirmation__group">(Group {team.groupLetter})</span>
+              <span className="third-place-confirmation__group">
+                ({t.group} {team.groupLetter})
+              </span>
               <span className="third-place-confirmation__points third-place-confirmation__points--eliminated">
-                {team.points} {team.points === 1 ? 'pt' : 'pts'}
+                {team.points} {team.points === 1 ? t.pt : t.pts}
               </span>
             </div>
           ))}

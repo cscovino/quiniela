@@ -9,6 +9,7 @@ export interface Props {
 
 const { locale } = Astro.props;
 const t = getTranslations(locale).common.pages.rankings;
+const tTable = getTranslations(locale).common.rankingsTable;
 
 const rankings = await getBuildRankings();
 ---
@@ -19,6 +20,9 @@ const rankings = await getBuildRankings();
     cacheKey="rankings"
     title={t.heading}
     emptyMessage={t.empty}
+    previousLabel={tTable.previous}
+    nextLabel={tTable.next}
+    pageLabel={tTable.pageLabel}
     client:load
   />
 </main>

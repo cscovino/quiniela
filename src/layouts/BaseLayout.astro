@@ -46,6 +46,7 @@ const adminLink = getAdminLink(locale, activeNav);
 const tNav = getTranslations(locale).common.nav;
 const tCommon = getTranslations(locale).common.common;
 const tTournament = getTranslations(locale).common.tournament;
+const pwaTranslations = getTranslations(locale).common.pwa;
 const navBarTranslations = {
   brandLabel: tNav.brandLabel,
   login: tCommon.login,
@@ -156,7 +157,7 @@ const alternateUrl = canonicalUrl.replace(`/${locale}`, `/${otherLocale}`);
       <slot />
     </main>
     <ToastProvider client:idle />
-    <PWAInstall client:load />
+    <PWAInstall translations={pwaTranslations} client:load />
     <script src="../scripts/runtime.ts"></script>
   </body>
 </html>

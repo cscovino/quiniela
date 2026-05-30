@@ -38,6 +38,17 @@ export interface PredictionStepGroupProps {
     hintRankAllTeams?: string;
     team?: string;
     pts?: string;
+    vs?: string;
+    syncFromScores?: string;
+    position?: string;
+    selectOption?: string;
+    submitting?: string;
+    submit?: string;
+    classificationSubmitted?: string;
+    ordinal1?: string;
+    ordinal2?: string;
+    ordinal3?: string;
+    ordinalOther?: string;
   };
 }
 
@@ -50,6 +61,17 @@ const defaultTranslations = {
   hintRankAllTeams: 'Rank all teams with unique positions',
   team: 'Team',
   pts: 'Pts',
+  vs: 'VS',
+  syncFromScores: 'Sync from scores',
+  position: 'Position',
+  selectOption: 'Select',
+  submitting: 'Submitting...',
+  submit: 'Submit',
+  classificationSubmitted: 'Classification submitted',
+  ordinal1: 'st',
+  ordinal2: 'nd',
+  ordinal3: 'rd',
+  ordinalOther: 'th',
 };
 
 export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
@@ -231,7 +253,7 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
                       <Typography variant="small">{homeTeam.name}</Typography>
                     </div>
                     <Typography variant="caption" className="prediction-step-group__vs">
-                      VS
+                      {labels.vs}
                     </Typography>
                     <div className="prediction-step-group__team">
                       <TeamFlag fifaCode={awayTeam.fifaCode} size="sm" />
@@ -303,14 +325,14 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
             <Typography variant="h3">{labels.classification}</Typography>
             {isClassificationManual && (
               <Button variant="ghost" size="sm" onClick={handleSyncFromStandings}>
-                Sync from scores
+                {labels.syncFromScores}
               </Button>
             )}
           </div>
           <div className="prediction-step-group__classification">
             <div className="prediction-step-group__row prediction-step-group__row--header">
               <span className="prediction-step-group__col team">{labels.team}</span>
-              <span className="prediction-step-group__col position">Position</span>
+              <span className="prediction-step-group__col position">{labels.position}</span>
             </div>
             {group.teams.map((team) => {
               const currentPosition = classification.indexOf(team.fifaCode);
@@ -330,11 +352,17 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
                       disabled={isDisabled}
                       aria-label={`Position for ${team.name}`}
                     >
-                      <option value="">Select</option>
+                      <option value="">{labels.selectOption}</option>
                       {Array.from({ length: group.teams.length }, (_, i) => (
                         <option key={i + 1} value={i + 1}>
                           {i + 1}
-                          {i === 0 ? 'st' : i === 1 ? 'nd' : i === 2 ? 'rd' : 'th'}
+                          {i === 0
+                            ? labels.ordinal1
+                            : i === 1
+                              ? labels.ordinal2
+                              : i === 2
+                                ? labels.ordinal3
+                                : labels.ordinalOther}
                         </option>
                       ))}
                     </select>
@@ -360,14 +388,14 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
             disabled={!canSubmit}
             onClick={handleSubmit}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
+            {isSubmitting ? labels.submitting : labels.submit}
           </Button>
         </div>
       )}
 
       {existingGroupBet != null && (
         <section className="prediction-step-group__section">
-          <Badge variant="success">Classification submitted</Badge>
+          <Badge variant="success">{labels.classificationSubmitted}</Badge>
           {standings.length > 0 && (
             <table className="prediction-step-group__standings">
               <thead>

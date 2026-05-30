@@ -72,6 +72,9 @@ export interface PredictorEditorProps {
     noFavouriteTeam?: string;
     save?: string;
     cancel?: string;
+    nameRequired?: string;
+    emojiAria?: string;
+    colorAria?: string;
   };
 }
 
@@ -86,6 +89,9 @@ const t = {
   noFavouriteTeam: 'No favorite',
   save: 'Save',
   cancel: 'Cancel',
+  nameRequired: 'Name is required',
+  emojiAria: 'Emoji {emoji}',
+  colorAria: 'Color {color}',
 };
 
 export const PredictorEditor: FC<PredictorEditorProps> = ({
@@ -113,7 +119,7 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      setError('Name is required');
+      setError(labels.nameRequired);
       return;
     }
     setError(null);
@@ -165,7 +171,7 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
               className={`predictor-editor__emoji-btn ${selectedEmoji === emoji ? 'predictor-editor__emoji-btn--selected' : ''}`}
               onClick={() => setSelectedEmoji(emoji)}
               aria-pressed={selectedEmoji === emoji}
-              aria-label={`Emoji ${emoji}`}
+              aria-label={labels.emojiAria.replace('{emoji}', emoji)}
             >
               {emoji}
             </button>
@@ -188,7 +194,7 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
               style={{ backgroundColor: color }}
               onClick={() => setSelectedColor(color)}
               aria-pressed={selectedColor === color}
-              aria-label={`Color ${color}`}
+              aria-label={labels.colorAria.replace('{color}', color)}
             />
           ))}
         </div>

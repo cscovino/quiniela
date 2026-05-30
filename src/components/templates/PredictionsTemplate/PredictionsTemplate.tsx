@@ -12,6 +12,10 @@ import {
   PredictionsFeedback,
   PredictionsNavigation,
   PredictionsProgress,
+  type PredictionStepBestPlayersProps,
+  type PredictionStepFinalPhaseProps,
+  type PredictionStepGroupProps,
+  type PredictionStepKnockoutRoundProps,
   ThirdPlaceConfirmation,
 } from '@molecules/Predictions';
 import { PredictorDeleteConfirm } from '@molecules/PredictorDeleteConfirm';
@@ -27,6 +31,11 @@ import { getLoginRoute } from '@utils/i18n';
 import './PredictionsTemplate.css';
 
 type PredictorView = 'list' | 'wizard' | 'editor' | 'delete';
+
+type GroupStepTranslations = PredictionStepGroupProps['translations'];
+type KnockoutStepTranslations = PredictionStepKnockoutRoundProps['translations'];
+type FinalPhaseStepTranslations = PredictionStepFinalPhaseProps['translations'];
+type BestPlayersStepTranslations = PredictionStepBestPlayersProps['translations'];
 
 function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -60,6 +69,8 @@ export interface PredictionsTemplateProps {
     buttonFinish?: string;
     stepXofY: string;
     submitToAdvance?: string;
+    stepDescriptionGroup?: string;
+    stepDescriptionRound?: string;
     thirdPlaceHeading?: string;
     thirdPlaceSubtitle?: string;
     deadlinePassed?: string;
@@ -91,11 +102,47 @@ export interface PredictionsTemplateProps {
       delete?: string;
       empty?: string;
       backToPredictors?: string;
+      listLabel?: string;
+      editPredictionsAria?: string;
+      editProfileAria?: string;
+      deleteAria?: string;
+      editProfile?: string;
     };
     predictorEditor?: {
       favouriteTeamLabel?: string;
       noFavouriteTeam?: string;
+      createTitle?: string;
+      editTitle?: string;
+      nameLabel?: string;
+      namePlaceholder?: string;
+      emojiLabel?: string;
+      colorLabel?: string;
+      save?: string;
+      cancel?: string;
+      nameRequired?: string;
+      emojiAria?: string;
+      colorAria?: string;
     };
+    predictorDelete?: {
+      title?: string;
+      confirmText?: string;
+      typeName?: string;
+      placeholder?: string;
+      confirmButton?: string;
+      cancelButton?: string;
+    };
+    thirdPlaceAdvancing?: string;
+    thirdPlaceEliminated?: string;
+    thirdPlaceBracketSlotLabel?: string;
+    thirdPlaceContinue?: string;
+    thirdPlaceAdjust?: string;
+    thirdPlaceGroup?: string;
+    thirdPlacePts?: string;
+    thirdPlacePt?: string;
+    groupStep?: GroupStepTranslations;
+    knockoutStep?: KnockoutStepTranslations;
+    finalPhaseStep?: FinalPhaseStepTranslations;
+    bestPlayersStep?: BestPlayersStepTranslations;
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -109,6 +156,11 @@ const defaultListTranslations = {
   delete: 'Delete',
   empty: 'No predictions yet',
   backToPredictors: 'Back to predictions',
+  listLabel: 'Predictor list',
+  editPredictionsAria: 'Edit predictions for {name}',
+  editProfileAria: 'Edit name and avatar for {name}',
+  deleteAria: 'Delete {name}',
+  editProfile: 'Edit Profile',
 };
 
 export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
@@ -178,7 +230,18 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     thirdPlaceTeams,
     groups,
     allTeams,
-  } = usePredictionSteps(translations, locale, selectedPredictorId, tournamentDeadline);
+  } = usePredictionSteps(
+    {
+      ...translations,
+      groupStep: translations.groupStep,
+      knockoutStep: translations.knockoutStep,
+      finalPhaseStep: translations.finalPhaseStep,
+      bestPlayersStep: translations.bestPlayersStep,
+    },
+    locale,
+    selectedPredictorId,
+    tournamentDeadline,
+  );
 
   const [showThirdPlaceConfirm, setShowThirdPlaceConfirm] = useState(false);
   const [confirmedThirdPlace, setConfirmedThirdPlace] = useState(false);
@@ -392,10 +455,23 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     );
   }
 
+  const stripUndefined = <T extends Record<string, unknown>>(obj?: T): Partial<T> => {
+    if (!obj) return {};
+    return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as Partial<T>;
+  };
+
   const listTranslations = {
     ...defaultListTranslations,
-    ...translations.predictorList,
+    ...stripUndefined(translations.predictorList),
   };
+
+  const editorTranslations = {
+    favouriteTeamLabel: 'Favorite Team',
+    noFavouriteTeam: 'No favorite',
+    ...stripUndefined(translations.predictorEditor),
+  };
+
+  const deleteTranslations = stripUndefined(translations.predictorDelete);
 
   if (view === 'list') {
     return (
@@ -457,11 +533,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
             onSave={editingPredictor ? handleUpdatePredictor : handleCreatePredictor}
             onCancel={handleBackToList}
             isSubmitting={isSubmitting}
-            translations={{
-              favouriteTeamLabel:
-                translations.predictorEditor?.favouriteTeamLabel || 'Favorite Team',
-              noFavouriteTeam: translations.predictorEditor?.noFavouriteTeam || 'No favorite',
-            }}
+            translations={editorTranslations}
           />
         </main>
       </div>
@@ -483,6 +555,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
             onConfirm={handleDeletePredictor}
             onCancel={handleBackToList}
             isSubmitting={isSubmitting}
+            translations={deleteTranslations}
           />
         </main>
       </div>
@@ -526,11 +599,14 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
                 subtitle:
                   translations.thirdPlaceSubtitle ||
                   'Best 8 of 12 third-placed teams advance to Round of 32',
-                advancing: 'Advancing to Round of 32',
-                eliminated: 'Eliminated',
-                bracketSlot: 'Match',
-                adjust: translations.predictedStandings || 'Adjust Group Predictions',
-                continue: translations.buttonNext || 'Continue',
+                advancing: translations.thirdPlaceAdvancing || 'Advancing to Round of 32',
+                eliminated: translations.thirdPlaceEliminated || 'Eliminated',
+                bracketSlot: translations.thirdPlaceBracketSlotLabel || 'Match',
+                adjust: translations.thirdPlaceAdjust || 'Adjust Group Predictions',
+                continue: translations.thirdPlaceContinue || 'Continue to Knockout',
+                group: translations.thirdPlaceGroup || 'Group',
+                pts: translations.thirdPlacePts || 'pts',
+                pt: translations.thirdPlacePt || 'pt',
               }}
             />
           </section>

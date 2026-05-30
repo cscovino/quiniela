@@ -47,6 +47,19 @@
   "matchCard": {
     "vs": "VS"
   },
+  "rankingsTable": {
+    "title": "Clasificación Global",
+    "empty": "Aún no hay clasificación disponible",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "pageLabel": "Página {page} de {totalPages}"
+  },
+  "pwa": {
+    "bannerLabel": "Instalar aplicación",
+    "dismiss": "Descartar",
+    "text": "Instalar App",
+    "install": "Instalar"
+  },
   "pages": {
     "home": {
       "title": "Inicio - Quiniela",
@@ -112,7 +125,9 @@
       "displayNameLabel": "Nombre",
       "displayNameRequired": "El nombre es obligatorio",
       "avatarUrlLabel": "URL del Avatar",
-      "avatarUrlHint": "URL de tu imagen de avatar (opcional)"
+      "avatarUrlHint": "URL de tu imagen de avatar (opcional)",
+      "favoriteTeamLabel": "Equipo Favorito",
+      "favoriteTeamHint": "Opcional — se muestra en tu perfil y clasificaciones"
     },
     "predictions": {
       "title": "Predicciones - Quiniela",
@@ -131,6 +146,8 @@
       "buttonNext": "Siguiente",
       "buttonBack": "Atrás",
       "buttonFinish": "Finalizar",
+      "buttonSubmit": "Enviar",
+      "submitToAdvance": "Envía tus predicciones para continuar",
       "stepXofY": "Paso {current} de {total}",
       "predictedStandings": "Clasificación Predicha",
       "team": "Equipo",
@@ -158,12 +175,92 @@
         "edit": "Editar",
         "delete": "Eliminar",
         "empty": "Aún no hay predicciones",
-        "backToPredictors": "Volver a predicciones"
+        "backToPredictors": "Volver a predicciones",
+        "listLabel": "Lista de pronosticadores",
+        "editPredictionsAria": "Editar predicciones de {name}",
+        "editProfileAria": "Editar nombre y avatar de {name}",
+        "deleteAria": "Eliminar {name}",
+        "editProfile": "Editar Perfil"
       },
       "predictorEditor": {
         "favouriteTeamLabel": "Equipo Favorito",
-        "noFavouriteTeam": "Sin favorito"
+        "noFavouriteTeam": "Sin favorito",
+        "createTitle": "Nueva predicción",
+        "editTitle": "Editar predicción",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "Introduce el nombre del pronosticador",
+        "emojiLabel": "Emoji",
+        "colorLabel": "Color",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "nameRequired": "El nombre es obligatorio",
+        "emojiAria": "Emoji {emoji}",
+        "colorAria": "Color {color}"
       },
+      "predictorDelete": {
+        "title": "Eliminar predicción",
+        "confirmText": "Esto eliminará permanentemente todas las predicciones de este pronosticador. Esta acción no se puede deshacer.",
+        "typeName": "Escribe el nombre para confirmar",
+        "placeholder": "Introduce el nombre del pronosticador",
+        "confirmButton": "Eliminar",
+        "cancelButton": "Cancelar"
+      },
+      "groupStep": {
+        "matches": "Predicciones de Partidos",
+        "standings": "Clasificación Predicha",
+        "classification": "Clasificación del Grupo",
+        "hintFillAllMatches": "Completa todos los marcadores para enviar",
+        "hintRankAllTeams": "Ordena todos los equipos con posiciones únicas",
+        "team": "Equipo",
+        "pts": "Pts",
+        "vs": "VS",
+        "syncFromScores": "Sincronizar desde marcadores",
+        "position": "Posición",
+        "selectOption": "Elegir",
+        "submitting": "Enviando...",
+        "submit": "Enviar",
+        "classificationSubmitted": "Clasificación enviada",
+        "ordinal1": "º",
+        "ordinal2": "º",
+        "ordinal3": "º",
+        "ordinalOther": "º"
+      },
+      "knockoutStep": {
+        "roundOf32": "Dieciseisavos de Final",
+        "roundOf16": "Octavos de Final",
+        "quarterfinals": "Cuartos de Final",
+        "semifinals": "Semifinales",
+        "thirdPlace": "Tercer Lugar",
+        "final": "Final",
+        "group": "Grupo",
+        "pickWinner": "Elige al ganador",
+        "teamsTbd": "Equipos por definir",
+        "allSubmitted": "Todas las predicciones de esta ronda han sido enviadas",
+        "submittedPredictions": "Predicciones enviadas:"
+      },
+      "finalPhaseStep": {
+        "teamsSoon": "Los equipos estarán disponibles pronto.",
+        "firstPlace": "1º Lugar",
+        "secondPlace": "2º Lugar",
+        "thirdPlace": "3º Lugar",
+        "fourthPlace": "4º Lugar",
+        "selectTeam": "Selecciona un equipo...",
+        "uniqueWarning": "Cada equipo solo puede seleccionarse una vez",
+        "submit": "Enviar Fase Final"
+      },
+      "bestPlayersStep": {
+        "bestGoalkeeper": "Mejor Portero",
+        "bestGoalkeeperHint": "Escribe el nombre del jugador que crees que será el mejor portero",
+        "bestGoalkeeperPlaceholder": "ej. Emiliano Martínez",
+        "bestScorer": "Máximo Goleador",
+        "bestScorerHint": "Escribe el nombre del jugador que crees que será el máximo goleador",
+        "bestScorerPlaceholder": "ej. Kylian Mbappé",
+        "submit": "Enviar Mejores Jugadores"
+      },
+      "thirdPlaceBracketSlotLabel": "Partido",
+      "thirdPlaceGroup": "Grupo",
+      "thirdPlacePts": "pts",
+      "thirdPlacePt": "pt",
       "thirdPlaceHeading": "Equipos en Tercer Lugar",
       "thirdPlaceSubtitle": "Los mejores 8 de 12 equipos en tercer lugar avanzan a Octavos de Final",
       "thirdPlaceAdvancing": "Avanzan a Octavos de Final",

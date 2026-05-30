@@ -38,21 +38,13 @@ export interface PredictionStepKnockoutRoundProps {
     semifinals?: string;
     thirdPlace?: string;
     final?: string;
+    group?: string;
     pickWinner?: string;
     teamsTbd?: string;
     allSubmitted?: string;
+    submittedPredictions?: string;
   };
 }
-
-const PHASE_LABELS: Record<PhaseType, string> = {
-  'round-of-32': 'Round of 32',
-  'round-of-16': 'Round of 16',
-  quarterfinals: 'Quarterfinals',
-  semifinals: 'Semifinals',
-  'third-place': 'Third Place',
-  final: 'Final',
-  group: 'Group',
-};
 
 const defaultTranslations = {
   roundOf32: 'Round of 32',
@@ -61,10 +53,25 @@ const defaultTranslations = {
   semifinals: 'Semifinals',
   thirdPlace: 'Third Place',
   final: 'Final',
+  group: 'Group',
   pickWinner: 'Pick the winner',
   teamsTbd: 'Teams TBD',
   allSubmitted: 'All predictions submitted for this round',
+  submittedPredictions: 'Submitted predictions:',
 };
+
+function getPhaseLabel(phase: PhaseType, labels: typeof defaultTranslations): string {
+  const map: Record<PhaseType, string> = {
+    'round-of-32': labels.roundOf32,
+    'round-of-16': labels.roundOf16,
+    quarterfinals: labels.quarterfinals,
+    semifinals: labels.semifinals,
+    'third-place': labels.thirdPlace,
+    final: labels.final,
+    group: labels.group,
+  };
+  return map[phase] || phase;
+}
 
 function resolveTeamFromBracket(
   slot: { source: { from: string; groupId?: string; position?: number; matchSlug?: string } },
@@ -107,7 +114,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   const [predictions, setPredictions] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const phaseLabel = PHASE_LABELS[phase] || phase;
+  const phaseLabel = getPhaseLabel(phase, labels);
 
   const unsubmittedMatches = useMemo(
     () => roundMatches.filter((m) => !existingKnockoutBets.has(m.slug)),
@@ -296,7 +303,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
 
       {submittedMatches.length > 0 && (
         <div className="prediction-step-knockout-round__submitted">
-          <Typography variant="small">Submitted predictions:</Typography>
+          <Typography variant="small">{labels.submittedPredictions}</Typography>
           <div className="prediction-step-knockout-round__submitted-list">
             {submittedMatches.map((match) => (
               <div key={match.slug} className="prediction-step-knockout-round__submitted-item">

@@ -20,6 +20,9 @@ export interface LoginFormProps {
     registerLink: string;
     googleLogin: string;
     or: string;
+    emailRequired?: string;
+    passwordRequired?: string;
+    backToLogin?: string;
     errors: {
       invalidEmail: string;
       invalidPassword: string;
@@ -58,11 +61,11 @@ export const LoginForm: FC<LoginFormProps> = ({
     e.preventDefault();
     clearError();
     if (!email.trim()) {
-      useAuthStore.setState({ error: 'Email is required' });
+      useAuthStore.setState({ error: translations.emailRequired || 'Email is required' });
       return;
     }
     if (!password) {
-      useAuthStore.setState({ error: 'Password is required' });
+      useAuthStore.setState({ error: translations.passwordRequired || 'Password is required' });
       return;
     }
     try {
@@ -133,7 +136,7 @@ export const LoginForm: FC<LoginFormProps> = ({
             setResetSent(false);
           }}
         >
-          ← Back to login
+          {translations.backToLogin || '← Back to login'}
         </button>
       </div>
     );

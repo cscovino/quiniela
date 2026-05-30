@@ -43,6 +43,9 @@ export interface RankingsTableProps {
   totalPages?: number;
   onPageChange?: (page: number) => void;
   emptyMessage?: string;
+  previousLabel?: string;
+  nextLabel?: string;
+  pageLabel?: string;
   className?: string;
 }
 
@@ -54,6 +57,9 @@ export const RankingsTable: FC<RankingsTableProps> = ({
   totalPages = 1,
   onPageChange,
   emptyMessage = 'No rankings available yet',
+  previousLabel = 'Previous',
+  nextLabel = 'Next',
+  pageLabel = 'Page {page} of {totalPages}',
   className = '',
 }) => {
   if (rankings.length === 0) {
@@ -97,10 +103,10 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             onClick={() => onPageChange?.(page - 1)}
             disabled={page <= 1}
           >
-            Previous
+            {previousLabel}
           </Button>
           <Typography variant="small">
-            Page {page} of {totalPages}
+            {pageLabel.replace('{page}', String(page)).replace('{totalPages}', String(totalPages))}
           </Typography>
           <Button
             variant="secondary"
@@ -108,7 +114,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             onClick={() => onPageChange?.(page + 1)}
             disabled={page >= totalPages}
           >
-            Next
+            {nextLabel}
           </Button>
         </div>
       )}

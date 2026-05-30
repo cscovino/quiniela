@@ -47,6 +47,19 @@
   "matchCard": {
     "vs": "VS"
   },
+  "rankingsTable": {
+    "title": "Global Rankings",
+    "empty": "No rankings available yet",
+    "previous": "Previous",
+    "next": "Next",
+    "pageLabel": "Page {page} of {totalPages}"
+  },
+  "pwa": {
+    "bannerLabel": "Install application",
+    "dismiss": "Dismiss",
+    "text": "Install App",
+    "install": "Install"
+  },
   "pages": {
     "home": {
       "title": "Home - Quiniela",
@@ -112,7 +125,9 @@
       "displayNameLabel": "Display Name",
       "displayNameRequired": "Display name is required",
       "avatarUrlLabel": "Avatar URL",
-      "avatarUrlHint": "URL to your avatar image (optional)"
+      "avatarUrlHint": "URL to your avatar image (optional)",
+      "favoriteTeamLabel": "Favorite Team",
+      "favoriteTeamHint": "Optional — shown on your profile and rankings"
     },
     "predictions": {
       "title": "Predictions - Quiniela",
@@ -131,6 +146,8 @@
       "buttonNext": "Next Step",
       "buttonBack": "Back",
       "buttonFinish": "Finish",
+      "buttonSubmit": "Submit",
+      "submitToAdvance": "Submit your predictions to continue",
       "stepXofY": "Step {current} of {total}",
       "predictedStandings": "Predicted Standings",
       "team": "Team",
@@ -158,12 +175,92 @@
         "edit": "Edit",
         "delete": "Delete",
         "empty": "No predictions yet",
-        "backToPredictors": "Back to predictions"
+        "backToPredictors": "Back to predictions",
+        "listLabel": "Predictor list",
+        "editPredictionsAria": "Edit predictions for {name}",
+        "editProfileAria": "Edit name and avatar for {name}",
+        "deleteAria": "Delete {name}",
+        "editProfile": "Edit Profile"
       },
       "predictorEditor": {
         "favouriteTeamLabel": "Favorite Team",
-        "noFavouriteTeam": "No favorite"
+        "noFavouriteTeam": "No favorite",
+        "createTitle": "New prediction",
+        "editTitle": "Edit prediction",
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter predictor name",
+        "emojiLabel": "Emoji",
+        "colorLabel": "Color",
+        "save": "Save",
+        "cancel": "Cancel",
+        "nameRequired": "Name is required",
+        "emojiAria": "Emoji {emoji}",
+        "colorAria": "Color {color}"
       },
+      "predictorDelete": {
+        "title": "Delete prediction",
+        "confirmText": "This will permanently delete all predictions for this predictor. This action cannot be undone.",
+        "typeName": "Type the name to confirm",
+        "placeholder": "Enter predictor name",
+        "confirmButton": "Delete",
+        "cancelButton": "Cancel"
+      },
+      "groupStep": {
+        "matches": "Match Predictions",
+        "standings": "Predicted Standings",
+        "classification": "Group Classification",
+        "hintFillAllMatches": "Fill in all match scores to submit",
+        "hintRankAllTeams": "Rank all teams with unique positions",
+        "team": "Team",
+        "pts": "Pts",
+        "vs": "VS",
+        "syncFromScores": "Sync from scores",
+        "position": "Position",
+        "selectOption": "Select",
+        "submitting": "Submitting...",
+        "submit": "Submit",
+        "classificationSubmitted": "Classification submitted",
+        "ordinal1": "st",
+        "ordinal2": "nd",
+        "ordinal3": "rd",
+        "ordinalOther": "th"
+      },
+      "knockoutStep": {
+        "roundOf32": "Round of 32",
+        "roundOf16": "Round of 16",
+        "quarterfinals": "Quarterfinals",
+        "semifinals": "Semifinals",
+        "thirdPlace": "Third Place",
+        "final": "Final",
+        "group": "Group",
+        "pickWinner": "Pick the winner",
+        "teamsTbd": "Teams TBD",
+        "allSubmitted": "All predictions submitted for this round",
+        "submittedPredictions": "Submitted predictions:"
+      },
+      "finalPhaseStep": {
+        "teamsSoon": "Teams will be available soon.",
+        "firstPlace": "1st Place",
+        "secondPlace": "2nd Place",
+        "thirdPlace": "3rd Place",
+        "fourthPlace": "4th Place",
+        "selectTeam": "Select team...",
+        "uniqueWarning": "Each team can only be selected once",
+        "submit": "Submit Final Phase"
+      },
+      "bestPlayersStep": {
+        "bestGoalkeeper": "Best Goalkeeper",
+        "bestGoalkeeperHint": "Enter the name of the player you think will be the best goalkeeper",
+        "bestGoalkeeperPlaceholder": "e.g. Emiliano Martinez",
+        "bestScorer": "Best Scorer",
+        "bestScorerHint": "Enter the name of the player you think will be the top scorer",
+        "bestScorerPlaceholder": "e.g. Kylian Mbappe",
+        "submit": "Submit Best Players"
+      },
+      "thirdPlaceBracketSlotLabel": "Match",
+      "thirdPlaceGroup": "Group",
+      "thirdPlacePts": "pts",
+      "thirdPlacePt": "pt",
       "thirdPlaceHeading": "Third-Placed Teams",
       "thirdPlaceSubtitle": "Best 8 of 12 third-placed teams advance to Round of 32",
       "thirdPlaceAdvancing": "Advancing to Round of 32",

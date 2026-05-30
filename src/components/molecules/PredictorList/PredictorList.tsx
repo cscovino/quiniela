@@ -31,6 +31,11 @@ export interface PredictorListProps {
     edit?: string;
     delete?: string;
     empty?: string;
+    listLabel?: string;
+    editPredictionsAria?: string;
+    editProfileAria?: string;
+    deleteAria?: string;
+    editProfile?: string;
   };
 }
 
@@ -41,6 +46,11 @@ const t = {
   edit: 'Edit',
   delete: 'Delete',
   empty: 'No predictions yet',
+  listLabel: 'Predictor list',
+  editPredictionsAria: 'Edit predictions for {name}',
+  editProfileAria: 'Edit name and avatar for {name}',
+  deleteAria: 'Delete {name}',
+  editProfile: 'Edit Profile',
 };
 
 export const PredictorList: FC<PredictorListProps> = ({
@@ -54,7 +64,7 @@ export const PredictorList: FC<PredictorListProps> = ({
   const labels = { ...t, ...translations };
 
   return (
-    <div className="predictor-list" role="list" aria-label="Predictor list">
+    <div className="predictor-list" role="list" aria-label={labels.listLabel}>
       {predictors.length === 0 && (
         <div className="predictor-list__empty">
           <Typography variant="body">{labels.empty}</Typography>
@@ -69,7 +79,7 @@ export const PredictorList: FC<PredictorListProps> = ({
           tabIndex={0}
           onClick={() => onSelect(predictor.id)}
           onKeyDown={(e) => e.key === 'Enter' && onSelect(predictor.id)}
-          aria-label={`Edit predictions for ${predictor.name}`}
+          aria-label={labels.editPredictionsAria.replace('{name}', predictor.name)}
         >
           <div className="predictor-list__card-content">
             <PredictorAvatar predictor={predictor} size="md" />
@@ -115,9 +125,9 @@ export const PredictorList: FC<PredictorListProps> = ({
                 e.stopPropagation();
                 onEdit(predictor.id);
               }}
-              aria-label={`Edit name and avatar for ${predictor.name}`}
+              aria-label={labels.editProfileAria.replace('{name}', predictor.name)}
             >
-              <Icon name="pen-square" size={16} /> Edit Profile
+              <Icon name="pen-square" size={16} /> {labels.editProfile}
             </Button>
             <Button
               variant="danger"
@@ -126,7 +136,7 @@ export const PredictorList: FC<PredictorListProps> = ({
                 e.stopPropagation();
                 onDelete(predictor.id);
               }}
-              aria-label={`Delete ${predictor.name}`}
+              aria-label={labels.deleteAria.replace('{name}', predictor.name)}
             >
               <Icon name="trash" size={16} /> {labels.delete}
             </Button>

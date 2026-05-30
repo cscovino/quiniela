@@ -55,6 +55,12 @@ export interface ProfileTemplateProps {
       edit?: string;
       delete?: string;
       empty?: string;
+      backToPredictors?: string;
+      listLabel?: string;
+      editPredictionsAria?: string;
+      editProfileAria?: string;
+      deleteAria?: string;
+      editProfile?: string;
     };
   };
   locale?: 'en' | 'es';
@@ -362,7 +368,13 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
               onCreate={() => {
                 window.location.href = predictionsRoute;
               }}
-              translations={translations.predictorList}
+              translations={
+                translations.predictorList
+                  ? Object.fromEntries(
+                      Object.entries(translations.predictorList).filter(([, v]) => v !== undefined),
+                    )
+                  : undefined
+              }
             />
           )}
         </section>

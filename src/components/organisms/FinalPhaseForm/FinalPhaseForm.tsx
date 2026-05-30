@@ -15,9 +15,27 @@ export interface FinalPhaseFormProps {
   isDisabled?: boolean;
   isSubmitting?: boolean;
   className?: string;
+  translations?: {
+    firstPlace?: string;
+    secondPlace?: string;
+    thirdPlace?: string;
+    fourthPlace?: string;
+    selectTeam?: string;
+    uniqueWarning?: string;
+    submit?: string;
+  };
 }
 
-const POSITION_LABELS = ['1st Place', '2nd Place', '3rd Place', '4th Place'];
+const defaultTranslations = {
+  firstPlace: '1st Place',
+  secondPlace: '2nd Place',
+  thirdPlace: '3rd Place',
+  fourthPlace: '4th Place',
+  selectTeam: 'Select team...',
+  uniqueWarning: 'Each team can only be selected once',
+  submit: 'Submit Final Phase',
+};
+
 const POSITION_KEYS: ('first' | 'second' | 'third' | 'fourth')[] = [
   'first',
   'second',
@@ -32,7 +50,15 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
   isDisabled = false,
   isSubmitting = false,
   className = '',
+  translations = {},
 }) => {
+  const labels = { ...defaultTranslations, ...translations };
+  const positionLabels = [
+    labels.firstPlace,
+    labels.secondPlace,
+    labels.thirdPlace,
+    labels.fourthPlace,
+  ];
   const [selections, setSelections] = useState({
     first: existingPrediction?.first || '',
     second: existingPrediction?.second || '',
@@ -77,7 +103,7 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
               <span className={`final-phase-form__badge final-phase-form__badge--${index + 1}`}>
                 #{index + 1}
               </span>
-              <Typography variant="h3">{POSITION_LABELS[index]}</Typography>
+              <Typography variant="h3">{positionLabels[index]}</Typography>
             </div>
             <select
               className="final-phase-form__select"
@@ -85,7 +111,7 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
               onChange={(e) => handlePositionChange(key, e.target.value)}
               disabled={isDisabled}
             >
-              <option value="">Select team...</option>
+              <option value="">{labels.selectTeam}</option>
               {sortedTeams.map((team) => {
                 const isSelectedElsewhere =
                   selectedTeams.has(team.fifaCode) && selections[key] !== team.fifaCode;
@@ -114,7 +140,7 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
 
       {!isUnique && (
         <div className="final-phase-form__warning">
-          <Typography variant="small">Each team can only be selected once</Typography>
+          <Typography variant="small">{labels.uniqueWarning}</Typography>
         </div>
       )}
 
@@ -126,7 +152,7 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
           disabled={isDisabled || isSubmitting || !isComplete || !isUnique}
         >
           {isSubmitting ? <Spinner size="sm" /> : null}
-          Submit Final Phase
+          {labels.submit}
         </Button>
       </div>
     </div>

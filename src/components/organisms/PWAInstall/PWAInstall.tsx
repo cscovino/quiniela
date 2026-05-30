@@ -6,7 +6,24 @@ import { Icon } from '@atoms/Icon';
 
 import './PWAInstall.css';
 
-export const PWAInstall: FC = () => {
+export interface PWAInstallProps {
+  translations?: {
+    bannerLabel?: string;
+    dismiss?: string;
+    text?: string;
+    install?: string;
+  };
+}
+
+const defaultTranslations = {
+  bannerLabel: 'Install application',
+  dismiss: 'Dismiss',
+  text: 'Install App',
+  install: 'Install',
+};
+
+export const PWAInstall: FC<PWAInstallProps> = ({ translations = {} }) => {
+  const labels = { ...defaultTranslations, ...translations };
   const [showPrompt, setShowPrompt] = useState(false);
   const deferredPrompt = useRef<BeforeInstallPromptEvent | null>(null);
 
@@ -42,13 +59,13 @@ export const PWAInstall: FC = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="pwa-install" role="banner" aria-label="Install application">
-      <Button variant="ghost" size="sm" onClick={handleDismiss} aria-label="Dismiss">
+    <div className="pwa-install" role="banner" aria-label={labels.bannerLabel}>
+      <Button variant="ghost" size="sm" onClick={handleDismiss} aria-label={labels.dismiss}>
         <Icon name="close" size={14} />
       </Button>
-      <span className="pwa-install__text">Install App</span>
+      <span className="pwa-install__text">{labels.text}</span>
       <Button variant="primary" size="sm" onClick={handleInstall}>
-        Install
+        {labels.install}
       </Button>
     </div>
   );

@@ -13,7 +13,26 @@ export interface BestPlayersFormProps {
   isDisabled?: boolean;
   isSubmitting?: boolean;
   className?: string;
+  translations?: {
+    bestGoalkeeper?: string;
+    bestGoalkeeperHint?: string;
+    bestGoalkeeperPlaceholder?: string;
+    bestScorer?: string;
+    bestScorerHint?: string;
+    bestScorerPlaceholder?: string;
+    submit?: string;
+  };
 }
+
+const defaultTranslations = {
+  bestGoalkeeper: 'Best Goalkeeper',
+  bestGoalkeeperHint: 'Enter the name of the player you think will be the best goalkeeper',
+  bestGoalkeeperPlaceholder: 'e.g. Emiliano Martinez',
+  bestScorer: 'Best Scorer',
+  bestScorerHint: 'Enter the name of the player you think will be the top scorer',
+  bestScorerPlaceholder: 'e.g. Kylian Mbappe',
+  submit: 'Submit Best Players',
+};
 
 export const BestPlayersForm: FC<BestPlayersFormProps> = ({
   onSubmit,
@@ -21,7 +40,9 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
   isDisabled = false,
   isSubmitting = false,
   className = '',
+  translations = {},
 }) => {
+  const labels = { ...defaultTranslations, ...translations };
   const [bestGoalkeeper, setBestGoalkeeper] = useState(existingPrediction?.bestGoalkeeper || '');
   const [bestScorer, setBestScorer] = useState(existingPrediction?.bestScorer || '');
 
@@ -38,14 +59,14 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
     <div className={`best-players-form ${className}`}>
       <div className="best-players-form__fields">
         <div className="best-players-form__field">
-          <Typography variant="h3">Best Goalkeeper</Typography>
+          <Typography variant="h3">{labels.bestGoalkeeper}</Typography>
           <Typography variant="small" className="best-players-form__hint">
-            Enter the name of the player you think will be the best goalkeeper
+            {labels.bestGoalkeeperHint}
           </Typography>
           <input
             type="text"
             className="best-players-form__input"
-            placeholder="e.g. Emiliano Martinez"
+            placeholder={labels.bestGoalkeeperPlaceholder}
             value={bestGoalkeeper}
             onChange={(e) => setBestGoalkeeper(e.target.value)}
             disabled={isDisabled}
@@ -53,14 +74,14 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
         </div>
 
         <div className="best-players-form__field">
-          <Typography variant="h3">Best Scorer</Typography>
+          <Typography variant="h3">{labels.bestScorer}</Typography>
           <Typography variant="small" className="best-players-form__hint">
-            Enter the name of the player you think will be the top scorer
+            {labels.bestScorerHint}
           </Typography>
           <input
             type="text"
             className="best-players-form__input"
-            placeholder="e.g. Kylian Mbappe"
+            placeholder={labels.bestScorerPlaceholder}
             value={bestScorer}
             onChange={(e) => setBestScorer(e.target.value)}
             disabled={isDisabled}
@@ -76,7 +97,7 @@ export const BestPlayersForm: FC<BestPlayersFormProps> = ({
           disabled={isDisabled || isSubmitting || (!bestGoalkeeper && !bestScorer)}
         >
           {isSubmitting ? <Spinner size="sm" /> : null}
-          Submit Best Players
+          {labels.submit}
         </Button>
       </div>
     </div>

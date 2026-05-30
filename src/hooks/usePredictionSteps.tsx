@@ -2,10 +2,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { Match } from '@app-types/firestore';
 import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
-import { PredictionStepGroup } from '@molecules/Predictions';
-import { PredictionStepKnockoutRound } from '@molecules/Predictions';
-import { PredictionStepBestPlayers, PredictionStepFinalPhase } from '@molecules/Predictions';
+import { PredictionStepGroup, type PredictionStepGroupProps } from '@molecules/Predictions';
+import {
+  PredictionStepKnockoutRound,
+  type PredictionStepKnockoutRoundProps,
+} from '@molecules/Predictions';
+import {
+  PredictionStepBestPlayers,
+  type PredictionStepBestPlayersProps,
+  PredictionStepFinalPhase,
+  type PredictionStepFinalPhaseProps,
+} from '@molecules/Predictions';
 import type { GroupForPrediction } from '@organisms/GroupPredictionForm';
+
+type GroupStepTranslations = PredictionStepGroupProps['translations'];
+type KnockoutStepTranslations = PredictionStepKnockoutRoundProps['translations'];
+type FinalPhaseStepTranslations = PredictionStepFinalPhaseProps['translations'];
+type BestPlayersStepTranslations = PredictionStepBestPlayersProps['translations'];
 import { predictionService } from '@services/prediction-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
@@ -69,6 +82,10 @@ export function usePredictionSteps(
       bestPlayersSubmitted: string;
       submitFailed: string;
     };
+    groupStep?: GroupStepTranslations;
+    knockoutStep?: KnockoutStepTranslations;
+    finalPhaseStep?: FinalPhaseStepTranslations;
+    bestPlayersStep?: BestPlayersStepTranslations;
   },
   locale: 'en' | 'es',
   selectedPredictorId: string | null,
@@ -425,6 +442,7 @@ export function usePredictionSteps(
             onSubmit={(data) => handleGroupStepSubmit(group.slug, stepIndex, data)}
             isDisabled={submitting || (deadline != null && deadline < new Date())}
             locale={locale}
+            translations={translations.groupStep}
           />
         ),
         onSubmit: () => Promise.resolve(),
@@ -486,6 +504,7 @@ export function usePredictionSteps(
             onSubmit={(predictions) => handleKnockoutRoundSubmit(phase, stepIndex, predictions)}
             isDisabled={submitting || (deadline != null && deadline < new Date())}
             thirdPlaceTeams={thirdPlaceTeams}
+            translations={translations.knockoutStep}
           />
         ),
         onSubmit: () => Promise.resolve(),
@@ -509,6 +528,7 @@ export function usePredictionSteps(
           isDisabled={submitting || (deadline != null && deadline < new Date())}
           isSubmitting={submitting}
           locale={locale}
+          translations={translations.finalPhaseStep}
         />
       ),
       onSubmit: () => Promise.resolve(),
@@ -529,6 +549,7 @@ export function usePredictionSteps(
           onSubmit={handleBestPlayersSubmit}
           isDisabled={submitting || (deadline != null && deadline < new Date())}
           isSubmitting={submitting}
+          translations={translations.bestPlayersStep}
         />
       ),
       onSubmit: () => Promise.resolve(),

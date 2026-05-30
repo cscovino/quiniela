@@ -8,6 +8,7 @@ export interface Props {
 
 const { locale } = Astro.props;
 const p = getTranslations(locale).common.pages.profile;
+const pred = getTranslations(locale).common.pages.predictions;
 
 const translations = {
   title: p.heading,
@@ -40,6 +41,7 @@ const translations = {
   avatarUrlHint: p.avatarUrlHint,
   favoriteTeamLabel: p.favoriteTeamLabel,
   favoriteTeamHint: p.favoriteTeamHint,
+  predictorList: pred.predictorList,
 };
 ---
 
