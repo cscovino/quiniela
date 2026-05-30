@@ -46,6 +46,7 @@ export interface RankingsTableProps {
   previousLabel?: string;
   nextLabel?: string;
   pageLabel?: string;
+  locale?: 'en' | 'es';
   className?: string;
 }
 
@@ -60,6 +61,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
   previousLabel = 'Previous',
   nextLabel = 'Next',
   pageLabel = 'Page {page} of {totalPages}',
+  locale = 'en',
   className = '',
 }) => {
   if (rankings.length === 0) {
@@ -91,6 +93,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             predictionsCount={entry.predictionsCount}
             todayMatchBets={entry.todayMatchBets}
             isCurrentUser={entry.userId === currentUserId}
+            locale={locale}
           />
         ))}
       </div>

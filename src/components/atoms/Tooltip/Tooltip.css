@@ -3,8 +3,11 @@
   display: inline-flex;
 }
 
+/* The bubble is positioned with fixed coordinates set inline by the component
+   (top/left = an anchor point near the trigger); the transform below offsets it
+   relative to that anchor depending on the chosen side. */
 .tooltip {
-  position: absolute;
+  position: fixed;
   background: var(--bg-card);
   color: var(--text-primary);
   font-family: var(--font-pixel);
@@ -13,34 +16,25 @@
   border: var(--border-width-sm) solid var(--border-color);
   box-shadow: var(--shadow-md);
   white-space: nowrap;
+  max-width: 70vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
   z-index: var(--z-tooltip);
-  animation: pixel-slide-in var(--duration-normal) var(--ease-out);
+  pointer-events: none;
 }
 
 .tooltip--top {
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: var(--space-2);
+  transform: translate(-50%, -100%);
 }
 
 .tooltip--bottom {
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: var(--space-2);
+  transform: translate(-50%, 0);
 }
 
 .tooltip--left {
-  right: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-right: var(--space-2);
+  transform: translate(-100%, -50%);
 }
 
 .tooltip--right {
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-left: var(--space-2);
+  transform: translate(0, -50%);
 }

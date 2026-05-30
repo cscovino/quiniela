@@ -1,10 +1,11 @@
 import type { FC } from 'react';
 
-import { getBadgeDefinition } from '@app-types/badges';
+import { getBadgeDefinition, getBadgeName } from '@app-types/badges';
 import { Avatar } from '@atoms/Avatar';
 import type { IconName } from '@atoms/Icon';
 import { Icon } from '@atoms/Icon';
 import { PredictorAvatar } from '@atoms/PredictorAvatar';
+import { Tooltip } from '@atoms/Tooltip';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
 import type { TodayMatchBet } from '@organisms/RankingsTable';
@@ -25,6 +26,7 @@ export interface RankingRowProps {
   predictionsCount?: number;
   todayMatchBets?: TodayMatchBet[];
   isCurrentUser?: boolean;
+  locale?: 'en' | 'es';
   className?: string;
 }
 
@@ -48,6 +50,7 @@ export const RankingRow: FC<RankingRowProps> = ({
   predictionsCount,
   todayMatchBets,
   isCurrentUser = false,
+  locale = 'en',
   className = '',
 }) => {
   const predictorLike = avatar ? { id: displayName, name: displayName, avatar } : undefined;
@@ -87,9 +90,14 @@ export const RankingRow: FC<RankingRowProps> = ({
           {earnedBadges.length > 0 && (
             <div className="ranking-row__badges">
               {earnedBadges.map((def) => (
-                <span key={def!.id} className="ranking-row__badge" title={def!.name.en}>
+                <Tooltip
+                  key={def!.id}
+                  className="ranking-row__badge"
+                  content={getBadgeName(def!.id, locale)}
+                  position="top"
+                >
                   <Icon name={def!.icon} size={12} />
-                </span>
+                </Tooltip>
               ))}
             </div>
           )}
