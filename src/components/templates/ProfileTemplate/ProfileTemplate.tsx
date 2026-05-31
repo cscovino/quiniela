@@ -292,6 +292,8 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
     rank: rank || 0,
   };
 
+  const selectedPredictor = predictors.find((p) => p.id === selectedPredictorId) ?? null;
+
   const predictionsRoute = getRoute(locale, 'predictions');
 
   return (
@@ -327,8 +329,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
             />
           ) : (
             <UserProfile
-              displayName={user.displayName}
-              avatarUrl={user.avatarUrl}
+              predictor={selectedPredictor}
               stats={displayStats}
               badges={badges}
               lockedBadges={lockedBadges}
@@ -359,10 +360,9 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
               predictors={predictorEntries}
               onSelect={(id) => {
                 handleSelectPredictor(id);
-                window.location.href = `${predictionsRoute}?predictor=${id}`;
               }}
-              onEdit={() => {
-                window.location.href = `${predictionsRoute}?predictor=${selectedPredictorId}`;
+              onEdit={(predictorId) => {
+                window.location.href = `${predictionsRoute}?predictor=${predictorId}`;
               }}
               onDelete={() => {}}
               onCreate={() => {
