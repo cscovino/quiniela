@@ -26,6 +26,32 @@ cp .env.example .env
 pnpm dev
 ```
 
+## 🔑 Local Firebase / App Check Setup
+
+Without a registered debug token, Firebase App Check will throttle requests in dev
+and `/api/rankings` will return `401 Unauthorized`.
+
+1. **Ensure your `.env` exists** — `cp .env.example .env` (already done if you followed Installation).
+
+2. **Get the debug token UUID** — two options:
+   - Run `pnpm dev`, open browser DevTools Console, and copy the UUID from the line
+     `App Check debug token: <uuid>` that the Firebase SDK prints on first load.
+   - Or generate one directly: Firebase Console → Build → App Check → Apps → ⋮ →
+     Manage debug tokens → **Add debug token**.
+
+3. **Register the UUID** in Firebase Console → Build → App Check → Apps → ⋮ →
+   Manage debug tokens → Add debug token (skip if you used option b above).
+
+4. **Add to `.env`:**
+   ```env
+   PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN=<your-uuid>
+   ```
+
+5. **Restart `pnpm dev`** — the console should show no App Check `403` errors and
+   `/api/rankings` should return `200`.
+
+> This token is gitignored — never commit it.
+
 ## 📁 Project Structure
 
 ```
