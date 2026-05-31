@@ -20,6 +20,7 @@ export interface PredictorListEntry {
 
 export interface PredictorListProps {
   predictors: PredictorListEntry[];
+  activeId?: string;
   onSelect: (predictorId: string) => void;
   onEdit: (predictorId: string) => void;
   onDelete: (predictorId: string) => void;
@@ -36,6 +37,7 @@ export interface PredictorListProps {
     editProfileAria?: string;
     deleteAria?: string;
     editProfile?: string;
+    viewAria?: string;
   };
 }
 
@@ -55,6 +57,7 @@ const t = {
 
 export const PredictorList: FC<PredictorListProps> = ({
   predictors,
+  activeId,
   onSelect,
   onEdit,
   onDelete,
@@ -74,12 +77,12 @@ export const PredictorList: FC<PredictorListProps> = ({
       {predictors.map(({ predictor, points, groupsDone, groupsTotal, badgesAwarded }) => (
         <div
           key={predictor.id}
-          className="predictor-list__card"
+          className={`predictor-list__card${predictor.id === activeId ? ' predictor-list__card--active' : ''}`}
           role="button"
           tabIndex={0}
           onClick={() => onSelect(predictor.id)}
           onKeyDown={(e) => e.key === 'Enter' && onSelect(predictor.id)}
-          aria-label={labels.editPredictionsAria.replace('{name}', predictor.name)}
+          aria-label={(labels.viewAria || labels.editPredictionsAria).replace('{name}', predictor.name)}
         >
           <div className="predictor-list__card-content">
             <PredictorAvatar predictor={predictor} size="md" />
