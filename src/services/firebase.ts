@@ -24,8 +24,16 @@ function ensureApp(): FirebaseApp {
       // Must be set BEFORE initializeAppCheck() — Firebase reads this global at init
       if (!import.meta.env.PROD) {
         const debugToken = import.meta.env.PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN;
-        // @ts-expect-error — Firebase reads this global at App Check init
-        self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken || true;
+        if (debugToken) {
+          // @ts-expect-error — Firebase reads this global at App Check init
+          self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
+        } else {
+          console.warn(
+            '[firebase] App Check debug token not set. ' +
+              'Set PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN in .env to a registered debug token UUID. ' +
+              'See README for setup instructions.',
+          );
+        }
       }
 
       const recaptchaKey = import.meta.env.PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY;
