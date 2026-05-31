@@ -2,14 +2,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { isAppCheckError } from '../firebase';
 
+// Hoisted to module top level (vi.mock is hoisted regardless; keeping it here
+// reflects actual execution order and avoids Vitest's nested-mock warning).
+vi.mock('firebase/app-check', () => ({
+  initializeAppCheck: vi.fn(() => ({})),
+  ReCaptchaV3Provider: vi.fn(),
+  getToken: vi.fn(() => Promise.resolve({ token: 'mock' })),
+}));
+
 describe('App Check debug-token guard', () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.mock('firebase/app-check', () => ({
-      initializeAppCheck: vi.fn(() => ({})),
-      ReCaptchaV3Provider: vi.fn(),
-      getToken: vi.fn(() => Promise.resolve({ token: 'mock' })),
-    }));
     delete (self as Record<string, unknown>).FIREBASE_APPCHECK_DEBUG_TOKEN;
   });
 
