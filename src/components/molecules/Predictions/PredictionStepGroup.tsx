@@ -42,7 +42,6 @@ export interface PredictionStepGroupProps {
     team?: string;
     pts?: string;
     vs?: string;
-    syncFromScores?: string;
     position?: string;
     selectOption?: string;
     submitting?: string;
@@ -65,7 +64,6 @@ const defaultTranslations = {
   team: 'Team',
   pts: 'Pts',
   vs: 'VS',
-  syncFromScores: 'Sync from scores',
   position: 'Position',
   selectOption: 'Select',
   submitting: 'Submitting...',
@@ -186,13 +184,6 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
     },
     [group.teams.length],
   );
-
-  const handleSyncFromStandings = useCallback(() => {
-    setIsClassificationManual(false);
-    if (standingsOrder.length === group.teams.length && standingsOrder.every(Boolean)) {
-      setClassification(standingsOrder);
-    }
-  }, [standingsOrder, group.teams.length]);
 
   const canSubmit = allMatchesFilled && classificationComplete;
 
@@ -334,11 +325,6 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
       <section className="prediction-step-group__section">
         <div className="prediction-step-group__classification-header">
           <Typography variant="h3">{labels.classification}</Typography>
-          {isClassificationManual && !isDisabled && (
-            <Button variant="ghost" size="sm" onClick={handleSyncFromStandings}>
-              {labels.syncFromScores}
-            </Button>
-          )}
         </div>
         <div className="prediction-step-group__classification">
           <div className="prediction-step-group__row prediction-step-group__row--header">
