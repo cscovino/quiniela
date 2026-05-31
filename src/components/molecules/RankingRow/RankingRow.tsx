@@ -4,7 +4,6 @@ import { getBadgeDefinition, getBadgeName } from '@app-types/badges';
 import { Avatar } from '@atoms/Avatar';
 import type { IconName } from '@atoms/Icon';
 import { Icon } from '@atoms/Icon';
-import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Tooltip } from '@atoms/Tooltip';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
@@ -15,6 +14,7 @@ import './RankingRow.css';
 export interface RankingRowProps {
   position: number;
   avatarUrl?: string;
+  // Intentionally unread this phase — Phase 6 wires rankings pixel-art (AVATAR-04)
   avatar?: { bgColor: string; emoji: string };
   displayName: string;
   points: number;
@@ -58,7 +58,6 @@ const STAT_LABELS: Record<
 export const RankingRow: FC<RankingRowProps> = ({
   position,
   avatarUrl,
-  avatar,
   displayName,
   points,
   todayPoints,
@@ -71,7 +70,6 @@ export const RankingRow: FC<RankingRowProps> = ({
   locale = 'en',
   className = '',
 }) => {
-  const predictorLike = avatar ? { id: displayName, name: displayName, avatar } : undefined;
   const statLabels = STAT_LABELS[locale];
 
   const earnedBadges = badges
@@ -97,11 +95,7 @@ export const RankingRow: FC<RankingRowProps> = ({
       </div>
 
       <div className="ranking-row__user">
-        {predictorLike ? (
-          <PredictorAvatar predictor={predictorLike} size="sm" />
-        ) : (
-          <Avatar src={avatarUrl} name={displayName} size="sm" />
-        )}
+        <Avatar src={avatarUrl} name={displayName} size="sm" />
         <div className="ranking-row__user-text">
           <Typography variant="small" className="ranking-row__name">
             {displayName}
