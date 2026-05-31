@@ -60,12 +60,23 @@ export interface Match {
   tbdAway?: string;
 }
 
+// AvatarOptions — D-01: constrained 6-trait interface (D-08: co-located with Predictor)
+export interface AvatarOptions {
+  skinColor?: string; // bare 6-hex, e.g. 'ffdbb4'
+  hair?: string; // pixel-art id, e.g. 'short01' | 'long05'
+  hairColor?: string; // bare 6-hex
+  clothing?: string; // pixel-art id, e.g. 'variant03'
+  clothingColor?: string; // bare 6-hex
+  glasses?: string; // pixel-art id, e.g. 'dark01' | 'light02'
+}
+
 export interface Predictor {
   id: string;
   userId: string;
   name: string;
-  avatarUrl?: string;
-  avatar?: { bgColor: string; emoji: string };
+  avatarUrl?: string; // legacy, keep optional
+  avatar?: { bgColor: string; emoji: string }; // legacy, keep optional
+  pixelArt?: { seed: string; options: AvatarOptions }; // NEW (AVATAR-02)
   favouriteTeamId?: string;
   createdAt: Timestamp;
 }
