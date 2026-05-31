@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 
 import type { Predictor } from '@app-types/firestore';
+import { DEFAULT_OPTIONS, generateAvatarDataUri } from '@utils/dicebear';
 
 import './PredictorAvatar.css';
 
@@ -46,25 +48,39 @@ export const PredictorAvatar: FC<PredictorAvatarProps> = ({
   size = 'md',
   className = '',
 }) => {
-  const hasAvatar = predictor.avatar?.emoji && predictor.avatar?.bgColor;
-  const bgColor = hasAvatar ? predictor.avatar!.bgColor : getFallbackColor(predictor.id);
-  const emoji = hasAvatar ? predictor.avatar!.emoji : '';
-  const initial = predictor.name ? predictor.name.charAt(0).toUpperCase() : '?';
+  // D-07: pure inline tier resolver
+  const seed = predictor.pixelArt?.seed ?? predictor.id;
+  const options = predictor.pixelArt?.options ?? DEFAULT_OPTIONS;
+  const isImage = Boolean(seed); // tiers 1 & 2 (real predictors always have id)
 
+  // D-05 / RESEARCH Q2 + Pitfall 2: serialized options key for cache correctness
+  const optionsKey = JSON.stringify(options);
+
+  const dataUri = useMemo(
+    () => (isImage ? generateAvatarDataUri(seed, options) : ''),
+    [seed, optionsKey, isImage],
+  );
+
+  if (isImage) {
+    return (
+      <div className={`predictor-avatar predictor-avatar--${size} ${className}`}>
+        <img className="predictor-avatar__img" src={dataUri} alt={predictor.name ?? ''} />
+      </div>
+    );
+  }
+
+  // tier-3 (no id): keep current colored-initial behavior verbatim (D-04)
+  const initial = predictor.name ? predictor.name.charAt(0).toUpperCase() : '?';
   return (
     <div
       className={`predictor-avatar predictor-avatar--${size} ${className}`}
-      style={{ backgroundColor: bgColor }}
+      style={{ backgroundColor: getFallbackColor(predictor.id) }}
       aria-label={predictor.name || 'Predictor avatar'}
       role="img"
     >
-      {emoji ? (
-        <span className="predictor-avatar__emoji" aria-hidden="true">
-          {emoji}
-        </span>
-      ) : (
-        <span className="predictor-avatar__initial">{initial}</span>
-      )}
+      <span className="predictor-avatar__initial" aria-hidden="true">
+        {initial}
+      </span>
     </div>
   );
 };
