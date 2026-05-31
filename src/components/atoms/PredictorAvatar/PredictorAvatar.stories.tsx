@@ -27,17 +27,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const WithAvatar: Story = {
+// Tier-1: predictor.pixelArt present — uses explicit seed + options
+export const WithPixelArt: Story = {
   args: {
     predictor: makePredictor({
-      id: 'user-1-default',
-      name: 'My Team',
-      avatar: { bgColor: '#E63946', emoji: '⚽' },
+      pixelArt: { seed: 'custom-seed', options: {} },
     }),
   },
 };
 
-export const WithoutAvatar: Story = {
+// Tier-2: no pixelArt, has id — deterministic pixel-art seeded from predictor.id
+export const IdSeeded: Story = {
   args: {
     predictor: makePredictor({
       id: 'user-2-default',
@@ -46,56 +46,38 @@ export const WithoutAvatar: Story = {
   },
 };
 
-export const LongName: Story = {
+// Tier-3: no id — colored initial fallback
+export const FallbackInitial: Story = {
   args: {
     predictor: makePredictor({
-      id: 'user-3-default',
-      name: 'Very Long Predictor Name',
+      id: '',
+      name: 'Carlos',
     }),
   },
 };
 
-export const TwoGraphemeEmoji: Story = {
+// Tier-3 edge: empty name renders '?'
+export const EmptyName: Story = {
   args: {
     predictor: makePredictor({
-      id: 'user-4-default',
-      name: 'Flag Team',
-      avatar: { bgColor: '#2D6A4F', emoji: '🇦🇷' },
+      id: '',
+      name: '',
     }),
   },
 };
 
+// All three sizes with id-seeded pixel-art predictors
 export const Sizes: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-      <PredictorAvatar
-        predictor={makePredictor({
-          id: 'sm-1',
-          name: 'Small',
-          avatar: { bgColor: '#E63946', emoji: '⚽' },
-        })}
-        size="sm"
-      />
-      <PredictorAvatar
-        predictor={makePredictor({
-          id: 'md-1',
-          name: 'Medium',
-          avatar: { bgColor: '#2D6A4F', emoji: '🏆' },
-        })}
-        size="md"
-      />
-      <PredictorAvatar
-        predictor={makePredictor({
-          id: 'lg-1',
-          name: 'Large',
-          avatar: { bgColor: '#F4A261', emoji: '🥅' },
-        })}
-        size="lg"
-      />
+      <PredictorAvatar predictor={makePredictor({ id: 'sm-1', name: 'Small' })} size="sm" />
+      <PredictorAvatar predictor={makePredictor({ id: 'md-1', name: 'Medium' })} size="md" />
+      <PredictorAvatar predictor={makePredictor({ id: 'lg-1', name: 'Large' })} size="lg" />
     </div>
   ),
 };
 
+// Tier-3 palette: 12 predictors with no id showing the FALLBACK_COLORS distribution
 export const FallbackColors: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -103,7 +85,7 @@ export const FallbackColors: Story = {
         <PredictorAvatar
           key={i}
           predictor={makePredictor({
-            id: `user-${i}-default`,
+            id: '',
             name: `User ${i + 1}`,
           })}
         />

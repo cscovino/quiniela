@@ -6,6 +6,7 @@
   box-shadow: var(--shadow-md);
   overflow: hidden;
   flex-shrink: 0;
+  background-color: var(--bg-card); /* D-01 single neutral backdrop behind transparent SVG */
 }
 
 .predictor-avatar--sm {
@@ -23,17 +24,13 @@
   height: 48px;
 }
 
-.predictor-avatar__emoji {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.predictor-avatar--sm .predictor-avatar__emoji {
-  font-size: 1rem;
-}
-
-.predictor-avatar--lg .predictor-avatar__emoji {
-  font-size: 1.5rem;
+.predictor-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* UI-SPEC: no crop/distortion */
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 .predictor-avatar__initial {
