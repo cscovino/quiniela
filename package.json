@@ -46,6 +46,8 @@
   },
   "dependencies": {
     "@astrojs/react": "^5.0.5",
+    "@dicebear/core": "^9.4.2",
+    "@dicebear/pixel-art": "9.4.2",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "astro": "^6.3.6",
@@ -97,7 +99,9 @@
       "yaml@>=2.0.0 <2.8.3": ">=2.8.3",
       "uuid": ">=11.1.1"
     },
-    "onlyBuiltDependencies": ["sharp"],
+    "onlyBuiltDependencies": [
+      "sharp"
+    ],
     "minimumReleaseAge": {
       "firebase-tools": "0"
     }
