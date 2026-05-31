@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
-import { Avatar } from '@atoms/Avatar';
+import type { Predictor } from '@app-types/firestore';
+import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Icon, type IconName } from '@atoms/Icon';
 import { Typography } from '@atoms/Typography';
 import { StatCard } from '@molecules/StatCard';
@@ -24,8 +25,7 @@ export interface BadgeLocked {
 }
 
 export interface UserProfileProps {
-  displayName: string;
-  avatarUrl?: string;
+  predictor: Predictor | null;
   favoriteTeam?: string;
   stats: {
     totalPoints: number;
@@ -51,8 +51,7 @@ export interface UserProfileProps {
 }
 
 export const UserProfile: FC<UserProfileProps> = ({
-  displayName,
-  avatarUrl,
+  predictor,
   favoriteTeam,
   stats,
   badges,
@@ -63,9 +62,9 @@ export const UserProfile: FC<UserProfileProps> = ({
   return (
     <div className={`user-profile ${className}`}>
       <div className="user-profile__header">
-        <Avatar src={avatarUrl} name={displayName} size="lg" />
+        {predictor && <PredictorAvatar predictor={predictor} size="lg" />}
         <div className="user-profile__info">
-          <Typography variant="h2">{displayName}</Typography>
+          <Typography variant="h2">{predictor?.name ?? ''}</Typography>
           {favoriteTeam && (
             <div className="user-profile__team">
               <Icon name="flag" size={14} />

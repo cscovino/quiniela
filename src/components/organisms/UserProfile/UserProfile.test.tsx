@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import type { Predictor } from '@app-types/firestore';
 
 import { UserProfile } from './UserProfile';
 
@@ -10,11 +11,19 @@ const translations = {
   exactBets: 'Exact Bets',
   rank: 'Rank',
   badges: 'Badges',
+  lockedBadges: 'Locked Badges',
+};
+
+const mockPredictor: Predictor = {
+  id: 'pred-1',
+  userId: 'user-1',
+  name: 'Carlos Enrique',
+  avatar: undefined,
+  createdAt: {} as any,
 };
 
 const mockProps = {
-  displayName: 'Carlos Enrique',
-  avatarUrl: undefined,
+  predictor: mockPredictor,
   favoriteTeam: 'Argentina',
   stats: {
     totalPoints: 120,
@@ -25,16 +34,22 @@ const mockProps = {
     rank: 12,
   },
   badges: [
-    { id: '1', name: 'On Fire', icon: 'fire', earnedAt: new Date('2026-06-20') },
-    { id: '2', name: 'First Blood', icon: 'trophy', earnedAt: new Date('2026-06-19') },
+    { id: '1', name: 'On Fire', icon: 'fire' as const, earnedAt: new Date('2026-06-20') },
+    { id: '2', name: 'First Blood', icon: 'trophy' as const, earnedAt: new Date('2026-06-19') },
   ],
   translations,
 };
 
 describe('UserProfile', () => {
-  it('renders display name', () => {
+  it('renders predictor name in h2 (PROF-hdr)', () => {
     render(<UserProfile {...mockProps} />);
     expect(screen.getByText('Carlos Enrique')).toBeInTheDocument();
+  });
+
+  it('renders without crashing when predictor is null (PROF-hdr null)', () => {
+    // Should not throw; h2 with empty content exists
+    expect(() => render(<UserProfile {...mockProps} predictor={null} />)).not.toThrow();
+    expect(screen.queryByText('Carlos Enrique')).not.toBeInTheDocument();
   });
 
   it('renders favorite team', () => {
