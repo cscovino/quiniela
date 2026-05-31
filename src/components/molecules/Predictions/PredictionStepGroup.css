@@ -131,7 +131,7 @@
   border: var(--border-width-md) solid var(--color-accent-500);
   color: var(--text-primary);
   font-family: var(--font-pixel);
-  font-size: var(--text-sm);
+  font-size: max(1rem, var(--text-sm)); /* min 16px — prevents iOS Safari viewport zoom on focus */
   appearance: none;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0b5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
