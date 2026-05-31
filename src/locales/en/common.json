@@ -214,7 +214,6 @@
         "team": "Team",
         "pts": "Pts",
         "vs": "VS",
-        "syncFromScores": "Sync from scores",
         "position": "Position",
         "selectOption": "Select",
         "submitting": "Submitting...",
