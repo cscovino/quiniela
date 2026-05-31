@@ -61,6 +61,7 @@ export interface ProfileTemplateProps {
       editProfileAria?: string;
       deleteAria?: string;
       editProfile?: string;
+      viewAria?: string;
     };
   };
   locale?: 'en' | 'es';
@@ -358,6 +359,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
           ) : (
             <PredictorList
               predictors={predictorEntries}
+              activeId={selectedPredictorId ?? undefined}
               onSelect={(id) => {
                 handleSelectPredictor(id);
               }}

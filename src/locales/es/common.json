@@ -116,7 +116,10 @@
       "matches": "Partidos",
       "yourPredictors": "Tus Pronosticadores",
       "selectPredictor": "Selecciona un pronosticador para ver detalles",
-      "editProfile": "Editar Perfil",
+      "editProfile": "Editar Cuenta",
+      "predictorList": {
+        "viewAria": "Ver {name}"
+      },
       "cancelEditing": "Cancelar",
       "saveProfile": "Guardar Cambios",
       "saving": "Guardando...",
