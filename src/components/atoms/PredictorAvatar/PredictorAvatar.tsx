@@ -56,8 +56,10 @@ export const PredictorAvatar: FC<PredictorAvatarProps> = ({
   // D-05 / RESEARCH Q2 + Pitfall 2: serialized options key for cache correctness
   const optionsKey = JSON.stringify(options);
 
+  // Reference only optionsKey in the closure (parse back inside) so the memo deps are
+  // exhaustive — `options` is an unstable object reference, optionsKey is its stable proxy.
   const dataUri = useMemo(
-    () => (isImage ? generateAvatarDataUri(seed, options) : ''),
+    () => (isImage ? generateAvatarDataUri(seed, JSON.parse(optionsKey)) : ''),
     [seed, optionsKey, isImage],
   );
 
@@ -74,7 +76,7 @@ export const PredictorAvatar: FC<PredictorAvatarProps> = ({
   return (
     <div
       className={`predictor-avatar predictor-avatar--${size} ${className}`}
-      style={{ backgroundColor: getFallbackColor(predictor.id) }}
+      style={{ backgroundColor: getFallbackColor(predictor.name || predictor.id || '?') }}
       aria-label={predictor.name || 'Predictor avatar'}
       role="img"
     >
