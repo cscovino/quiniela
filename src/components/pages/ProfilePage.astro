@@ -41,7 +41,7 @@ const translations = {
   avatarUrlHint: p.avatarUrlHint,
   favoriteTeamLabel: p.favoriteTeamLabel,
   favoriteTeamHint: p.favoriteTeamHint,
-  predictorList: pred.predictorList,
+  predictorList: { ...pred.predictorList, viewAria: p.predictorList?.viewAria },
 };
 ---
 

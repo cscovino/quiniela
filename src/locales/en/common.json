@@ -116,7 +116,10 @@
       "matches": "Matches",
       "yourPredictors": "Your Predictors",
       "selectPredictor": "Select a predictor to view details",
-      "editProfile": "Edit Profile",
+      "editProfile": "Edit Account",
+      "predictorList": {
+        "viewAria": "View {name}"
+      },
       "cancelEditing": "Cancel",
       "saveProfile": "Save Changes",
       "saving": "Saving...",
