@@ -75,10 +75,13 @@ describe('GroupStandings', () => {
     expect(screen.getByText('Group A')).toBeInTheDocument();
   });
 
-  it('renders team names', () => {
+  it('renders team name span and FIFA code span for each team', () => {
     render(<GroupStandings groups={mockGroups} translations={translations} />);
-    const teamNames = screen.getAllByText('Argentina');
-    expect(teamNames.length).toBeGreaterThan(0);
+    // Full name span — toggled visible on desktop via CSS (may appear in GroupHeader too)
+    const nameEls = screen.getAllByText('Argentina');
+    expect(nameEls.length).toBeGreaterThan(0);
+    // FIFA code span — toggled visible on mobile via CSS; aria-hidden but present in DOM
+    expect(screen.getByText('ARG')).toBeInTheDocument();
   });
 
   it('renders stats columns', () => {
