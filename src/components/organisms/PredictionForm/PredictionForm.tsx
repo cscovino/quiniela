@@ -76,14 +76,18 @@ export const PredictionForm: FC<PredictionFormProps> = ({
             <div className="prediction-form__teams">
               <div className="prediction-form__team">
                 <TeamFlag fifaCode={match.homeTeam.fifaCode} size="md" />
-                <Typography variant="small">{match.homeTeam.name}</Typography>
+                <Typography variant="small" className="prediction-form__team-name">
+                  {match.homeTeam.name}
+                </Typography>
               </div>
               <Typography variant="caption" className="prediction-form__vs">
                 VS
               </Typography>
               <div className="prediction-form__team">
                 <TeamFlag fifaCode={match.awayTeam.fifaCode} size="md" />
-                <Typography variant="small">{match.awayTeam.name}</Typography>
+                <Typography variant="small" className="prediction-form__team-name">
+                  {match.awayTeam.name}
+                </Typography>
               </div>
             </div>
 
