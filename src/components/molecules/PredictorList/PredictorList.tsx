@@ -127,7 +127,7 @@ export const PredictorList: FC<PredictorListProps> = ({
               }}
               aria-label={labels.editProfileAria.replace('{name}', predictor.name)}
             >
-              <Icon name="pen-square" size={16} /> {labels.editProfile}
+              <Icon name="pen-square" size={16} /><span className="predictor-list__btn-label">{labels.editProfile}</span>
             </Button>
             <Button
               variant="danger"
@@ -138,7 +138,7 @@ export const PredictorList: FC<PredictorListProps> = ({
               }}
               aria-label={labels.deleteAria.replace('{name}', predictor.name)}
             >
-              <Icon name="trash" size={16} /> {labels.delete}
+              <Icon name="trash" size={16} /><span className="predictor-list__btn-label">{labels.delete}</span>
             </Button>
           </div>
         </div>
