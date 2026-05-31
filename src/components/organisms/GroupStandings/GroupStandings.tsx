@@ -61,7 +61,8 @@ export const GroupStandings: FC<GroupStandingsProps> = ({
               <div key={team.teamId} className="group-standings__row">
                 <span className="group-standings__col group-standings__col--team">
                   <TeamFlag fifaCode={team.fifaCode} size="sm" />
-                  {team.teamName}
+                  <span className="group-standings__team-name">{team.teamName}</span>
+                  <span className="group-standings__team-code" aria-hidden="true">{team.fifaCode}</span>
                 </span>
                 <span className="group-standings__col">{team.played}</span>
                 <span className="group-standings__col">{team.won}</span>

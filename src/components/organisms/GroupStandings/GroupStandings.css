@@ -71,3 +71,22 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-accent-500);
 }
+
+/* UX-03: responsive team name — FIFA code on mobile, full name on desktop */
+.group-standings__team-name {
+  display: none;
+}
+
+.group-standings__team-code {
+  display: inline;
+}
+
+@media (min-width: 1024px) {
+  .group-standings__team-name {
+    display: inline;
+  }
+
+  .group-standings__team-code {
+    display: none;
+  }
+}
