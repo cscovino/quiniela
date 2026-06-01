@@ -25,12 +25,12 @@
   display: block;
 }
 
-.points-chart__line-group--dimmed {
-  opacity: 0.15;
+.points-chart__bar-group {
   transition: opacity 0.2s ease;
 }
 
-.points-chart__line-group {
+.points-chart__bar-group--dimmed {
+  opacity: 0.15;
   transition: opacity 0.2s ease;
 }
 
