@@ -8,6 +8,7 @@ const translations = {
   noData: 'No data',
   points: 'Points',
   matches: 'Matches',
+  days: 'Days',
   chartAriaLabel: 'Points earned per day',
   legendToggleAria: 'Toggle highlight for {name}',
 };
@@ -62,7 +63,7 @@ describe('PointsChart', () => {
   });
 
   describe('summary row', () => {
-    it('matches count shows unique days not raw entry count', () => {
+    it('days count shows unique days not raw entry count', () => {
       const seriesWithDuplicateDay = [
         {
           id: 'pred-1',

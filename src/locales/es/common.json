@@ -114,6 +114,7 @@
       "noPointsData": "Aún no hay datos de puntos",
       "points": "Puntos",
       "matches": "Partidos",
+      "days": "Días",
       "chartAriaLabel": "Puntos ganados por día",
       "legendToggleAria": "Resaltar {name}",
       "yourPredictors": "Tus Pronosticadores",

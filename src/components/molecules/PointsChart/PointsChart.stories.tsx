@@ -15,6 +15,7 @@ const translations = {
   noData: 'No data available',
   points: 'Points',
   matches: 'Matches',
+  days: 'Days',
   chartAriaLabel: 'Points earned per day',
   legendToggleAria: 'Toggle highlight for {name}',
 };

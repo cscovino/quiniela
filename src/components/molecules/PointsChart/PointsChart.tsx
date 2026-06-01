@@ -27,6 +27,7 @@ export interface PointsChartProps {
     noData: string;
     points: string;
     matches: string;
+    days: string;
     chartAriaLabel: string;
     legendToggleAria: string;
   };
@@ -114,7 +115,6 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
   };
 
   const totalPointsAcross = chartSeries.reduce((sum, s) => sum + s.totalPoints, 0);
-  const totalMatches = allDateKeys.length;
 
   return (
     <div className={`points-chart ${className}`}>
@@ -243,9 +243,9 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
           </Typography>
         </span>
         <span className="points-chart__stat">
-          <Typography variant="small">{translations.matches}:</Typography>
+          <Typography variant="small">{translations.days}:</Typography>
           <Typography variant="small" className="points-chart__value">
-            {totalMatches}
+            {totalDays}
           </Typography>
         </span>
       </div>

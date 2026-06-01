@@ -36,6 +36,7 @@ export interface ProfileTemplateProps {
     noPointsData: string;
     points: string;
     matches: string;
+    days: string;
     yourPredictors: string;
     selectPredictor: string;
     editProfile?: string;
@@ -412,6 +413,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
               noData: translations.noPointsData,
               points: translations.points,
               matches: translations.matches,
+              days: translations.days,
               chartAriaLabel: translations.chartAriaLabel || 'Points earned per day',
               legendToggleAria: translations.legendToggleAria || 'Toggle highlight for {name}',
             }}

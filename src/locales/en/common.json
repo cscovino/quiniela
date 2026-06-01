@@ -114,6 +114,7 @@
       "noPointsData": "No points data yet",
       "points": "Points",
       "matches": "Matches",
+      "days": "Days",
       "chartAriaLabel": "Points earned per day",
       "legendToggleAria": "Toggle highlight for {name}",
       "yourPredictors": "Your Predictors",

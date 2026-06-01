@@ -56,6 +56,7 @@ const translations = {
   noPointsData: 'No data available',
   points: 'Points',
   matches: 'Matches',
+  days: 'Days',
   yourPredictors: 'Your Predictors',
   selectPredictor: 'Select a predictor',
 };
