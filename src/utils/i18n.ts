@@ -29,6 +29,7 @@ export interface NavLink {
   label: string;
   active: boolean;
   auth: boolean;
+  core: boolean;
 }
 
 const ROUTE_SLUGS: Record<Locale, Record<Exclude<ActiveNav, 'admin'>, string>> = {
@@ -56,19 +57,21 @@ export function getRoute(locale: Locale, nav: Exclude<ActiveNav, 'admin'>): stri
 
 export function getNavLinks(locale: Locale, activeNav: ActiveNav): NavLink[] {
   const nav = translations[locale].common.nav;
-  const items: { key: Exclude<ActiveNav, 'admin'>; label: string; auth: boolean }[] = [
-    { key: 'home', label: nav.home, auth: false },
-    { key: 'tournament', label: nav.tournament, auth: false },
-    { key: 'predictions', label: nav.predictions, auth: true },
-    { key: 'rankings', label: nav.rankings, auth: true },
-    { key: 'profile', label: nav.profile, auth: true },
-  ];
+  const items: { key: Exclude<ActiveNav, 'admin'>; label: string; auth: boolean; core: boolean }[] =
+    [
+      { key: 'home', label: nav.home, auth: false, core: false },
+      { key: 'tournament', label: nav.tournament, auth: false, core: true },
+      { key: 'predictions', label: nav.predictions, auth: true, core: true },
+      { key: 'rankings', label: nav.rankings, auth: true, core: true },
+      { key: 'profile', label: nav.profile, auth: true, core: false },
+    ];
 
   return items.map((item) => ({
     href: getRoute(locale, item.key),
     label: item.label,
     active: activeNav === item.key,
     auth: item.auth,
+    core: item.core,
   }));
 }
 

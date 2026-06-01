@@ -14,6 +14,7 @@ export interface NavLink {
   label: string;
   active: boolean;
   auth: boolean;
+  core: boolean;
 }
 
 export interface NavBarTranslations {
