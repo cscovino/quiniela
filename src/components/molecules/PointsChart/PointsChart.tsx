@@ -90,9 +90,9 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
   const getY = (pts: number) => padding.top + chartHeight - (pts / (maxDelta || 1)) * chartHeight;
 
   const yTicks = 5;
-  const yTickValues = Array.from({ length: yTicks + 1 }, (_, i) =>
-    Math.round((maxDelta / yTicks) * i),
-  );
+  const yTickValues = [
+    ...new Set(Array.from({ length: yTicks + 1 }, (_, i) => Math.round((maxDelta / yTicks) * i))),
+  ];
 
   const totalDays = allDateKeys.length;
   const slotWidth = chartWidth / (totalDays || 1);
