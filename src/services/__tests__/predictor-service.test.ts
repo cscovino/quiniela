@@ -2,6 +2,8 @@
 import * as firebaseFirestore from 'firebase/firestore';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AVATAR_PRESETS } from '@utils/avatar-presets';
+
 import { predictorService } from '../predictor-service';
 
 vi.mock('../firebase', () => ({
@@ -68,6 +70,45 @@ describe('predictor-service', () => {
         name: 'My Predictor',
         avatarUrl: 'https://example.com/avatar.jpg',
       });
+    });
+
+    it('creates a predictor with pixelArt when provided as 5th arg', async () => {
+      vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
+
+      const pixelArt = {
+        seed: 'my-seed-123',
+        options: {
+          skinColor: AVATAR_PRESETS.skinColor[1],
+          hair: AVATAR_PRESETS.hair[1],
+          hairColor: AVATAR_PRESETS.hairColor[1],
+          clothing: AVATAR_PRESETS.clothing[1],
+          clothingColor: AVATAR_PRESETS.clothingColor[1],
+          glasses: AVATAR_PRESETS.glasses[1],
+        },
+      };
+
+      const result = await predictorService.createPredictor(
+        'user-1',
+        'My Predictor',
+        undefined,
+        'team-mex',
+        pixelArt,
+      );
+
+      expect(result).toMatchObject({ name: 'My Predictor', pixelArt });
+      expect(firebaseFirestore.setDoc).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ pixelArt }),
+      );
+    });
+
+    it('rejects createPredictor with invalid pixelArt seed', async () => {
+      await expect(
+        predictorService.createPredictor('user-1', 'My Predictor', undefined, undefined, {
+          seed: '',
+          options: {},
+        }),
+      ).rejects.toThrow('Invalid avatar seed');
     });
   });
 
@@ -142,6 +183,91 @@ describe('predictor-service', () => {
           avatar: { bgColor: 'not-a-color', emoji: '⚽' },
         }),
       ).rejects.toThrow('Invalid background color');
+    });
+
+    it('persists pixelArt and calls deleteField for legacy avatar/avatarUrl', async () => {
+      vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
+      // Mock deleteField to return a sentinel so we can detect it in the payload
+      vi.mocked(firebaseFirestore.deleteField).mockReturnValue({
+        isEqual: vi.fn(),
+        _methodName: 'FieldValue.delete',
+      } as any);
+
+      const validPixelArt = {
+        seed: 'abc123',
+        options: {
+          skinColor: AVATAR_PRESETS.skinColor[0],
+          hair: AVATAR_PRESETS.hair[0],
+          hairColor: AVATAR_PRESETS.hairColor[0],
+          clothing: AVATAR_PRESETS.clothing[0],
+          clothingColor: AVATAR_PRESETS.clothingColor[0],
+          glasses: AVATAR_PRESETS.glasses[0],
+        },
+      };
+
+      await predictorService.updatePredictor('user-1', 'user-1-default', {
+        pixelArt: validPixelArt,
+      });
+
+      expect(firebaseFirestore.deleteField).toHaveBeenCalled();
+      expect(firebaseFirestore.setDoc).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          pixelArt: validPixelArt,
+          avatar: expect.anything(), // deleteField sentinel
+          avatarUrl: expect.anything(), // deleteField sentinel
+        }),
+        expect.objectContaining({ merge: true }),
+      );
+    });
+
+    it('rejects out-of-set hair value', async () => {
+      await expect(
+        predictorService.updatePredictor('user-1', 'user-1-default', {
+          pixelArt: { seed: 'x', options: { hair: 'NOT_IN_SET' } },
+        }),
+      ).rejects.toThrow('Invalid hair');
+    });
+
+    it('rejects empty seed', async () => {
+      await expect(
+        predictorService.updatePredictor('user-1', 'user-1-default', {
+          pixelArt: { seed: '', options: {} },
+        }),
+      ).rejects.toThrow('Invalid avatar seed');
+    });
+
+    it('rejects seed longer than 64 chars', async () => {
+      await expect(
+        predictorService.updatePredictor('user-1', 'user-1-default', {
+          pixelArt: { seed: 'a'.repeat(65), options: {} },
+        }),
+      ).rejects.toThrow('Invalid avatar seed');
+    });
+
+    it('accepts glasses undefined (represents None — no throw)', async () => {
+      vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
+      vi.mocked(firebaseFirestore.deleteField).mockReturnValue({
+        isEqual: vi.fn(),
+        _methodName: 'FieldValue.delete',
+      } as any);
+
+      await expect(
+        predictorService.updatePredictor('user-1', 'user-1-default', {
+          pixelArt: {
+            seed: 'valid-seed',
+            options: { glasses: undefined, skinColor: AVATAR_PRESETS.skinColor[0] },
+          },
+        }),
+      ).resolves.toBeUndefined();
+    });
+
+    it('rejects unknown glasses id', async () => {
+      await expect(
+        predictorService.updatePredictor('user-1', 'user-1-default', {
+          pixelArt: { seed: 'valid-seed', options: { glasses: 'unknown-glasses-99' } },
+        }),
+      ).rejects.toThrow('Invalid glasses');
     });
   });
 

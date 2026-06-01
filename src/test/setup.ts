@@ -60,6 +60,7 @@ vi.mock('firebase/firestore', () => ({
   orderBy: vi.fn(() => ({ type: 'orderBy' })),
   limit: vi.fn(() => ({ type: 'limit' })),
   serverTimestamp: vi.fn(() => 'server-timestamp'),
+  deleteField: vi.fn(() => ({ _methodName: 'FieldValue.delete' })),
   Timestamp: {
     now: vi.fn(() => new Date()),
     fromDate: vi.fn((d) => d),
