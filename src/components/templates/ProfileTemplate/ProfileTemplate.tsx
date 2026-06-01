@@ -65,6 +65,19 @@ export interface ProfileTemplateProps {
     };
     chartAriaLabel?: string;
     legendToggleAria?: string;
+    statGrid?: {
+      statPoints?: string;
+      statAccuracy?: string;
+      statCurrentStreak?: string;
+      statBestStreak?: string;
+      statExactBets?: string;
+      statGroups?: string;
+      statPointsAriaLabel?: string;
+      statAccuracyAriaLabel?: string;
+      statCurrentStreakAriaLabel?: string;
+      statBestStreakAriaLabel?: string;
+      statExactBetsAriaLabel?: string;
+    };
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -128,6 +141,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
         groupsDone: r.progress.groupsSubmitted,
         groupsTotal: r.progress.totalGroups,
         badgesAwarded: r.stats?.badgesAwarded,
+        stats: r.stats ?? undefined,
       }));
       setPredictorEntries(entries);
     } catch {
@@ -374,10 +388,17 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
               }}
               translations={
                 translations.predictorList
-                  ? Object.fromEntries(
-                      Object.entries(translations.predictorList).filter(([, v]) => v !== undefined),
-                    )
-                  : undefined
+                  ? {
+                      ...Object.fromEntries(
+                        Object.entries(translations.predictorList).filter(
+                          ([, v]) => v !== undefined,
+                        ),
+                      ),
+                      statGrid: translations.statGrid,
+                    }
+                  : translations.statGrid
+                    ? { statGrid: translations.statGrid }
+                    : undefined
               }
             />
           )}
