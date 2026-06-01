@@ -100,8 +100,9 @@ export const AvatarPicker: FC<AvatarPickerProps> = ({
                 <button
                   key="glasses-none"
                   type="button"
+                  role="radio"
                   className={`avatar-picker__chip avatar-picker__chip--style${currentValue === undefined ? ' avatar-picker__chip--selected' : ''}`}
-                  aria-pressed={currentValue === undefined}
+                  aria-checked={currentValue === undefined}
                   aria-label={`${label} ${labels.glassesNone}`}
                   onClick={() =>
                     onChange({
@@ -120,9 +121,10 @@ export const AvatarPicker: FC<AvatarPickerProps> = ({
                     <button
                       key={v}
                       type="button"
+                      role="radio"
                       className={`avatar-picker__chip avatar-picker__chip--color${isSelected ? ' avatar-picker__chip--selected' : ''}`}
                       style={{ backgroundColor: `#${v}` }}
-                      aria-pressed={isSelected}
+                      aria-checked={isSelected}
                       aria-label={labels.swatchColorAria
                         .replace('{trait}', label)
                         .replace('{color}', v)}
@@ -145,8 +147,9 @@ export const AvatarPicker: FC<AvatarPickerProps> = ({
                     <button
                       key={v}
                       type="button"
+                      role="radio"
                       className={`avatar-picker__chip avatar-picker__chip--style${isSelected ? ' avatar-picker__chip--selected' : ''}`}
-                      aria-pressed={isSelected}
+                      aria-checked={isSelected}
                       aria-label={labels.swatchStyleAria
                         .replace('{trait}', label)
                         .replace('{n}', String(i + 1))}
