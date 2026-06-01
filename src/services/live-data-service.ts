@@ -165,9 +165,12 @@ function loadPreviousRankings(): Map<string, number> {
   }
 }
 
-function storeRankingsSnapshot(entries: { userId: string; position: number }[]): void {
+function storeRankingsSnapshot(entries: { predictorId: string; position: number }[]): void {
   try {
-    const data: [string, number][] = entries.map((e) => [e.userId, e.position]);
+    // Key on predictorId, not userId: one account can have multiple predictors in
+    // the top-100, and a userId key would collapse them (last-write-wins) and yield
+    // wrong rank-change arrows. predictorId is the unique ranking-row identity.
+    const data: [string, number][] = entries.map((e) => [e.predictorId, e.position]);
     localStorage.setItem(RANKINGS_SNAPSHOT_KEY, JSON.stringify(data));
   } catch {
     // storage unavailable
@@ -176,10 +179,10 @@ function storeRankingsSnapshot(entries: { userId: string; position: number }[]):
 
 function computeRankChange(
   index: number,
-  userId: string,
+  predictorId: string,
   prevMap: Map<string, number>,
 ): 'up' | 'down' | 'same' | undefined {
-  const prevPos = prevMap.get(userId);
+  const prevPos = prevMap.get(predictorId);
   if (prevPos == null) return undefined;
   if (prevPos < index + 1) return 'down';
   if (prevPos > index + 1) return 'up';
@@ -339,12 +342,14 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
       accuracy: Math.round(s.accuracy * 100),
       streak: s.currentStreak,
       badges: s.badgesAwarded ?? undefined,
-      rankChange: computeRankChange(index, s.userId, prevRankings),
+      rankChange: computeRankChange(index, s.predictorId, prevRankings),
       todayMatchBets: todayBets.predictorBets.get(s.predictorId),
     };
   });
 
-  storeRankingsSnapshot(entries.map((e, i) => ({ userId: e.userId, position: i + 1 })));
+  // Map over `sorted` (ApiRankingEntry, predictorId is required) rather than `entries`
+  // (view model, predictorId optional) — 1:1 in order, so positions are identical.
+  storeRankingsSnapshot(sorted.map((s, i) => ({ predictorId: s.predictorId, position: i + 1 })));
 
   return entries;
 }
