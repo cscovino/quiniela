@@ -31,10 +31,10 @@
 }
 
 .prediction-form__teams {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 
 .prediction-form__team {
@@ -42,8 +42,7 @@
   flex-direction: row;
   align-items: center;
   gap: var(--space-2);
-  flex: 1;
-  min-width: 0; /* enables child truncation in flex context */
+  min-width: 0; /* enables child truncation in grid context */
 }
 
 .prediction-form__team-name {
