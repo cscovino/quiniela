@@ -2,13 +2,14 @@ import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
 import { Typography } from '@atoms/Typography';
+import { bucketByLocalDay } from '@utils/points-history';
 
 import './PointsChart.css';
 
 export interface PointEntry {
   date: Date;
   points: number;
-  cumulative: number;
+  cumulative?: number;
   matchId?: string;
 }
 
@@ -26,6 +27,8 @@ export interface PointsChartProps {
     noData: string;
     points: string;
     matches: string;
+    chartAriaLabel: string;
+    legendToggleAria: string;
   };
   className?: string;
 }
@@ -47,28 +50,22 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
 
     const colored = assignColors(series);
 
-    const withCumulative = colored.map((s) => {
-      const sorted = [...s.data].sort((a, b) => a.date.getTime() - b.date.getTime());
-      const cumulative: PointEntry[] = [];
-      let total = 0;
-      for (const entry of sorted) {
-        total += entry.points;
-        cumulative.push({ ...entry, cumulative: total });
-      }
-      return { ...s, data: cumulative, totalPoints: total };
+    const seriesWithBuckets = colored.map((s) => {
+      const bucket = bucketByLocalDay(s.data);
+      const totalPoints = Array.from(bucket.values()).reduce((a, b) => a + b, 0);
+      return { ...s, bucket, totalPoints };
     });
 
-    const allDates = withCumulative.flatMap((s) => s.data.map((e) => e.date.getTime()));
-    const minDate = Math.min(...allDates);
-    const maxDate = Math.max(...allDates);
-    const dateRange = maxDate - minDate || 1;
+    const allDateKeys = [
+      ...new Set(seriesWithBuckets.flatMap((s) => Array.from(s.bucket.keys()))),
+    ].sort();
 
-    const maxPoints = Math.max(
-      ...withCumulative.flatMap((s) => s.data.map((e) => e.cumulative)),
+    const maxDelta = Math.max(
+      ...seriesWithBuckets.flatMap((s) => Array.from(s.bucket.values())),
       0,
     );
 
-    return { series: withCumulative, minDate, dateRange, maxPoints };
+    return { series: seriesWithBuckets, allDateKeys, maxDelta };
   }, [series]);
 
   if (!processed || processed.series.every((s) => s.data.length === 0)) {
@@ -82,7 +79,7 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
     );
   }
 
-  const { series: chartSeries, minDate, dateRange, maxPoints } = processed;
+  const { series: chartSeries, allDateKeys, maxDelta } = processed;
 
   const width = 600;
   const height = 200;
@@ -90,21 +87,22 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
-  const getX = (date: Date) => padding.left + ((date.getTime() - minDate) / dateRange) * chartWidth;
-
-  const getY = (pts: number) => padding.top + chartHeight - (pts / (maxPoints || 1)) * chartHeight;
+  const getY = (pts: number) => padding.top + chartHeight - (pts / (maxDelta || 1)) * chartHeight;
 
   const yTicks = 5;
   const yTickValues = Array.from({ length: yTicks + 1 }, (_, i) =>
-    Math.round((maxPoints / yTicks) * i),
+    Math.round((maxDelta / yTicks) * i),
   );
 
-  const allPoints = chartSeries.flatMap((s) => s.data);
-  const xTickCount = Math.min(allPoints.length, 5);
-  const uniqueDates = [...new Set(allPoints.map((p) => p.date.getTime()))].sort((a, b) => a - b);
+  const totalDays = allDateKeys.length;
+  const slotWidth = chartWidth / (totalDays || 1);
+  const seriesCount = chartSeries.length;
+  const barWidth = Math.max(4, Math.min(20, (slotWidth * 0.8) / (seriesCount || 1)));
+
+  const xTickCount = Math.min(totalDays, 5);
   const xTickIndices = Array.from({ length: xTickCount }, (_, i) => {
-    const idx = Math.round((i / (xTickCount - 1)) * (uniqueDates.length - 1));
-    return uniqueDates[idx];
+    const idx = xTickCount <= 1 ? 0 : Math.round((i / (xTickCount - 1)) * (totalDays - 1));
+    return idx;
   });
 
   const handleLegendClick = (id: string) => {
@@ -116,7 +114,7 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
   };
 
   const totalPointsAcross = chartSeries.reduce((sum, s) => sum + s.totalPoints, 0);
-  const totalMatches = allPoints.length;
+  const totalMatches = allDateKeys.length;
 
   return (
     <div className={`points-chart ${className}`}>
@@ -126,6 +124,7 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
           viewBox={`0 0 ${width} ${height}`}
           className="points-chart__svg"
           preserveAspectRatio="xMidYMid meet"
+          aria-label={translations.chartAriaLabel}
         >
           {yTickValues.map((val) => (
             <g key={val}>
@@ -151,49 +150,59 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
             </g>
           ))}
 
-          {xTickIndices.map((ts) => {
-            const date = new Date(ts);
+          {xTickIndices.map((idx) => {
+            const dateKey = allDateKeys[idx];
+            if (!dateKey) return null;
+            const slotCenterX = padding.left + idx * slotWidth + slotWidth / 2;
             return (
               <text
-                key={ts}
-                x={getX(date)}
+                key={dateKey}
+                x={slotCenterX}
                 y={height - 5}
                 textAnchor="middle"
                 fill="var(--text-muted)"
                 fontSize="9"
                 fontFamily="var(--font-body)"
               >
-                {date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {new Date(dateKey).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                })}
               </text>
             );
           })}
 
-          {chartSeries.map((s) => {
+          {chartSeries.map((s, i) => {
             const isDimmed = highlightedId !== null && highlightedId !== s.id;
+            const groupWidth = barWidth * seriesCount + 2 * (seriesCount - 1);
             return (
               <g
                 key={s.id}
-                className={`points-chart__line-group ${isDimmed ? 'points-chart__line-group--dimmed' : ''}`}
+                className={`points-chart__bar-group ${isDimmed ? 'points-chart__bar-group--dimmed' : ''}`}
               >
-                <path
-                  d={s.data
-                    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${getX(p.date)} ${getY(p.cumulative)}`)
-                    .join(' ')}
-                  fill="none"
-                  stroke={s.color}
-                  strokeWidth="2"
-                />
-                {s.data.map((p, i) => (
-                  <circle
-                    key={i}
-                    cx={getX(p.date)}
-                    cy={getY(p.cumulative)}
-                    r="3"
-                    fill="var(--bg-card)"
-                    stroke={s.color}
-                    strokeWidth="2"
-                  />
-                ))}
+                {allDateKeys.map((dateKey, d) => {
+                  const points = s.bucket.get(dateKey) ?? 0;
+                  if (points === 0) return null;
+                  const slotCenterX = padding.left + d * slotWidth + slotWidth / 2;
+                  const groupStartX = slotCenterX - groupWidth / 2;
+                  const barX = groupStartX + i * (barWidth + 2);
+                  const barHeight = (points / (maxDelta || 1)) * chartHeight;
+                  const barY = padding.top + chartHeight - barHeight;
+                  return (
+                    <rect
+                      key={dateKey}
+                      x={barX}
+                      y={barY}
+                      width={barWidth}
+                      height={barHeight}
+                      fill={s.color}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLegendClick(s.id);
+                      }}
+                    />
+                  );
+                })}
               </g>
             );
           })}
@@ -213,7 +222,7 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
                 e.stopPropagation();
                 handleLegendClick(s.id);
               }}
-              aria-label={`Toggle highlight for ${s.name}`}
+              aria-label={translations.legendToggleAria.replace('{name}', s.name)}
             >
               <span className="points-chart__legend-swatch" style={{ backgroundColor: s.color }} />
               <span className="points-chart__legend-name">{s.name}</span>

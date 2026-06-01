@@ -63,6 +63,8 @@ export interface ProfileTemplateProps {
       editProfile?: string;
       viewAria?: string;
     };
+    chartAriaLabel?: string;
+    legendToggleAria?: string;
   };
   locale?: 'en' | 'es';
   className?: string;
@@ -389,6 +391,8 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
               noData: translations.noPointsData,
               points: translations.points,
               matches: translations.matches,
+              chartAriaLabel: translations.chartAriaLabel || 'Points earned per day',
+              legendToggleAria: translations.legendToggleAria || 'Toggle highlight for {name}',
             }}
           />
         </section>
