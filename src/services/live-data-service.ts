@@ -333,6 +333,7 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
       displayName: s.displayName || s.predictorId,
       avatarUrl: s.avatarUrl || undefined,
       avatar: s.avatar || undefined,
+      pixelArt: s.pixelArt ?? undefined,
       points: s.totalPoints,
       todayPoints,
       accuracy: Math.round(s.accuracy * 100),

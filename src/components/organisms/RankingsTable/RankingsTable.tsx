@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 
+import type { AvatarOptions } from '@app-types/firestore';
 import { Button } from '@atoms/Button';
 import { Typography } from '@atoms/Typography';
 import { RankingRow } from '@molecules/RankingRow';
@@ -24,6 +25,7 @@ export interface RankingEntry {
   predictorId?: string;
   avatarUrl?: string;
   avatar?: { bgColor: string; emoji: string };
+  pixelArt?: { seed: string; options: AvatarOptions } | null;
   displayName: string;
   points: number;
   todayPoints?: number;
@@ -80,8 +82,8 @@ export const RankingsTable: FC<RankingsTableProps> = ({
           <RankingRow
             key={entry.predictorId || entry.userId}
             position={(page - 1) * 20 + index + 1}
-            avatarUrl={entry.avatarUrl}
-            avatar={entry.avatar}
+            predictorId={entry.predictorId}
+            pixelArt={entry.pixelArt}
             displayName={entry.displayName}
             points={entry.points}
             todayPoints={entry.todayPoints}

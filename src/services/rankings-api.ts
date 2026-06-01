@@ -1,3 +1,5 @@
+import type { AvatarOptions } from '@app-types/firestore';
+
 import { getAppCheckToken } from './firebase';
 
 /**
@@ -15,6 +17,7 @@ export interface ApiRankingEntry {
   displayName: string;
   avatarUrl: string | null;
   avatar: { bgColor: string; emoji: string } | null;
+  pixelArt?: { seed: string; options: AvatarOptions } | null;
   totalPoints: number;
   /** Raw accuracy in the 0..1 range (multiply by 100 for a percentage). */
   accuracy: number;
