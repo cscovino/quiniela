@@ -186,7 +186,7 @@ describe('predictor-service', () => {
     });
 
     it('persists pixelArt and calls deleteField for legacy avatar/avatarUrl', async () => {
-      vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
+      vi.mocked(firebaseFirestore.updateDoc).mockResolvedValue();
       // Mock deleteField to return a sentinel so we can detect it in the payload
       vi.mocked(firebaseFirestore.deleteField).mockReturnValue({
         isEqual: vi.fn(),
@@ -210,15 +210,46 @@ describe('predictor-service', () => {
       });
 
       expect(firebaseFirestore.deleteField).toHaveBeenCalled();
-      expect(firebaseFirestore.setDoc).toHaveBeenCalledWith(
+      expect(firebaseFirestore.updateDoc).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
-          pixelArt: validPixelArt,
+          pixelArt: expect.objectContaining({
+            seed: validPixelArt.seed,
+            options: validPixelArt.options,
+          }),
           avatar: expect.anything(), // deleteField sentinel
           avatarUrl: expect.anything(), // deleteField sentinel
         }),
-        expect.objectContaining({ merge: true }),
       );
+    });
+
+    it('omits glasses key from Firestore payload when glasses is undefined (None)', async () => {
+      vi.mocked(firebaseFirestore.updateDoc).mockResolvedValue();
+      vi.mocked(firebaseFirestore.deleteField).mockReturnValue({
+        isEqual: vi.fn(),
+        _methodName: 'FieldValue.delete',
+      } as any);
+
+      await predictorService.updatePredictor('user-1', 'user-1-default', {
+        pixelArt: {
+          seed: 'valid-seed',
+          options: { glasses: undefined, skinColor: AVATAR_PRESETS.skinColor[0] },
+        },
+      });
+
+      expect(firebaseFirestore.updateDoc).toHaveBeenCalled();
+      const callPayload = vi.mocked(firebaseFirestore.updateDoc).mock.calls[0][1] as any;
+      expect(callPayload.pixelArt.options).not.toHaveProperty('glasses');
+      expect(callPayload.avatar).toBeDefined(); // deleteField sentinel
+      expect(callPayload.avatarUrl).toBeDefined(); // deleteField sentinel
+    });
+
+    it('rejects options: null (bypasses all trait checks)', async () => {
+      await expect(
+        predictorService.updatePredictor('user-1', 'user-1-default', {
+          pixelArt: { seed: 'valid-seed', options: null as any },
+        }),
+      ).rejects.toThrow('Invalid avatar options');
     });
 
     it('rejects out-of-set hair value', async () => {
@@ -246,7 +277,7 @@ describe('predictor-service', () => {
     });
 
     it('accepts glasses undefined (represents None — no throw)', async () => {
-      vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
+      vi.mocked(firebaseFirestore.updateDoc).mockResolvedValue();
       vi.mocked(firebaseFirestore.deleteField).mockReturnValue({
         isEqual: vi.fn(),
         _methodName: 'FieldValue.delete',

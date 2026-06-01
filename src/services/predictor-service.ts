@@ -12,6 +12,7 @@ import {
   serverTimestamp,
   setDoc,
   type Timestamp,
+  updateDoc,
   where,
   writeBatch,
 } from 'firebase/firestore';
@@ -67,6 +68,14 @@ function validateAvatar(avatar?: { bgColor?: string; emoji?: string }): string |
   return null;
 }
 
+// Strips keys whose value is undefined so no undefined field reaches Firestore.
+// (Firebase JS SDK v9+ drops undefined nested keys silently, causing stale values to survive.)
+function stripUndefinedOptions(options: AvatarOptions): AvatarOptions {
+  return Object.fromEntries(
+    Object.entries(options).filter(([, v]) => v !== undefined),
+  ) as AvatarOptions;
+}
+
 // D-04: strict allow-list validation — mirrors validateAvatar pattern.
 // Rejects any option value outside the curated AVATAR_PRESETS and any empty/oversized seed.
 // glasses undefined is accepted (represents "None" — D-02).
@@ -79,7 +88,10 @@ function validatePixelArt(pixelArt?: { seed: string; options: AvatarOptions }): 
   ) {
     return 'Invalid avatar seed';
   }
-  const o = pixelArt.options ?? {};
+  if (typeof pixelArt.options !== 'object' || pixelArt.options === null) {
+    return 'Invalid avatar options';
+  }
+  const o = pixelArt.options;
   const inSet = (value: string | undefined, set: readonly string[]): boolean =>
     value === undefined || set.includes(value);
   if (!inSet(o.skinColor, AVATAR_PRESETS.skinColor)) return 'Invalid skinColor';
@@ -120,7 +132,9 @@ export const predictorService = {
       name,
       ...(avatarUrl && { avatarUrl }),
       ...(favouriteTeamId && { favouriteTeamId }),
-      ...(pixelArt && { pixelArt }),
+      ...(pixelArt && {
+        pixelArt: { seed: pixelArt.seed, options: stripUndefinedOptions(pixelArt.options) },
+      }),
     };
 
     await setDoc(doc(getDb(), 'users', userId, 'predictors', predictorId), {
@@ -166,13 +180,21 @@ export const predictorService = {
     const ref = doc(getDb(), 'users', userId, 'predictors', predictorId);
 
     // D-04: when persisting pixelArt, clear the legacy avatar/avatarUrl fields
-    // in the same write. deleteField() actually removes the field (null would store null).
+    // in the same write. Use updateDoc (not setDoc merge:true) so the entire
+    // pixelArt.options map is REPLACED — setDoc with merge:true recursively
+    // merges nested maps, which would leave stale keys (e.g. a prior glasses
+    // value) when switching to "None" (glasses: undefined → key omitted).
+    // stripUndefinedOptions ensures no undefined values reach Firestore.
     if (patch.pixelArt !== undefined) {
-      await setDoc(
-        ref,
-        { ...patch, avatar: deleteField(), avatarUrl: deleteField() },
-        { merge: true },
-      );
+      await updateDoc(ref, {
+        ...patch,
+        pixelArt: {
+          seed: patch.pixelArt.seed,
+          options: stripUndefinedOptions(patch.pixelArt.options),
+        },
+        avatar: deleteField(),
+        avatarUrl: deleteField(),
+      });
     } else {
       await setDoc(ref, patch, { merge: true });
     }
