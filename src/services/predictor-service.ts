@@ -1,6 +1,7 @@
 import {
   collection,
   deleteDoc,
+  deleteField,
   doc,
   type DocumentData,
   type DocumentReference,
@@ -15,7 +16,8 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 
-import type { Predictor, PredictorStats } from '@app-types/firestore';
+import type { AvatarOptions, Predictor, PredictorStats } from '@app-types/firestore';
+import { AVATAR_PRESETS } from '@utils/avatar-presets';
 import {
   getPredictorProgress,
   type GroupBetRecord,
@@ -65,6 +67,30 @@ function validateAvatar(avatar?: { bgColor?: string; emoji?: string }): string |
   return null;
 }
 
+// D-04: strict allow-list validation — mirrors validateAvatar pattern.
+// Rejects any option value outside the curated AVATAR_PRESETS and any empty/oversized seed.
+// glasses undefined is accepted (represents "None" — D-02).
+function validatePixelArt(pixelArt?: { seed: string; options: AvatarOptions }): string | null {
+  if (!pixelArt) return null;
+  if (
+    typeof pixelArt.seed !== 'string' ||
+    pixelArt.seed.length === 0 ||
+    pixelArt.seed.length > 64
+  ) {
+    return 'Invalid avatar seed';
+  }
+  const o = pixelArt.options ?? {};
+  const inSet = (value: string | undefined, set: readonly string[]): boolean =>
+    value === undefined || set.includes(value);
+  if (!inSet(o.skinColor, AVATAR_PRESETS.skinColor)) return 'Invalid skinColor';
+  if (!inSet(o.hair, AVATAR_PRESETS.hair)) return 'Invalid hair';
+  if (!inSet(o.hairColor, AVATAR_PRESETS.hairColor)) return 'Invalid hairColor';
+  if (!inSet(o.clothing, AVATAR_PRESETS.clothing)) return 'Invalid clothing';
+  if (!inSet(o.clothingColor, AVATAR_PRESETS.clothingColor)) return 'Invalid clothingColor';
+  if (!inSet(o.glasses, AVATAR_PRESETS.glasses)) return 'Invalid glasses';
+  return null;
+}
+
 export const predictorService = {
   async getUserPredictors(userId: string): Promise<Predictor[]> {
     const predictorsRef = collection(getDb(), 'users', userId, 'predictors');
@@ -77,9 +103,15 @@ export const predictorService = {
     name: string,
     avatarUrl?: string,
     favouriteTeamId?: string,
+    pixelArt?: { seed: string; options: AvatarOptions },
   ): Promise<Predictor> {
     const nameError = validateName(name);
     if (nameError) throw new Error(nameError);
+
+    if (pixelArt !== undefined) {
+      const pixelArtError = validatePixelArt(pixelArt);
+      if (pixelArtError) throw new Error(pixelArtError);
+    }
 
     const predictorId = `${userId}-${Date.now()}`;
     const predictor: Omit<Predictor, 'createdAt'> = {
@@ -88,6 +120,7 @@ export const predictorService = {
       name,
       ...(avatarUrl && { avatarUrl }),
       ...(favouriteTeamId && { favouriteTeamId }),
+      ...(pixelArt && { pixelArt }),
     };
 
     await setDoc(doc(getDb(), 'users', userId, 'predictors', predictorId), {
@@ -113,6 +146,7 @@ export const predictorService = {
     patch: {
       name?: string;
       avatar?: { bgColor: string; emoji: string };
+      pixelArt?: { seed: string; options: AvatarOptions };
       favouriteTeamId?: string | null;
     },
   ): Promise<void> {
@@ -124,9 +158,24 @@ export const predictorService = {
       const avatarError = validateAvatar(patch.avatar);
       if (avatarError) throw new Error(avatarError);
     }
+    if (patch.pixelArt !== undefined) {
+      const pixelArtError = validatePixelArt(patch.pixelArt);
+      if (pixelArtError) throw new Error(pixelArtError);
+    }
 
     const ref = doc(getDb(), 'users', userId, 'predictors', predictorId);
-    await setDoc(ref, patch, { merge: true });
+
+    // D-04: when persisting pixelArt, clear the legacy avatar/avatarUrl fields
+    // in the same write. deleteField() actually removes the field (null would store null).
+    if (patch.pixelArt !== undefined) {
+      await setDoc(
+        ref,
+        { ...patch, avatar: deleteField(), avatarUrl: deleteField() },
+        { merge: true },
+      );
+    } else {
+      await setDoc(ref, patch, { merge: true });
+    }
   },
 
   async deletePredictor(
