@@ -83,7 +83,7 @@ describe('AvatarPicker', () => {
       );
 
       // First skinColor preset is '8d5524' — bare hex, no #
-      const firstSkinColorChip = screen.getByRole('button', {
+      const firstSkinColorChip = screen.getByRole('radio', {
         name: /Skin color 8d5524/i,
       });
       await user.click(firstSkinColorChip);
@@ -115,7 +115,7 @@ describe('AvatarPicker', () => {
         />,
       );
 
-      const noneChip = screen.getByRole('button', { name: /Glasses None/i });
+      const noneChip = screen.getByRole('radio', { name: /Glasses None/i });
       await user.click(noneChip);
 
       expect(handleChange).toHaveBeenCalledTimes(1);
@@ -126,7 +126,7 @@ describe('AvatarPicker', () => {
       ).toBeUndefined();
     });
 
-    it('None chip shows aria-pressed=true when glasses is undefined', () => {
+    it('None chip shows aria-checked=true when glasses is undefined', () => {
       render(
         <AvatarPicker
           value={{ ...defaultValue, options: { ...defaultValue.options, glasses: undefined } }}
@@ -136,8 +136,8 @@ describe('AvatarPicker', () => {
         />,
       );
 
-      const noneChip = screen.getByRole('button', { name: /Glasses None/i });
-      expect(noneChip).toHaveAttribute('aria-pressed', 'true');
+      const noneChip = screen.getByRole('radio', { name: /Glasses None/i });
+      expect(noneChip).toHaveAttribute('aria-checked', 'true');
     });
   });
 
@@ -163,7 +163,7 @@ describe('AvatarPicker', () => {
   });
 
   describe('Selected chip state', () => {
-    it('currently selected chip has aria-pressed=true and --selected class', () => {
+    it('currently selected chip has aria-checked=true and --selected class', () => {
       render(
         <AvatarPicker
           value={defaultValue}
@@ -174,17 +174,17 @@ describe('AvatarPicker', () => {
       );
 
       // skinColor[0] is '8d5524' — should be selected
-      const selectedChip = screen.getByRole('button', { name: /Skin color 8d5524/i });
-      expect(selectedChip).toHaveAttribute('aria-pressed', 'true');
+      const selectedChip = screen.getByRole('radio', { name: /Skin color 8d5524/i });
+      expect(selectedChip).toHaveAttribute('aria-checked', 'true');
       expect(selectedChip).toHaveClass('avatar-picker__chip--selected');
 
       // skinColor[1] is 'a86540' — should NOT be selected
-      const unselectedChip = screen.getByRole('button', { name: /Skin color a86540/i });
-      expect(unselectedChip).toHaveAttribute('aria-pressed', 'false');
+      const unselectedChip = screen.getByRole('radio', { name: /Skin color a86540/i });
+      expect(unselectedChip).toHaveAttribute('aria-checked', 'false');
       expect(unselectedChip).not.toHaveClass('avatar-picker__chip--selected');
     });
 
-    it('style chip corresponding to current value has aria-pressed=true', () => {
+    it('style chip corresponding to current value has aria-checked=true', () => {
       render(
         <AvatarPicker
           value={defaultValue}
@@ -195,8 +195,8 @@ describe('AvatarPicker', () => {
       );
 
       // hair[0] is 'short01', style index 1
-      const selectedHairChip = screen.getByRole('button', { name: /Hair style 1$/i });
-      expect(selectedHairChip).toHaveAttribute('aria-pressed', 'true');
+      const selectedHairChip = screen.getByRole('radio', { name: /Hair style 1$/i });
+      expect(selectedHairChip).toHaveAttribute('aria-checked', 'true');
       expect(selectedHairChip).toHaveClass('avatar-picker__chip--selected');
     });
   });
@@ -221,7 +221,7 @@ describe('AvatarPicker', () => {
       expect(screen.getByRole('radiogroup', { name: 'Lentes' })).toBeInTheDocument();
 
       // Spanish None label appears
-      expect(screen.getByRole('button', { name: /Lentes Ninguno/i })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: /Lentes Ninguno/i })).toBeInTheDocument();
 
       // No English labels in DOM
       expect(screen.queryByRole('radiogroup', { name: 'Skin' })).not.toBeInTheDocument();
