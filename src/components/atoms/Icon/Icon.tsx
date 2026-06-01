@@ -75,6 +75,7 @@ export interface IconProps {
   size?: number;
   color?: string;
   className?: string;
+  ariaLabel?: string;
 }
 
 const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: string }>> = {
@@ -115,7 +116,7 @@ const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: 
   zap: Zap,
 };
 
-export const Icon: FC<IconProps> = ({ name, size = 24, color, className = '' }) => {
+export const Icon: FC<IconProps> = ({ name, size = 24, color, className = '', ariaLabel }) => {
   const Component = iconMap[name];
 
   return (
@@ -123,7 +124,7 @@ export const Icon: FC<IconProps> = ({ name, size = 24, color, className = '' }) 
       className={`icon ${className}`}
       style={color ? ({ '--icon-color': color } as CSSProperties) : undefined}
       role="img"
-      aria-label={name}
+      aria-label={ariaLabel ?? name}
     >
       <Component width={size} height={size} />
     </span>
