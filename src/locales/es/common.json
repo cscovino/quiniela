@@ -114,11 +114,26 @@
       "noPointsData": "Aún no hay datos de puntos",
       "points": "Puntos",
       "matches": "Partidos",
+      "chartAriaLabel": "Puntos ganados por día",
+      "legendToggleAria": "Resaltar {name}",
       "yourPredictors": "Tus Pronosticadores",
       "selectPredictor": "Selecciona un pronosticador para ver detalles",
       "editProfile": "Editar Cuenta",
       "predictorList": {
         "viewAria": "Ver {name}"
+      },
+      "statGrid": {
+        "statPoints": "Pts",
+        "statAccuracy": "Prec",
+        "statCurrentStreak": "Racha",
+        "statBestStreak": "Mejor",
+        "statExactBets": "Exactas",
+        "statGroups": "Grupos",
+        "statPointsAriaLabel": "Puntos: {value}",
+        "statAccuracyAriaLabel": "Precisión: {value}",
+        "statCurrentStreakAriaLabel": "Racha actual: {value}",
+        "statBestStreakAriaLabel": "Mejor racha: {value}",
+        "statExactBetsAriaLabel": "Apuestas exactas: {value}"
       },
       "cancelEditing": "Cancelar",
       "saveProfile": "Guardar Cambios",

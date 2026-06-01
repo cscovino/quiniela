@@ -114,11 +114,26 @@
       "noPointsData": "No points data yet",
       "points": "Points",
       "matches": "Matches",
+      "chartAriaLabel": "Points earned per day",
+      "legendToggleAria": "Toggle highlight for {name}",
       "yourPredictors": "Your Predictors",
       "selectPredictor": "Select a predictor to view details",
       "editProfile": "Edit Account",
       "predictorList": {
         "viewAria": "View {name}"
+      },
+      "statGrid": {
+        "statPoints": "Pts",
+        "statAccuracy": "Acc",
+        "statCurrentStreak": "Streak",
+        "statBestStreak": "Best",
+        "statExactBets": "Exact",
+        "statGroups": "Groups",
+        "statPointsAriaLabel": "Points: {value}",
+        "statAccuracyAriaLabel": "Accuracy: {value}",
+        "statCurrentStreakAriaLabel": "Current streak: {value}",
+        "statBestStreakAriaLabel": "Best streak: {value}",
+        "statExactBetsAriaLabel": "Exact bets: {value}"
       },
       "cancelEditing": "Cancel",
       "saveProfile": "Save Changes",
