@@ -302,11 +302,11 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
   }
 
   const displayStats = {
-    totalPoints: stats?.totalPoints || 0,
-    exactBets: stats?.exactBets || 0,
-    accuracy: stats?.accuracy || 0,
-    currentStreak: stats?.currentStreak || 0,
-    maxStreak: stats?.maxStreak || 0,
+    totalPoints: stats?.totalPoints ?? 0,
+    exactBets: stats?.exactBets ?? 0,
+    accuracy: stats?.accuracy ?? 0,
+    currentStreak: stats?.currentStreak ?? 0,
+    maxStreak: stats?.maxStreak ?? 0,
     rank: rank || 0,
   };
 
