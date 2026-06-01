@@ -26,6 +26,7 @@ import { FIRST_PREDICTOR_TOUR, PREDICTION_WIZARD_TOUR } from '@organisms/Product
 import { predictorService } from '@services/predictor-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
+import { useToastStore } from '@store/toast-store';
 import { getLoginRoute } from '@utils/i18n';
 
 import './PredictionsTemplate.css';
@@ -115,13 +116,20 @@ export interface PredictionsTemplateProps {
       editTitle?: string;
       nameLabel?: string;
       namePlaceholder?: string;
-      emojiLabel?: string;
-      colorLabel?: string;
       save?: string;
       cancel?: string;
       nameRequired?: string;
-      emojiAria?: string;
-      colorAria?: string;
+      skinLabel?: string;
+      hairLabel?: string;
+      hairColorLabel?: string;
+      clothingLabel?: string;
+      clothingColorLabel?: string;
+      glassesLabel?: string;
+      glassesNone?: string;
+      randomize?: string;
+      randomizeAria?: string;
+      swatchColorAria?: string;
+      swatchStyleAria?: string;
     };
     predictorDelete?: {
       title?: string;
@@ -374,6 +382,15 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       ]);
       await loadPredictorEntries();
       setView('list');
+    } catch (err) {
+      console.warn('[PredictionsTemplate] createPredictor failed', err);
+      useToastStore
+        .getState()
+        .addToast({
+          title: translations.submitError,
+          message: translations.submitError,
+          type: 'error',
+        });
     } finally {
       setIsSubmitting(false);
     }
@@ -407,6 +424,15 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       await loadPredictorEntries();
       setView('list');
       setEditingPredictor(null);
+    } catch (err) {
+      console.warn('[PredictionsTemplate] updatePredictor failed', err);
+      useToastStore
+        .getState()
+        .addToast({
+          title: translations.submitError,
+          message: translations.submitError,
+          type: 'error',
+        });
     } finally {
       setIsSubmitting(false);
     }
