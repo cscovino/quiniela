@@ -19,7 +19,7 @@ describe('bucketByLocalDay', () => {
         { date: june12b, points: 3 },
       ]);
       expect(result.size).toBe(1);
-      expect(result.get(june12.toLocaleDateString())).toBe(8);
+      expect(result.get('2026-06-12')).toBe(8);
     });
 
     it('keeps separate buckets for different days', () => {
@@ -29,8 +29,8 @@ describe('bucketByLocalDay', () => {
         { date: june15, points: 7 },
       ]);
       expect(result.size).toBe(2);
-      expect(result.get(june12.toLocaleDateString())).toBe(8);
-      expect(result.get(june15.toLocaleDateString())).toBe(7);
+      expect(result.get('2026-06-12')).toBe(8);
+      expect(result.get('2026-06-15')).toBe(7);
     });
   });
 
@@ -38,7 +38,7 @@ describe('bucketByLocalDay', () => {
     it('still buckets an entry with zero points', () => {
       const result = bucketByLocalDay([{ date: june12, points: 0 }]);
       expect(result.size).toBe(1);
-      expect(result.get(june12.toLocaleDateString())).toBe(0);
+      expect(result.get('2026-06-12')).toBe(0);
     });
   });
 
@@ -49,8 +49,8 @@ describe('bucketByLocalDay', () => {
         { date: june15, points: 7 },
       ]);
       expect(result.size).toBe(2);
-      expect(result.get(june12.toLocaleDateString())).toBe(5);
-      expect(result.get(june15.toLocaleDateString())).toBe(7);
+      expect(result.get('2026-06-12')).toBe(5);
+      expect(result.get('2026-06-15')).toBe(7);
     });
   });
 });

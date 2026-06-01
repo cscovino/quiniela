@@ -164,10 +164,13 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
                 fontSize="9"
                 fontFamily="var(--font-body)"
               >
-                {new Date(dateKey).toLocaleDateString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                })}
+                {(() => {
+                  const [y, m, d] = dateKey.split('-').map(Number);
+                  return new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                  });
+                })()}
               </text>
             );
           })}
