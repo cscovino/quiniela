@@ -87,7 +87,9 @@ describe('PredictorList', () => {
     it('calls onEdit with the correct predictor id when edit button is clicked', () => {
       onEdit.mockClear();
       render(<PredictorList {...defaultProps} />);
-      const editButtons = screen.getAllByRole('button', { name: /Edit name and avatar for Alpha/i });
+      const editButtons = screen.getAllByRole('button', {
+        name: /Edit name and avatar for Alpha/i,
+      });
       fireEvent.click(editButtons[0]);
       expect(onEdit).toHaveBeenCalledWith('pred-A');
     });
@@ -98,6 +100,140 @@ describe('PredictorList', () => {
       const deleteButton = screen.getByRole('button', { name: /Delete Alpha/i });
       fireEvent.click(deleteButton);
       expect(onDelete).toHaveBeenCalledWith('pred-A');
+    });
+  });
+
+  describe('stat grid', () => {
+    const mockEntryWithStats: PredictorListEntry = {
+      predictor: {
+        id: 'pred-C',
+        userId: 'user-1',
+        name: 'Gamma',
+        createdAt: { toDate: () => new Date() } as never,
+      },
+      stats: {
+        totalPoints: 42,
+        accuracy: 0.75,
+        currentStreak: 3,
+        maxStreak: 5,
+        exactBets: 7,
+        totalBets: 10,
+      },
+    };
+
+    const mockEntryZeroTotalBets: PredictorListEntry = {
+      predictor: {
+        id: 'pred-D',
+        userId: 'user-1',
+        name: 'Delta',
+        createdAt: { toDate: () => new Date() } as never,
+      },
+      stats: {
+        totalPoints: 0,
+        accuracy: 0,
+        currentStreak: 0,
+        maxStreak: 0,
+        exactBets: 0,
+        totalBets: 0,
+      },
+    };
+
+    const mockEntryWithBadges: PredictorListEntry = {
+      predictor: {
+        id: 'pred-E',
+        userId: 'user-1',
+        name: 'Epsilon',
+        createdAt: { toDate: () => new Date() } as never,
+      },
+      badgesAwarded: { first_bet: '2026-06-01' },
+    };
+
+    const statGridTranslations = {
+      statGrid: {
+        statPoints: 'Pts',
+        statAccuracy: 'Acc',
+        statCurrentStreak: 'Streak',
+        statBestStreak: 'Best',
+        statExactBets: 'Exact',
+        statGroups: 'Groups',
+        statPointsAriaLabel: 'Points: {value}',
+        statAccuracyAriaLabel: 'Accuracy: {value}',
+        statCurrentStreakAriaLabel: 'Current streak: {value}',
+        statBestStreakAriaLabel: 'Best streak: {value}',
+        statExactBetsAriaLabel: 'Exact bets: {value}',
+      },
+    };
+
+    it('renders predictor-list__stat-grid element when stats prop is provided', () => {
+      const { container } = render(
+        <PredictorList
+          predictors={[mockEntryWithStats]}
+          onSelect={onSelect}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onCreate={onCreate}
+          translations={statGridTranslations}
+        />,
+      );
+      expect(container.querySelector('.predictor-list__stat-grid')).not.toBeNull();
+    });
+
+    it('renders — for accuracy when totalBets === 0', () => {
+      render(
+        <PredictorList
+          predictors={[mockEntryZeroTotalBets]}
+          onSelect={onSelect}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onCreate={onCreate}
+          translations={statGridTranslations}
+        />,
+      );
+      const dashes = screen.getAllByText('—');
+      expect(dashes.length).toBeGreaterThan(0);
+    });
+
+    it('renders 75% when accuracy=0.75 and totalBets=10', () => {
+      render(
+        <PredictorList
+          predictors={[mockEntryWithStats]}
+          onSelect={onSelect}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onCreate={onCreate}
+          translations={statGridTranslations}
+        />,
+      );
+      expect(screen.getByText('75%')).toBeTruthy();
+    });
+
+    it('renders 0 for totalPoints when stats.totalPoints === 0', () => {
+      const { container } = render(
+        <PredictorList
+          predictors={[mockEntryZeroTotalBets]}
+          onSelect={onSelect}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onCreate={onCreate}
+          translations={statGridTranslations}
+        />,
+      );
+      const statValues = container.querySelectorAll('.predictor-list__stat-value');
+      const pointsValue = statValues[0];
+      expect(pointsValue?.textContent).toBe('0');
+    });
+
+    it('predictor-list__card-badges is present in the DOM when badgesAwarded provided', () => {
+      const { container } = render(
+        <PredictorList
+          predictors={[mockEntryWithBadges]}
+          onSelect={onSelect}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onCreate={onCreate}
+        />,
+      );
+      expect(container.querySelector('.predictor-list__card-badges')).not.toBeNull();
     });
   });
 });

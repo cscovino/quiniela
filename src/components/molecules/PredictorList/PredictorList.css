@@ -60,10 +60,33 @@
   text-overflow: ellipsis;
 }
 
-.predictor-list__card-meta {
-  display: flex;
+.predictor-list__stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
-  align-items: center;
+  margin-top: var(--space-2);
+  width: 100%;
+}
+
+.predictor-list__stat-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.predictor-list__stat-value {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+  line-height: var(--leading-tight);
+}
+
+.predictor-list__stat-label {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: var(--leading-tight);
 }
 
 .predictor-list__card-badges {
