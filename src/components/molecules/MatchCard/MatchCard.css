@@ -46,9 +46,10 @@
 
 .match-card__teams {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: var(--space-1);
+  justify-content: space-between;
+  gap: var(--space-2);
   min-width: 0;
 }
 
@@ -58,16 +59,14 @@
   gap: var(--space-2);
   flex: 1;
   min-width: 0;
-  width: 100%;
-  justify-content: center;
 }
 
 .match-card__team--home {
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .match-card__team--away {
-  justify-content: center;
+  justify-content: flex-end;
   flex-direction: row-reverse;
 }
 
@@ -168,33 +167,11 @@
   }
 
   .match-card__teams {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
     gap: var(--space-4);
   }
 
   .match-card__team {
     gap: var(--space-3);
-    width: auto;
-    justify-content: flex-start;
-  }
-
-  .match-card__team--away {
-    justify-content: flex-end;
-  }
-
-  .match-card__vs {
-    order: unset;
-    margin: 0;
-  }
-
-  .match-card__team--home {
-    order: unset;
-  }
-
-  .match-card__team--away {
-    order: unset;
   }
 
   .match-card__score {
