@@ -11,22 +11,60 @@ interface PointsHistoryEntry {
   matchId?: string;
 }
 
+export interface SortedStat {
+  id: string;
+  userId: string;
+  predictorId: string;
+  totalPoints: number;
+  accuracy: number;
+  currentStreak: number;
+  exactBets: number;
+  badgesAwarded: Record<string, string>;
+  pointsHistory: Array<{ timestamp: number; points: number }>;
+}
+
+export interface PredictorProfile {
+  name: string;
+  avatarUrl: string | null;
+  avatar: { bgColor?: string; emoji?: string } | null;
+  pixelArt: { seed: string; options: Record<string, unknown> } | null;
+}
+
+export function buildRankingEntries(
+  sorted: SortedStat[],
+  profileMap: Map<string, PredictorProfile>,
+) {
+  return sorted.map((s, i) => {
+    const key = `users/${s.userId}/predictors/${s.predictorId}`;
+    const profile = profileMap.get(key);
+    return {
+      id: s.id,
+      rank: i + 1,
+      userId: s.userId,
+      predictorId: s.predictorId,
+      displayName: profile?.name || s.predictorId,
+      avatarUrl: profile?.avatarUrl || null,
+      avatar:
+        profile?.avatar?.bgColor && profile?.avatar?.emoji
+          ? { bgColor: profile.avatar.bgColor, emoji: profile.avatar.emoji }
+          : null,
+      pixelArt: profile?.pixelArt ?? null,
+      totalPoints: s.totalPoints,
+      accuracy: s.accuracy,
+      currentStreak: s.currentStreak,
+      exactBets: s.exactBets,
+      badgesAwarded: s.badgesAwarded,
+      pointsHistory: s.pointsHistory,
+    };
+  });
+}
+
 export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
   withAppCheck(async (req, res) => {
     try {
       const statsSnap = await db.collectionGroup('stats').get();
 
-      const allStats: Array<{
-        id: string;
-        userId: string;
-        predictorId: string;
-        totalPoints: number;
-        accuracy: number;
-        currentStreak: number;
-        exactBets: number;
-        badgesAwarded: Record<string, string>;
-        pointsHistory: Array<{ timestamp: number; points: number }>;
-      }> = [];
+      const allStats: SortedStat[] = [];
 
       statsSnap.forEach((doc) => {
         const refPath = doc.ref.path;
@@ -69,50 +107,23 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
             name: (data?.name as string) || null,
             avatarUrl: (data?.avatarUrl as string | null) || null,
             avatar: (data?.avatar as { bgColor?: string; emoji?: string } | null) || null,
+            pixelArt:
+              (data?.pixelArt as { seed: string; options: Record<string, unknown> } | null) ?? null,
           };
         }),
       );
 
-      const profileMap = new Map<
-        string,
-        {
-          name: string;
-          avatarUrl: string | null;
-          avatar: { bgColor?: string; emoji?: string } | null;
-        }
-      >();
+      const profileMap = new Map<string, PredictorProfile>();
       for (const p of predictorDocs) {
         profileMap.set(p.id, {
           name: p.name || p.id.split('/').pop() || 'Unknown',
           avatarUrl: p.avatarUrl,
           avatar: p.avatar,
+          pixelArt: p.pixelArt,
         });
       }
 
-      const rankings = sorted.map((s, i) => {
-        const key = `users/${s.userId}/predictors/${s.predictorId}`;
-        const profile = profileMap.get(key);
-        return {
-          id: s.id,
-          rank: i + 1,
-          userId: s.userId,
-          predictorId: s.predictorId,
-          displayName: profile?.name || s.predictorId,
-          avatarUrl: profile?.avatarUrl || null,
-          avatar:
-            profile?.avatar?.bgColor && profile?.avatar?.emoji
-              ? { bgColor: profile.avatar.bgColor, emoji: profile.avatar.emoji }
-              : null,
-          totalPoints: s.totalPoints,
-          accuracy: s.accuracy,
-          currentStreak: s.currentStreak,
-          exactBets: s.exactBets,
-          badgesAwarded: s.badgesAwarded,
-          pointsHistory: s.pointsHistory,
-        };
-      });
-
-      res.json(rankings);
+      res.json(buildRankingEntries(sorted, profileMap));
     } catch (error) {
       functions.logger.error('rankings function error:', error);
       res.status(500).json({ error: 'Failed to fetch rankings' });
