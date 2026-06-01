@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { Timestamp } from 'firebase/firestore';
 
 import type { Predictor } from '@app-types/firestore';
+import { DEFAULT_OPTIONS } from '@utils/dicebear';
 
 import { PredictorEditor } from './PredictorEditor';
 
@@ -9,7 +10,7 @@ const makePredictor = (overrides: Partial<Predictor> = {}): Predictor => ({
   id: 'user-1-default',
   userId: 'user-1',
   name: 'Default',
-  avatar: { bgColor: '#E63946', emoji: '⚽' },
+  pixelArt: { seed: 'story-seed', options: { ...DEFAULT_OPTIONS } },
   createdAt: new Date() as Timestamp,
   ...overrides,
 });

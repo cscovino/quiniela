@@ -1,54 +1,15 @@
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
-import type { Predictor } from '@app-types/firestore';
+import type { AvatarOptions, Predictor } from '@app-types/firestore';
 import { Button } from '@atoms/Button';
 import { Input } from '@atoms/Input';
 import { Typography } from '@atoms/Typography';
+import { AvatarPicker, type AvatarPickerTranslations } from '@molecules/AvatarPicker';
+import { randomAvatar } from '@utils/avatar-presets';
+import { DEFAULT_OPTIONS } from '@utils/dicebear';
 
 import './PredictorEditor.css';
-
-const EMOJI_OPTIONS = [
-  '⚽',
-  '🏆',
-  '🥅',
-  '🎯',
-  '⭐',
-  '🔥',
-  '🇦🇷',
-  '🇧🇷',
-  '🇩🇪',
-  '🇫🇷',
-  '🇪🇸',
-  '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  '🇵🇹',
-  '🇮🇹',
-  '🇲🇽',
-  '🇺🇸',
-  '🇨🇦',
-  '🇯🇵',
-  '🦁',
-  '🐉',
-  '🦅',
-  '🐺',
-  '🦊',
-  '🐻',
-];
-
-const COLOR_OPTIONS = [
-  '#E63946',
-  '#2D6A4F',
-  '#06D6A0',
-  '#7B2D8E',
-  '#F4A261',
-  '#D4AF37',
-  '#1D3557',
-  '#457B9D',
-  '#A8DADC',
-  '#E76F51',
-  '#264653',
-  '#6A0572',
-];
 
 export interface PredictorEditorProps {
   mode: 'create' | 'edit';
@@ -56,7 +17,7 @@ export interface PredictorEditorProps {
   teams?: { fifaCode: string; name: string }[];
   onSave: (data: {
     name: string;
-    avatar: { bgColor: string; emoji: string };
+    pixelArt: { seed: string; options: AvatarOptions };
     favouriteTeamId?: string;
   }) => Promise<void>;
   onCancel: () => void;
@@ -66,16 +27,12 @@ export interface PredictorEditorProps {
     editTitle?: string;
     nameLabel?: string;
     namePlaceholder?: string;
-    emojiLabel?: string;
-    colorLabel?: string;
     favouriteTeamLabel?: string;
     noFavouriteTeam?: string;
     save?: string;
     cancel?: string;
     nameRequired?: string;
-    emojiAria?: string;
-    colorAria?: string;
-  };
+  } & AvatarPickerTranslations;
 }
 
 const t = {
@@ -83,15 +40,23 @@ const t = {
   editTitle: 'Edit prediction',
   nameLabel: 'Name',
   namePlaceholder: 'Enter predictor name',
-  emojiLabel: 'Emoji',
-  colorLabel: 'Color',
   favouriteTeamLabel: 'Favorite Team',
   noFavouriteTeam: 'No favorite',
   save: 'Save',
   cancel: 'Cancel',
   nameRequired: 'Name is required',
-  emojiAria: 'Emoji {emoji}',
-  colorAria: 'Color {color}',
+  // AvatarPicker fallback labels (mirrors AvatarPicker in-file `t`)
+  skinLabel: 'Skin',
+  hairLabel: 'Hair',
+  hairColorLabel: 'Hair Color',
+  clothingLabel: 'Clothing',
+  clothingColorLabel: 'Clothing Color',
+  glassesLabel: 'Glasses',
+  glassesNone: 'None',
+  randomize: 'Randomize',
+  randomizeAria: 'Randomize avatar',
+  swatchColorAria: '{trait} color {color}',
+  swatchStyleAria: '{trait} style {n}',
 };
 
 export const PredictorEditor: FC<PredictorEditorProps> = ({
@@ -104,11 +69,19 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
   translations = {},
 }) => {
   const labels = { ...t, ...translations };
+
   const [name, setName] = useState(predictor?.name || '');
-  const [selectedEmoji, setSelectedEmoji] = useState(predictor?.avatar?.emoji || EMOJI_OPTIONS[0]);
-  const [selectedColor, setSelectedColor] = useState(
-    predictor?.avatar?.bgColor || COLOR_OPTIONS[0],
-  );
+  const [avatar, setAvatar] = useState<{ seed: string; options: AvatarOptions }>(() => {
+    if (mode === 'create') {
+      return randomAvatar();
+    }
+    return (
+      predictor?.pixelArt ?? {
+        seed: predictor?.id ?? crypto.randomUUID(),
+        options: { ...DEFAULT_OPTIONS },
+      }
+    );
+  });
   const [favouriteTeamId, setFavouriteTeamId] = useState(predictor?.favouriteTeamId || '');
   const [error, setError] = useState<string | null>(null);
 
@@ -125,9 +98,23 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
     setError(null);
     await onSave({
       name: name.trim(),
-      avatar: { bgColor: selectedColor, emoji: selectedEmoji },
+      pixelArt: avatar,
       favouriteTeamId: favouriteTeamId || undefined,
     });
+  };
+
+  const pickerTranslations: AvatarPickerTranslations = {
+    skinLabel: labels.skinLabel,
+    hairLabel: labels.hairLabel,
+    hairColorLabel: labels.hairColorLabel,
+    clothingLabel: labels.clothingLabel,
+    clothingColorLabel: labels.clothingColorLabel,
+    glassesLabel: labels.glassesLabel,
+    glassesNone: labels.glassesNone,
+    randomize: labels.randomize,
+    randomizeAria: labels.randomizeAria,
+    swatchColorAria: labels.swatchColorAria,
+    swatchStyleAria: labels.swatchStyleAria,
   };
 
   return (
@@ -157,58 +144,13 @@ export const PredictorEditor: FC<PredictorEditorProps> = ({
         )}
       </div>
 
-      <div className="predictor-editor__field">
-        <span className="predictor-editor__label">{labels.emojiLabel}</span>
-        <div
-          className="predictor-editor__emoji-grid"
-          role="radiogroup"
-          aria-label={labels.emojiLabel}
-        >
-          {EMOJI_OPTIONS.map((emoji) => (
-            <button
-              key={emoji}
-              type="button"
-              className={`predictor-editor__emoji-btn ${selectedEmoji === emoji ? 'predictor-editor__emoji-btn--selected' : ''}`}
-              onClick={() => setSelectedEmoji(emoji)}
-              aria-pressed={selectedEmoji === emoji}
-              aria-label={labels.emojiAria.replace('{emoji}', emoji)}
-            >
-              {emoji}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="predictor-editor__field">
-        <span className="predictor-editor__label">{labels.colorLabel}</span>
-        <div
-          className="predictor-editor__color-grid"
-          role="radiogroup"
-          aria-label={labels.colorLabel}
-        >
-          {COLOR_OPTIONS.map((color) => (
-            <button
-              key={color}
-              type="button"
-              className={`predictor-editor__color-swatch ${selectedColor === color ? 'predictor-editor__color-swatch--selected' : ''}`}
-              style={{ backgroundColor: color }}
-              onClick={() => setSelectedColor(color)}
-              aria-pressed={selectedColor === color}
-              aria-label={labels.colorAria.replace('{color}', color)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="predictor-editor__preview">
-        <div
-          className="predictor-editor__preview-avatar"
-          style={{ backgroundColor: selectedColor }}
-        >
-          <span className="predictor-editor__preview-emoji">{selectedEmoji}</span>
-        </div>
-        <Typography variant="body">{name || labels.namePlaceholder}</Typography>
-      </div>
+      <AvatarPicker
+        value={avatar}
+        onChange={setAvatar}
+        onRandomize={() => setAvatar(randomAvatar())}
+        name={name}
+        translations={pickerTranslations}
+      />
 
       {sortedTeams.length > 0 && (
         <div className="predictor-editor__field">
