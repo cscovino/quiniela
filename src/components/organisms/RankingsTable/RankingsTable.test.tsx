@@ -6,27 +6,33 @@ import { RankingsTable } from './RankingsTable';
 const mockRankings = [
   {
     userId: 'user-1',
+    predictorId: 'pred-1',
     displayName: 'Carlos',
     points: 120,
     accuracy: 85,
     streak: 7,
     rankChange: 'up' as const,
+    pixelArt: { seed: 'pred-1', options: {} },
   },
   {
     userId: 'user-2',
+    predictorId: 'pred-2',
     displayName: 'Maria',
     points: 98,
     accuracy: 78,
     streak: 4,
     rankChange: 'same' as const,
+    pixelArt: { seed: 'pred-2', options: {} },
   },
   {
     userId: 'user-3',
+    predictorId: 'pred-3',
     displayName: 'Juan',
     points: 87,
     accuracy: 72,
     streak: 2,
     rankChange: 'down' as const,
+    pixelArt: null,
   },
 ];
 
@@ -78,5 +84,11 @@ describe('RankingsTable', () => {
   it('shows empty state when no rankings', () => {
     render(<RankingsTable rankings={[]} />);
     expect(screen.getByText('No rankings available yet')).toBeInTheDocument();
+  });
+
+  it('threads predictorId + pixelArt to each RankingRow (Pitfall 2 guard, SC#3)', () => {
+    const { container } = render(<RankingsTable rankings={mockRankings} />);
+    const avatarImgs = container.querySelectorAll('.predictor-avatar__img');
+    expect(avatarImgs.length).toBe(mockRankings.length);
   });
 });

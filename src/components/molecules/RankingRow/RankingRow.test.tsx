@@ -3,6 +3,36 @@ import { render, screen } from '@testing-library/react';
 import { RankingRow } from './RankingRow';
 
 describe('RankingRow', () => {
+  it('renders PredictorAvatar img when predictorId and pixelArt provided (SC#3, D-01)', () => {
+    const { container } = render(
+      <RankingRow
+        position={1}
+        displayName="Carlos"
+        points={45}
+        accuracy={85}
+        streak={3}
+        predictorId="p1"
+        pixelArt={{ seed: 'p1', options: {} }}
+      />,
+    );
+    expect(container.querySelector('.predictor-avatar__img')).toBeInTheDocument();
+    expect(container.querySelector('.avatar')).not.toBeInTheDocument();
+  });
+
+  it('renders PredictorAvatar img via tier-2 id-seed when predictorId given but no pixelArt (D-04)', () => {
+    const { container } = render(
+      <RankingRow
+        position={2}
+        displayName="Maria"
+        points={30}
+        accuracy={70}
+        streak={1}
+        predictorId="p2"
+      />,
+    );
+    expect(container.querySelector('.predictor-avatar__img')).toBeInTheDocument();
+  });
+
   it('renders user info', () => {
     render(<RankingRow position={5} displayName="Carlos" points={45} accuracy={85} streak={3} />);
     expect(screen.getByText('Carlos')).toBeInTheDocument();
