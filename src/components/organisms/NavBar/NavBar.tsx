@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@atoms/Button';
 import { Icon } from '@atoms/Icon';
@@ -49,6 +49,8 @@ export const NavBar: FC<NavBarProps> = ({
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const [menuOpen, setMenuOpen] = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof document !== 'undefined') {
@@ -83,6 +85,47 @@ export const NavBar: FC<NavBarProps> = ({
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        hamburgerRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const drawer = drawerRef.current;
+    if (!drawer) return;
+    const focusable = Array.from(
+      drawer.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex="0"]'),
+    );
+    if (focusable.length === 0) return;
+    focusable[0].focus();
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    drawer.addEventListener('keydown', handleTab);
+    return () => drawer.removeEventListener('keydown', handleTab);
+  }, [menuOpen]);
+
   const isLoggedIn = !!user;
   const isAdmin = user?.role === 'admin';
   const userDisplayName = user?.displayName || user?.email || '';
@@ -93,7 +136,10 @@ export const NavBar: FC<NavBarProps> = ({
   const loginHref = getLoginRoute(locale);
   const homeHref = getHomeRoute(locale);
 
-  const closeMenu = () => setMenuOpen(false);
+  const closeMenu = () => {
+    setMenuOpen(false);
+    hamburgerRef.current?.focus();
+  };
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -119,25 +165,18 @@ export const NavBar: FC<NavBarProps> = ({
       </a>
 
       <div className="nav-bar__links">
-        {links.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
-            data-astro-prefetch
-          >
-            {link.label}
-          </a>
-        ))}
-        {adminLink && isAdmin && (
-          <a
-            href={adminLink.href}
-            className={`nav-bar__link ${adminLink.active ? 'nav-bar__link--active' : ''}`}
-            data-astro-prefetch
-          >
-            {adminLink.label}
-          </a>
-        )}
+        {links
+          .filter((l) => l.core)
+          .map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className={`nav-bar__link ${link.active ? 'nav-bar__link--active' : ''}`}
+              data-astro-prefetch
+            >
+              {link.label}
+            </a>
+          ))}
       </div>
 
       <div className="nav-bar__actions">
@@ -182,18 +221,27 @@ export const NavBar: FC<NavBarProps> = ({
           </a>
         )}
 
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
+          ref={hamburgerRef}
+          className="btn btn--ghost btn--sm"
           onClick={() => setMenuOpen((o) => !o)}
           aria-label={translations.toggleMenu}
           aria-expanded={menuOpen}
+          aria-controls="nav-drawer"
+          type="button"
         >
-          <Icon name={menuOpen ? 'close' : 'menu'} size={20} />
-        </Button>
+          <span className="btn__content">
+            <Icon name={menuOpen ? 'close' : 'menu'} size={20} />
+          </span>
+        </button>
       </div>
 
       <div
+        id="nav-drawer"
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={translations.toggleMenu}
         className={`nav-bar__mobile-menu ${menuOpen ? 'open' : ''}`}
         onClick={(e) => {
           if (e.target === e.currentTarget) closeMenu();

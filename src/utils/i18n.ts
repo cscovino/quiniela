@@ -81,6 +81,7 @@ export function getAdminLink(locale: Locale, activeNav: ActiveNav): NavLink {
     label: translations[locale].common.nav.admin,
     active: activeNav === 'admin',
     auth: true,
+    core: false,
   };
 }
 

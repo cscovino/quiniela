@@ -252,10 +252,6 @@
     display: none;
   }
 
-  .nav-bar__mobile-menu {
-    display: none !important;
-  }
-
   .nav-bar__title {
     font-size: var(--text-xl);
   }
