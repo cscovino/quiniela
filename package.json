@@ -30,6 +30,8 @@
     "sync-displayname": "tsx --env-file=.env scripts/sync-user-displayname.ts",
     "migrate:knockout": "tsx --env-file=.env scripts/migrate-knockout-schedule.ts",
     "migrate:knockout:phase2": "tsx --env-file=.env scripts/migrate-knockout-schedule.ts --phase2",
+    "migrate:avatars": "tsx --env-file=.env scripts/migrate-predictor-avatars.ts",
+    "migrate:avatars:apply": "tsx --env-file=.env scripts/migrate-predictor-avatars.ts --apply",
     "prepare": "husky"
   },
   "lint-staged": {
