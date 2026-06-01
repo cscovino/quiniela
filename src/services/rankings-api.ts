@@ -37,6 +37,14 @@ export interface ApiRankingEntry {
  */
 export async function fetchRankingsFromApi(): Promise<ApiRankingEntry[]> {
   const token = await getAppCheckToken();
+  // D-03 THROWAWAY DIAGNOSTIC — remove before phase close
+  if (!token) {
+    console.warn(
+      '[rankings-api] App Check token is undefined — X-Firebase-AppCheck header omitted. ' +
+        'Check: (1) PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY present in deployed bundle, ' +
+        '(2) reCAPTCHA v3 allowed domains include this origin.',
+    );
+  }
   const res = await fetch('/api/rankings', {
     headers: token ? { 'X-Firebase-AppCheck': token } : undefined,
   });
