@@ -146,7 +146,13 @@ describe('ProfileTemplate', () => {
     mockAuthState.isAuthLoading = false;
 
     const pred1 = { ...mockPredictor, id: 'user-1-default', name: 'Tigre FC' };
-    const pred2 = { id: 'pred-42', userId: 'user-1', name: 'León', avatar: undefined, createdAt: {} as any };
+    const pred2 = {
+      id: 'pred-42',
+      userId: 'user-1',
+      name: 'León',
+      avatar: undefined,
+      createdAt: {} as any,
+    };
 
     vi.mocked(predictorService.getUserPredictors).mockResolvedValue([pred1, pred2]);
     vi.mocked(predictorService.getUserPredictorsWithStats).mockResolvedValue([
@@ -186,12 +192,66 @@ describe('ProfileTemplate', () => {
     expect(screen.getByText('My Profile')).toBeInTheDocument();
   });
 
+  it('threads stats from getUserPredictorsWithStats into PredictorListEntry (PROF-stats)', async () => {
+    mockAuthState.user = mockUser;
+    mockAuthState.isAuthLoading = false;
+
+    const mockStats = {
+      totalPoints: 10,
+      accuracy: 0.5,
+      currentStreak: 2,
+      maxStreak: 4,
+      exactBets: 3,
+      totalBets: 6,
+      winnerBets: 3,
+      pointsHistory: [],
+      badgesAwarded: {},
+    };
+
+    vi.mocked(predictorService.getUserPredictors).mockResolvedValue([mockPredictor]);
+    vi.mocked(predictorService.getUserPredictorsWithStats).mockResolvedValue([
+      { ...mockPredictor, stats: mockStats, progress: { groupsSubmitted: 2, totalGroups: 8 } },
+    ] as any);
+
+    vi.mocked(tournamentService.getPredictorStats).mockResolvedValue({
+      totalPoints: 10,
+      exactBets: 3,
+      accuracy: 0.5,
+      currentStreak: 2,
+      maxStreak: 4,
+      badgesAwarded: {},
+      pointsHistory: [],
+    } as any);
+
+    vi.mocked(tournamentService.getAllPredictorStats).mockResolvedValue([]);
+
+    render(<ProfileTemplate translations={translations} />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Tigre FC').length).toBeGreaterThan(0);
+    });
+
+    // Stat grid is rendered when stats are present (stats threaded through to PredictorList)
+    const statGrid = document.querySelector('.predictor-list__stat-grid');
+    expect(statGrid).not.toBeNull();
+  });
+
   it('onEdit uses the clicked predictor id (PROF-edit)', async () => {
     mockAuthState.user = mockUser;
     mockAuthState.isAuthLoading = false;
 
     const pred1 = { ...mockPredictor, id: 'user-1-default', name: 'Tigre FC' };
-    const pred2 = { id: 'pred-42', userId: 'user-1', name: 'León', avatar: undefined, createdAt: {} as any };
+    const pred2 = {
+      id: 'pred-42',
+      userId: 'user-1',
+      name: 'León',
+      avatar: undefined,
+      createdAt: {} as any,
+    };
 
     vi.mocked(predictorService.getUserPredictors).mockResolvedValue([pred1, pred2]);
     vi.mocked(predictorService.getUserPredictorsWithStats).mockResolvedValue([
