@@ -25,6 +25,7 @@ export function useLiveData<T>(
     const cached = dataCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       setData(cached.data as T);
+      setLoading(false);
       return;
     }
 
@@ -40,6 +41,7 @@ export function useLiveData<T>(
           Array.isArray(initialData) &&
           initialData.length > 0
         ) {
+          setData(initialData);
           setLoading(false);
           return;
         }
