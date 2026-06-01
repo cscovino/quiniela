@@ -21,6 +21,7 @@ import { PenSquare } from 'pixelarticons/react/PenSquare';
 import { Plus } from 'pixelarticons/react/Plus';
 import { Radio } from 'pixelarticons/react/Radio';
 import { Robot } from 'pixelarticons/react/Robot';
+import { Shuffle } from 'pixelarticons/react/Shuffle';
 import { Sparkle } from 'pixelarticons/react/Sparkle';
 import { SquareAlert } from 'pixelarticons/react/SquareAlert';
 import { Target } from 'pixelarticons/react/Target';
@@ -58,6 +59,7 @@ export type IconName =
   | 'pen-square'
   | 'plus'
   | 'robot'
+  | 'shuffle'
   | 'sparkles'
   | 'star'
   | 'target'
@@ -101,6 +103,7 @@ const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: 
   'pen-square': PenSquare,
   plus: Plus,
   robot: Robot,
+  shuffle: Shuffle,
   sparkles: Sparkle,
   star: Sparkle,
   target: Target,
