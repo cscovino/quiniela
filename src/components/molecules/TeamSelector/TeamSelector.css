@@ -26,6 +26,8 @@
   transition:
     background var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out);
+  flex: 1;
+  min-width: 0;
 }
 
 .team-selector__option:hover:not(.team-selector__option--disabled) {
@@ -48,4 +50,10 @@
   opacity: 0;
   width: 0;
   height: 0;
+}
+
+.team-selector__vs {
+  align-self: center;
+  flex-shrink: 0;
+  color: var(--text-secondary);
 }
