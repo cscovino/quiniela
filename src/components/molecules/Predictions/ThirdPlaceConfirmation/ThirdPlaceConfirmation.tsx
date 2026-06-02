@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useEffect, useState } from 'react';
 
 import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 import { Button } from '@atoms/Button';
@@ -9,7 +9,7 @@ import './ThirdPlaceConfirmation.css';
 export interface ThirdPlaceConfirmationProps {
   rankedTeams: ThirdPlacedTeam[];
   onAdjust: () => void;
-  onContinue: () => void;
+  onContinue: (confirmedSlugs: string[]) => void;
   translations: {
     heading: string;
     subtitle: string;
@@ -21,6 +21,10 @@ export interface ThirdPlaceConfirmationProps {
     group?: string;
     pts?: string;
     pt?: string;
+    selectionCount?: string;
+    toggleAdvancing?: string;
+    toggleEliminated?: string;
+    maxSelected?: string;
   };
 }
 
@@ -35,6 +39,10 @@ const defaultTranslations = {
   group: 'Group',
   pts: 'pts',
   pt: 'pt',
+  selectionCount: '{selected} / 8 advancing',
+  toggleAdvancing: 'Click to remove from advancing',
+  toggleEliminated: 'Click to add to advancing',
+  maxSelected: '8 teams already selected. Deselect one to change.',
 };
 
 export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
@@ -44,8 +52,45 @@ export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
   translations,
 }) => {
   const t = { ...defaultTranslations, ...translations };
-  const advancing = rankedTeams.filter((t) => t.advancing);
-  const eliminated = rankedTeams.filter((t) => !t.advancing);
+
+  const [localAdvancingSet, setLocalAdvancingSet] = useState<Set<string>>(
+    () =>
+      new Set(
+        rankedTeams
+          .filter((team) => team.advancing)
+          .map((team) => `group-${team.groupLetter.toLowerCase()}`),
+      ),
+  );
+
+  useEffect(() => {
+    setLocalAdvancingSet(
+      new Set(
+        rankedTeams
+          .filter((team) => team.advancing)
+          .map((team) => `group-${team.groupLetter.toLowerCase()}`),
+      ),
+    );
+  }, [rankedTeams]);
+
+  const handleToggle = (groupSlug: string) => {
+    setLocalAdvancingSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupSlug)) {
+        next.delete(groupSlug);
+      } else if (next.size < 8) {
+        next.add(groupSlug);
+      }
+      return next;
+    });
+  };
+
+  const selectionCountText = (t.selectionCount ?? '{selected} / 8 advancing').replace(
+    '{selected}',
+    String(localAdvancingSet.size),
+  );
+
+  const isComplete = localAdvancingSet.size === 8;
+  const isAtMax = localAdvancingSet.size >= 8;
 
   return (
     <div className="third-place-confirmation">
@@ -58,64 +103,85 @@ export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
         </Typography>
       </div>
 
-      <div className="third-place-confirmation__advancing">
-        <Typography
-          variant="h3"
-          className="third-place-confirmation__section-title third-place-confirmation__section-title--advancing"
+      <div className="third-place-confirmation__counter">
+        <span
+          className={`third-place-confirmation__counter-chip ${
+            isComplete
+              ? 'third-place-confirmation__counter-chip--complete'
+              : 'third-place-confirmation__counter-chip--incomplete'
+          }`}
         >
-          {t.advancing}
-        </Typography>
-        <div className="third-place-confirmation__list">
-          {advancing.map((team, index) => (
-            <div key={team.teamId} className="third-place-confirmation__row">
+          {selectionCountText}
+        </span>
+        {isAtMax && t.maxSelected && (
+          <Typography variant="caption" className="third-place-confirmation__max-message">
+            {t.maxSelected}
+          </Typography>
+        )}
+      </div>
+
+      <div className="third-place-confirmation__list">
+        {rankedTeams.map((team, index) => {
+          const groupSlug = `group-${team.groupLetter.toLowerCase()}`;
+          const isAdvancing = localAdvancingSet.has(groupSlug);
+          const isDisabledRow = !isAdvancing && isAtMax;
+
+          return (
+            <button
+              key={team.teamId}
+              type="button"
+              className={[
+                'third-place-confirmation__row',
+                isAdvancing
+                  ? 'third-place-confirmation__row--advancing'
+                  : 'third-place-confirmation__row--eliminated',
+                isDisabledRow ? 'third-place-confirmation__row--disabled' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() => !isDisabledRow && handleToggle(groupSlug)}
+              aria-pressed={isAdvancing}
+              aria-disabled={isDisabledRow}
+              aria-label={
+                isAdvancing
+                  ? (t.toggleAdvancing ?? 'Click to remove from advancing')
+                  : (t.toggleEliminated ?? 'Click to add to advancing')
+              }
+            >
               <span className="third-place-confirmation__rank">{index + 1}.</span>
               <span className="third-place-confirmation__team-name">{team.teamName}</span>
               <span className="third-place-confirmation__group">
                 ({t.group} {team.groupLetter})
               </span>
-              <span className="third-place-confirmation__points third-place-confirmation__points--advancing">
+              <span
+                className={`third-place-confirmation__points ${
+                  isAdvancing
+                    ? 'third-place-confirmation__points--advancing'
+                    : 'third-place-confirmation__points--eliminated'
+                }`}
+              >
                 {team.points} {team.points === 1 ? t.pt : t.pts}
               </span>
-              {team.bracketSlotLabel && (
+              {isAdvancing && team.bracketSlotLabel && (
                 <span className="third-place-confirmation__bracket-slot">
                   &#8594; {t.bracketSlot} {team.bracketSlotLabel.replace('Match ', '')}
                 </span>
               )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="third-place-confirmation__eliminated">
-        <Typography
-          variant="h3"
-          className="third-place-confirmation__section-title third-place-confirmation__section-title--eliminated"
-        >
-          {t.eliminated}
-        </Typography>
-        <div className="third-place-confirmation__list">
-          {eliminated.map((team, index) => (
-            <div key={team.teamId} className="third-place-confirmation__row">
-              <span className="third-place-confirmation__rank">
-                {advancing.length + index + 1}.
-              </span>
-              <span className="third-place-confirmation__team-name">{team.teamName}</span>
-              <span className="third-place-confirmation__group">
-                ({t.group} {team.groupLetter})
-              </span>
-              <span className="third-place-confirmation__points third-place-confirmation__points--eliminated">
-                {team.points} {team.points === 1 ? t.pt : t.pts}
-              </span>
-            </div>
-          ))}
-        </div>
+            </button>
+          );
+        })}
       </div>
 
       <div className="third-place-confirmation__actions">
         <Button variant="ghost" size="md" onClick={onAdjust}>
           {t.adjust}
         </Button>
-        <Button variant="primary" size="md" onClick={onContinue}>
+        <Button
+          variant="primary"
+          size="md"
+          onClick={() => onContinue(Array.from(localAdvancingSet))}
+          disabled={localAdvancingSet.size !== 8}
+        >
           {t.continue}
         </Button>
       </div>
