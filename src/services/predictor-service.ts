@@ -100,6 +100,19 @@ function validatePixelArt(pixelArt?: { seed: string; options: AvatarOptions }): 
   if (!inSet(o.clothing, AVATAR_PRESETS.clothing)) return 'Invalid clothing';
   if (!inSet(o.clothingColor, AVATAR_PRESETS.clothingColor)) return 'Invalid clothingColor';
   if (!inSet(o.glasses, AVATAR_PRESETS.glasses)) return 'Invalid glasses';
+  // NEW style axes:
+  if (!inSet(o.eyes, AVATAR_PRESETS.eyes)) return 'Invalid eyes';
+  if (!inSet(o.beard, AVATAR_PRESETS.beard)) return 'Invalid beard';
+  if (!inSet(o.mouth, AVATAR_PRESETS.mouth)) return 'Invalid mouth';
+  if (!inSet(o.hat, AVATAR_PRESETS.hat)) return 'Invalid hat';
+  if (!inSet(o.accessories, AVATAR_PRESETS.accessories)) return 'Invalid accessories';
+  // NEW color axes:
+  if (!inSet(o.eyesColor, AVATAR_PRESETS.eyesColor)) return 'Invalid eyesColor';
+  if (!inSet(o.mouthColor, AVATAR_PRESETS.mouthColor)) return 'Invalid mouthColor';
+  if (!inSet(o.hatColor, AVATAR_PRESETS.hatColor)) return 'Invalid hatColor';
+  if (!inSet(o.accessoriesColor, AVATAR_PRESETS.accessoriesColor))
+    return 'Invalid accessoriesColor';
+  if (!inSet(o.glassesColor, AVATAR_PRESETS.glassesColor)) return 'Invalid glassesColor';
   return null;
 }
 
