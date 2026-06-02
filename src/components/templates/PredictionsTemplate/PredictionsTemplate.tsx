@@ -283,7 +283,10 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
 
   const handleThirdPlaceAdjust = () => {
     setShowThirdPlaceConfirm(false);
-    setCurrentStep(groupsCount - 1);
+    const firstGroupIdx = steps.findIndex((s) => s.kind === 'group');
+    if (firstGroupIdx >= 0) {
+      setCurrentStep(firstGroupIdx);
+    }
   };
 
   const handleThirdPlaceContinue = () => {
@@ -384,13 +387,11 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       setView('list');
     } catch (err) {
       console.warn('[PredictionsTemplate] createPredictor failed', err);
-      useToastStore
-        .getState()
-        .addToast({
-          title: translations.submitError,
-          message: translations.submitError,
-          type: 'error',
-        });
+      useToastStore.getState().addToast({
+        title: translations.submitError,
+        message: translations.submitError,
+        type: 'error',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -426,13 +427,11 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       setEditingPredictor(null);
     } catch (err) {
       console.warn('[PredictionsTemplate] updatePredictor failed', err);
-      useToastStore
-        .getState()
-        .addToast({
-          title: translations.submitError,
-          message: translations.submitError,
-          type: 'error',
-        });
+      useToastStore.getState().addToast({
+        title: translations.submitError,
+        message: translations.submitError,
+        type: 'error',
+      });
     } finally {
       setIsSubmitting(false);
     }
