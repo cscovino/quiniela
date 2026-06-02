@@ -68,6 +68,18 @@ export interface AvatarOptions {
   clothing?: string; // pixel-art id, e.g. 'variant03'
   clothingColor?: string; // bare 6-hex
   glasses?: string; // pixel-art id, e.g. 'dark01' | 'light02'
+  // NEW style axes (optional, None = absent):
+  eyes?: string; // pixel-art id, e.g. 'variant01'
+  beard?: string; // pixel-art id, e.g. 'variant01' — NO beardColor axis
+  mouth?: string; // pixel-art id, e.g. 'happy01'
+  hat?: string; // pixel-art id, e.g. 'variant01'
+  accessories?: string; // pixel-art id, e.g. 'variant01'
+  // NEW color axes (optional):
+  eyesColor?: string; // bare 6-hex
+  mouthColor?: string; // bare 6-hex
+  hatColor?: string; // bare 6-hex
+  accessoriesColor?: string; // bare 6-hex
+  glassesColor?: string; // bare 6-hex — frames color for existing glasses
 }
 
 export interface Predictor {
