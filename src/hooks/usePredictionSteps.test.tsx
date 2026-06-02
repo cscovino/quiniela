@@ -73,4 +73,31 @@ describe('usePredictionSteps — bets async cycle', () => {
       expect.any(Error),
     );
   });
+
+  // hook real-cycle test — success path (the branch that produces non-zero points)
+  it('transitions betsStatus to loaded after getExistingBets resolves with saved bets', async () => {
+    vi.mocked(predictionService.getExistingBets).mockResolvedValue({
+      matchBets: new Map([['match-a1', { home: 2, away: 1 }]]),
+      knockoutBets: new Map(),
+      groupBets: new Map([['group-a', ['MEX', 'RSA', 'KOR', 'CZE']]]),
+      finalPhase: null,
+      bestPlayers: null,
+    });
+
+    const { result } = renderHook(() =>
+      usePredictionSteps(minimalTranslations, 'en', 'predictor-id-123'),
+    );
+
+    await waitFor(() => expect(result.current.betsStatus).toBe('loaded'));
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  // null-predictor path must resolve, not sit in perpetual loading
+  it('resolves betsStatus to loaded when no predictor is selected', async () => {
+    vi.mocked(predictionService.getExistingBets).mockClear();
+    const { result } = renderHook(() => usePredictionSteps(minimalTranslations, 'en', null));
+
+    await waitFor(() => expect(result.current.betsStatus).toBe('loaded'));
+    expect(predictionService.getExistingBets).not.toHaveBeenCalled();
+  });
 });

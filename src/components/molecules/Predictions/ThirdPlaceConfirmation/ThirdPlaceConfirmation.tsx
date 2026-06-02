@@ -126,7 +126,7 @@ export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
       )}
 
       {hasError && (
-        <div className="third-place-confirmation__error" role="alert" aria-live="polite">
+        <div className="third-place-confirmation__error" role="alert">
           <p className="third-place-confirmation__error-message">{t.error}</p>
           <Button variant="secondary" size="md" onClick={onRetry}>
             {t.retry}

@@ -423,7 +423,7 @@ describe('ThirdPlaceConfirmation', () => {
   });
 
   // T1 — hasError=true: error shown, zero-point list absent, Continue absent
-  it('T1: hasError=true hides zero-point ranked list and Continue button', () => {
+  it('hasError=true hides zero-point ranked list and Continue button', () => {
     const zeroPointTeams: ThirdPlacedTeam[] = [
       {
         rank: 1,
@@ -458,7 +458,7 @@ describe('ThirdPlaceConfirmation', () => {
   });
 
   // T2 — loaded state shows non-zero points, alphabetical fallback team absent
-  it('T2: loaded state shows ranked teams with non-zero points; alphabetical fallback absent', () => {
+  it('loaded state shows ranked teams with non-zero points; alphabetical fallback absent', () => {
     const realTeams: ThirdPlacedTeam[] = [
       {
         rank: 1,
