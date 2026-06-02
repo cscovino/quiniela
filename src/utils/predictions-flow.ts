@@ -4,10 +4,6 @@ import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 import type { ThirdPlaceSlot } from '@/data/third-place-matrix';
 import { getCombinationKey, THIRD_PLACE_MATRIX } from '@/data/third-place-matrix';
 
-export async function ensureThirdPlaceMatrix(): Promise<void> {
-  // matrix is statically imported; no warm-up needed
-}
-
 // Converts a group slug ('group-a') to a bare uppercase letter ('A')
 function letterFromSlug(slug: string): string {
   return slug.replace('group-', '').toUpperCase();

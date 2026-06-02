@@ -24,7 +24,6 @@ import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
 import {
   computeThirdPlaceStandings,
-  ensureThirdPlaceMatrix,
   isGroupClassificationComplete,
   KNOCKOUT_PHASES,
 } from '@utils/predictions-flow';
@@ -189,10 +188,6 @@ export function usePredictionSteps(
       cancelled = true;
     };
   }, [locale]);
-
-  useEffect(() => {
-    ensureThirdPlaceMatrix();
-  }, []);
 
   useEffect(() => {
     if (!user || !selectedPredictorId) return;
