@@ -3,10 +3,8 @@ import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 
 import { getCombinationKey, THIRD_PLACE_MATRIX } from '../data/third-place-matrix';
 
-let _thirdPlaceMatrix: Record<string, unknown> = {};
-
 export async function ensureThirdPlaceMatrix(): Promise<void> {
-  if (Object.keys(_thirdPlaceMatrix).length > 0) return;
+  // matrix is statically imported; no warm-up needed
 }
 
 export interface MatchWithId extends Match {
