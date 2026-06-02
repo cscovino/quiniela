@@ -13,10 +13,12 @@ import {
   calculateGroupStandings,
   computeThirdPlaceStandings,
   deriveFinalFour,
+  formatSlotSource,
   getGroupMatches,
   getPredictorProgress,
   isGroupClassificationComplete,
   isGroupMatchesComplete,
+  type SlotSourceLabels,
 } from '../predictions-flow';
 
 const makeMatch = (
@@ -1146,5 +1148,183 @@ describe('THIRD_PLACE_MATRIX static import', () => {
   it('is available synchronously (no async needed)', () => {
     expect(THIRD_PLACE_MATRIX).toBeDefined();
     expect(Object.keys(THIRD_PLACE_MATRIX).length).toBe(495);
+  });
+});
+
+describe('formatSlotSource — slot source to human-readable label', () => {
+  const mockLabels: SlotSourceLabels = {
+    groupWinner: 'Winner Group {group}',
+    groupRunnerUp: 'Runner-up Group {group}',
+    groupPosition: 'Position {n} Group {group}',
+    bestThird: 'Best 3rd place',
+    winnerOf: 'Winner of Match {match}',
+    loserOf: 'Loser of Match {match}',
+  };
+
+  it('returns the group winner label with group letter substituted', () => {
+    const result = formatSlotSource({ from: 'group', groupId: 'group-a', position: 1 }, mockLabels);
+    expect(result).toBe('Winner Group A');
+  });
+
+  it('returns the group runner-up label with group letter substituted', () => {
+    const result = formatSlotSource({ from: 'group', groupId: 'group-e', position: 2 }, mockLabels);
+    expect(result).toBe('Runner-up Group E');
+  });
+
+  it('returns the group position fallback label with position and group letter', () => {
+    const result = formatSlotSource({ from: 'group', groupId: 'group-b', position: 3 }, mockLabels);
+    expect(result).toBe('Position 3 Group B');
+  });
+
+  it('returns the best third label without interpolation', () => {
+    const result = formatSlotSource(
+      { from: 'best-third', matrixSlot: 'M74', eligibleGroups: ['group-a'] },
+      mockLabels,
+    );
+    expect(result).toBe('Best 3rd place');
+  });
+
+  it('returns the winner-of label with match slug substituted', () => {
+    const result = formatSlotSource({ from: 'winner-of', matchSlug: 'r32-1' }, mockLabels);
+    expect(result).toBe('Winner of Match r32-1');
+  });
+
+  it('returns the loser-of label with match slug substituted', () => {
+    const result = formatSlotSource({ from: 'loser-of', matchSlug: 'sf-1' }, mockLabels);
+    expect(result).toBe('Loser of Match sf-1');
+  });
+});
+
+describe('buildKnockoutBracket — R32 population from group predictions and third-place qualifiers', () => {
+  // 12 groups A-L; position indices: [0]=winner, [1]=runner-up, [2]=3rd, [3]=4th
+  const r32GroupBets: GroupBetRecord = {
+    'group-a': ['t1a', 't2a', 't3a', 't4a'],
+    'group-b': ['t1b', 't2b', 't3b', 't4b'],
+    'group-c': ['t1c', 't2c', 't3c', 't4c'],
+    'group-d': ['t1d', 't2d', 't3d', 't4d'],
+    'group-e': ['t1e', 't2e', 't3e', 't4e'],
+    'group-f': ['t1f', 't2f', 't3f', 't4f'],
+    'group-g': ['t1g', 't2g', 't3g', 't4g'],
+    'group-h': ['t1h', 't2h', 't3h', 't4h'],
+    'group-i': ['t1i', 't2i', 't3i', 't4i'],
+    'group-j': ['t1j', 't2j', 't3j', 't4j'],
+    'group-k': ['t1k', 't2k', 't3k', 't4k'],
+    'group-l': ['t1l', 't2l', 't3l', 't4l'],
+  };
+
+  // Groups A-H advance — combination ABCDEFGH → matrix: { M74:'F', M82:'A', M81:'B', M77:'H', M79:'C', M80:'E', M85:'G', M87:'D' }
+  const r32ConfirmedMap: Record<string, string> = {
+    'group-a': 't3a',
+    'group-b': 't3b',
+    'group-c': 't3c',
+    'group-d': 't3d',
+    'group-e': 't3e',
+    'group-f': 't3f',
+    'group-g': 't3g',
+    'group-h': 't3h',
+  };
+
+  const r32Matches = [
+    'r32-1',
+    'r32-2',
+    'r32-3',
+    'r32-4',
+    'r32-5',
+    'r32-6',
+    'r32-7',
+    'r32-8',
+    'r32-9',
+    'r32-10',
+    'r32-11',
+    'r32-12',
+    'r32-13',
+    'r32-14',
+    'r32-15',
+    'r32-16',
+  ].map((slug) => makeMatch(slug, '', 'round-of-32', '', ''));
+
+  it('resolves all 16 R32 matchups to the correct teams from group predictions', () => {
+    const bracket = buildKnockoutBracket(r32GroupBets, r32Matches, {}, r32ConfirmedMap);
+    const bySlug = Object.fromEntries(bracket.map((m) => [m.slug, m]));
+
+    expect(bySlug['r32-1'].homeTeam.resolvedTeam).toBe('t2a');
+    expect(bySlug['r32-1'].awayTeam.resolvedTeam).toBe('t2b');
+    expect(bySlug['r32-2'].homeTeam.resolvedTeam).toBe('t1e');
+    expect(bySlug['r32-2'].awayTeam.resolvedTeam).toBe('t3f');
+    expect(bySlug['r32-3'].homeTeam.resolvedTeam).toBe('t1f');
+    expect(bySlug['r32-3'].awayTeam.resolvedTeam).toBe('t2c');
+    expect(bySlug['r32-4'].homeTeam.resolvedTeam).toBe('t1c');
+    expect(bySlug['r32-4'].awayTeam.resolvedTeam).toBe('t2f');
+    expect(bySlug['r32-5'].homeTeam.resolvedTeam).toBe('t1i');
+    expect(bySlug['r32-5'].awayTeam.resolvedTeam).toBe('t3h');
+    expect(bySlug['r32-6'].homeTeam.resolvedTeam).toBe('t2e');
+    expect(bySlug['r32-6'].awayTeam.resolvedTeam).toBe('t2i');
+    expect(bySlug['r32-7'].homeTeam.resolvedTeam).toBe('t1a');
+    expect(bySlug['r32-7'].awayTeam.resolvedTeam).toBe('t3c');
+    expect(bySlug['r32-8'].homeTeam.resolvedTeam).toBe('t1l');
+    expect(bySlug['r32-8'].awayTeam.resolvedTeam).toBe('t3e');
+    expect(bySlug['r32-9'].homeTeam.resolvedTeam).toBe('t1d');
+    expect(bySlug['r32-9'].awayTeam.resolvedTeam).toBe('t3b');
+    expect(bySlug['r32-10'].homeTeam.resolvedTeam).toBe('t1g');
+    expect(bySlug['r32-10'].awayTeam.resolvedTeam).toBe('t3a');
+    expect(bySlug['r32-11'].homeTeam.resolvedTeam).toBe('t2k');
+    expect(bySlug['r32-11'].awayTeam.resolvedTeam).toBe('t2l');
+    expect(bySlug['r32-12'].homeTeam.resolvedTeam).toBe('t1h');
+    expect(bySlug['r32-12'].awayTeam.resolvedTeam).toBe('t2j');
+    expect(bySlug['r32-13'].homeTeam.resolvedTeam).toBe('t1b');
+    expect(bySlug['r32-13'].awayTeam.resolvedTeam).toBe('t3g');
+    expect(bySlug['r32-14'].homeTeam.resolvedTeam).toBe('t1j');
+    expect(bySlug['r32-14'].awayTeam.resolvedTeam).toBe('t2h');
+    expect(bySlug['r32-15'].homeTeam.resolvedTeam).toBe('t1k');
+    expect(bySlug['r32-15'].awayTeam.resolvedTeam).toBe('t3d');
+    expect(bySlug['r32-16'].homeTeam.resolvedTeam).toBe('t2d');
+    expect(bySlug['r32-16'].awayTeam.resolvedTeam).toBe('t2g');
+  });
+
+  it('resolves group-winner slots correctly', () => {
+    const bracket = buildKnockoutBracket(r32GroupBets, r32Matches, {}, r32ConfirmedMap);
+    const bySlug = Object.fromEntries(bracket.map((m) => [m.slug, m]));
+
+    expect(bySlug['r32-7'].homeTeam.resolvedTeam).toBe('t1a'); // winner A
+    expect(bySlug['r32-2'].homeTeam.resolvedTeam).toBe('t1e'); // winner E
+  });
+
+  it('resolves runner-up slots correctly', () => {
+    const bracket = buildKnockoutBracket(r32GroupBets, r32Matches, {}, r32ConfirmedMap);
+    const bySlug = Object.fromEntries(bracket.map((m) => [m.slug, m]));
+
+    expect(bySlug['r32-1'].homeTeam.resolvedTeam).toBe('t2a'); // runner-up A
+    expect(bySlug['r32-1'].awayTeam.resolvedTeam).toBe('t2b'); // runner-up B
+    expect(bySlug['r32-16'].homeTeam.resolvedTeam).toBe('t2d'); // runner-up D
+  });
+
+  it('resolves best-third slots via the matrix when 8 groups advance', () => {
+    const bracket = buildKnockoutBracket(r32GroupBets, r32Matches, {}, r32ConfirmedMap);
+    const bySlug = Object.fromEntries(bracket.map((m) => [m.slug, m]));
+
+    // matrix slots: M74→r32-2, M77→r32-5, M79→r32-7, M80→r32-8, M81→r32-9, M82→r32-10, M85→r32-13, M87→r32-15
+    // ABCDEFGH → { M74:'F', M82:'A', M81:'B', M77:'H', M79:'C', M80:'E', M85:'G', M87:'D' }
+    expect(bySlug['r32-2'].awayTeam.resolvedTeam).toBe('t3f'); // M74→group-f
+    expect(bySlug['r32-5'].awayTeam.resolvedTeam).toBe('t3h'); // M77→group-h
+    expect(bySlug['r32-7'].awayTeam.resolvedTeam).toBe('t3c'); // M79→group-c
+    expect(bySlug['r32-8'].awayTeam.resolvedTeam).toBe('t3e'); // M80→group-e
+    expect(bySlug['r32-9'].awayTeam.resolvedTeam).toBe('t3b'); // M81→group-b
+    expect(bySlug['r32-10'].awayTeam.resolvedTeam).toBe('t3a'); // M82→group-a
+    expect(bySlug['r32-13'].awayTeam.resolvedTeam).toBe('t3g'); // M85→group-g
+    expect(bySlug['r32-15'].awayTeam.resolvedTeam).toBe('t3d'); // M87→group-d
+  });
+
+  it('returns TBD for best-third slots when confirmedAdvancingMap is absent', () => {
+    const bracket = buildKnockoutBracket(r32GroupBets, r32Matches, {});
+    const bySlug = Object.fromEntries(bracket.map((m) => [m.slug, m]));
+
+    expect(bySlug['r32-2'].awayTeam.resolvedTeam).toBe('TBD');
+    expect(bySlug['r32-5'].awayTeam.resolvedTeam).toBe('TBD');
+    expect(bySlug['r32-7'].awayTeam.resolvedTeam).toBe('TBD');
+    expect(bySlug['r32-8'].awayTeam.resolvedTeam).toBe('TBD');
+    expect(bySlug['r32-9'].awayTeam.resolvedTeam).toBe('TBD');
+    expect(bySlug['r32-10'].awayTeam.resolvedTeam).toBe('TBD');
+    expect(bySlug['r32-13'].awayTeam.resolvedTeam).toBe('TBD');
+    expect(bySlug['r32-15'].awayTeam.resolvedTeam).toBe('TBD');
   });
 });
