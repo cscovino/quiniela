@@ -219,4 +219,112 @@ describe('randomAvatar', () => {
     expect(optsNever.hat).toBeUndefined();
     expect(optsNever.accessories).toBeUndefined();
   });
+
+  it('randomAvatar may produce beard/hat/accessories (~25% each)', () => {
+    // With 25% probability per optional trait, after 20 runs the chance of
+    // never seeing any optional trait is (0.75)^20 ≈ 0.003 — near-certain to see at least one.
+    let optionalTraitSeen = false;
+    for (let i = 0; i < 20; i++) {
+      const avatar = randomAvatar(Math.random, () => `seed-${i}`);
+      if (avatar.options.beard || avatar.options.hat || avatar.options.accessories) {
+        optionalTraitSeen = true;
+        break;
+      }
+    }
+    expect(optionalTraitSeen).toBe(true);
+  });
+
+  it('randomAvatar with fixed rng produces deterministic optional trait values', () => {
+    // Two independent rng instances seeded at the same value → identical sequences
+    const makeRng = () => {
+      let n = 0.42;
+      return () => {
+        n = (n * 9301 + 49297) % 233280;
+        return n / 233280;
+      };
+    };
+    const rng1 = makeRng();
+    const rng2 = makeRng();
+    const a1 = randomAvatar(rng1, () => 'fixed-seed');
+    const a2 = randomAvatar(rng2, () => 'fixed-seed');
+    expect(a1.options.beard).toBe(a2.options.beard);
+    expect(a1.options.hat).toBe(a2.options.hat);
+    expect(a1.options.accessories).toBe(a2.options.accessories);
+  });
+});
+
+describe('validatePixelArt coverage for all 16 axes (AVATAR-11)', () => {
+  // validatePixelArt is internal to predictor-service and not directly exported.
+  // Its validation logic relies on AVATAR_PRESETS as the allow-list source of truth.
+  // We verify the preset structure here so that when predictor-service tests call
+  // updatePredictor with good/bad values, the validation has correct data to check against.
+
+  const ALL_16_AXES = [
+    'skinColor',
+    'hair',
+    'hairColor',
+    'clothing',
+    'clothingColor',
+    'glasses',
+    'eyes',
+    'beard',
+    'mouth',
+    'hat',
+    'accessories',
+    'eyesColor',
+    'glassesColor',
+    'mouthColor',
+    'hatColor',
+    'accessoriesColor',
+  ] as const;
+
+  it('AVATAR_PRESETS has all 16 axes defined', () => {
+    for (const axis of ALL_16_AXES) {
+      expect(AVATAR_PRESETS).toHaveProperty(axis);
+      expect(Array.isArray(AVATAR_PRESETS[axis])).toBe(true);
+      expect((AVATAR_PRESETS[axis] as readonly string[]).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('all new style axis values have correct format', () => {
+    // eyes: variant01-variant12
+    for (const value of AVATAR_PRESETS.eyes) {
+      expect(value).toMatch(/^variant\d+$/);
+    }
+    // beard: variant01-variant06
+    for (const value of AVATAR_PRESETS.beard) {
+      expect(value).toMatch(/^variant\d+$/);
+    }
+    // mouth: happy01-happy06, sad01-sad06
+    for (const value of AVATAR_PRESETS.mouth) {
+      expect(value).toMatch(/^(happy|sad)\d+$/);
+    }
+    // hat: variant01-variant06
+    for (const value of AVATAR_PRESETS.hat) {
+      expect(value).toMatch(/^variant\d+$/);
+    }
+    // accessories: variant01-variant03
+    for (const value of AVATAR_PRESETS.accessories) {
+      expect(value).toMatch(/^variant\d+$/);
+    }
+  });
+
+  it('all new color axis values are bare 6-hex (no #)', () => {
+    const colorAxes: (keyof typeof AVATAR_PRESETS)[] = [
+      'eyesColor',
+      'glassesColor',
+      'mouthColor',
+      'hatColor',
+      'accessoriesColor',
+    ];
+    for (const axis of colorAxes) {
+      for (const value of AVATAR_PRESETS[axis]) {
+        expect(value).toMatch(/^[a-fA-F0-9]{6}$/);
+      }
+    }
+  });
+
+  it('AVATAR_PRESETS is frozen (immutable)', () => {
+    expect(Object.isFrozen(AVATAR_PRESETS)).toBe(true);
+  });
 });

@@ -300,6 +300,86 @@ describe('predictor-service', () => {
         }),
       ).rejects.toThrow('Invalid glasses');
     });
+
+    it('rejects out-of-preset values for all 10 new axes', async () => {
+      const badOptions = [
+        { eyes: 'not-a-variant' },
+        { eyesColor: 'notahex' },
+        { beard: 'invalid-beard' },
+        { mouth: 'not-a-mouth' },
+        { mouthColor: 'xyz1234' },
+        { hat: 'invalid-hat' },
+        { hatColor: 'garbage' },
+        { accessories: 'bad-accessory' },
+        { accessoriesColor: 'fff' },
+        { glassesColor: 'abcdef' },
+      ];
+
+      for (const options of badOptions) {
+        await expect(
+          predictorService.updatePredictor('user-1', 'user-1-default', {
+            pixelArt: { seed: 'test-seed', options },
+          }),
+        ).rejects.toThrow();
+      }
+    });
+
+    it('accepts all preset values for all new style axes', async () => {
+      for (const eyes of AVATAR_PRESETS.eyes) {
+        await expect(
+          predictorService.updatePredictor('user-1', 'user-1-default', {
+            pixelArt: { seed: 'test-seed', options: { eyes } },
+          }),
+        ).resolves.toBeUndefined();
+      }
+      for (const beard of AVATAR_PRESETS.beard) {
+        await expect(
+          predictorService.updatePredictor('user-1', 'user-1-default', {
+            pixelArt: { seed: 'test-seed', options: { beard } },
+          }),
+        ).resolves.toBeUndefined();
+      }
+      for (const mouth of AVATAR_PRESETS.mouth) {
+        await expect(
+          predictorService.updatePredictor('user-1', 'user-1-default', {
+            pixelArt: { seed: 'test-seed', options: { mouth } },
+          }),
+        ).resolves.toBeUndefined();
+      }
+      for (const hat of AVATAR_PRESETS.hat) {
+        await expect(
+          predictorService.updatePredictor('user-1', 'user-1-default', {
+            pixelArt: { seed: 'test-seed', options: { hat } },
+          }),
+        ).resolves.toBeUndefined();
+      }
+      for (const accessories of AVATAR_PRESETS.accessories) {
+        await expect(
+          predictorService.updatePredictor('user-1', 'user-1-default', {
+            pixelArt: { seed: 'test-seed', options: { accessories } },
+          }),
+        ).resolves.toBeUndefined();
+      }
+    });
+
+    it('accepts all preset values for all new color axes', async () => {
+      const colorAxes: (keyof typeof AVATAR_PRESETS)[] = [
+        'eyesColor',
+        'glassesColor',
+        'mouthColor',
+        'hatColor',
+        'accessoriesColor',
+      ];
+      for (const axis of colorAxes) {
+        for (const value of AVATAR_PRESETS[axis]) {
+          await expect(
+            predictorService.updatePredictor('user-1', 'user-1-default', {
+              pixelArt: { seed: 'test-seed', options: { [axis]: value } },
+            }),
+          ).resolves.toBeUndefined();
+        }
+      }
+    });
   });
 
   describe('deletePredictor', () => {
