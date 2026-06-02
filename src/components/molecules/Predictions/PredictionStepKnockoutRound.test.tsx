@@ -114,6 +114,24 @@ describe('PredictionStepKnockoutRound', () => {
     });
   });
 
-  it.todo('renders resolved team names from resolvedMatchups prop');
-  it.todo('renders TBD card when resolvedTeam is TBD');
+  it('renders resolved team names from resolvedMatchups prop', () => {
+    render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[makeMatch('r32-m1', 'round-of-32', 'BRA', 'ARG')]}
+      />,
+    );
+    expect(screen.getAllByText(/BRA/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/ARG/i).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders TBD card when resolvedTeam is TBD', () => {
+    render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[makeMatch('r32-m1', 'round-of-32')]}
+      />,
+    );
+    expect(screen.getByText('Teams TBD')).toBeInTheDocument();
+  });
 });

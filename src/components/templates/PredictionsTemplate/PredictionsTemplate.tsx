@@ -233,6 +233,12 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     return { deadline: tournamentDeadline, state, label, countdownLabel };
   }, [tournamentDeadline, now, translations.deadlinePassed, translations.deadlineCountdown]);
 
+  const [showThirdPlaceConfirm, setShowThirdPlaceConfirm] = useState(false);
+  const [confirmedThirdPlace, setConfirmedThirdPlace] = useState(false);
+  const [confirmedAdvancingMap, setConfirmedAdvancingMap] = useState<
+    Record<string, string> | undefined
+  >(undefined);
+
   const {
     loading: stepsLoading,
     steps,
@@ -258,26 +264,10 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     locale,
     selectedPredictorId,
     tournamentDeadline,
-  );
-
-  const [showThirdPlaceConfirm, setShowThirdPlaceConfirm] = useState(false);
-  const [confirmedThirdPlace, setConfirmedThirdPlace] = useState(false);
-  const [confirmedAdvancingGroupSlugs, setConfirmedAdvancingGroupSlugs] = useState<string[] | null>(
-    null,
+    confirmedAdvancingMap,
   );
 
   const groupsCount = groups.length;
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- consumed by next plan
-  const confirmedAdvancingMap = useMemo<Record<string, string> | undefined>(() => {
-    if (!confirmedAdvancingGroupSlugs) return undefined;
-    const map: Record<string, string> = {};
-    confirmedAdvancingGroupSlugs.forEach((slug) => {
-      const team = thirdPlaceTeams.find((t) => `group-${t.groupLetter.toLowerCase()}` === slug);
-      if (team) map[slug] = team.teamId;
-    });
-    return map;
-  }, [confirmedAdvancingGroupSlugs, thirdPlaceTeams]);
 
   useEffect(() => {
     if (confirmedThirdPlace) {
@@ -310,7 +300,12 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
   const handleThirdPlaceContinue = (confirmedSlugs: string[]) => {
     setShowThirdPlaceConfirm(false);
     setConfirmedThirdPlace(true);
-    setConfirmedAdvancingGroupSlugs(confirmedSlugs);
+    const map: Record<string, string> = {};
+    confirmedSlugs.forEach((slug) => {
+      const team = thirdPlaceTeams.find((t) => `group-${t.groupLetter.toLowerCase()}` === slug);
+      if (team) map[slug] = team.teamId;
+    });
+    setConfirmedAdvancingMap(map);
     setCurrentStep(groupsCount);
   };
 
