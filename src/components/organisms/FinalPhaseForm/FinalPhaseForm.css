@@ -20,6 +20,10 @@
   gap: var(--space-3);
 }
 
+.final-phase-form__position--prefilled {
+  background: var(--bg-card-hover);
+}
+
 .final-phase-form__position-header {
   display: flex;
   align-items: center;
@@ -39,20 +43,20 @@
 
 .final-phase-form__badge--1 {
   background: var(--color-gold-500);
-  color: var(--text-inverse);
+  color: #000000;
   border-color: var(--color-gold-600);
 }
 
 .final-phase-form__badge--2 {
-  background: var(--color-accent-500);
-  color: var(--text-inverse);
-  border-color: var(--color-accent-600);
+  background: var(--medal-silver-bg);
+  color: var(--medal-silver-text);
+  border-color: color-mix(in srgb, var(--medal-silver-bg) 70%, black 30%);
 }
 
 .final-phase-form__badge--3 {
-  background: var(--color-tertiary-500);
-  color: var(--text-inverse);
-  border-color: var(--color-tertiary-600);
+  background: var(--color-warm-500);
+  color: #000000;
+  border-color: var(--color-warm-600);
 }
 
 .final-phase-form__badge--4 {

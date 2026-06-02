@@ -113,6 +113,10 @@
   --color-gold-800: #554717;
   --color-gold-900: #2b240c;
 
+  /* Medal silver tokens */
+  --medal-silver-bg: #c0c0c0;
+  --medal-silver-text: #000000;
+
   /* Semantic - Success (Green for correct predictions) */
   --color-success: #00e676;
   --color-success-bg: #0a2e1a;
@@ -245,6 +249,10 @@
   --color-gold-700: #f8de8c;
   --color-gold-800: #fbeab3;
   --color-gold-900: #fdf5d9;
+
+  /* Medal silver tokens */
+  --medal-silver-bg: #707080;
+  --medal-silver-text: #ffffff;
 
   /* Semantic - Success */
   --color-success: #00c853;
