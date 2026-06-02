@@ -399,11 +399,7 @@ export function usePredictionSteps(
         });
         setSubmittedSteps((prev) => new Set(prev).add(stepIndex));
 
-        const newKnockoutBets = { ...knockoutBetsByMatchSlug };
-        Object.entries(predictions).forEach(([slug, winner]) => {
-          newKnockoutBets[slug] = winner;
-        });
-        setKnockoutBetsByMatchSlug(newKnockoutBets);
+        setKnockoutBetsByMatchSlug((prev) => ({ ...prev, ...predictions }));
       }
       if (result.errors.length > 0) {
         const error = result.errors[0];
@@ -414,7 +410,7 @@ export function usePredictionSteps(
       }
       setTimeout(() => setFeedback(null), 5000);
     },
-    [user, selectedPredictorId, firestoreMatches, translations, knockoutBetsByMatchSlug],
+    [user, selectedPredictorId, firestoreMatches, translations],
   );
 
   const steps = useMemo(() => {

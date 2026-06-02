@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { PhaseType } from '@app-types/firestore';
@@ -133,5 +133,139 @@ describe('PredictionStepKnockoutRound', () => {
       />,
     );
     expect(screen.getByText('Teams TBD')).toBeInTheDocument();
+  });
+});
+
+describe('KOFIX-04 behavioral regression', () => {
+  it('in-progress pick survives a roundMatches reference change (regression)', () => {
+    const initialMatches = [
+      makeMatch('r32-m1', 'round-of-32', 'arg', 'esp'),
+      makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
+    ];
+    const { rerender } = render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={initialMatches}
+        previousRoundPredictions={{}}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('radio', { name: /ARG/i }));
+
+    act(() => {
+      rerender(
+        <PredictionStepKnockoutRound
+          {...defaultProps}
+          roundMatches={[
+            makeMatch('r32-m1', 'round-of-32', 'arg', 'esp'),
+            makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
+          ]}
+          previousRoundPredictions={{}}
+        />,
+      );
+    });
+
+    expect(screen.getByRole('radio', { name: /ARG/i })).toBeChecked();
+  });
+
+  it('completing all picks enables advance and stays enabled across recompute', () => {
+    const onStateChange = vi.fn();
+    const { rerender } = render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[
+          makeMatch('r32-m1', 'round-of-32', 'arg', 'esp'),
+          makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
+        ]}
+        previousRoundPredictions={{}}
+        onStateChange={onStateChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('radio', { name: /ARG/i }));
+    fireEvent.click(screen.getByRole('radio', { name: /BRA/i }));
+
+    act(() => {
+      rerender(
+        <PredictionStepKnockoutRound
+          {...defaultProps}
+          roundMatches={[
+            makeMatch('r32-m1', 'round-of-32', 'arg', 'esp'),
+            makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
+          ]}
+          previousRoundPredictions={{}}
+          onStateChange={onStateChange}
+        />,
+      );
+    });
+
+    const calls = onStateChange.mock.calls;
+    const lastCall = calls[calls.length - 1][0] as { canAdvance: boolean };
+    expect(lastCall.canAdvance).toBe(true);
+
+    const afterRerender = calls.slice(
+      calls.findIndex((c) => (c[0] as { canAdvance: boolean }).canAdvance === true),
+    );
+    const falseAfterTrue = afterRerender.some(
+      (c) => (c[0] as { canAdvance: boolean }).canAdvance === false,
+    );
+    expect(falseAfterTrue).toBe(false);
+  });
+
+  it('drops a preserved pick whose team is no longer in the matchup (D-01)', () => {
+    const { rerender } = render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[makeMatch('r32-m1', 'round-of-32', 'arg', 'esp')]}
+        previousRoundPredictions={{}}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('radio', { name: /ARG/i }));
+
+    act(() => {
+      rerender(
+        <PredictionStepKnockoutRound
+          {...defaultProps}
+          roundMatches={[makeMatch('r32-m1', 'round-of-32', 'bra', 'fra')]}
+          previousRoundPredictions={{}}
+        />,
+      );
+    });
+
+    expect(screen.queryByRole('radio', { checked: true })).toBeNull();
+  });
+
+  it('stable onSubmit does not re-trigger reset (D-02 watch-item)', () => {
+    const onSubmit = vi.fn();
+    const { rerender } = render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[
+          makeMatch('r32-m1', 'round-of-32', 'arg', 'esp'),
+          makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
+        ]}
+        previousRoundPredictions={{}}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('radio', { name: /ARG/i }));
+
+    act(() => {
+      rerender(
+        <PredictionStepKnockoutRound
+          {...defaultProps}
+          roundMatches={[
+            makeMatch('r32-m1', 'round-of-32', 'arg', 'esp'),
+            makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
+          ]}
+          previousRoundPredictions={{}}
+          onSubmit={onSubmit}
+        />,
+      );
+    });
+
+    expect(screen.getByRole('radio', { name: /ARG/i })).toBeChecked();
   });
 });

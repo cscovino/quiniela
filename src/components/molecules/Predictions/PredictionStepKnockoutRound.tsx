@@ -98,8 +98,17 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   const [predictions, setPredictions] = useState<Record<string, string>>(initialPredictions);
 
   useEffect(() => {
-    setPredictions(initialPredictions);
-  }, [initialPredictions]);
+    setPredictions((prev) => {
+      const merged: Record<string, string> = { ...initialPredictions };
+      for (const m of roundMatches) {
+        const picked = prev[m.slug];
+        if (!picked) continue;
+        const valid = m.homeTeam?.fifaCode === picked || m.awayTeam?.fifaCode === picked;
+        if (valid) merged[m.slug] = picked;
+      }
+      return merged;
+    });
+  }, [initialPredictions, roundMatches]);
 
   const handlePrediction = (matchSlug: string, winner: string) => {
     setPredictions((prev) => ({
