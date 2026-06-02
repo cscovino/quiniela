@@ -320,10 +320,93 @@ describe('getPredictorProgress', () => {
 });
 
 describe('loser-of resolver', () => {
-  it.todo('returns the non-winner feeder when both feeders and winner are known');
-  it.todo('returns TBD when no knockout pick exists');
-  it.todo('returns TBD when stored winner is stale (D-02)');
-  it.todo('propagates TBD transitively to third-place match when sf pick is stale');
+  // Fixture: wire group bets and knockout bets for the full chain from R32 through SF
+  // so that sf-1 feeders (arg and esp) are both resolved.
+  // Chain: group-a pos-1 → r32-1 → r16-1 → qf-1 → sf-1
+  //        group-c pos-1 → r32-2 → r16-1 → qf-1 (away)  -- actually r16-1 away = r32-2
+  //        group-e pos-1 → r32-3 → r16-2 → qf-1 (away)
+  //        group-g pos-1 → r32-4 → r16-2 (away)
+  // sf-1 feeders: W-qf-1 and W-qf-2; qf-1 = W-r16-1 vs W-r16-2
+  // To keep fixture minimal: set knockoutBets for every step in the chain up to sf-1
+  const thirdPlaceMatch: MatchWithId[] = [makeMatch('third-place', '', 'third-place', '', '')];
+
+  // group-a winner = 'arg', group-c winner = 'esp'
+  // r32-1: arg (group-a pos-1) wins → 'arg'
+  // r32-2: esp (group-c pos-1) wins → 'esp'
+  // r16-1: arg (W-r32-1) vs esp (W-r32-2) → 'arg'
+  // r32-3: group-e pos-1 = 'bra' → 'bra'; r32-4: group-g pos-1 = 'ger' → 'ger'
+  // r16-2: bra vs ger → 'bra'
+  // qf-1: arg vs bra → 'arg'
+  // r32-5..r32-8 + r16-3 + r16-4 → qf-2 = 'fra'
+  // sf-1: arg vs fra → 'arg' (winner); loser = 'fra'
+
+  const groupBets: GroupBetRecord = {
+    'group-a': ['arg', 'bra', 'ger', 'fra'],
+    'group-c': ['esp', 'eng', 'por', 'ita'],
+    'group-e': ['bra', 'ger', 'arg', 'fra'],
+    'group-g': ['ger', 'arg', 'bra', 'fra'],
+    'group-b': ['fra', 'esp', 'arg', 'bra'],
+    'group-d': ['eng', 'por', 'esp', 'ita'],
+    'group-f': ['por', 'fra', 'arg', 'bra'],
+    'group-h': ['ita', 'eng', 'por', 'fra'],
+  };
+
+  const fullChainBets: KnockoutBetRecord = {
+    // R32 winners
+    'r32-1': 'arg',
+    'r32-2': 'esp',
+    'r32-3': 'bra',
+    'r32-4': 'ger',
+    'r32-5': 'fra',
+    'r32-6': 'eng',
+    'r32-7': 'por',
+    'r32-8': 'ita',
+    // R16 winners
+    'r16-1': 'arg',
+    'r16-2': 'bra',
+    'r16-3': 'fra',
+    'r16-4': 'por',
+    // QF winners
+    'qf-1': 'arg',
+    'qf-2': 'fra',
+    // SF winners
+    'sf-1': 'arg',
+    'sf-2': 'por',
+  };
+
+  it('returns the non-winner feeder when both feeders and winner are known', () => {
+    const bracket = buildKnockoutBracket(groupBets, thirdPlaceMatch, fullChainBets);
+    const thirdPlace = bracket[0];
+    // sf-1: qf-1 winner (arg) vs qf-2 winner (fra), stored winner = arg → loser = fra
+    expect(thirdPlace.homeTeam.resolvedTeam).toBe('fra');
+  });
+
+  it('returns TBD when no knockout pick exists', () => {
+    const noBets: KnockoutBetRecord = {};
+    const bracket = buildKnockoutBracket(groupBets, thirdPlaceMatch, noBets);
+    expect(bracket[0].homeTeam.resolvedTeam).toBe('TBD');
+  });
+
+  it('returns TBD when stored winner is stale (D-02)', () => {
+    // sf-1 feeders resolve to arg and fra; stored winner is 'zzz' (stale)
+    const staleBets: KnockoutBetRecord = {
+      ...fullChainBets,
+      'sf-1': 'zzz', // stale — not arg or fra
+    };
+    const bracket = buildKnockoutBracket(groupBets, thirdPlaceMatch, staleBets);
+    expect(bracket[0].homeTeam.resolvedTeam).toBe('TBD');
+  });
+
+  it('propagates TBD transitively to third-place match when sf pick is stale', () => {
+    const staleBothSFs: KnockoutBetRecord = {
+      ...fullChainBets,
+      'sf-1': 'zzz', // stale
+      'sf-2': 'zzz', // stale
+    };
+    const bracket = buildKnockoutBracket(groupBets, thirdPlaceMatch, staleBothSFs);
+    expect(bracket[0].homeTeam.resolvedTeam).toBe('TBD');
+    expect(bracket[0].awayTeam.resolvedTeam).toBe('TBD');
+  });
 });
 
 describe('deriveFinalFour', () => {
