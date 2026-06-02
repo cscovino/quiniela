@@ -291,6 +291,10 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
 
   const handleThirdPlaceAdjust = () => {
     setShowThirdPlaceConfirm(false);
+    // Editing group standings can change which thirds rank — drop the confirmed
+    // advancing set so the bracket falls back to the deterministic default until
+    // the user re-confirms, rather than resolving from a now-stale selection.
+    setConfirmedAdvancingMap(undefined);
     const firstGroupIdx = steps.findIndex((s) => s.kind === 'group');
     if (firstGroupIdx >= 0) {
       setCurrentStep(firstGroupIdx);
