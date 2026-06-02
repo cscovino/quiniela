@@ -1,8 +1,6 @@
 import type { Match, PhaseType } from '@app-types/firestore';
 import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 
-import { getCombinationKey, THIRD_PLACE_MATRIX } from '../data/third-place-matrix';
-
 export async function ensureThirdPlaceMatrix(): Promise<void> {
   // matrix is statically imported; no warm-up needed
 }
@@ -535,7 +533,10 @@ export function computeThirdPlaceStandings(
   matches: MatchWithId[],
   teamsMap: Record<string, TeamInfo>,
   groups: { slug: string }[],
+  confirmedAdvancingGroupSlugs?: string[],
 ): ThirdPlacedTeam[] {
+  const letterFromSlug = (slug: string) => slug.replace('group-', '').toUpperCase();
+
   const thirdPlacedRecords: Array<{
     teamId: string;
     teamName: string;
@@ -560,34 +561,33 @@ export function computeThirdPlaceStandings(
       teamName: team?.name || thirdPlaceTeamId,
       groupLetter: group.slug,
       groupSlug: group.slug,
-      points: teamStanding?.points || 0,
-      goalDifference: (teamStanding?.goalsFor || 0) - (teamStanding?.goalsAgainst || 0),
-      goalsScored: teamStanding?.goalsFor || 0,
+      points: teamStanding?.points ?? 0,
+      goalDifference: (teamStanding?.goalsFor ?? 0) - (teamStanding?.goalsAgainst ?? 0),
+      goalsScored: teamStanding?.goalsFor ?? 0,
     });
   }
 
+  // D-03: deterministic sort — points (desc) → GD (desc) → GF (desc) → groupLetter (asc) → teamId (asc)
   thirdPlacedRecords.sort((a, b) => {
     if (b.points !== a.points) return b.points - a.points;
     if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
     if (b.goalsScored !== a.goalsScored) return b.goalsScored - a.goalsScored;
-    return 0;
+    const aLetter = letterFromSlug(a.groupSlug);
+    const bLetter = letterFromSlug(b.groupSlug);
+    if (aLetter !== bLetter) return aLetter.localeCompare(bLetter);
+    return a.teamId.localeCompare(b.teamId);
   });
 
-  const letterFromSlug = (slug: string) => slug.replace('group-', '').toUpperCase();
-  const advancingGroups = thirdPlacedRecords.slice(0, 8).map((r) => r.groupSlug);
-  const advancingLetters = advancingGroups.map(letterFromSlug);
-  const combinationKey = getCombinationKey(advancingLetters);
-  const slotMapping = THIRD_PLACE_MATRIX[combinationKey] ?? {};
+  // D-04: use confirmed advancing set if provided; otherwise default to deterministic top-8
+  const advancingSet =
+    confirmedAdvancingGroupSlugs ?? thirdPlacedRecords.slice(0, 8).map((r) => r.groupSlug);
 
-  return thirdPlacedRecords.map((record, index) => {
-    const isAdvancing = index < 8;
-    const recordLetter = letterFromSlug(record.groupSlug);
-    const slot: string | undefined = isAdvancing
-      ? Object.entries(slotMapping).find(([, g]) => g === recordLetter)?.[0]
-      : undefined;
+  return thirdPlacedRecords.map((record) => {
+    // D-04: advancing reflects user's confirmed set, not a hardcoded slice
+    const isAdvancing = advancingSet.includes(record.groupSlug);
 
     return {
-      rank: index + 1,
+      rank: thirdPlacedRecords.indexOf(record) + 1,
       teamId: record.teamId,
       teamName: record.teamName,
       groupLetter: record.groupLetter,
@@ -595,9 +595,55 @@ export function computeThirdPlaceStandings(
       goalDifference: record.goalDifference,
       goalsScored: record.goalsScored,
       advancing: isAdvancing,
-      bracketSlotLabel: slot ? `Match ${slot.replace('M', '')}` : undefined,
+      // bracketSlotLabel intentionally undefined: official slot names (M74 etc.) don't map 1:1 to seed slugs
+      bracketSlotLabel: undefined,
       // bracketMatchSlug intentionally omitted: official slot names (M74 etc.) don't map 1:1 to seed slugs
       bracketMatchSlug: undefined,
     };
   });
+}
+
+export interface FinalFourResult {
+  first: string; // 'TBD' if final winner unknown
+  second: string; // 'TBD' if final loser unknown
+  third: string; // 'TBD' if third-place winner unknown
+  fourth: string; // 'TBD' if third-place loser unknown
+}
+
+// Derives the predicted final standings from knockout bets.
+// D-01: progressive — each field resolves independently; only truly-unknown slots return 'TBD'.
+// D-02: stale picks (stored winner not matching resolved feeders) return 'TBD' transitively.
+export function deriveFinalFour(
+  knockoutBets: KnockoutBetRecord,
+  groupBetsByGroupId: GroupBetRecord,
+): FinalFourResult {
+  // first = winner of 'final' (validated against sf-1 and sf-2 winners via D-02)
+  const first = resolveSlot(
+    { slotId: 'derive-first', source: { from: 'winner-of', matchSlug: 'final' } },
+    groupBetsByGroupId,
+    knockoutBets,
+  );
+
+  // second = loser of 'final' (the sf winner who did not win the final)
+  const second = resolveSlot(
+    { slotId: 'derive-second', source: { from: 'loser-of', matchSlug: 'final' } },
+    groupBetsByGroupId,
+    knockoutBets,
+  );
+
+  // third = winner of 'third-place' match (loser-of sf-1 vs loser-of sf-2)
+  const third = resolveSlot(
+    { slotId: 'derive-third', source: { from: 'winner-of', matchSlug: 'third-place' } },
+    groupBetsByGroupId,
+    knockoutBets,
+  );
+
+  // fourth = loser of 'third-place' match
+  const fourth = resolveSlot(
+    { slotId: 'derive-fourth', source: { from: 'loser-of', matchSlug: 'third-place' } },
+    groupBetsByGroupId,
+    knockoutBets,
+  );
+
+  return { first, second, third, fourth };
 }
