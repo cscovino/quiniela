@@ -23,7 +23,10 @@ import { predictionService } from '@services/prediction-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
 import {
+  buildKnockoutBracket,
   computeThirdPlaceStandings,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  deriveFinalFour,
   isGroupClassificationComplete,
   KNOCKOUT_PHASES,
 } from '@utils/predictions-flow';
@@ -91,6 +94,7 @@ export function usePredictionSteps(
   locale: 'en' | 'es',
   selectedPredictorId: string | null,
   deadline: Date | null = null,
+  confirmedAdvancingMap?: Record<string, string>,
 ): UsePredictionStepsResult {
   const user = useAuthStore((s) => s.user);
 
@@ -463,6 +467,16 @@ export function usePredictionSteps(
       stepIndex++;
     }
 
+    const knockoutMatchesList = firestoreMatches.filter((m) =>
+      (KNOCKOUT_PHASES as string[]).includes(m.phase),
+    );
+    const resolvedBracket = buildKnockoutBracket(
+      groupBetsByGroupId,
+      knockoutMatchesList,
+      knockoutBetsByMatchSlug,
+      confirmedAdvancingMap,
+    );
+
     for (const phase of KNOCKOUT_PHASES) {
       const phaseMatches = firestoreMatches.filter((m) => m.phase === phase);
       if (phaseMatches.length === 0) continue;
@@ -485,6 +499,47 @@ export function usePredictionSteps(
         translations.stepDescriptionRound?.replace('{round}', roundLabel) ||
         `Pick winners for the ${roundLabel}`;
 
+      const phaseResolved = resolvedBracket.filter((m) => m.phase === phase);
+      const roundMatches = phaseResolved.map((m) => ({
+        slug: m.slug,
+        phase: m.phase,
+        homeTeam:
+          (m as unknown as { homeTeam: { resolvedTeam: string } }).homeTeam.resolvedTeam !== 'TBD'
+            ? {
+                fifaCode: (m as unknown as { homeTeam: { resolvedTeam: string } }).homeTeam
+                  .resolvedTeam,
+                name:
+                  teamsMap[
+                    (m as unknown as { homeTeam: { resolvedTeam: string } }).homeTeam.resolvedTeam
+                  ]?.name ||
+                  (m as unknown as { homeTeam: { resolvedTeam: string } }).homeTeam.resolvedTeam,
+              }
+            : null,
+        awayTeam:
+          (m as unknown as { awayTeam: { resolvedTeam: string } }).awayTeam.resolvedTeam !== 'TBD'
+            ? {
+                fifaCode: (m as unknown as { awayTeam: { resolvedTeam: string } }).awayTeam
+                  .resolvedTeam,
+                name:
+                  teamsMap[
+                    (m as unknown as { awayTeam: { resolvedTeam: string } }).awayTeam.resolvedTeam
+                  ]?.name ||
+                  (m as unknown as { awayTeam: { resolvedTeam: string } }).awayTeam.resolvedTeam,
+              }
+            : null,
+        tbdHome:
+          (m as unknown as { homeTeam: { resolvedTeam: string } }).homeTeam.resolvedTeam === 'TBD'
+            ? ('TBD' as const)
+            : undefined,
+        tbdAway:
+          (m as unknown as { awayTeam: { resolvedTeam: string } }).awayTeam.resolvedTeam === 'TBD'
+            ? ('TBD' as const)
+            : undefined,
+        predictionDeadline:
+          firestoreMatches.find((fm) => fm.slug === m.slug)?.predictionDeadline.toDate() ??
+          new Date(0),
+      }));
+
       result.push({
         id: `knockout-${phase}`,
         kind: 'knockout-round',
@@ -496,17 +551,7 @@ export function usePredictionSteps(
         content: (
           <PredictionStepKnockoutRound
             phase={phase}
-            roundMatches={phaseMatches.map((m) => ({
-              slug: m.slug,
-              phase: m.phase,
-              homeTeam: m.homeTeamId
-                ? { fifaCode: m.homeTeamId.toUpperCase(), name: m.homeTeamId }
-                : null,
-              awayTeam: m.awayTeamId
-                ? { fifaCode: m.awayTeamId.toUpperCase(), name: m.awayTeamId }
-                : null,
-              predictionDeadline: m.predictionDeadline.toDate(),
-            }))}
+            roundMatches={roundMatches}
             existingKnockoutBets={existingPhaseBets}
             previousRoundPredictions={knockoutBetsByMatchSlug}
             onSubmit={(predictions) => handleKnockoutRoundSubmit(phase, idx, predictions)}
@@ -588,6 +633,7 @@ export function usePredictionSteps(
     handleKnockoutRoundSubmit,
     registerStepState,
     deadline,
+    confirmedAdvancingMap,
   ]);
 
   // Allow advancing when either the saved data already satisfies the step
@@ -609,8 +655,16 @@ export function usePredictionSteps(
         firestoreMatches,
         teamsMap,
         groups,
+        confirmedAdvancingMap ? Object.keys(confirmedAdvancingMap) : undefined,
       ),
-    [groupBetsByGroupId, existingMatchValues, firestoreMatches, teamsMap, groups],
+    [
+      groupBetsByGroupId,
+      existingMatchValues,
+      firestoreMatches,
+      teamsMap,
+      groups,
+      confirmedAdvancingMap,
+    ],
   );
 
   return {
