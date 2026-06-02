@@ -23,14 +23,27 @@ export function generateAvatarDataUri(
   return createAvatar(pixelArt, {
     seed,
     backgroundColor: ['transparent'], // D-03 transparent output
-    skinColor: wrap(options.skinColor), // D-02 single value → 1-element array
+    // EXISTING 6 axes:
+    skinColor: wrap(options.skinColor),
     hair: wrap(options.hair),
     hairColor: wrap(options.hairColor),
     clothing: wrap(options.clothing),
     clothingColor: wrap(options.clothingColor),
     glasses: wrap(options.glasses),
-    // Force glasses to always render when a style is chosen (RESEARCH Pitfall 3).
-    // glassesProbability is a plain number (0–100), not an array.
     glassesProbability: options.glasses ? 100 : undefined,
+    // NEW style axes:
+    eyes: wrap(options.eyes),
+    beard: wrap(options.beard),
+    mouth: wrap(options.mouth),
+    hat: wrap(options.hat),
+    hatProbability: options.hat ? 100 : undefined,
+    accessories: wrap(options.accessories),
+    accessoriesProbability: options.accessories ? 100 : undefined,
+    // NEW color axes:
+    eyesColor: wrap(options.eyesColor),
+    mouthColor: wrap(options.mouthColor),
+    hatColor: wrap(options.hatColor),
+    accessoriesColor: wrap(options.accessoriesColor),
+    glassesColor: wrap(options.glassesColor),
   }).toDataUri(); // D-05 sync string, no size set
 }
