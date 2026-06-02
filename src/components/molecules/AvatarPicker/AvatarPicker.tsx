@@ -20,6 +20,20 @@ export interface AvatarPickerTranslations {
   randomizeAria?: string;
   swatchColorAria?: string;
   swatchStyleAria?: string;
+  // NEW — optional trait labels:
+  eyesLabel?: string;
+  eyesColorLabel?: string;
+  beardLabel?: string;
+  beardNone?: string;
+  mouthLabel?: string;
+  mouthColorLabel?: string;
+  hatLabel?: string;
+  hatNone?: string;
+  hatColorLabel?: string;
+  accessoriesLabel?: string;
+  accessoriesNone?: string;
+  accessoriesColorLabel?: string;
+  glassesColorLabel?: string;
 }
 
 export interface AvatarPickerProps {
@@ -42,10 +56,40 @@ const t: Required<AvatarPickerTranslations> = {
   randomizeAria: 'Randomize avatar',
   swatchColorAria: '{trait} color {color}',
   swatchStyleAria: '{trait} style {n}',
+  // NEW defaults:
+  eyesLabel: 'Eyes',
+  eyesColorLabel: 'Eye color',
+  beardLabel: 'Beard',
+  beardNone: 'None',
+  mouthLabel: 'Mouth',
+  mouthColorLabel: 'Lip color',
+  hatLabel: 'Hat',
+  hatNone: 'None',
+  hatColorLabel: 'Hat color',
+  accessoriesLabel: 'Accessories',
+  accessoriesNone: 'None',
+  accessoriesColorLabel: 'Accessories color',
+  glassesColorLabel: 'Glasses color',
 };
 
-type ColorTrait = 'skinColor' | 'hairColor' | 'clothingColor';
-type StyleTrait = 'hair' | 'clothing' | 'glasses';
+type ColorTrait =
+  | 'skinColor'
+  | 'hairColor'
+  | 'clothingColor'
+  | 'eyesColor'
+  | 'mouthColor'
+  | 'hatColor'
+  | 'accessoriesColor'
+  | 'glassesColor';
+type StyleTrait =
+  | 'hair'
+  | 'clothing'
+  | 'glasses'
+  | 'eyes'
+  | 'beard'
+  | 'mouth'
+  | 'hat'
+  | 'accessories';
 
 interface TraitRowDef {
   trait: string;
@@ -63,12 +107,25 @@ export const AvatarPicker: FC<AvatarPickerProps> = ({
   const labels: Required<AvatarPickerTranslations> = { ...t, ...translations };
 
   const traitRows: TraitRowDef[] = [
+    // EXISTING 6:
     { trait: 'skinColor', label: labels.skinLabel, type: 'color' },
     { trait: 'hair', label: labels.hairLabel, type: 'style' },
     { trait: 'hairColor', label: labels.hairColorLabel, type: 'color' },
     { trait: 'clothing', label: labels.clothingLabel, type: 'style' },
     { trait: 'clothingColor', label: labels.clothingColorLabel, type: 'color' },
     { trait: 'glasses', label: labels.glassesLabel, type: 'style' },
+    // NEW style axes (optional traits — None chip handled in render):
+    { trait: 'eyes', label: labels.eyesLabel, type: 'style' },
+    { trait: 'beard', label: labels.beardLabel, type: 'style' },
+    { trait: 'mouth', label: labels.mouthLabel, type: 'style' },
+    { trait: 'hat', label: labels.hatLabel, type: 'style' },
+    { trait: 'accessories', label: labels.accessoriesLabel, type: 'style' },
+    // NEW color axes:
+    { trait: 'eyesColor', label: labels.eyesColorLabel, type: 'color' },
+    { trait: 'mouthColor', label: labels.mouthColorLabel, type: 'color' },
+    { trait: 'hatColor', label: labels.hatColorLabel, type: 'color' },
+    { trait: 'accessoriesColor', label: labels.accessoriesColorLabel, type: 'color' },
+    { trait: 'glassesColor', label: labels.glassesColorLabel, type: 'color' },
   ];
 
   const previewPredictor: Predictor = {
