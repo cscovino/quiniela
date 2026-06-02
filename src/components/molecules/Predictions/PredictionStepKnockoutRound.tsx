@@ -2,12 +2,10 @@ import type { FC } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import type { PhaseType } from '@app-types/firestore';
-import type { RegisterStepState, ThirdPlacedTeam } from '@app-types/prediction-steps';
+import type { RegisterStepState } from '@app-types/prediction-steps';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
 import { TeamSelector } from '@molecules/TeamSelector';
-import type { GroupBetRecord } from '@utils/predictions-flow';
-import { BRACKET_MAP } from '@utils/predictions-flow';
 
 import './PredictionStepKnockoutRound.css';
 
@@ -24,13 +22,11 @@ export interface KnockoutRoundMatch {
 export interface PredictionStepKnockoutRoundProps {
   phase: PhaseType;
   roundMatches: KnockoutRoundMatch[];
-  groupBetsByGroupId: GroupBetRecord;
   /** Slugs already saved for this round — kept for compatibility; prefill uses previousRoundPredictions. */
   existingKnockoutBets?: Set<string>;
   previousRoundPredictions: Record<string, string>;
   onSubmit: (predictions: Record<string, string>) => Promise<void>;
   isDisabled: boolean;
-  thirdPlaceTeams?: ThirdPlacedTeam[];
   /** When provided, the step reports its submit/validity to the wizard's Next button. */
   onStateChange?: RegisterStepState;
   translations?: {
@@ -75,40 +71,12 @@ function getPhaseLabel(phase: PhaseType, labels: typeof defaultTranslations): st
   return map[phase] || phase;
 }
 
-function resolveTeamFromBracket(
-  slot: { source: { from: string; groupId?: string; position?: number; matchSlug?: string } },
-  groupBetsByGroupId: GroupBetRecord,
-  knockoutBets: Record<string, string>,
-): { fifaCode: string; name: string } | null {
-  const source = slot.source;
-
-  if (source.from === 'group' && source.groupId && source.position) {
-    const groupPositions = groupBetsByGroupId[source.groupId];
-    if (!groupPositions || groupPositions.length < source.position) {
-      return null;
-    }
-    const teamId = groupPositions[source.position - 1];
-    if (!teamId || teamId === 'TBD') return null;
-    return { fifaCode: teamId.toUpperCase(), name: teamId };
-  }
-
-  if (source.from === 'winner-of' && source.matchSlug) {
-    const winner = knockoutBets[source.matchSlug];
-    if (!winner || winner === 'TBD') return null;
-    return { fifaCode: winner.toUpperCase(), name: winner };
-  }
-
-  return null;
-}
-
 export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> = ({
   phase,
   roundMatches,
-  groupBetsByGroupId,
   previousRoundPredictions,
   onSubmit,
   isDisabled,
-  thirdPlaceTeams = [],
   onStateChange,
   translations = {},
 }) => {
@@ -132,78 +100,6 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   useEffect(() => {
     setPredictions(initialPredictions);
   }, [initialPredictions]);
-
-  // Merge this round's live picks over previous-round results so winner-of slots resolve.
-  const knockoutBetsRecord = useMemo(
-    () => ({ ...previousRoundPredictions, ...predictions }),
-    [previousRoundPredictions, predictions],
-  );
-
-  const resolvedMatches = useMemo(() => {
-    const advancingGroupSet = new Set(
-      thirdPlaceTeams.filter((t) => t.advancing).map((t) => t.groupLetter),
-    );
-
-    const isThirdPlaceSlot = (source: { from: string; groupId?: string; position?: number }) =>
-      phase === 'round-of-32' && source.from === 'group' && source.position === 3;
-
-    return roundMatches.map((match) => {
-      const bracketEntry = BRACKET_MAP[match.slug];
-      if (!bracketEntry) {
-        return {
-          ...match,
-          homeTeam: match.homeTeam,
-          awayTeam: match.awayTeam,
-          tbdHome: 'TBD',
-          tbdAway: 'TBD',
-        };
-      }
-
-      let homeTeam: { fifaCode: string; name: string } | null = null;
-      if (isThirdPlaceSlot(bracketEntry.home.source)) {
-        const groupId = bracketEntry.home.source.groupId || '';
-        if (advancingGroupSet.has(groupId)) {
-          const positions = groupBetsByGroupId[groupId];
-          if (positions && positions.length >= 4) {
-            const teamId = positions[2];
-            homeTeam = { fifaCode: teamId.toUpperCase(), name: teamId };
-          }
-        }
-      } else {
-        homeTeam = resolveTeamFromBracket(
-          { source: bracketEntry.home.source },
-          groupBetsByGroupId,
-          knockoutBetsRecord,
-        );
-      }
-
-      let awayTeam: { fifaCode: string; name: string } | null = null;
-      if (isThirdPlaceSlot(bracketEntry.away.source)) {
-        const groupId = bracketEntry.away.source.groupId || '';
-        if (advancingGroupSet.has(groupId)) {
-          const positions = groupBetsByGroupId[groupId];
-          if (positions && positions.length >= 4) {
-            const teamId = positions[2];
-            awayTeam = { fifaCode: teamId.toUpperCase(), name: teamId };
-          }
-        }
-      } else {
-        awayTeam = resolveTeamFromBracket(
-          { source: bracketEntry.away.source },
-          groupBetsByGroupId,
-          knockoutBetsRecord,
-        );
-      }
-
-      return {
-        ...match,
-        homeTeam,
-        awayTeam,
-        tbdHome: homeTeam ? undefined : 'TBD',
-        tbdAway: awayTeam ? undefined : 'TBD',
-      };
-    });
-  }, [roundMatches, groupBetsByGroupId, knockoutBetsRecord, thirdPlaceTeams, phase]);
 
   const handlePrediction = (matchSlug: string, winner: string) => {
     setPredictions((prev) => ({
@@ -229,10 +125,10 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
 
   // A round can advance once every match with resolved teams has a pick.
   const canAdvance = useMemo(() => {
-    const playable = resolvedMatches.filter((m) => m.homeTeam != null && m.awayTeam != null);
+    const playable = roundMatches.filter((m) => m.homeTeam != null && m.awayTeam != null);
     if (playable.length === 0) return true;
     return playable.every((m) => predictions[m.slug]);
-  }, [resolvedMatches, predictions]);
+  }, [roundMatches, predictions]);
 
   useEffect(() => {
     onStateChange?.({
@@ -251,7 +147,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
       </div>
 
       <div className="prediction-step-knockout-round__matches">
-        {resolvedMatches.map((match) => {
+        {roundMatches.map((match) => {
           const disabled = isMatchDisabled(match);
           const hasTeams = match.homeTeam != null && match.awayTeam != null;
 

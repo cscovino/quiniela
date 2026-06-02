@@ -485,11 +485,6 @@ export function usePredictionSteps(
         translations.stepDescriptionRound?.replace('{round}', roundLabel) ||
         `Pick winners for the ${roundLabel}`;
 
-      const thirdPlaceTeams: ThirdPlacedTeam[] =
-        phase === 'round-of-32'
-          ? computeThirdPlaceStandings(groupBetsByGroupId, {}, firestoreMatches, teamsMap, groups)
-          : [];
-
       result.push({
         id: `knockout-${phase}`,
         kind: 'knockout-round',
@@ -512,12 +507,10 @@ export function usePredictionSteps(
                 : null,
               predictionDeadline: m.predictionDeadline.toDate(),
             }))}
-            groupBetsByGroupId={groupBetsByGroupId}
             existingKnockoutBets={existingPhaseBets}
             previousRoundPredictions={knockoutBetsByMatchSlug}
             onSubmit={(predictions) => handleKnockoutRoundSubmit(phase, idx, predictions)}
             isDisabled={submitting || (deadline != null && deadline < new Date())}
-            thirdPlaceTeams={thirdPlaceTeams}
             onStateChange={registerStepState(idx)}
             translations={translations.knockoutStep}
           />

@@ -174,4 +174,8 @@ describe('ThirdPlaceConfirmation', () => {
     expect(screen.getByText(/3 pts/)).toBeInTheDocument();
     expect(screen.getByText(/2 pts/)).toBeInTheDocument();
   });
+
+  it.todo('toggle row changes advancing state');
+  it.todo('Continue disabled when fewer than 8 advancing');
+  it.todo('max 8 constraint: clicking a 9th row has no effect');
 });

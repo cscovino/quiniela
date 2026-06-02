@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { PhaseType } from '@app-types/firestore';
-import type { GroupBetRecord } from '@utils/predictions-flow';
 
 import type { KnockoutRoundMatch } from './PredictionStepKnockoutRound';
 import { PredictionStepKnockoutRound } from './PredictionStepKnockoutRound';
@@ -22,24 +21,12 @@ const makeMatch = (
   predictionDeadline: new Date(Date.now() + 86400000),
 });
 
-const groupBets: GroupBetRecord = {
-  A: ['arg', 'fra', 'ger', 'bra'],
-  B: ['bra', 'por', 'esp', 'ita'],
-  C: ['esp', 'eng', 'ned', 'mar'],
-  D: ['fra', 'bel', 'cro', 'den'],
-  E: ['ned', 'ita', 'por', 'ger'],
-  F: ['bra', 'esp', 'mar', 'cro'],
-  G: ['arg', 'fra', 'bel', 'ita'],
-  H: ['por', 'eng', 'ger', 'ned'],
-};
-
 const defaultProps = {
   phase: 'round-of-32' as const,
   roundMatches: [
     makeMatch('r32-m1', 'round-of-32', 'arg', 'esp'),
     makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
   ],
-  groupBetsByGroupId: groupBets,
   existingKnockoutBets: new Set<string>(),
   previousRoundPredictions: {},
   onSubmit: vi.fn(),
@@ -64,7 +51,6 @@ describe('PredictionStepKnockoutRound', () => {
       <PredictionStepKnockoutRound
         {...defaultProps}
         roundMatches={[makeMatch('r32-m1', 'round-of-32')]}
-        groupBetsByGroupId={{}}
       />,
     );
     expect(screen.getByText('Teams TBD')).toBeInTheDocument();
@@ -75,7 +61,6 @@ describe('PredictionStepKnockoutRound', () => {
       <PredictionStepKnockoutRound
         {...defaultProps}
         roundMatches={[makeMatch('r32-m1', 'round-of-32')]}
-        groupBetsByGroupId={{}}
       />,
     );
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
@@ -128,4 +113,7 @@ describe('PredictionStepKnockoutRound', () => {
       unmount();
     });
   });
+
+  it.todo('renders resolved team names from resolvedMatchups prop');
+  it.todo('renders TBD card when resolvedTeam is TBD');
 });
