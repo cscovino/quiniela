@@ -2,6 +2,7 @@ import { type FC, useEffect, useState } from 'react';
 
 import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 import { Button } from '@atoms/Button';
+import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
 
 import './ThirdPlaceConfirmation.css';
@@ -10,6 +11,9 @@ export interface ThirdPlaceConfirmationProps {
   rankedTeams: ThirdPlacedTeam[];
   onAdjust: () => void;
   onContinue: (confirmedSlugs: string[]) => void;
+  isLoading?: boolean;
+  hasError?: boolean;
+  onRetry?: () => void;
   translations: {
     heading: string;
     subtitle: string;
@@ -25,6 +29,9 @@ export interface ThirdPlaceConfirmationProps {
     toggleAdvancing?: string;
     toggleEliminated?: string;
     maxSelected?: string;
+    loading?: string;
+    error?: string;
+    retry?: string;
   };
 }
 
@@ -43,12 +50,18 @@ const defaultTranslations = {
   toggleAdvancing: 'Click to remove from advancing',
   toggleEliminated: 'Click to add to advancing',
   maxSelected: '8 teams already selected. Deselect one to change.',
+  loading: 'Loading your predictions...',
+  error: 'Could not load your predictions. Please try again.',
+  retry: 'Retry',
 };
 
 export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
   rankedTeams,
   onAdjust,
   onContinue,
+  isLoading = false,
+  hasError = false,
+  onRetry,
   translations,
 }) => {
   const t = { ...defaultTranslations, ...translations };
@@ -103,88 +116,110 @@ export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
         </Typography>
       </div>
 
-      <div className="third-place-confirmation__counter">
-        <span
-          className={`third-place-confirmation__counter-chip ${
-            isComplete
-              ? 'third-place-confirmation__counter-chip--complete'
-              : 'third-place-confirmation__counter-chip--incomplete'
-          }`}
-        >
-          {selectionCountText}
-        </span>
-        {isAtMax && t.maxSelected && (
-          <Typography variant="caption" className="third-place-confirmation__max-message">
-            {t.maxSelected}
-          </Typography>
-        )}
-      </div>
+      {isLoading && (
+        <div className="third-place-confirmation__loading">
+          <div className="third-place-confirmation__loading-spinner">
+            <Spinner size="md" />
+          </div>
+          <p className="third-place-confirmation__loading-label">{t.loading}</p>
+        </div>
+      )}
 
-      <div className="third-place-confirmation__list">
-        {rankedTeams.map((team, index) => {
-          const groupSlug = `group-${team.groupLetter.toLowerCase()}`;
-          const isAdvancing = localAdvancingSet.has(groupSlug);
-          const isDisabledRow = !isAdvancing && isAtMax;
+      {hasError && (
+        <div className="third-place-confirmation__error" role="alert" aria-live="polite">
+          <p className="third-place-confirmation__error-message">{t.error}</p>
+          <Button variant="secondary" size="md" onClick={onRetry}>
+            {t.retry}
+          </Button>
+        </div>
+      )}
 
-          return (
-            <button
-              key={team.teamId}
-              type="button"
-              className={[
-                'third-place-confirmation__row',
-                isAdvancing
-                  ? 'third-place-confirmation__row--advancing'
-                  : 'third-place-confirmation__row--eliminated',
-                isDisabledRow ? 'third-place-confirmation__row--disabled' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              onClick={() => !isDisabledRow && handleToggle(groupSlug)}
-              aria-pressed={isAdvancing}
-              aria-disabled={isDisabledRow}
-              aria-label={
-                isAdvancing
-                  ? (t.toggleAdvancing ?? 'Click to remove from advancing')
-                  : (t.toggleEliminated ?? 'Click to add to advancing')
-              }
+      {!isLoading && !hasError && (
+        <>
+          <div className="third-place-confirmation__counter">
+            <span
+              className={`third-place-confirmation__counter-chip ${
+                isComplete
+                  ? 'third-place-confirmation__counter-chip--complete'
+                  : 'third-place-confirmation__counter-chip--incomplete'
+              }`}
             >
-              <span className="third-place-confirmation__rank">{index + 1}.</span>
-              <span className="third-place-confirmation__team-name">{team.teamName}</span>
-              <span className="third-place-confirmation__group">
-                ({t.group} {team.groupLetter})
-              </span>
-              <span
-                className={`third-place-confirmation__points ${
-                  isAdvancing
-                    ? 'third-place-confirmation__points--advancing'
-                    : 'third-place-confirmation__points--eliminated'
-                }`}
-              >
-                {team.points} {team.points === 1 ? t.pt : t.pts}
-              </span>
-              {isAdvancing && team.bracketSlotLabel && (
-                <span className="third-place-confirmation__bracket-slot">
-                  &#8594; {t.bracketSlot} {team.bracketSlotLabel.replace('Match ', '')}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+              {selectionCountText}
+            </span>
+            {isAtMax && t.maxSelected && (
+              <Typography variant="caption" className="third-place-confirmation__max-message">
+                {t.maxSelected}
+              </Typography>
+            )}
+          </div>
 
-      <div className="third-place-confirmation__actions">
-        <Button variant="ghost" size="md" onClick={onAdjust}>
-          {t.adjust}
-        </Button>
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => onContinue(Array.from(localAdvancingSet))}
-          disabled={localAdvancingSet.size !== 8}
-        >
-          {t.continue}
-        </Button>
-      </div>
+          <div className="third-place-confirmation__list">
+            {rankedTeams.map((team, index) => {
+              const groupSlug = `group-${team.groupLetter.toLowerCase()}`;
+              const isAdvancing = localAdvancingSet.has(groupSlug);
+              const isDisabledRow = !isAdvancing && isAtMax;
+
+              return (
+                <button
+                  key={team.teamId}
+                  type="button"
+                  className={[
+                    'third-place-confirmation__row',
+                    isAdvancing
+                      ? 'third-place-confirmation__row--advancing'
+                      : 'third-place-confirmation__row--eliminated',
+                    isDisabledRow ? 'third-place-confirmation__row--disabled' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => !isDisabledRow && handleToggle(groupSlug)}
+                  aria-pressed={isAdvancing}
+                  aria-disabled={isDisabledRow}
+                  aria-label={
+                    isAdvancing
+                      ? (t.toggleAdvancing ?? 'Click to remove from advancing')
+                      : (t.toggleEliminated ?? 'Click to add to advancing')
+                  }
+                >
+                  <span className="third-place-confirmation__rank">{index + 1}.</span>
+                  <span className="third-place-confirmation__team-name">{team.teamName}</span>
+                  <span className="third-place-confirmation__group">
+                    ({t.group} {team.groupLetter})
+                  </span>
+                  <span
+                    className={`third-place-confirmation__points ${
+                      isAdvancing
+                        ? 'third-place-confirmation__points--advancing'
+                        : 'third-place-confirmation__points--eliminated'
+                    }`}
+                  >
+                    {team.points} {team.points === 1 ? t.pt : t.pts}
+                  </span>
+                  {isAdvancing && team.bracketSlotLabel && (
+                    <span className="third-place-confirmation__bracket-slot">
+                      &#8594; {t.bracketSlot} {team.bracketSlotLabel.replace('Match ', '')}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="third-place-confirmation__actions">
+            <Button variant="ghost" size="md" onClick={onAdjust}>
+              {t.adjust}
+            </Button>
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => onContinue(Array.from(localAdvancingSet))}
+              disabled={localAdvancingSet.size !== 8}
+            >
+              {t.continue}
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

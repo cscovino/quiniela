@@ -151,6 +151,9 @@ export interface PredictionsTemplateProps {
     thirdPlaceToggleAdvancing?: string;
     thirdPlaceToggleEliminated?: string;
     thirdPlaceMaxSelected?: string;
+    thirdPlaceLoading?: string;
+    thirdPlaceError?: string;
+    thirdPlaceRetry?: string;
     groupStep?: GroupStepTranslations;
     knockoutStep?: KnockoutStepTranslations;
     finalPhaseStep?: FinalPhaseStepTranslations;
@@ -253,6 +256,8 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     thirdPlaceTeams,
     groups,
     allTeams,
+    betsStatus,
+    retryBets,
   } = usePredictionSteps(
     {
       ...translations,
@@ -278,11 +283,12 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     if (
       currentStep === lastGroupStep &&
       !showThirdPlaceConfirm &&
-      steps[lastGroupStep]?.isComplete
+      steps[lastGroupStep]?.isComplete &&
+      betsStatus === 'loaded'
     ) {
       setShowThirdPlaceConfirm(true);
     }
-  }, [currentStep, groupsCount, showThirdPlaceConfirm, confirmedThirdPlace, steps]);
+  }, [currentStep, groupsCount, showThirdPlaceConfirm, confirmedThirdPlace, steps, betsStatus]);
 
   useEffect(() => {
     if (view !== 'wizard') return;
@@ -643,6 +649,9 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
               rankedTeams={thirdPlaceTeams}
               onAdjust={handleThirdPlaceAdjust}
               onContinue={handleThirdPlaceContinue}
+              isLoading={betsStatus === 'loading'}
+              hasError={betsStatus === 'error'}
+              onRetry={retryBets}
               translations={{
                 heading: translations.thirdPlaceHeading || 'Third-Placed Teams Qualification',
                 subtitle:
@@ -660,6 +669,9 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
                 toggleAdvancing: translations.thirdPlaceToggleAdvancing,
                 toggleEliminated: translations.thirdPlaceToggleEliminated,
                 maxSelected: translations.thirdPlaceMaxSelected,
+                loading: translations.thirdPlaceLoading,
+                error: translations.thirdPlaceError,
+                retry: translations.thirdPlaceRetry,
               }}
             />
           </section>

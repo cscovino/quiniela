@@ -68,6 +68,8 @@ export interface UsePredictionStepsResult {
   groups: GroupForPrediction[];
   firestoreMatches: (Match & { id: string })[];
   thirdPlaceTeams: ThirdPlacedTeam[];
+  betsStatus: 'loading' | 'error' | 'loaded';
+  retryBets: () => void;
 }
 
 export function usePredictionSteps(
@@ -145,6 +147,14 @@ export function usePredictionSteps(
     {},
   );
 
+  const [betsStatus, setBetsStatus] = useState<'loading' | 'error' | 'loaded'>('loading');
+  const [fetchTrigger, setFetchTrigger] = useState(0);
+
+  const retryBets = useCallback(() => {
+    setBetsStatus('loading');
+    setFetchTrigger((n) => n + 1);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     Promise.allSettled([
@@ -193,7 +203,11 @@ export function usePredictionSteps(
   }, [locale]);
 
   useEffect(() => {
-    if (!user || !selectedPredictorId) return;
+    setBetsStatus('loading');
+    if (!user || !selectedPredictorId) {
+      setBetsStatus('loaded');
+      return;
+    }
     let cancelled = false;
     predictionService
       .getExistingBets(user.uid, selectedPredictorId)
@@ -227,12 +241,18 @@ export function usePredictionSteps(
             bestScorer: bestPlayers.bestScorer,
           });
         }
+        setBetsStatus('loaded');
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (cancelled) return;
+        // eslint-disable-next-line no-console
+        console.warn('[usePredictionSteps] getExistingBets failed:', err);
+        setBetsStatus('error');
+      });
     return () => {
       cancelled = true;
     };
-  }, [user, selectedPredictorId]);
+  }, [user, selectedPredictorId, fetchTrigger]);
 
   const handleFinalPhaseSubmit = useCallback(
     async (data: { first?: string; second?: string; third?: string; fourth?: string }) => {
@@ -694,5 +714,7 @@ export function usePredictionSteps(
     groups,
     firestoreMatches,
     thirdPlaceTeams,
+    betsStatus,
+    retryBets,
   };
 }

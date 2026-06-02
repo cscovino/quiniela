@@ -4,6 +4,24 @@ import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 
 import { ThirdPlaceConfirmation } from './ThirdPlaceConfirmation';
 
+// Extend defaultTranslations with new optional keys used by the new state tests
+const extendedTranslations = {
+  heading: 'Third-Placed Teams Qualification',
+  subtitle: 'Best 8 of 12 third-placed teams advance to Round of 32',
+  advancing: 'Advancing to Round of 32',
+  eliminated: 'Eliminated',
+  bracketSlot: 'Match',
+  adjust: 'Adjust Group Predictions',
+  continue: 'Continue to Knockout',
+  selectionCount: '{selected} / 8 advancing',
+  toggleAdvancing: 'Click to remove from advancing',
+  toggleEliminated: 'Click to add to advancing',
+  maxSelected: '8 teams already selected. Deselect one to change.',
+  loading: 'Loading your predictions...',
+  error: 'Could not load your predictions. Please try again.',
+  retry: 'Retry',
+};
+
 // 8 advancing teams (groups A–H) + 4 eliminated (groups I–L)
 const mockAdvancing: ThirdPlacedTeam[] = [
   {
@@ -347,5 +365,201 @@ describe('ThirdPlaceConfirmation', () => {
     fireEvent.click(continueBtn);
     expect(onContinue).toHaveBeenCalledTimes(1);
     expect(onContinue.mock.calls[0][0]).toHaveLength(8);
+  });
+
+  // S1 — loading state
+  it('renders Spinner and loading message when isLoading=true; list is hidden', () => {
+    render(
+      <ThirdPlaceConfirmation
+        rankedTeams={[]}
+        onAdjust={vi.fn()}
+        onContinue={vi.fn()}
+        isLoading={true}
+        hasError={false}
+        translations={extendedTranslations}
+      />,
+    );
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByText('Loading your predictions...')).toBeInTheDocument();
+    expect(screen.queryByText('Brazil')).not.toBeInTheDocument();
+  });
+
+  // S2 — error state
+  it('renders error message and Retry button when hasError=true; Continue is absent', () => {
+    render(
+      <ThirdPlaceConfirmation
+        rankedTeams={[]}
+        onAdjust={vi.fn()}
+        onContinue={vi.fn()}
+        isLoading={false}
+        hasError={true}
+        onRetry={vi.fn()}
+        translations={extendedTranslations}
+      />,
+    );
+    expect(
+      screen.getByText('Could not load your predictions. Please try again.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Continue to Knockout' })).not.toBeInTheDocument();
+  });
+
+  // S3 — Retry click calls onRetry
+  it('calls onRetry exactly once when Retry button is clicked', () => {
+    const onRetry = vi.fn();
+    render(
+      <ThirdPlaceConfirmation
+        rankedTeams={[]}
+        onAdjust={vi.fn()}
+        onContinue={vi.fn()}
+        isLoading={false}
+        hasError={true}
+        onRetry={onRetry}
+        translations={extendedTranslations}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  // T1 — hasError=true: error shown, zero-point list absent, Continue absent
+  it('T1: hasError=true hides zero-point ranked list and Continue button', () => {
+    const zeroPointTeams: ThirdPlacedTeam[] = [
+      {
+        rank: 1,
+        teamId: 'MEX',
+        teamName: 'Mexico',
+        groupLetter: 'A',
+        points: 0,
+        goalDifference: 0,
+        goalsScored: 0,
+        advancing: true,
+      },
+    ];
+    render(
+      <ThirdPlaceConfirmation
+        rankedTeams={zeroPointTeams}
+        onAdjust={vi.fn()}
+        onContinue={vi.fn()}
+        isLoading={false}
+        hasError={true}
+        onRetry={vi.fn()}
+        translations={extendedTranslations}
+      />,
+    );
+    // Error message present
+    expect(
+      screen.getByText('Could not load your predictions. Please try again.'),
+    ).toBeInTheDocument();
+    // Zero-point team name not rendered
+    expect(screen.queryByText('Mexico')).not.toBeInTheDocument();
+    // Continue button not rendered
+    expect(screen.queryByRole('button', { name: 'Continue to Knockout' })).not.toBeInTheDocument();
+  });
+
+  // T2 — loaded state shows non-zero points, alphabetical fallback team absent
+  it('T2: loaded state shows ranked teams with non-zero points; alphabetical fallback absent', () => {
+    const realTeams: ThirdPlacedTeam[] = [
+      {
+        rank: 1,
+        teamId: 'BRA',
+        teamName: 'Brazil',
+        groupLetter: 'A',
+        points: 6,
+        goalDifference: 5,
+        goalsScored: 7,
+        advancing: true,
+        bracketSlotLabel: 'Match 74',
+        bracketMatchSlug: 'r32-m74',
+      },
+      {
+        rank: 2,
+        teamId: 'ESP',
+        teamName: 'Spain',
+        groupLetter: 'B',
+        points: 5,
+        goalDifference: 3,
+        goalsScored: 5,
+        advancing: true,
+        bracketSlotLabel: 'Match 77',
+        bracketMatchSlug: 'r32-m77',
+      },
+      {
+        rank: 3,
+        teamId: 'FRA',
+        teamName: 'France',
+        groupLetter: 'C',
+        points: 5,
+        goalDifference: 2,
+        goalsScored: 4,
+        advancing: true,
+      },
+      {
+        rank: 4,
+        teamId: 'GER',
+        teamName: 'Germany',
+        groupLetter: 'D',
+        points: 4,
+        goalDifference: 1,
+        goalsScored: 3,
+        advancing: true,
+      },
+      {
+        rank: 5,
+        teamId: 'ARG',
+        teamName: 'Argentina',
+        groupLetter: 'E',
+        points: 4,
+        goalDifference: 0,
+        goalsScored: 2,
+        advancing: true,
+      },
+      {
+        rank: 6,
+        teamId: 'POR',
+        teamName: 'Portugal',
+        groupLetter: 'F',
+        points: 4,
+        goalDifference: 0,
+        goalsScored: 1,
+        advancing: true,
+      },
+      {
+        rank: 7,
+        teamId: 'ENG',
+        teamName: 'England',
+        groupLetter: 'G',
+        points: 3,
+        goalDifference: 2,
+        goalsScored: 4,
+        advancing: true,
+      },
+      {
+        rank: 8,
+        teamId: 'ITA',
+        teamName: 'Italy',
+        groupLetter: 'H',
+        points: 3,
+        goalDifference: 1,
+        goalsScored: 3,
+        advancing: true,
+      },
+    ];
+    render(
+      <ThirdPlaceConfirmation
+        rankedTeams={realTeams}
+        onAdjust={vi.fn()}
+        onContinue={vi.fn()}
+        isLoading={false}
+        hasError={false}
+        translations={extendedTranslations}
+      />,
+    );
+    // Non-zero points visible
+    expect(screen.getByText(/6 pts/)).toBeInTheDocument();
+    // Alphabetical fallback team not present
+    expect(screen.queryByText('Czech Republic')).not.toBeInTheDocument();
+    // Ranked list is rendered
+    expect(screen.getByText('Brazil')).toBeInTheDocument();
   });
 });
