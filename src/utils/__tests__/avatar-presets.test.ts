@@ -51,39 +51,64 @@ describe('AVATAR_PRESETS', () => {
 
   it('has expected curated values for skinColor', () => {
     expect(AVATAR_PRESETS.skinColor).toEqual([
-      '8d5524',
-      'a86540',
-      'c68642',
-      'e0ac69',
-      'f1c27d',
+      'ffe5d9',
+      'ffd7c4',
       'ffdbac',
+      'f1c27d',
+      'e0ac69',
+      'c68642',
+      'a86540',
+      '916f61',
+      '8d5524',
+      '6b4423',
+      '4a3218',
+      '2e1e12',
     ]);
   });
 
   it('has expected curated values for hair', () => {
     expect(AVATAR_PRESETS.hair).toEqual([
       'short01',
+      'short04',
       'short07',
+      'short10',
+      'short13',
       'short16',
       'long01',
+      'long05',
       'long09',
-      'long15',
+      'long13',
+      'long17',
+      'long21',
     ]);
   });
 
   it('has expected curated values for clothing', () => {
     expect(AVATAR_PRESETS.clothing).toEqual([
       'variant01',
+      'variant03',
       'variant05',
+      'variant07',
       'variant09',
       'variant14',
+      'variant17',
       'variant19',
+      'variant21',
       'variant23',
     ]);
   });
 
   it('has expected curated values for glasses', () => {
-    expect(AVATAR_PRESETS.glasses).toEqual(['dark01', 'dark03', 'light02', 'light05']);
+    expect(AVATAR_PRESETS.glasses).toEqual([
+      'dark01',
+      'dark03',
+      'dark05',
+      'dark07',
+      'light02',
+      'light04',
+      'light06',
+      'light07',
+    ]);
   });
 });
 
@@ -131,6 +156,14 @@ describe('randomAvatar', () => {
     expect(options.clothingColor).toBe(AVATAR_PRESETS.clothingColor[0]);
     // glasses at index 0 of [...AVATAR_PRESETS.glasses, undefined] → 'dark01'
     expect(options.glasses).toBe(AVATAR_PRESETS.glasses[0]);
+    // new style axes (always defined):
+    expect(options.eyes).toBe(AVATAR_PRESETS.eyes[0]);
+    expect(options.eyesColor).toBe(AVATAR_PRESETS.eyesColor[0]);
+    expect(options.mouth).toBe(AVATAR_PRESETS.mouth[0]);
+    expect(options.mouthColor).toBe(AVATAR_PRESETS.mouthColor[0]);
+    expect(options.hatColor).toBe(AVATAR_PRESETS.hatColor[0]);
+    expect(options.accessoriesColor).toBe(AVATAR_PRESETS.accessoriesColor[0]);
+    expect(options.glassesColor).toBe(AVATAR_PRESETS.glassesColor[0]);
   });
 
   it('two calls with different injected uuid produce different seeds', () => {
@@ -146,8 +179,8 @@ describe('randomAvatar', () => {
 
   it('glasses may be undefined (representing None)', () => {
     // rng just above the threshold to pick undefined (last in [...glasses, undefined])
-    // glasses array length is 4, so [...glasses, undefined] length is 5
-    // index 4 → undefined; rng returning 0.9 → Math.floor(0.9 * 5) = 4
+    // glasses array length is 8, so [...glasses, undefined] length is 9
+    // index 8 → undefined; rng returning 0.9 → Math.floor(0.9 * 9) = 8
     const rngPickingLast = () => 0.9;
     const { options } = randomAvatar(rngPickingLast, () => 'uuid');
     expect(options.glasses).toBeUndefined();
@@ -160,5 +193,30 @@ describe('randomAvatar', () => {
     expect(options.hairColor).toBeDefined();
     expect(options.clothing).toBeDefined();
     expect(options.clothingColor).toBeDefined();
+    // new required axes:
+    expect(options.eyes).toBeDefined();
+    expect(options.eyesColor).toBeDefined();
+    expect(options.mouth).toBeDefined();
+    expect(options.mouthColor).toBeDefined();
+    expect(options.hatColor).toBeDefined();
+    expect(options.accessoriesColor).toBeDefined();
+    expect(options.glassesColor).toBeDefined();
+  });
+
+  it('optional traits (beard, hat, accessories) may be undefined at ~25% probability', () => {
+    // With OPTIONAL_TRAIT_PROBABILITY=0.25, rng returning >=0.25 picks undefined.
+    // Test with rng that always returns 0 (below threshold → always defined):
+    const alwaysPick = () => 0;
+    const { options: optsAlways } = randomAvatar(alwaysPick, () => 'uuid');
+    expect(optsAlways.beard).toBeDefined();
+    expect(optsAlways.hat).toBeDefined();
+    expect(optsAlways.accessories).toBeDefined();
+
+    // Test with rng that always returns 0.5 (above threshold → undefined):
+    const neverPick = () => 0.5;
+    const { options: optsNever } = randomAvatar(neverPick, () => 'uuid');
+    expect(optsNever.beard).toBeUndefined();
+    expect(optsNever.hat).toBeUndefined();
+    expect(optsNever.accessories).toBeUndefined();
   });
 });
