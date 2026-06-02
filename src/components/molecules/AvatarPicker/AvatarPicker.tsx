@@ -171,6 +171,61 @@ export const AvatarPicker: FC<AvatarPickerProps> = ({
                   {labels.glassesNone}
                 </button>
               )}
+              {/* NEW: Optional trait None chips — same pattern as glasses None */}
+              {type === 'style' && trait === 'beard' && (
+                <button
+                  key="beard-none"
+                  type="button"
+                  role="radio"
+                  className={`avatar-picker__chip avatar-picker__chip--style${currentValue === undefined ? ' avatar-picker__chip--selected' : ''}`}
+                  aria-checked={currentValue === undefined}
+                  aria-label={`${label} ${labels.beardNone}`}
+                  onClick={() =>
+                    onChange({
+                      ...value,
+                      options: { ...value.options, beard: undefined },
+                    })
+                  }
+                >
+                  {labels.beardNone}
+                </button>
+              )}
+              {type === 'style' && trait === 'hat' && (
+                <button
+                  key="hat-none"
+                  type="button"
+                  role="radio"
+                  className={`avatar-picker__chip avatar-picker__chip--style${currentValue === undefined ? ' avatar-picker__chip--selected' : ''}`}
+                  aria-checked={currentValue === undefined}
+                  aria-label={`${label} ${labels.hatNone}`}
+                  onClick={() =>
+                    onChange({
+                      ...value,
+                      options: { ...value.options, hat: undefined },
+                    })
+                  }
+                >
+                  {labels.hatNone}
+                </button>
+              )}
+              {type === 'style' && trait === 'accessories' && (
+                <button
+                  key="accessories-none"
+                  type="button"
+                  role="radio"
+                  className={`avatar-picker__chip avatar-picker__chip--style${currentValue === undefined ? ' avatar-picker__chip--selected' : ''}`}
+                  aria-checked={currentValue === undefined}
+                  aria-label={`${label} ${labels.accessoriesNone}`}
+                  onClick={() =>
+                    onChange({
+                      ...value,
+                      options: { ...value.options, accessories: undefined },
+                    })
+                  }
+                >
+                  {labels.accessoriesNone}
+                </button>
+              )}
               {type === 'color' &&
                 presets.map((v) => {
                   const isSelected = currentValue === v;
