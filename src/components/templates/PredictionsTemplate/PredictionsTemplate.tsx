@@ -147,6 +147,10 @@ export interface PredictionsTemplateProps {
     thirdPlaceGroup?: string;
     thirdPlacePts?: string;
     thirdPlacePt?: string;
+    thirdPlaceSelectionCount?: string;
+    thirdPlaceToggleAdvancing?: string;
+    thirdPlaceToggleEliminated?: string;
+    thirdPlaceMaxSelected?: string;
     groupStep?: GroupStepTranslations;
     knockoutStep?: KnockoutStepTranslations;
     finalPhaseStep?: FinalPhaseStepTranslations;
@@ -258,8 +262,22 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
 
   const [showThirdPlaceConfirm, setShowThirdPlaceConfirm] = useState(false);
   const [confirmedThirdPlace, setConfirmedThirdPlace] = useState(false);
+  const [confirmedAdvancingGroupSlugs, setConfirmedAdvancingGroupSlugs] = useState<string[] | null>(
+    null,
+  );
 
   const groupsCount = groups.length;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- consumed by next plan
+  const confirmedAdvancingMap = useMemo<Record<string, string> | undefined>(() => {
+    if (!confirmedAdvancingGroupSlugs) return undefined;
+    const map: Record<string, string> = {};
+    confirmedAdvancingGroupSlugs.forEach((slug) => {
+      const team = thirdPlaceTeams.find((t) => `group-${t.groupLetter.toLowerCase()}` === slug);
+      if (team) map[slug] = team.teamId;
+    });
+    return map;
+  }, [confirmedAdvancingGroupSlugs, thirdPlaceTeams]);
 
   useEffect(() => {
     if (confirmedThirdPlace) {
@@ -289,9 +307,10 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     }
   };
 
-  const handleThirdPlaceContinue = () => {
+  const handleThirdPlaceContinue = (confirmedSlugs: string[]) => {
     setShowThirdPlaceConfirm(false);
     setConfirmedThirdPlace(true);
+    setConfirmedAdvancingGroupSlugs(confirmedSlugs);
     setCurrentStep(groupsCount);
   };
 
@@ -638,6 +657,10 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
                 group: translations.thirdPlaceGroup || 'Group',
                 pts: translations.thirdPlacePts || 'pts',
                 pt: translations.thirdPlacePt || 'pt',
+                selectionCount: translations.thirdPlaceSelectionCount,
+                toggleAdvancing: translations.thirdPlaceToggleAdvancing,
+                toggleEliminated: translations.thirdPlaceToggleEliminated,
+                maxSelected: translations.thirdPlaceMaxSelected,
               }}
             />
           </section>
