@@ -136,7 +136,7 @@ describe('PredictionStepKnockoutRound', () => {
   });
 });
 
-describe('KOFIX-04 behavioral regression', () => {
+describe('knockout pick survival across recompute', () => {
   it('in-progress pick survives a roundMatches reference change (regression)', () => {
     const initialMatches = [
       makeMatch('r32-m1', 'round-of-32', 'arg', 'esp'),
@@ -212,7 +212,7 @@ describe('KOFIX-04 behavioral regression', () => {
     expect(falseAfterTrue).toBe(false);
   });
 
-  it('drops a preserved pick whose team is no longer in the matchup (D-01)', () => {
+  it('drops a preserved pick whose team is no longer in the matchup', () => {
     const { rerender } = render(
       <PredictionStepKnockoutRound
         {...defaultProps}
@@ -236,7 +236,7 @@ describe('KOFIX-04 behavioral regression', () => {
     expect(screen.queryByRole('radio', { checked: true })).toBeNull();
   });
 
-  it('stable onSubmit does not re-trigger reset (D-02 watch-item)', () => {
+  it('stable onSubmit does not re-trigger reset', () => {
     const onSubmit = vi.fn();
     const { rerender } = render(
       <PredictionStepKnockoutRound
