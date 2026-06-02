@@ -173,13 +173,13 @@ describe('AvatarPicker', () => {
         />,
       );
 
-      // skinColor[0] is '8d5524' — should be selected
-      const selectedChip = screen.getByRole('radio', { name: /Skin color 8d5524/i });
+      // skinColor[0] is 'ffe5d9' (Fitzpatrick 1-2, very light) — should be selected
+      const selectedChip = screen.getByRole('radio', { name: /Skin color ffe5d9/i });
       expect(selectedChip).toHaveAttribute('aria-checked', 'true');
       expect(selectedChip).toHaveClass('avatar-picker__chip--selected');
 
-      // skinColor[1] is 'a86540' — should NOT be selected
-      const unselectedChip = screen.getByRole('radio', { name: /Skin color a86540/i });
+      // skinColor[1] is 'ffd7c4' — should NOT be selected
+      const unselectedChip = screen.getByRole('radio', { name: /Skin color ffd7c4/i });
       expect(unselectedChip).toHaveAttribute('aria-checked', 'false');
       expect(unselectedChip).not.toHaveClass('avatar-picker__chip--selected');
     });
