@@ -10,6 +10,7 @@ import '../../templates/PredictionsTemplate/PredictionsTemplate.css';
 export interface PredictionStepFinalPhaseProps {
   teams: { fifaCode: string; name: string }[];
   existingPrediction?: { first?: string; second?: string; third?: string; fourth?: string };
+  derivedPrefill?: { first: string; second: string; third: string; fourth: string };
   onSubmit: (data: {
     first?: string;
     second?: string;
@@ -29,6 +30,7 @@ export interface PredictionStepFinalPhaseProps {
 export const PredictionStepFinalPhase: FC<PredictionStepFinalPhaseProps> = ({
   teams,
   existingPrediction,
+  derivedPrefill,
   onSubmit,
   isDisabled,
   isSubmitting = false,
@@ -46,6 +48,7 @@ export const PredictionStepFinalPhase: FC<PredictionStepFinalPhaseProps> = ({
           teams={teams}
           onSubmit={onSubmit}
           existingPrediction={existingPrediction}
+          derivedPrefill={derivedPrefill}
           isDisabled={isDisabled}
           isSubmitting={isSubmitting}
           onStateChange={onStateChange}

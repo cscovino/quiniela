@@ -25,7 +25,6 @@ import { useAuthStore } from '@store/auth-store';
 import {
   buildKnockoutBracket,
   computeThirdPlaceStandings,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   deriveFinalFour,
   isGroupClassificationComplete,
   KNOCKOUT_PHASES,
@@ -566,6 +565,21 @@ export function usePredictionSteps(
     }
 
     const finalIdx = stepIndex;
+
+    // Prefill final-four selects from predicted bracket results (saved bet wins)
+    const derivedPrefill = (() => {
+      if (existingFinalPhase != null) return null;
+      const result = deriveFinalFour(knockoutBetsByMatchSlug, groupBetsByGroupId);
+      if (
+        result.first === 'TBD' &&
+        result.second === 'TBD' &&
+        result.third === 'TBD' &&
+        result.fourth === 'TBD'
+      )
+        return null;
+      return result;
+    })();
+
     result.push({
       id: 'final-positions',
       kind: 'final-positions',
@@ -578,6 +592,7 @@ export function usePredictionSteps(
         <PredictionStepFinalPhase
           teams={allTeams}
           existingPrediction={existingFinalPhase || undefined}
+          derivedPrefill={derivedPrefill || undefined}
           onSubmit={handleFinalPhaseSubmit}
           isDisabled={submitting || (deadline != null && deadline < new Date())}
           isSubmitting={submitting}

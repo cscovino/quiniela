@@ -13,6 +13,7 @@ export interface FinalPhaseFormProps {
   teams: { fifaCode: string; name: string }[];
   onSubmit: (data: { first?: string; second?: string; third?: string; fourth?: string }) => void;
   existingPrediction?: { first?: string; second?: string; third?: string; fourth?: string };
+  derivedPrefill?: { first: string; second: string; third: string; fourth: string };
   isDisabled?: boolean;
   isSubmitting?: boolean;
   /** When provided, the form reports its submit to the wizard's Next button and hides its own. */
@@ -50,6 +51,7 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
   teams,
   onSubmit,
   existingPrediction,
+  derivedPrefill,
   isDisabled = false,
   isSubmitting = false,
   onStateChange,
@@ -69,6 +71,17 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
     third: existingPrediction?.third || '',
     fourth: existingPrediction?.fourth || '',
   });
+
+  // Seed empty selects from derivedPrefill; never overwrite an existing pick or write 'TBD'
+  useEffect(() => {
+    if (!derivedPrefill) return;
+    setSelections((prev) => ({
+      first: prev.first || (derivedPrefill.first !== 'TBD' ? derivedPrefill.first : ''),
+      second: prev.second || (derivedPrefill.second !== 'TBD' ? derivedPrefill.second : ''),
+      third: prev.third || (derivedPrefill.third !== 'TBD' ? derivedPrefill.third : ''),
+      fourth: prev.fourth || (derivedPrefill.fourth !== 'TBD' ? derivedPrefill.fourth : ''),
+    }));
+  }, [derivedPrefill]);
 
   const handlePositionChange = (position: string, fifaCode: string) => {
     setSelections((prev) => ({ ...prev, [position]: fifaCode }));
@@ -116,7 +129,14 @@ export const FinalPhaseForm: FC<FinalPhaseFormProps> = ({
     <div className={`final-phase-form ${className}`}>
       <div className="final-phase-form__positions">
         {POSITION_KEYS.map((key, index) => (
-          <div key={key} className="final-phase-form__position">
+          <div
+            key={key}
+            className={`final-phase-form__position${
+              derivedPrefill && !existingPrediction?.[key] && selections[key]
+                ? ' final-phase-form__position--prefilled'
+                : ''
+            }`}
+          >
             <div className="final-phase-form__position-header">
               <span className={`final-phase-form__badge final-phase-form__badge--${index + 1}`}>
                 #{index + 1}
