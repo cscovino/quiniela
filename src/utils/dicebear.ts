@@ -34,6 +34,7 @@ export function generateAvatarDataUri(
     // NEW style axes:
     eyes: wrap(options.eyes),
     beard: wrap(options.beard),
+    beardProbability: options.beard ? 100 : undefined, // beard has no color axis
     mouth: wrap(options.mouth),
     hat: wrap(options.hat),
     hatProbability: options.hat ? 100 : undefined,
