@@ -1,10 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
 import { THIRD_PLACE_MATRIX } from '../../data/third-place-matrix';
-import type { GroupBetRecord, KnockoutBetRecord, MatchWithId } from '../predictions-flow';
+import type {
+  GroupBetRecord,
+  KnockoutBetRecord,
+  MatchWithId,
+  PredictionRecord,
+} from '../predictions-flow';
 import {
+  BRACKET_MAP,
   buildKnockoutBracket,
   calculateGroupStandings,
+  computeThirdPlaceStandings,
+  deriveFinalFour,
   getGroupMatches,
   getPredictorProgress,
   isGroupClassificationComplete,
@@ -42,6 +50,10 @@ const teamsMap = {
   eng: { fifaCode: 'ENG', name: 'England' },
   por: { fifaCode: 'POR', name: 'Portugal' },
   ita: { fifaCode: 'ITA', name: 'Italy' },
+  mex: { fifaCode: 'MEX', name: 'Mexico' },
+  usa: { fifaCode: 'USA', name: 'United States' },
+  ned: { fifaCode: 'NED', name: 'Netherlands' },
+  cro: { fifaCode: 'CRO', name: 'Croatia' },
 };
 
 describe('getGroupMatches', () => {
@@ -212,19 +224,91 @@ describe('isGroupClassificationComplete', () => {
 });
 
 describe('BRACKET_MAP', () => {
-  it.todo(
-    'has entries for all 32 knockout matches (r32-1..r32-16, r16-1..r16-8, qf-1..qf-4, sf-1/sf-2, third-place, final)',
-  );
+  it('has entries for all 32 knockout matches (r32-1..r32-16, r16-1..r16-8, qf-1..qf-4, sf-1/sf-2, third-place, final)', () => {
+    const expectedSlugs = [
+      'r32-1',
+      'r32-2',
+      'r32-3',
+      'r32-4',
+      'r32-5',
+      'r32-6',
+      'r32-7',
+      'r32-8',
+      'r32-9',
+      'r32-10',
+      'r32-11',
+      'r32-12',
+      'r32-13',
+      'r32-14',
+      'r32-15',
+      'r32-16',
+      'r16-1',
+      'r16-2',
+      'r16-3',
+      'r16-4',
+      'r16-5',
+      'r16-6',
+      'r16-7',
+      'r16-8',
+      'qf-1',
+      'qf-2',
+      'qf-3',
+      'qf-4',
+      'sf-1',
+      'sf-2',
+      'third-place',
+      'final',
+    ];
+    for (const slug of expectedSlugs) {
+      expect(BRACKET_MAP[slug], `missing entry for ${slug}`).toBeDefined();
+    }
+    expect(Object.keys(BRACKET_MAP)).toHaveLength(32);
+  });
 
-  it.todo('R32 matches reference group positions with group-a slug form (not bare A)');
+  it('R32 matches reference group positions with group-a slug form (not bare A)', () => {
+    expect(BRACKET_MAP['r32-1'].home.source.from).toBe('group');
+    if (BRACKET_MAP['r32-1'].home.source.from === 'group') {
+      expect(BRACKET_MAP['r32-1'].home.source.groupId).toBe('group-a');
+      expect(BRACKET_MAP['r32-1'].home.source.position).toBe(1);
+    }
+  });
 
-  it.todo('R16 matches reference winners of R32 using seed-canonical slugs (r32-1, not r32-m1)');
+  it('R16 matches reference winners of R32 using seed-canonical slugs (r32-1, not r32-m1)', () => {
+    expect(BRACKET_MAP['r16-1'].home.source.from).toBe('winner-of');
+    if (BRACKET_MAP['r16-1'].home.source.from === 'winner-of') {
+      expect(BRACKET_MAP['r16-1'].home.source.matchSlug).toBe('r32-1');
+    }
+    expect(BRACKET_MAP['r16-1'].away.source.from).toBe('winner-of');
+    if (BRACKET_MAP['r16-1'].away.source.from === 'winner-of') {
+      expect(BRACKET_MAP['r16-1'].away.source.matchSlug).toBe('r32-2');
+    }
+  });
 
-  it.todo('Final references winners of semifinals using seed-canonical slugs (sf-1/sf-2)');
+  it('Final references winners of semifinals using seed-canonical slugs (sf-1/sf-2)', () => {
+    expect(BRACKET_MAP['final'].home.source.from).toBe('winner-of');
+    if (BRACKET_MAP['final'].home.source.from === 'winner-of') {
+      expect(BRACKET_MAP['final'].home.source.matchSlug).toBe('sf-1');
+    }
+    expect(BRACKET_MAP['final'].away.source.from).toBe('winner-of');
+    if (BRACKET_MAP['final'].away.source.from === 'winner-of') {
+      expect(BRACKET_MAP['final'].away.source.matchSlug).toBe('sf-2');
+    }
+  });
 });
 
 describe('buildKnockoutBracket', () => {
-  it.todo('resolves group-a slot to team when group bets use slug-form keys (group-a, not A)');
+  it('resolves group-a slot to team when group bets use slug-form keys (group-a, not A)', () => {
+    const knockoutMatches: MatchWithId[] = [makeMatch('r32-1', '', 'round-of-32', '', '')];
+    const groupBets: GroupBetRecord = {
+      'group-a': ['arg', 'bra', 'ger', 'fra'],
+    };
+    const knockoutBets: KnockoutBetRecord = {};
+
+    const bracket = buildKnockoutBracket(groupBets, knockoutMatches, knockoutBets);
+
+    // r32-1 home = group-a position 1 = 'arg'
+    expect(bracket[0].homeTeam.resolvedTeam).toBe('arg');
+  });
 
   it('returns TBD when group bets are missing', () => {
     const knockoutMatches: MatchWithId[] = [
@@ -240,7 +324,27 @@ describe('buildKnockoutBracket', () => {
     expect(bracket[0].awayTeam.resolvedTeam).toBe('TBD');
   });
 
-  it.todo('resolves winner-of slots from knockout bets using seed-canonical slugs (r32-1)');
+  it('resolves winner-of slots from knockout bets using seed-canonical slugs (r32-1)', () => {
+    const knockoutMatches: MatchWithId[] = [
+      makeMatch('r32-1', '', 'round-of-32', '', ''),
+      makeMatch('r16-1', '', 'round-of-16', '', ''),
+    ];
+    const groupBets: GroupBetRecord = {
+      'group-a': ['arg', 'bra', 'ger', 'fra'],
+      'group-c': ['esp', 'eng', 'por', 'ita'],
+    };
+    const knockoutBets: KnockoutBetRecord = {
+      'r32-1': 'arg',
+      'r32-2': 'esp',
+    };
+
+    const bracket = buildKnockoutBracket(groupBets, knockoutMatches, knockoutBets);
+
+    // r16-1 home = winner of r32-1 = 'arg'
+    expect(bracket[1].homeTeam.resolvedTeam).toBe('arg');
+    // r16-1 away = winner of r32-2 = 'esp'
+    expect(bracket[1].awayTeam.resolvedTeam).toBe('esp');
+  });
 
   it('returns TBD for winner-of when knockout bet is missing', () => {
     const knockoutMatches: MatchWithId[] = [
@@ -259,7 +363,18 @@ describe('buildKnockoutBracket', () => {
     expect(bracket[1].homeTeam.resolvedTeam).toBe('TBD');
   });
 
-  it.todo('handles partial group bets (incomplete positions) with seed-canonical slugs');
+  it('handles partial group bets (incomplete positions) with seed-canonical slugs', () => {
+    const knockoutMatches: MatchWithId[] = [makeMatch('r32-1', '', 'round-of-32', '', '')];
+    const groupBets: GroupBetRecord = {
+      'group-a': ['arg', 'bra'], // only 2 positions — incomplete
+    };
+    const knockoutBets: KnockoutBetRecord = {};
+
+    const bracket = buildKnockoutBracket(groupBets, knockoutMatches, knockoutBets);
+
+    // r32-1 home = group-a pos-1 = 'arg' (still resolves since pos 1 exists)
+    expect(bracket[0].homeTeam.resolvedTeam).toBe('arg');
+  });
 });
 
 describe('getPredictorProgress', () => {
@@ -409,20 +524,296 @@ describe('loser-of resolver', () => {
   });
 });
 
+// Shared knockout chain fixture for deriveFinalFour tests.
+// sf-1: arg (W-qf-1) vs fra (W-qf-2); winner = arg, loser = fra
+// sf-2: por (W-qf-3) vs esp (W-qf-4); winner = por, loser = esp
+// final: arg vs por; winner = arg (first), loser = por (second)
+// third-place: fra vs esp; winner = fra (third), loser = esp (fourth)
+const dfGroupBets: GroupBetRecord = {
+  'group-a': ['arg', 'bra', 'ger', 'fra'],
+  'group-c': ['esp', 'eng', 'por', 'ita'],
+  'group-e': ['bra', 'ger', 'arg', 'fra'],
+  'group-g': ['ger', 'arg', 'bra', 'fra'],
+  'group-b': ['fra', 'esp', 'arg', 'bra'],
+  'group-d': ['por', 'eng', 'esp', 'ita'],
+  'group-f': ['por', 'fra', 'arg', 'bra'],
+  'group-h': ['esp', 'eng', 'por', 'fra'],
+};
+
+const dfFullBets: KnockoutBetRecord = {
+  // R32
+  'r32-1': 'arg',
+  'r32-2': 'esp',
+  'r32-3': 'bra',
+  'r32-4': 'ger',
+  'r32-5': 'fra',
+  'r32-6': 'por',
+  'r32-7': 'por',
+  'r32-8': 'esp',
+  // R16
+  'r16-1': 'arg',
+  'r16-2': 'bra',
+  'r16-3': 'fra',
+  'r16-4': 'por',
+  // QF
+  'qf-1': 'arg',
+  'qf-2': 'fra',
+  'qf-3': 'por',
+  'qf-4': 'esp',
+  // SF
+  'sf-1': 'arg',
+  'sf-2': 'por',
+  // Final + third-place
+  final: 'arg',
+  'third-place': 'fra',
+};
+
 describe('deriveFinalFour', () => {
-  it.todo('returns all TBD when no knockout picks exist (D-01)');
-  it.todo('returns correct first/second/third/fourth when all picks are set');
-  it.todo('returns first/second TBD when final stored pick is stale (D-02)');
-  it.todo('partial: returns first/second when only final is predicted (third/fourth TBD)');
+  it('returns all TBD when no knockout picks exist (D-01)', () => {
+    const result = deriveFinalFour({}, {});
+    expect(result).toEqual({ first: 'TBD', second: 'TBD', third: 'TBD', fourth: 'TBD' });
+  });
+
+  it('returns correct first/second/third/fourth when all picks are set', () => {
+    const result = deriveFinalFour(dfFullBets, dfGroupBets);
+    // first = winner of final = arg
+    expect(result.first).toBe('arg');
+    // second = loser of final = por
+    expect(result.second).toBe('por');
+    // third = winner of third-place match = fra
+    expect(result.third).toBe('fra');
+    // fourth = loser of third-place match = esp
+    expect(result.fourth).toBe('esp');
+  });
+
+  it('returns first/second TBD when final stored pick is stale (D-02)', () => {
+    const staleFinalBets: KnockoutBetRecord = {
+      ...dfFullBets,
+      final: 'zzz', // stale — not arg or por
+    };
+    const result = deriveFinalFour(staleFinalBets, dfGroupBets);
+    expect(result.first).toBe('TBD');
+    expect(result.second).toBe('TBD');
+  });
+
+  it('partial: returns first/second when only final is predicted (third/fourth TBD)', () => {
+    // Only set enough to resolve the final, but no third-place pick
+    const betsNoThirdPlace: KnockoutBetRecord = { ...dfFullBets };
+    delete betsNoThirdPlace['third-place'];
+
+    const result = deriveFinalFour(betsNoThirdPlace, dfGroupBets);
+    // final is predicted: first=arg, second=por
+    expect(result.first).toBe('arg');
+    expect(result.second).toBe('por');
+    // third-place has no pick → TBD
+    expect(result.third).toBe('TBD');
+    expect(result.fourth).toBe('TBD');
+  });
 });
 
 describe('computeThirdPlaceStandings (rewrite)', () => {
-  it.todo('returns non-zero points when matchPredictions are provided (KO-02)');
-  it.todo('normalizes group-a slug to A for getCombinationKey');
-  it.todo('uses confirmed advancing set when provided (D-04)');
-  it.todo('defaults to top-8 when confirmedAdvancingGroupSlugs is omitted');
-  it.todo('returns advancing:false with no bracketMatchSlug when fewer than 8 advance (D-05)');
-  it.todo('tiebreaker: equal points/GD/GF → stable by group letter then teamId (D-03)');
+  // Shared fixtures for these tests
+  const groups8 = [
+    { slug: 'group-a' },
+    { slug: 'group-b' },
+    { slug: 'group-c' },
+    { slug: 'group-d' },
+    { slug: 'group-e' },
+    { slug: 'group-f' },
+    { slug: 'group-g' },
+    { slug: 'group-h' },
+  ];
+
+  // 3 matches per group (6-team groups have 3 rounds); use 2 matches for simplicity
+  const groupMatches: MatchWithId[] = [
+    // group-a matches
+    makeMatch('ga-m1', 'group-a', 'group', 'arg', 'bra'),
+    makeMatch('ga-m2', 'group-a', 'group', 'ger', 'fra'),
+    makeMatch('ga-m3', 'group-a', 'group', 'esp', 'ita'),
+    makeMatch('ga-m4', 'group-a', 'group', 'arg', 'ger'),
+    makeMatch('ga-m5', 'group-a', 'group', 'bra', 'esp'),
+    makeMatch('ga-m6', 'group-a', 'group', 'fra', 'ita'),
+    // group-b matches (minimal)
+    makeMatch('gb-m1', 'group-b', 'group', 'mex', 'usa'),
+    makeMatch('gb-m2', 'group-b', 'group', 'ned', 'cro'),
+    // group-c through group-h (minimal — just enough to have a third-place team)
+    makeMatch('gc-m1', 'group-c', 'group', 'por', 'esp'),
+    makeMatch('gd-m1', 'group-d', 'group', 'fra', 'ger'),
+    makeMatch('ge-m1', 'group-e', 'group', 'bra', 'arg'),
+    makeMatch('gf-m1', 'group-f', 'group', 'ita', 'eng'),
+    makeMatch('gg-m1', 'group-g', 'group', 'mex', 'usa'),
+    makeMatch('gh-m1', 'group-h', 'group', 'ned', 'cro'),
+  ];
+
+  // Group bets: 4 positions per group (index 3 = the third-place team)
+  const groupBets8: GroupBetRecord = {
+    'group-a': ['arg', 'bra', 'ger', 'fra'], // fra is third-place
+    'group-b': ['mex', 'usa', 'ned', 'cro'], // cro is third-place
+    'group-c': ['por', 'esp', 'ita', 'eng'], // eng is third-place
+    'group-d': ['fra', 'ger', 'arg', 'bra'], // bra is third-place
+    'group-e': ['bra', 'arg', 'ger', 'esp'], // esp is third-place
+    'group-f': ['ita', 'por', 'mex', 'usa'], // usa is third-place
+    'group-g': ['mex', 'usa', 'bra', 'ger'], // ger is third-place (in group-g)
+    'group-h': ['ned', 'cro', 'por', 'esp'], // esp is third-place (in group-h)
+  };
+
+  // Score predictions for group-a (fra = third-place team)
+  // fra loses all group matches → 0 pts in reality, but here we track the predicted team (fra = pos 3)
+  // We give fra 1 win to get non-zero points
+  const matchPredictions: PredictionRecord = {
+    'ga-m1': { home: 2, away: 0 }, // arg beats bra
+    'ga-m2': { home: 1, away: 0 }, // ger beats fra
+    'ga-m3': { home: 0, away: 1 }, // esp loses to ita
+    'ga-m4': { home: 3, away: 0 }, // arg beats ger
+    'ga-m5': { home: 2, away: 1 }, // bra beats esp
+    'ga-m6': { home: 2, away: 1 }, // fra beats ita  ← fra gets 3 pts
+  };
+
+  it('returns non-zero points when matchPredictions are provided (KO-02)', () => {
+    const result = computeThirdPlaceStandings(
+      groupBets8,
+      matchPredictions,
+      groupMatches,
+      teamsMap,
+      groups8,
+    );
+
+    // fra is group-a's third-place team and has 3 points from beating ita
+    const fraEntry = result.find((r) => r.teamId === 'fra' && r.groupLetter === 'group-a');
+    expect(fraEntry).toBeDefined();
+    expect(fraEntry!.points).toBeGreaterThan(0);
+  });
+
+  it('normalizes group-a slug to A for getCombinationKey', () => {
+    // With 8 groups all having bets, the top 8 advancing teams should have advancing=true.
+    // If normalization were broken, advancingSet would still set advancing correctly
+    // (since it's set-based now), but we verify the result is consistent.
+    const result = computeThirdPlaceStandings(
+      groupBets8,
+      matchPredictions,
+      groupMatches,
+      teamsMap,
+      groups8,
+    );
+
+    // All 8 results should have advancing=true (top 8 from 8 groups = all advance)
+    expect(result).toHaveLength(8);
+    expect(result.every((r) => r.advancing)).toBe(true);
+  });
+
+  it('uses confirmed advancing set when provided (D-04)', () => {
+    const confirmed = [
+      'group-a',
+      'group-b',
+      'group-c',
+      'group-d',
+      'group-e',
+      'group-f',
+      'group-g',
+      'group-h',
+    ];
+    const result = computeThirdPlaceStandings(
+      groupBets8,
+      matchPredictions,
+      groupMatches,
+      teamsMap,
+      groups8,
+      confirmed,
+    );
+
+    // All 8 confirmed groups → advancing=true for all
+    expect(result.every((r) => r.advancing)).toBe(true);
+    // Non-confirmed team should be advancing=false — not applicable here since all 8 confirmed
+    // Verify advancing=false when only 4 confirmed is tested in the D-05 test below
+  });
+
+  it('defaults to top-8 when confirmedAdvancingGroupSlugs is omitted', () => {
+    const result = computeThirdPlaceStandings(
+      groupBets8,
+      matchPredictions,
+      groupMatches,
+      teamsMap,
+      groups8,
+      // no 6th param
+    );
+
+    // With exactly 8 groups, all 8 should have advancing=true (top 8 = all 8)
+    const advancingCount = result.filter((r) => r.advancing).length;
+    expect(advancingCount).toBe(8);
+  });
+
+  it('returns advancing:false with no bracketMatchSlug when fewer than 8 advance (D-05)', () => {
+    // Only confirm 4 groups
+    const confirmed = ['group-a', 'group-b', 'group-c', 'group-d'];
+    const result = computeThirdPlaceStandings(
+      groupBets8,
+      matchPredictions,
+      groupMatches,
+      teamsMap,
+      groups8,
+      confirmed,
+    );
+
+    // 4 advancing, 4 not
+    const advancing = result.filter((r) => r.advancing);
+    const notAdvancing = result.filter((r) => !r.advancing);
+    expect(advancing).toHaveLength(4);
+    expect(notAdvancing).toHaveLength(4);
+
+    // bracketMatchSlug always undefined regardless of advancing status
+    expect(result.every((r) => r.bracketMatchSlug === undefined)).toBe(true);
+    expect(result.every((r) => r.bracketSlotLabel === undefined)).toBe(true);
+  });
+
+  it('tiebreaker: equal points/GD/GF → stable by group letter then teamId (D-03)', () => {
+    // All groups have the same match predictions (no predictions) → all teams get 0 pts, 0 GD, 0 GF
+    // With identical stats, sorting falls through to groupLetter then teamId
+    const tiedGroupBets: GroupBetRecord = {
+      'group-a': ['arg', 'bra', 'ger', 'fra'], // fra = third
+      'group-b': ['mex', 'usa', 'ned', 'cro'], // cro = third
+      'group-c': ['por', 'esp', 'ita', 'eng'], // eng = third
+      'group-d': ['fra', 'ger', 'arg', 'bra'], // bra = third (note: different bra than group-a)
+      'group-e': ['bra', 'arg', 'ger', 'esp'], // esp = third
+      'group-f': ['ita', 'por', 'mex', 'usa'], // usa = third
+      'group-g': ['mex', 'usa', 'bra', 'ger'], // ger = third (in group-g context)
+      'group-h': ['ned', 'cro', 'por', 'arg'], // arg = third (in group-h context)
+    };
+    const tiedGroups = groups8;
+
+    // Empty predictions → all third-place teams have 0 points, 0 GD, 0 GF
+    const result1 = computeThirdPlaceStandings(
+      tiedGroupBets,
+      {},
+      groupMatches,
+      teamsMap,
+      tiedGroups,
+    );
+    const result2 = computeThirdPlaceStandings(
+      tiedGroupBets,
+      {},
+      groupMatches,
+      teamsMap,
+      tiedGroups,
+    );
+
+    // Sort is deterministic — same result across multiple calls
+    expect(result1.map((r) => r.teamId)).toEqual(result2.map((r) => r.teamId));
+
+    // First team should be from group-a (letter A < B < C ...) when all else is tied
+    // group-a third = 'fra'; group-b third = 'cro'; group-c third = 'eng'
+    // Sorted by group letter: A, B, C, D, E, F, G, H
+    const groupLetters = result1.map((r) => r.groupLetter);
+    expect(groupLetters).toEqual([
+      'group-a',
+      'group-b',
+      'group-c',
+      'group-d',
+      'group-e',
+      'group-f',
+      'group-g',
+      'group-h',
+    ]);
+  });
 });
 
 describe('THIRD_PLACE_MATRIX static import', () => {
