@@ -18,6 +18,20 @@ const enTranslations: Required<AvatarPickerTranslations> = {
   randomizeAria: 'Randomize avatar',
   swatchColorAria: '{trait} color {color}',
   swatchStyleAria: '{trait} style {n}',
+  // NEW — optional trait labels:
+  eyesLabel: 'Eyes',
+  eyesColorLabel: 'Eye color',
+  beardLabel: 'Beard',
+  beardNone: 'None',
+  mouthLabel: 'Mouth',
+  mouthColorLabel: 'Lip color',
+  hatLabel: 'Hat',
+  hatNone: 'None',
+  hatColorLabel: 'Hat color',
+  accessoriesLabel: 'Accessories',
+  accessoriesNone: 'None',
+  accessoriesColorLabel: 'Accessories color',
+  glassesColorLabel: 'Glasses color',
 };
 
 const esTranslations: Required<AvatarPickerTranslations> = {
@@ -32,6 +46,20 @@ const esTranslations: Required<AvatarPickerTranslations> = {
   randomizeAria: 'Avatar aleatorio',
   swatchColorAria: '{trait} color {color}',
   swatchStyleAria: '{trait} estilo {n}',
+  // NEW — optional trait labels:
+  eyesLabel: 'Ojos',
+  eyesColorLabel: 'Color de ojos',
+  beardLabel: 'Barba',
+  beardNone: 'Ninguno',
+  mouthLabel: 'Boca',
+  mouthColorLabel: 'Color de labios',
+  hatLabel: 'Sombrero',
+  hatNone: 'Ninguno',
+  hatColorLabel: 'Color de sombrero',
+  accessoriesLabel: 'Accesorios',
+  accessoriesNone: 'Ninguno',
+  accessoriesColorLabel: 'Color de accesorios',
+  glassesColorLabel: 'Color de lentes',
 };
 
 const defaultValue = {
@@ -47,8 +75,8 @@ const defaultValue = {
 };
 
 describe('AvatarPicker', () => {
-  describe('SC#1 — six radiogroups', () => {
-    it('renders 6 radiogroup elements with the correct aria-labels', () => {
+  describe('SC#1 — sixteen radiogroups (6 original + 10 new)', () => {
+    it('renders 16 radiogroup elements with the correct aria-labels', () => {
       render(
         <AvatarPicker
           value={defaultValue}
@@ -59,9 +87,26 @@ describe('AvatarPicker', () => {
       );
 
       const groups = screen.getAllByRole('radiogroup');
-      expect(groups).toHaveLength(6);
+      expect(groups).toHaveLength(16);
 
-      const labels = ['Skin', 'Hair', 'Hair Color', 'Clothing', 'Clothing Color', 'Glasses'];
+      const labels = [
+        'Skin',
+        'Hair',
+        'Hair Color',
+        'Clothing',
+        'Clothing Color',
+        'Glasses',
+        'Eyes',
+        'Beard',
+        'Mouth',
+        'Hat',
+        'Accessories',
+        'Eye color',
+        'Lip color',
+        'Hat color',
+        'Accessories color',
+        'Glasses color',
+      ];
       labels.forEach((label) => {
         expect(screen.getByRole('radiogroup', { name: label })).toBeInTheDocument();
       });
@@ -220,14 +265,18 @@ describe('AvatarPicker', () => {
       expect(screen.getByRole('radiogroup', { name: 'Color de ropa' })).toBeInTheDocument();
       expect(screen.getByRole('radiogroup', { name: 'Lentes' })).toBeInTheDocument();
 
-      // Spanish None label appears
+      // Spanish None label appears (4 optional traits: glasses, beard, hat, accessories)
       expect(screen.getByRole('radio', { name: /Lentes Ninguno/i })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: /Barba Ninguno/i })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: /Sombrero Ninguno/i })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: /Accesorios Ninguno/i })).toBeInTheDocument();
 
       // No English labels in DOM
       expect(screen.queryByRole('radiogroup', { name: 'Skin' })).not.toBeInTheDocument();
       expect(screen.queryByRole('radiogroup', { name: 'Hair' })).not.toBeInTheDocument();
       expect(screen.queryByRole('radiogroup', { name: 'Glasses' })).not.toBeInTheDocument();
-      expect(screen.queryByText('None')).not.toBeInTheDocument();
+      // No English "None" text appears (all None chips now use Spanish "Ninguno")
+      expect(screen.queryByRole('radio', { name: /None/i })).not.toBeInTheDocument();
       expect(screen.queryByText('Randomize')).not.toBeInTheDocument();
     });
   });
