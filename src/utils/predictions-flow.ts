@@ -1,8 +1,16 @@
 import type { Match, PhaseType } from '@app-types/firestore';
 import type { ThirdPlacedTeam } from '@app-types/prediction-steps';
 
+import type { ThirdPlaceSlot } from '@/data/third-place-matrix';
+import { getCombinationKey, THIRD_PLACE_MATRIX } from '@/data/third-place-matrix';
+
 export async function ensureThirdPlaceMatrix(): Promise<void> {
   // matrix is statically imported; no warm-up needed
+}
+
+// Converts a group slug ('group-a') to a bare uppercase letter ('A')
+function letterFromSlug(slug: string): string {
+  return slug.replace('group-', '').toUpperCase();
 }
 
 export interface MatchWithId extends Match {
@@ -49,6 +57,7 @@ export interface KnockoutSlotSourceLoserOf {
 
 export interface KnockoutSlotSourceBestThird {
   from: 'best-third';
+  matrixSlot: ThirdPlaceSlot;
   eligibleGroups: string[];
 }
 
@@ -188,191 +197,231 @@ export function isGroupClassificationComplete(
 }
 
 // 2.5: BRACKET_MAP — declarative mapping for knockout slots
-// World Cup 2026 format: 48 teams → 12 groups → 16 R32 matches (seed-faithful)
+// World Cup 2026 format: 48 teams → 12 groups (A-L) → 16 R32 matches (official FIFA bracket)
+// Each of the 12 winners (1A-1L) appears exactly once; each of the 12 runners-up (2A-2L) appears
+// exactly once; 8 best-third slots are keyed by their official match-number matrix slot.
 export const BRACKET_MAP: Record<string, { home: KnockoutMatchSlot; away: KnockoutMatchSlot }> = {
-  // Round of 32 (16 matches) — each group winner vs a best-third team
+  // Round of 32 (16 matches) — official FIFA WC2026 bracket
+  // r32-1 = M73: 2A vs 2B
   'r32-1': {
-    home: { slotId: 'r32-1-home', source: { from: 'group', groupId: 'group-a', position: 1 } },
-    away: {
-      slotId: 'r32-1-away',
-      source: { from: 'best-third', eligibleGroups: ['group-c', 'group-d', 'group-e'] },
-    },
+    home: { slotId: 'r32-1-home', source: { from: 'group', groupId: 'group-a', position: 2 } },
+    away: { slotId: 'r32-1-away', source: { from: 'group', groupId: 'group-b', position: 2 } },
   },
+  // r32-2 = M74: 1E vs best-third(A/B/C/D/F) — matrix slot M74
   'r32-2': {
-    home: { slotId: 'r32-2-home', source: { from: 'group', groupId: 'group-c', position: 1 } },
+    home: { slotId: 'r32-2-home', source: { from: 'group', groupId: 'group-e', position: 1 } },
     away: {
       slotId: 'r32-2-away',
-      source: { from: 'best-third', eligibleGroups: ['group-a', 'group-b', 'group-f'] },
+      source: {
+        from: 'best-third',
+        matrixSlot: 'M74',
+        eligibleGroups: ['group-a', 'group-b', 'group-c', 'group-d', 'group-f'],
+      },
     },
   },
+  // r32-3 = M75: 1F vs 2C
   'r32-3': {
-    home: { slotId: 'r32-3-home', source: { from: 'group', groupId: 'group-e', position: 1 } },
-    away: {
-      slotId: 'r32-3-away',
-      source: { from: 'best-third', eligibleGroups: ['group-g', 'group-h', 'group-k'] },
-    },
+    home: { slotId: 'r32-3-home', source: { from: 'group', groupId: 'group-f', position: 1 } },
+    away: { slotId: 'r32-3-away', source: { from: 'group', groupId: 'group-c', position: 2 } },
   },
+  // r32-4 = M76: 1C vs 2F
   'r32-4': {
-    home: { slotId: 'r32-4-home', source: { from: 'group', groupId: 'group-g', position: 1 } },
-    away: {
-      slotId: 'r32-4-away',
-      source: { from: 'best-third', eligibleGroups: ['group-i', 'group-j', 'group-l'] },
-    },
+    home: { slotId: 'r32-4-home', source: { from: 'group', groupId: 'group-c', position: 1 } },
+    away: { slotId: 'r32-4-away', source: { from: 'group', groupId: 'group-f', position: 2 } },
   },
+  // r32-5 = M77: 1I vs best-third(C/D/F/G/H) — matrix slot M77
   'r32-5': {
-    home: { slotId: 'r32-5-home', source: { from: 'group', groupId: 'group-b', position: 1 } },
+    home: { slotId: 'r32-5-home', source: { from: 'group', groupId: 'group-i', position: 1 } },
     away: {
       slotId: 'r32-5-away',
-      source: { from: 'best-third', eligibleGroups: ['group-a', 'group-b', 'group-f'] },
+      source: {
+        from: 'best-third',
+        matrixSlot: 'M77',
+        eligibleGroups: ['group-c', 'group-d', 'group-f', 'group-g', 'group-h'],
+      },
     },
   },
+  // r32-6 = M78: 2E vs 2I
   'r32-6': {
-    home: { slotId: 'r32-6-home', source: { from: 'group', groupId: 'group-d', position: 1 } },
-    away: {
-      slotId: 'r32-6-away',
-      source: { from: 'best-third', eligibleGroups: ['group-c', 'group-d', 'group-e'] },
-    },
+    home: { slotId: 'r32-6-home', source: { from: 'group', groupId: 'group-e', position: 2 } },
+    away: { slotId: 'r32-6-away', source: { from: 'group', groupId: 'group-i', position: 2 } },
   },
+  // r32-7 = M79: 1A vs best-third(C/E/F/H/I) — matrix slot M79
   'r32-7': {
-    home: { slotId: 'r32-7-home', source: { from: 'group', groupId: 'group-f', position: 1 } },
+    home: { slotId: 'r32-7-home', source: { from: 'group', groupId: 'group-a', position: 1 } },
     away: {
       slotId: 'r32-7-away',
-      source: { from: 'best-third', eligibleGroups: ['group-g', 'group-h', 'group-k'] },
+      source: {
+        from: 'best-third',
+        matrixSlot: 'M79',
+        eligibleGroups: ['group-c', 'group-e', 'group-f', 'group-h', 'group-i'],
+      },
     },
   },
+  // r32-8 = M80: 1L vs best-third(E/H/I/J/K) — matrix slot M80
   'r32-8': {
-    home: { slotId: 'r32-8-home', source: { from: 'group', groupId: 'group-h', position: 1 } },
+    home: { slotId: 'r32-8-home', source: { from: 'group', groupId: 'group-l', position: 1 } },
     away: {
       slotId: 'r32-8-away',
-      source: { from: 'best-third', eligibleGroups: ['group-i', 'group-j', 'group-l'] },
+      source: {
+        from: 'best-third',
+        matrixSlot: 'M80',
+        eligibleGroups: ['group-e', 'group-h', 'group-i', 'group-j', 'group-k'],
+      },
     },
   },
+  // r32-9 = M81: 1D vs best-third(B/E/F/I/J) — matrix slot M81
   'r32-9': {
-    home: { slotId: 'r32-9-home', source: { from: 'group', groupId: 'group-i', position: 1 } },
+    home: { slotId: 'r32-9-home', source: { from: 'group', groupId: 'group-d', position: 1 } },
     away: {
       slotId: 'r32-9-away',
-      source: { from: 'best-third', eligibleGroups: ['group-g', 'group-h', 'group-k'] },
+      source: {
+        from: 'best-third',
+        matrixSlot: 'M81',
+        eligibleGroups: ['group-b', 'group-e', 'group-f', 'group-i', 'group-j'],
+      },
     },
   },
+  // r32-10 = M82: 1G vs best-third(A/E/H/I/J) — matrix slot M82
   'r32-10': {
-    home: { slotId: 'r32-10-home', source: { from: 'group', groupId: 'group-k', position: 1 } },
+    home: { slotId: 'r32-10-home', source: { from: 'group', groupId: 'group-g', position: 1 } },
     away: {
       slotId: 'r32-10-away',
-      source: { from: 'best-third', eligibleGroups: ['group-i', 'group-j', 'group-l'] },
+      source: {
+        from: 'best-third',
+        matrixSlot: 'M82',
+        eligibleGroups: ['group-a', 'group-e', 'group-h', 'group-i', 'group-j'],
+      },
     },
   },
+  // r32-11 = M83: 2K vs 2L
   'r32-11': {
-    home: { slotId: 'r32-11-home', source: { from: 'group', groupId: 'group-a', position: 1 } },
-    away: {
-      slotId: 'r32-11-away',
-      source: { from: 'best-third', eligibleGroups: ['group-a', 'group-b', 'group-f'] },
-    },
+    home: { slotId: 'r32-11-home', source: { from: 'group', groupId: 'group-k', position: 2 } },
+    away: { slotId: 'r32-11-away', source: { from: 'group', groupId: 'group-l', position: 2 } },
   },
+  // r32-12 = M84: 1H vs 2J
   'r32-12': {
-    home: { slotId: 'r32-12-home', source: { from: 'group', groupId: 'group-c', position: 1 } },
-    away: {
-      slotId: 'r32-12-away',
-      source: { from: 'best-third', eligibleGroups: ['group-c', 'group-d', 'group-e'] },
-    },
+    home: { slotId: 'r32-12-home', source: { from: 'group', groupId: 'group-h', position: 1 } },
+    away: { slotId: 'r32-12-away', source: { from: 'group', groupId: 'group-j', position: 2 } },
   },
+  // r32-13 = M85: 1B vs best-third(E/F/G/I/J) — matrix slot M85
   'r32-13': {
-    home: { slotId: 'r32-13-home', source: { from: 'group', groupId: 'group-e', position: 1 } },
+    home: { slotId: 'r32-13-home', source: { from: 'group', groupId: 'group-b', position: 1 } },
     away: {
       slotId: 'r32-13-away',
-      source: { from: 'best-third', eligibleGroups: ['group-i', 'group-j', 'group-l'] },
+      source: {
+        from: 'best-third',
+        matrixSlot: 'M85',
+        eligibleGroups: ['group-e', 'group-f', 'group-g', 'group-i', 'group-j'],
+      },
     },
   },
+  // r32-14 = M86: 1J vs 2H
   'r32-14': {
-    home: { slotId: 'r32-14-home', source: { from: 'group', groupId: 'group-g', position: 1 } },
-    away: {
-      slotId: 'r32-14-away',
-      source: { from: 'best-third', eligibleGroups: ['group-a', 'group-b', 'group-f'] },
-    },
+    home: { slotId: 'r32-14-home', source: { from: 'group', groupId: 'group-j', position: 1 } },
+    away: { slotId: 'r32-14-away', source: { from: 'group', groupId: 'group-h', position: 2 } },
   },
+  // r32-15 = M87: 1K vs best-third(D/E/I/J/L) — matrix slot M87
   'r32-15': {
-    home: { slotId: 'r32-15-home', source: { from: 'group', groupId: 'group-b', position: 1 } },
+    home: { slotId: 'r32-15-home', source: { from: 'group', groupId: 'group-k', position: 1 } },
     away: {
       slotId: 'r32-15-away',
-      source: { from: 'best-third', eligibleGroups: ['group-c', 'group-d', 'group-e'] },
+      source: {
+        from: 'best-third',
+        matrixSlot: 'M87',
+        eligibleGroups: ['group-d', 'group-e', 'group-i', 'group-j', 'group-l'],
+      },
     },
   },
+  // r32-16 = M88: 2D vs 2G
   'r32-16': {
-    home: { slotId: 'r32-16-home', source: { from: 'group', groupId: 'group-d', position: 1 } },
-    away: {
-      slotId: 'r32-16-away',
-      source: { from: 'best-third', eligibleGroups: ['group-g', 'group-h', 'group-k'] },
-    },
+    home: { slotId: 'r32-16-home', source: { from: 'group', groupId: 'group-d', position: 2 } },
+    away: { slotId: 'r32-16-away', source: { from: 'group', groupId: 'group-g', position: 2 } },
   },
 
-  // Round of 16 (8 matches) — strictly sequential: r16-N = W-r32-(2N-1) vs W-r32-(2N)
+  // Round of 16 (8 matches) — official FIFA WC2026 cross-pairings
+  // r16-1 = M89: W-r32-2 vs W-r32-5
   'r16-1': {
-    home: { slotId: 'r16-1-home', source: { from: 'winner-of', matchSlug: 'r32-1' } },
-    away: { slotId: 'r16-1-away', source: { from: 'winner-of', matchSlug: 'r32-2' } },
+    home: { slotId: 'r16-1-home', source: { from: 'winner-of', matchSlug: 'r32-2' } },
+    away: { slotId: 'r16-1-away', source: { from: 'winner-of', matchSlug: 'r32-5' } },
   },
+  // r16-2 = M90: W-r32-1 vs W-r32-3
   'r16-2': {
-    home: { slotId: 'r16-2-home', source: { from: 'winner-of', matchSlug: 'r32-3' } },
-    away: { slotId: 'r16-2-away', source: { from: 'winner-of', matchSlug: 'r32-4' } },
+    home: { slotId: 'r16-2-home', source: { from: 'winner-of', matchSlug: 'r32-1' } },
+    away: { slotId: 'r16-2-away', source: { from: 'winner-of', matchSlug: 'r32-3' } },
   },
+  // r16-3 = M91: W-r32-4 vs W-r32-6
   'r16-3': {
-    home: { slotId: 'r16-3-home', source: { from: 'winner-of', matchSlug: 'r32-5' } },
+    home: { slotId: 'r16-3-home', source: { from: 'winner-of', matchSlug: 'r32-4' } },
     away: { slotId: 'r16-3-away', source: { from: 'winner-of', matchSlug: 'r32-6' } },
   },
+  // r16-4 = M92: W-r32-7 vs W-r32-8
   'r16-4': {
     home: { slotId: 'r16-4-home', source: { from: 'winner-of', matchSlug: 'r32-7' } },
     away: { slotId: 'r16-4-away', source: { from: 'winner-of', matchSlug: 'r32-8' } },
   },
+  // r16-5 = M93: W-r32-11 vs W-r32-12
   'r16-5': {
-    home: { slotId: 'r16-5-home', source: { from: 'winner-of', matchSlug: 'r32-9' } },
-    away: { slotId: 'r16-5-away', source: { from: 'winner-of', matchSlug: 'r32-10' } },
+    home: { slotId: 'r16-5-home', source: { from: 'winner-of', matchSlug: 'r32-11' } },
+    away: { slotId: 'r16-5-away', source: { from: 'winner-of', matchSlug: 'r32-12' } },
   },
+  // r16-6 = M94: W-r32-9 vs W-r32-10
   'r16-6': {
-    home: { slotId: 'r16-6-home', source: { from: 'winner-of', matchSlug: 'r32-11' } },
-    away: { slotId: 'r16-6-away', source: { from: 'winner-of', matchSlug: 'r32-12' } },
+    home: { slotId: 'r16-6-home', source: { from: 'winner-of', matchSlug: 'r32-9' } },
+    away: { slotId: 'r16-6-away', source: { from: 'winner-of', matchSlug: 'r32-10' } },
   },
+  // r16-7 = M95: W-r32-14 vs W-r32-16
   'r16-7': {
-    home: { slotId: 'r16-7-home', source: { from: 'winner-of', matchSlug: 'r32-13' } },
-    away: { slotId: 'r16-7-away', source: { from: 'winner-of', matchSlug: 'r32-14' } },
+    home: { slotId: 'r16-7-home', source: { from: 'winner-of', matchSlug: 'r32-14' } },
+    away: { slotId: 'r16-7-away', source: { from: 'winner-of', matchSlug: 'r32-16' } },
   },
+  // r16-8 = M96: W-r32-13 vs W-r32-15
   'r16-8': {
-    home: { slotId: 'r16-8-home', source: { from: 'winner-of', matchSlug: 'r32-15' } },
-    away: { slotId: 'r16-8-away', source: { from: 'winner-of', matchSlug: 'r32-16' } },
+    home: { slotId: 'r16-8-home', source: { from: 'winner-of', matchSlug: 'r32-13' } },
+    away: { slotId: 'r16-8-away', source: { from: 'winner-of', matchSlug: 'r32-15' } },
   },
 
-  // Quarterfinals (4 matches)
+  // Quarterfinals (4 matches) — official FIFA WC2026 bracket
+  // qf-1 = M97: W-r16-1 vs W-r16-2
   'qf-1': {
     home: { slotId: 'qf-1-home', source: { from: 'winner-of', matchSlug: 'r16-1' } },
     away: { slotId: 'qf-1-away', source: { from: 'winner-of', matchSlug: 'r16-2' } },
   },
+  // qf-2 = M98: W-r16-5 vs W-r16-6
   'qf-2': {
-    home: { slotId: 'qf-2-home', source: { from: 'winner-of', matchSlug: 'r16-3' } },
-    away: { slotId: 'qf-2-away', source: { from: 'winner-of', matchSlug: 'r16-4' } },
+    home: { slotId: 'qf-2-home', source: { from: 'winner-of', matchSlug: 'r16-5' } },
+    away: { slotId: 'qf-2-away', source: { from: 'winner-of', matchSlug: 'r16-6' } },
   },
+  // qf-3 = M99: W-r16-3 vs W-r16-4
   'qf-3': {
-    home: { slotId: 'qf-3-home', source: { from: 'winner-of', matchSlug: 'r16-5' } },
-    away: { slotId: 'qf-3-away', source: { from: 'winner-of', matchSlug: 'r16-6' } },
+    home: { slotId: 'qf-3-home', source: { from: 'winner-of', matchSlug: 'r16-3' } },
+    away: { slotId: 'qf-3-away', source: { from: 'winner-of', matchSlug: 'r16-4' } },
   },
+  // qf-4 = M100: W-r16-7 vs W-r16-8
   'qf-4': {
     home: { slotId: 'qf-4-home', source: { from: 'winner-of', matchSlug: 'r16-7' } },
     away: { slotId: 'qf-4-away', source: { from: 'winner-of', matchSlug: 'r16-8' } },
   },
 
   // Semifinals (2 matches)
+  // sf-1 = M101: W-qf-1 vs W-qf-2
   'sf-1': {
     home: { slotId: 'sf-1-home', source: { from: 'winner-of', matchSlug: 'qf-1' } },
     away: { slotId: 'sf-1-away', source: { from: 'winner-of', matchSlug: 'qf-2' } },
   },
+  // sf-2 = M102: W-qf-3 vs W-qf-4
   'sf-2': {
     home: { slotId: 'sf-2-home', source: { from: 'winner-of', matchSlug: 'qf-3' } },
     away: { slotId: 'sf-2-away', source: { from: 'winner-of', matchSlug: 'qf-4' } },
   },
 
-  // Third place
+  // Third place — M103
   'third-place': {
     home: { slotId: 'tp-home', source: { from: 'loser-of', matchSlug: 'sf-1' } },
     away: { slotId: 'tp-away', source: { from: 'loser-of', matchSlug: 'sf-2' } },
   },
 
-  // Final
+  // Final — M104
   final: {
     home: { slotId: 'f-home', source: { from: 'winner-of', matchSlug: 'sf-1' } },
     away: { slotId: 'f-away', source: { from: 'winner-of', matchSlug: 'sf-2' } },
@@ -397,8 +446,15 @@ function resolveSlot(
 
   if (source.from === 'best-third') {
     if (!confirmedAdvancingMap) return 'TBD';
-    const match = source.eligibleGroups.find((g) => confirmedAdvancingMap[g]);
-    return match ? (confirmedAdvancingMap[match] ?? 'TBD') : 'TBD';
+    // Matrix-driven resolution: derive the combination key from advancing group letters,
+    // then look up which group letter occupies this slot in the matrix.
+    const advancingKeys = Object.keys(confirmedAdvancingMap);
+    if (advancingKeys.length < 8) return 'TBD'; // fewer than 8 advancing groups — graceful
+    const letters = advancingKeys.map((slug) => slug.replace('group-', '').toUpperCase());
+    const combinationKey = getCombinationKey(letters);
+    const letter = THIRD_PLACE_MATRIX[combinationKey]?.[source.matrixSlot];
+    if (!letter) return 'TBD';
+    return confirmedAdvancingMap['group-' + letter.toLowerCase()] ?? 'TBD';
   }
 
   // winner-of or loser-of — recursive resolution
@@ -412,17 +468,18 @@ function resolveSlot(
 
   if (source.from === 'winner-of') {
     if (!storedWinner) return 'TBD';
-    // D-02: validate stored winner is still a valid feeder (when both feeders are resolved)
-    if (homeTeam !== 'TBD' && awayTeam !== 'TBD') {
-      if (storedWinner !== homeTeam && storedWinner !== awayTeam) return 'TBD'; // stale pick
-    }
-    return storedWinner;
+    // D-02: validate stored winner against whichever feeders are already resolved (WR-01 fix)
+    if (homeTeam !== 'TBD' && storedWinner === homeTeam) return storedWinner;
+    if (awayTeam !== 'TBD' && storedWinner === awayTeam) return storedWinner;
+    if (homeTeam === 'TBD' && awayTeam === 'TBD') return storedWinner;
+    return 'TBD'; // at least one feeder resolved and storedWinner matched neither — stale
   }
 
-  // loser-of
+  // loser-of: both feeders must be resolved to derive the loser
   if (homeTeam === 'TBD' || awayTeam === 'TBD') return 'TBD';
   if (!storedWinner) return 'TBD';
-  if (storedWinner !== homeTeam && storedWinner !== awayTeam) return 'TBD'; // D-02
+  // D-02 + WR-01: storedWinner must match one of the two resolved feeders
+  if (storedWinner !== homeTeam && storedWinner !== awayTeam) return 'TBD';
   return storedWinner === homeTeam ? awayTeam : homeTeam;
 }
 
@@ -527,6 +584,18 @@ export function getPredictorProgress(
   };
 }
 
+// Maps an official match-number matrix slot to the seed slug for that R32 match
+const MATRIX_SLOT_TO_SEED_SLUG: Partial<Record<string, string>> = {
+  M74: 'r32-2',
+  M77: 'r32-5',
+  M79: 'r32-7',
+  M80: 'r32-8',
+  M81: 'r32-9',
+  M82: 'r32-10',
+  M85: 'r32-13',
+  M87: 'r32-15',
+};
+
 export function computeThirdPlaceStandings(
   groupBets: GroupBetRecord,
   matchPredictions: PredictionRecord,
@@ -535,8 +604,6 @@ export function computeThirdPlaceStandings(
   groups: { slug: string }[],
   confirmedAdvancingGroupSlugs?: string[],
 ): ThirdPlacedTeam[] {
-  const letterFromSlug = (slug: string) => slug.replace('group-', '').toUpperCase();
-
   const thirdPlacedRecords: Array<{
     teamId: string;
     teamName: string;
@@ -559,7 +626,7 @@ export function computeThirdPlaceStandings(
     thirdPlacedRecords.push({
       teamId: thirdPlaceTeamId,
       teamName: team?.name || thirdPlaceTeamId,
-      groupLetter: group.slug,
+      groupLetter: letterFromSlug(group.slug), // bare letter 'A', not 'group-a'
       groupSlug: group.slug,
       points: teamStanding?.points ?? 0,
       goalDifference: (teamStanding?.goalsFor ?? 0) - (teamStanding?.goalsAgainst ?? 0),
@@ -572,9 +639,7 @@ export function computeThirdPlaceStandings(
     if (b.points !== a.points) return b.points - a.points;
     if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
     if (b.goalsScored !== a.goalsScored) return b.goalsScored - a.goalsScored;
-    const aLetter = letterFromSlug(a.groupSlug);
-    const bLetter = letterFromSlug(b.groupSlug);
-    if (aLetter !== bLetter) return aLetter.localeCompare(bLetter);
+    if (a.groupLetter !== b.groupLetter) return a.groupLetter.localeCompare(b.groupLetter);
     return a.teamId.localeCompare(b.teamId);
   });
 
@@ -582,9 +647,29 @@ export function computeThirdPlaceStandings(
   const advancingSet =
     confirmedAdvancingGroupSlugs ?? thirdPlacedRecords.slice(0, 8).map((r) => r.groupSlug);
 
+  // Derive bracketMatchSlug for each advancing team via the third-place matrix.
+  // Requires exactly 8 advancing groups; gracefully returns undefined if <8 or key missing (D-05).
+  let combinationKey: string | undefined;
+  let matrixRow: Partial<Record<string, string>> | undefined;
+  if (advancingSet.length === 8) {
+    const advancingLetters = advancingSet.map((slug) => slug.replace('group-', '').toUpperCase());
+    combinationKey = getCombinationKey(advancingLetters);
+    matrixRow = THIRD_PLACE_MATRIX[combinationKey];
+  }
+
   return thirdPlacedRecords.map((record) => {
     // D-04: advancing reflects user's confirmed set, not a hardcoded slice
     const isAdvancing = advancingSet.includes(record.groupSlug);
+
+    // Derive bracketMatchSlug: find which matrix slot this group's letter occupies,
+    // then map that slot to its seed slug. Only possible when matrix row is available.
+    let bracketMatchSlug: string | undefined;
+    if (isAdvancing && matrixRow) {
+      const matchingSlot = Object.entries(matrixRow).find(
+        ([, groupLetter]) => groupLetter === record.groupLetter,
+      )?.[0];
+      bracketMatchSlug = matchingSlot ? MATRIX_SLOT_TO_SEED_SLUG[matchingSlot] : undefined;
+    }
 
     return {
       rank: thirdPlacedRecords.indexOf(record) + 1,
@@ -595,10 +680,8 @@ export function computeThirdPlaceStandings(
       goalDifference: record.goalDifference,
       goalsScored: record.goalsScored,
       advancing: isAdvancing,
-      // bracketSlotLabel intentionally undefined: official slot names (M74 etc.) don't map 1:1 to seed slugs
-      bracketSlotLabel: undefined,
-      // bracketMatchSlug intentionally omitted: official slot names (M74 etc.) don't map 1:1 to seed slugs
-      bracketMatchSlug: undefined,
+      bracketSlotLabel: bracketMatchSlug,
+      bracketMatchSlug,
     };
   });
 }
