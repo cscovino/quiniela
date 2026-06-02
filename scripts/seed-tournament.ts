@@ -206,38 +206,38 @@ const groupMatches = [
 ];
 
 const knockoutMatches = [
-  // Round of 32 - June 29-30, July 1-2
-  { slug: 'r32-1', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-29T18:00:00Z', stadium: 'dallas-stadium', tbd: true, tbdHome: '1A', tbdAway: '3C/D/E' },
-  { slug: 'r32-2', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-29T21:00:00Z', stadium: 'atlanta-stadium', tbd: true, tbdHome: '1C', tbdAway: '3A/B/F' },
-  { slug: 'r32-3', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-29T18:00:00Z', stadium: 'la-stadium', tbd: true, tbdHome: '1E', tbdAway: '3G/H/K' },
-  { slug: 'r32-4', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-29T21:00:00Z', stadium: 'sf-bay-area-stadium', tbd: true, tbdHome: '1G', tbdAway: '3I/J/L' },
-  { slug: 'r32-5', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-30T18:00:00Z', stadium: 'mexico-city-stadium', tbd: true, tbdHome: '1B', tbdAway: '3A/B/F' },
-  { slug: 'r32-6', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-30T21:00:00Z', stadium: 'bc-place-vancouver', tbd: true, tbdHome: '1D', tbdAway: '3C/D/E' },
-  { slug: 'r32-7', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-30T18:00:00Z', stadium: 'houston-stadium', tbd: true, tbdHome: '1F', tbdAway: '3G/H/K' },
-  { slug: 'r32-8', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-30T21:00:00Z', stadium: 'kansas-city-stadium', tbd: true, tbdHome: '1H', tbdAway: '3I/J/L' },
-  { slug: 'r32-9', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-01T18:00:00Z', stadium: 'ny-nj-stadium', tbd: true, tbdHome: '1I', tbdAway: '3G/H/K' },
-  { slug: 'r32-10', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-01T21:00:00Z', stadium: 'philadelphia-stadium', tbd: true, tbdHome: '1K', tbdAway: '3I/J/L' },
-  { slug: 'r32-11', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-01T18:00:00Z', stadium: 'boston-stadium', tbd: true, tbdHome: '1A', tbdAway: '3A/B/F' },
-  { slug: 'r32-12', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-01T21:00:00Z', stadium: 'miami-stadium', tbd: true, tbdHome: '1C', tbdAway: '3C/D/E' },
-  { slug: 'r32-13', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-02T18:00:00Z', stadium: 'toronto-stadium', tbd: true, tbdHome: '1E', tbdAway: '3I/J/L' },
-  { slug: 'r32-14', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-02T21:00:00Z', stadium: 'seattle-stadium', tbd: true, tbdHome: '1G', tbdAway: '3A/B/F' },
-  { slug: 'r32-15', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-02T18:00:00Z', stadium: 'estadio-monterrey', tbd: true, tbdHome: '1B', tbdAway: '3C/D/E' },
-  { slug: 'r32-16', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-02T21:00:00Z', stadium: 'estadio-guadalajara', tbd: true, tbdHome: '1D', tbdAway: '3G/H/K' },
-  // Round of 16 - July 4-5
-  { slug: 'r16-1', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-04T18:00:00Z', stadium: 'dallas-stadium', tbd: true, tbdHome: 'W-R32-1', tbdAway: 'W-R32-2' },
-  { slug: 'r16-2', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-04T21:00:00Z', stadium: 'atlanta-stadium', tbd: true, tbdHome: 'W-R32-3', tbdAway: 'W-R32-4' },
-  { slug: 'r16-3', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-05T18:00:00Z', stadium: 'mexico-city-stadium', tbd: true, tbdHome: 'W-R32-5', tbdAway: 'W-R32-6' },
+  // Round of 32 - June 29-30, July 1-2 (official FIFA WC2026 bracket)
+  { slug: 'r32-1', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-29T18:00:00Z', stadium: 'dallas-stadium', tbd: true, tbdHome: '2A', tbdAway: '2B' },
+  { slug: 'r32-2', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-29T21:00:00Z', stadium: 'atlanta-stadium', tbd: true, tbdHome: '1E', tbdAway: '3A/B/C/D/F' },
+  { slug: 'r32-3', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-29T18:00:00Z', stadium: 'la-stadium', tbd: true, tbdHome: '1F', tbdAway: '2C' },
+  { slug: 'r32-4', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-29T21:00:00Z', stadium: 'sf-bay-area-stadium', tbd: true, tbdHome: '1C', tbdAway: '2F' },
+  { slug: 'r32-5', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-30T18:00:00Z', stadium: 'mexico-city-stadium', tbd: true, tbdHome: '1I', tbdAway: '3C/D/F/G/H' },
+  { slug: 'r32-6', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-30T21:00:00Z', stadium: 'bc-place-vancouver', tbd: true, tbdHome: '2E', tbdAway: '2I' },
+  { slug: 'r32-7', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-30T18:00:00Z', stadium: 'houston-stadium', tbd: true, tbdHome: '1A', tbdAway: '3C/E/F/H/I' },
+  { slug: 'r32-8', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-06-30T21:00:00Z', stadium: 'kansas-city-stadium', tbd: true, tbdHome: '1L', tbdAway: '3E/H/I/J/K' },
+  { slug: 'r32-9', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-01T18:00:00Z', stadium: 'ny-nj-stadium', tbd: true, tbdHome: '1D', tbdAway: '3B/E/F/I/J' },
+  { slug: 'r32-10', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-01T21:00:00Z', stadium: 'philadelphia-stadium', tbd: true, tbdHome: '1G', tbdAway: '3A/E/H/I/J' },
+  { slug: 'r32-11', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-01T18:00:00Z', stadium: 'boston-stadium', tbd: true, tbdHome: '2K', tbdAway: '2L' },
+  { slug: 'r32-12', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-01T21:00:00Z', stadium: 'miami-stadium', tbd: true, tbdHome: '1H', tbdAway: '2J' },
+  { slug: 'r32-13', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-02T18:00:00Z', stadium: 'toronto-stadium', tbd: true, tbdHome: '1B', tbdAway: '3E/F/G/I/J' },
+  { slug: 'r32-14', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-02T21:00:00Z', stadium: 'seattle-stadium', tbd: true, tbdHome: '1J', tbdAway: '2H' },
+  { slug: 'r32-15', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-02T18:00:00Z', stadium: 'estadio-monterrey', tbd: true, tbdHome: '1K', tbdAway: '3D/E/I/J/L' },
+  { slug: 'r32-16', phase: 'round-of-32', homeTeamId: null, awayTeamId: null, date: '2026-07-02T21:00:00Z', stadium: 'estadio-guadalajara', tbd: true, tbdHome: '2D', tbdAway: '2G' },
+  // Round of 16 - July 4-5 (official FIFA WC2026 bracket)
+  { slug: 'r16-1', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-04T18:00:00Z', stadium: 'dallas-stadium', tbd: true, tbdHome: 'W-R32-2', tbdAway: 'W-R32-5' },
+  { slug: 'r16-2', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-04T21:00:00Z', stadium: 'atlanta-stadium', tbd: true, tbdHome: 'W-R32-1', tbdAway: 'W-R32-3' },
+  { slug: 'r16-3', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-05T18:00:00Z', stadium: 'mexico-city-stadium', tbd: true, tbdHome: 'W-R32-4', tbdAway: 'W-R32-6' },
   { slug: 'r16-4', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-05T21:00:00Z', stadium: 'houston-stadium', tbd: true, tbdHome: 'W-R32-7', tbdAway: 'W-R32-8' },
-  { slug: 'r16-5', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-04T18:00:00Z', stadium: 'ny-nj-stadium', tbd: true, tbdHome: 'W-R32-9', tbdAway: 'W-R32-10' },
-  { slug: 'r16-6', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-04T21:00:00Z', stadium: 'philadelphia-stadium', tbd: true, tbdHome: 'W-R32-11', tbdAway: 'W-R32-12' },
-  { slug: 'r16-7', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-05T18:00:00Z', stadium: 'toronto-stadium', tbd: true, tbdHome: 'W-R32-13', tbdAway: 'W-R32-14' },
-  { slug: 'r16-8', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-05T21:00:00Z', stadium: 'la-stadium', tbd: true, tbdHome: 'W-R32-15', tbdAway: 'W-R32-16' },
-  // Quarterfinals - July 9-10
+  { slug: 'r16-5', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-04T18:00:00Z', stadium: 'ny-nj-stadium', tbd: true, tbdHome: 'W-R32-11', tbdAway: 'W-R32-12' },
+  { slug: 'r16-6', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-04T21:00:00Z', stadium: 'philadelphia-stadium', tbd: true, tbdHome: 'W-R32-9', tbdAway: 'W-R32-10' },
+  { slug: 'r16-7', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-05T18:00:00Z', stadium: 'toronto-stadium', tbd: true, tbdHome: 'W-R32-14', tbdAway: 'W-R32-16' },
+  { slug: 'r16-8', phase: 'round-of-16', homeTeamId: null, awayTeamId: null, date: '2026-07-05T21:00:00Z', stadium: 'la-stadium', tbd: true, tbdHome: 'W-R32-13', tbdAway: 'W-R32-15' },
+  // Quarterfinals - July 9-10 (official FIFA WC2026 bracket)
   { slug: 'qf-1', phase: 'quarterfinals', homeTeamId: null, awayTeamId: null, date: '2026-07-09T18:00:00Z', stadium: 'dallas-stadium', tbd: true, tbdHome: 'W-R16-1', tbdAway: 'W-R16-2' },
-  { slug: 'qf-2', phase: 'quarterfinals', homeTeamId: null, awayTeamId: null, date: '2026-07-09T21:00:00Z', stadium: 'miami-stadium', tbd: true, tbdHome: 'W-R16-3', tbdAway: 'W-R16-4' },
-  { slug: 'qf-3', phase: 'quarterfinals', homeTeamId: null, awayTeamId: null, date: '2026-07-10T18:00:00Z', stadium: 'ny-nj-stadium', tbd: true, tbdHome: 'W-R16-5', tbdAway: 'W-R16-6' },
+  { slug: 'qf-2', phase: 'quarterfinals', homeTeamId: null, awayTeamId: null, date: '2026-07-09T21:00:00Z', stadium: 'miami-stadium', tbd: true, tbdHome: 'W-R16-5', tbdAway: 'W-R16-6' },
+  { slug: 'qf-3', phase: 'quarterfinals', homeTeamId: null, awayTeamId: null, date: '2026-07-10T18:00:00Z', stadium: 'ny-nj-stadium', tbd: true, tbdHome: 'W-R16-3', tbdAway: 'W-R16-4' },
   { slug: 'qf-4', phase: 'quarterfinals', homeTeamId: null, awayTeamId: null, date: '2026-07-10T21:00:00Z', stadium: 'la-stadium', tbd: true, tbdHome: 'W-R16-7', tbdAway: 'W-R16-8' },
-  // Semifinals - July 13-14
+  // Semifinals - July 13-14 (official FIFA WC2026 bracket)
   { slug: 'sf-1', phase: 'semifinals', homeTeamId: null, awayTeamId: null, date: '2026-07-13T21:00:00Z', stadium: 'dallas-stadium', tbd: true, tbdHome: 'W-QF-1', tbdAway: 'W-QF-2' },
   { slug: 'sf-2', phase: 'semifinals', homeTeamId: null, awayTeamId: null, date: '2026-07-14T21:00:00Z', stadium: 'atlanta-stadium', tbd: true, tbdHome: 'W-QF-3', tbdAway: 'W-QF-4' },
   // Third Place - July 18
