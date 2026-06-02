@@ -203,9 +203,11 @@ describe('knockout pick survival across recompute', () => {
     const lastCall = calls[calls.length - 1][0] as { canAdvance: boolean };
     expect(lastCall.canAdvance).toBe(true);
 
-    const afterRerender = calls.slice(
-      calls.findIndex((c) => (c[0] as { canAdvance: boolean }).canAdvance === true),
+    const firstTrueIdx = calls.findIndex(
+      (c) => (c[0] as { canAdvance: boolean }).canAdvance === true,
     );
+    expect(firstTrueIdx).toBeGreaterThanOrEqual(0);
+    const afterRerender = calls.slice(firstTrueIdx);
     const falseAfterTrue = afterRerender.some(
       (c) => (c[0] as { canAdvance: boolean }).canAdvance === false,
     );
@@ -236,8 +238,7 @@ describe('knockout pick survival across recompute', () => {
     expect(screen.queryByRole('radio', { checked: true })).toBeNull();
   });
 
-  it('stable onSubmit does not re-trigger reset', () => {
-    const onSubmit = vi.fn();
+  it('onSubmit reference change does not re-trigger reset', () => {
     const { rerender } = render(
       <PredictionStepKnockoutRound
         {...defaultProps}
@@ -246,12 +247,14 @@ describe('knockout pick survival across recompute', () => {
           makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
         ]}
         previousRoundPredictions={{}}
-        onSubmit={onSubmit}
+        onSubmit={vi.fn()}
       />,
     );
 
     fireEvent.click(screen.getByRole('radio', { name: /ARG/i }));
 
+    // Rerender with a FRESH onSubmit reference: this is what re-fires the
+    // secondary onStateChange/onSubmit effect. The pick must survive that.
     act(() => {
       rerender(
         <PredictionStepKnockoutRound
@@ -261,7 +264,7 @@ describe('knockout pick survival across recompute', () => {
             makeMatch('r32-m2', 'round-of-32', 'bra', 'fra'),
           ]}
           previousRoundPredictions={{}}
-          onSubmit={onSubmit}
+          onSubmit={vi.fn()}
         />,
       );
     });
