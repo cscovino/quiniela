@@ -726,3 +726,26 @@ export function deriveFinalFour(
 
   return { first, second, third, fourth };
 }
+
+// Labels passed to formatSlotSource — caller provides template strings from i18n
+export interface SlotSourceLabels {
+  groupWinner: string; // e.g. "Winner Group {group}"
+  groupRunnerUp: string; // e.g. "Runner-up Group {group}"
+  groupPosition: string; // e.g. "Position {n} Group {group}"
+  bestThird: string; // e.g. "Best 3rd place"
+  winnerOf: string; // e.g. "Winner of Match {match}"
+  loserOf: string; // e.g. "Loser of Match {match}"
+}
+
+// Converts a KnockoutSlotSource to a human-readable localized string
+export function formatSlotSource(source: KnockoutSlotSource, labels: SlotSourceLabels): string {
+  if (source.from === 'group') {
+    const group = source.groupId.replace('group-', '').toUpperCase();
+    if (source.position === 1) return labels.groupWinner.replace('{group}', group);
+    if (source.position === 2) return labels.groupRunnerUp.replace('{group}', group);
+    return labels.groupPosition.replace('{n}', String(source.position)).replace('{group}', group);
+  }
+  if (source.from === 'best-third') return labels.bestThird;
+  if (source.from === 'winner-of') return labels.winnerOf.replace('{match}', source.matchSlug);
+  return labels.loserOf.replace('{match}', source.matchSlug);
+}

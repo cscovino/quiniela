@@ -261,7 +261,13 @@
         "pickWinner": "Pick the winner",
         "teamsTbd": "Teams TBD",
         "allSubmitted": "All predictions submitted for this round",
-        "submittedPredictions": "Submitted predictions:"
+        "submittedPredictions": "Submitted predictions:",
+        "groupWinner": "Winner Group {group}",
+        "groupRunnerUp": "Runner-up Group {group}",
+        "groupPosition": "Position {n} Group {group}",
+        "bestThird": "Best 3rd place",
+        "winnerOf": "Winner of Match {match}",
+        "loserOf": "Loser of Match {match}"
       },
       "finalPhaseStep": {
         "teamsSoon": "Teams will be available soon.",

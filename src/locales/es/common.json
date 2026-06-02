@@ -261,7 +261,13 @@
         "pickWinner": "Elige al ganador",
         "teamsTbd": "Equipos por definir",
         "allSubmitted": "Todas las predicciones de esta ronda han sido enviadas",
-        "submittedPredictions": "Predicciones enviadas:"
+        "submittedPredictions": "Predicciones enviadas:",
+        "groupWinner": "Ganador Grupo {group}",
+        "groupRunnerUp": "Subcampeón Grupo {group}",
+        "groupPosition": "Posición {n} Grupo {group}",
+        "bestThird": "Mejor tercero",
+        "winnerOf": "Ganador de Partido {match}",
+        "loserOf": "Perdedor de Partido {match}"
       },
       "finalPhaseStep": {
         "teamsSoon": "Los equipos estarán disponibles pronto.",
