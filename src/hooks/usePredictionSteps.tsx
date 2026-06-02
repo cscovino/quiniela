@@ -602,8 +602,15 @@ export function usePredictionSteps(
   }, [currentStep]);
 
   const thirdPlaceTeams = useMemo(
-    () => computeThirdPlaceStandings(groupBetsByGroupId, {}, firestoreMatches, teamsMap, groups),
-    [groupBetsByGroupId, firestoreMatches, teamsMap, groups],
+    () =>
+      computeThirdPlaceStandings(
+        groupBetsByGroupId,
+        existingMatchValues,
+        firestoreMatches,
+        teamsMap,
+        groups,
+      ),
+    [groupBetsByGroupId, existingMatchValues, firestoreMatches, teamsMap, groups],
   );
 
   return {
