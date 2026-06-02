@@ -33,31 +33,6 @@
   opacity: 0.6;
 }
 
-.prediction-step-knockout-round__match-header {
-  padding-bottom: var(--space-2);
-  border-bottom: var(--border-width-sm) solid var(--color-accent-500);
-}
-
-.prediction-step-knockout-round__teams {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
-.prediction-step-knockout-round__team {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex: 1;
-  min-width: 0;
-}
-
-.prediction-step-knockout-round__vs {
-  flex-shrink: 0;
-  color: var(--color-primary-500);
-}
-
 .prediction-step-knockout-round__tbd {
   display: flex;
   flex-direction: column;

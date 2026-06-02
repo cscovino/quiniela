@@ -4,10 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import type { PhaseType } from '@app-types/firestore';
 import type { RegisterStepState } from '@app-types/prediction-steps';
 import { Typography } from '@atoms/Typography';
-import { TeamFlag } from '@molecules/TeamFlag';
 import { TeamSelector } from '@molecules/TeamSelector';
 
 import './PredictionStepKnockoutRound.css';
+
+import { BRACKET_MAP, formatSlotSource, SlotSourceLabels } from '@/utils/predictions-flow';
 
 export interface KnockoutRoundMatch {
   slug: string;
@@ -41,6 +42,12 @@ export interface PredictionStepKnockoutRoundProps {
     teamsTbd?: string;
     allSubmitted?: string;
     submittedPredictions?: string;
+    groupWinner?: string;
+    groupRunnerUp?: string;
+    groupPosition?: string;
+    bestThird?: string;
+    winnerOf?: string;
+    loserOf?: string;
   };
 }
 
@@ -56,6 +63,12 @@ const defaultTranslations = {
   teamsTbd: 'Teams TBD',
   allSubmitted: 'All predictions submitted for this round',
   submittedPredictions: 'Submitted predictions:',
+  groupWinner: 'Winner Group {group}',
+  groupRunnerUp: 'Runner-up Group {group}',
+  groupPosition: 'Position {n} Group {group}',
+  bestThird: 'Best 3rd place',
+  winnerOf: 'Winner of Match {match}',
+  loserOf: 'Loser of Match {match}',
 };
 
 function getPhaseLabel(phase: PhaseType, labels: typeof defaultTranslations): string {
@@ -165,38 +178,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
               key={match.slug}
               className={`prediction-step-knockout-round__match ${disabled ? 'prediction-step-knockout-round__match--disabled' : ''}`}
             >
-              <div className="prediction-step-knockout-round__match-header">
-                {hasTeams ? (
-                  <div className="prediction-step-knockout-round__teams">
-                    <div className="prediction-step-knockout-round__team">
-                      <TeamFlag fifaCode={match.homeTeam!.fifaCode} size="sm" />
-                      <Typography variant="small">{match.homeTeam!.name}</Typography>
-                    </div>
-                    <Typography variant="caption" className="prediction-step-knockout-round__vs">
-                      VS
-                    </Typography>
-                    <div className="prediction-step-knockout-round__team">
-                      <TeamFlag fifaCode={match.awayTeam!.fifaCode} size="sm" />
-                      <Typography variant="small">{match.awayTeam!.name}</Typography>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="prediction-step-knockout-round__tbd">
-                    <Typography variant="small">
-                      {match.homeTeam?.name || match.tbdHome || 'TBD'} vs{' '}
-                      {match.awayTeam?.name || match.tbdAway || 'TBD'}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      className="prediction-step-knockout-round__tbd-label"
-                    >
-                      {labels.teamsTbd}
-                    </Typography>
-                  </div>
-                )}
-              </div>
-
-              {hasTeams && (
+              {hasTeams ? (
                 <TeamSelector
                   options={[match.homeTeam!, match.awayTeam!]}
                   value={predictions[match.slug]}
@@ -204,6 +186,30 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
                   label={labels.pickWinner}
                   disabled={disabled}
                 />
+              ) : (
+                <div className="prediction-step-knockout-round__tbd">
+                  <Typography variant="small">
+                    {(() => {
+                      const entry = BRACKET_MAP[match.slug];
+                      if (!entry) return 'TBD vs TBD';
+                      const slotLabels: SlotSourceLabels = {
+                        groupWinner: labels.groupWinner,
+                        groupRunnerUp: labels.groupRunnerUp,
+                        groupPosition: labels.groupPosition,
+                        bestThird: labels.bestThird,
+                        winnerOf: labels.winnerOf,
+                        loserOf: labels.loserOf,
+                      };
+                      return `${formatSlotSource(entry.home.source, slotLabels)} vs ${formatSlotSource(entry.away.source, slotLabels)}`;
+                    })()}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    className="prediction-step-knockout-round__tbd-label"
+                  >
+                    {labels.teamsTbd}
+                  </Typography>
+                </div>
               )}
             </div>
           );

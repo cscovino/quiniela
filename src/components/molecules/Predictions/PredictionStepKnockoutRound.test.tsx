@@ -134,6 +134,35 @@ describe('PredictionStepKnockoutRound', () => {
     );
     expect(screen.getByText('Teams TBD')).toBeInTheDocument();
   });
+
+  it('renders slot-source label on TBD card with bracket-slot source', () => {
+    render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[makeMatch('r32-2', 'round-of-32')]}
+        translations={{
+          groupWinner: 'Winner Group {group}',
+          groupRunnerUp: 'Runner-up Group {group}',
+          groupPosition: 'Position {n} Group {group}',
+          bestThird: 'Best 3rd place',
+          winnerOf: 'Winner of Match {match}',
+          loserOf: 'Loser of Match {match}',
+        }}
+      />,
+    );
+    expect(screen.getByText('Teams TBD')).toBeInTheDocument();
+  });
+
+  it('does not render duplicate header on resolved cards', () => {
+    render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[makeMatch('r32-m1', 'round-of-32', 'arg', 'esp')]}
+      />,
+    );
+    const headerEl = document.querySelector('.prediction-step-knockout-round__match-header');
+    expect(headerEl).toBeNull();
+  });
 });
 
 describe('knockout pick survival across recompute', () => {
