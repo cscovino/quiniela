@@ -2,6 +2,8 @@ import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions/v1';
 
+import { SCORING } from './scoring';
+
 const db = admin.firestore();
 
 interface MatchData {
@@ -88,17 +90,17 @@ export function computeStandings(
 
     if (homeGoals > awayGoals) {
       home.won += 1;
-      home.points += 3;
+      home.points += SCORING.GROUP.WIN;
       away.lost += 1;
     } else if (homeGoals < awayGoals) {
       away.won += 1;
-      away.points += 3;
+      away.points += SCORING.GROUP.WIN;
       home.lost += 1;
     } else {
       home.drawn += 1;
       away.drawn += 1;
-      home.points += 1;
-      away.points += 1;
+      home.points += SCORING.GROUP.DRAW;
+      away.points += SCORING.GROUP.DRAW;
     }
 
     home.goalDifference = home.goalsFor - home.goalsAgainst;
