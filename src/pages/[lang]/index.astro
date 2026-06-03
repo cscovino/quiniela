@@ -21,6 +21,7 @@ const buildData = await getBuildData();
 
 const predictionsUrl = getRoute(locale, 'predictions');
 const rankingsUrl = getRoute(locale, 'rankings');
+const rulesUrl = getRoute(locale, 'rules');
 
 const matchTranslations = {
   scheduled: t.matchStatus.scheduled,
@@ -61,6 +62,9 @@ const tournamentInfo = buildData.tournament;
         </Button>
         <Button href={rankingsUrl} variant="secondary" size="lg">
           {t.pages.home.hero.ctaStandings}
+        </Button>
+        <Button href={rulesUrl} variant="accent" size="lg">
+          {t.pages.home.hero.ctaRules}
         </Button>
       </div>
     </section>

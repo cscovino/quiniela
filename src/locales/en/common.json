@@ -69,7 +69,8 @@
         "title": "Predict. Compete. Win.",
         "subtitle": "Make your predictions for every match and climb the leaderboard!",
         "ctaPredict": "Make Predictions",
-        "ctaStandings": "View Standings"
+        "ctaStandings": "View Standings",
+        "ctaRules": "View Rules"
       },
       "matches": {
         "title": "Upcoming Matches",

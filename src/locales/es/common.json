@@ -69,7 +69,8 @@
         "title": "Predice. Compite. Gana.",
         "subtitle": "¡Haz tus predicciones para cada partido y escala en la clasificación!",
         "ctaPredict": "Hacer Predicciones",
-        "ctaStandings": "Ver Clasificación"
+        "ctaStandings": "Ver Clasificación",
+        "ctaRules": "Ver Reglamento"
       },
       "matches": {
         "title": "Próximos Partidos",
