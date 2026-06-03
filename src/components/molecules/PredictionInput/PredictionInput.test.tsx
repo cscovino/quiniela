@@ -17,7 +17,7 @@ describe('PredictionInput', () => {
       <PredictionInput homeTeamName="Argentina" awayTeamName="France" onChange={handleChange} />,
     );
 
-    const inputs = screen.getAllByRole('spinbutton');
+    const inputs = screen.getAllByRole('textbox');
     await user.clear(inputs[0]);
     await user.type(inputs[0], '3');
 
@@ -34,7 +34,7 @@ describe('PredictionInput', () => {
       />,
     );
 
-    const inputs = screen.getAllByRole('spinbutton');
+    const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input) => {
       expect(input).toBeDisabled();
     });
@@ -51,8 +51,8 @@ describe('PredictionInput', () => {
       />,
     );
 
-    const inputs = screen.getAllByRole('spinbutton');
-    expect(inputs[0]).toHaveValue(2);
-    expect(inputs[1]).toHaveValue(1);
+    const inputs = screen.getAllByRole('textbox');
+    expect(inputs[0]).toHaveValue('2');
+    expect(inputs[1]).toHaveValue('1');
   });
 });

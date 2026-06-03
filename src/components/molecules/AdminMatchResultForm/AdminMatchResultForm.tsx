@@ -87,7 +87,9 @@ export const AdminMatchResultForm: FC<AdminMatchResultFormProps> = ({
             <label>
               <Typography variant="small">{match.homeTeamId?.toUpperCase() || 'Home'}</Typography>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 min="0"
                 max="99"
                 value={homeScore}
@@ -99,7 +101,9 @@ export const AdminMatchResultForm: FC<AdminMatchResultFormProps> = ({
             <label>
               <Typography variant="small">{match.awayTeamId?.toUpperCase() || 'Away'}</Typography>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 min="0"
                 max="99"
                 value={awayScore}

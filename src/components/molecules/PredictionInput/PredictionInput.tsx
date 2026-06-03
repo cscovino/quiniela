@@ -45,7 +45,9 @@ export const PredictionInput: FC<PredictionInputProps> = ({
           {homeTeamName}
         </Typography>
         <Input
-          type="number"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           value={homeScore.toString()}
           onChange={(e) => handleHomeChange(e.target.value)}
           disabled={disabled}
@@ -61,7 +63,9 @@ export const PredictionInput: FC<PredictionInputProps> = ({
 
       <div className="prediction-input__team">
         <Input
-          type="number"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           value={awayScore.toString()}
           onChange={(e) => handleAwayChange(e.target.value)}
           disabled={disabled}

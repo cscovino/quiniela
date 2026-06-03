@@ -51,7 +51,7 @@ describe('PredictionForm', () => {
 
   it('disables form when isDisabled is true', () => {
     render(<PredictionForm matches={mockMatches} onSubmit={() => {}} isDisabled />);
-    const inputs = screen.getAllByRole('spinbutton');
+    const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input) => {
       expect(input).toBeDisabled();
     });
