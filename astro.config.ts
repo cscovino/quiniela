@@ -51,7 +51,6 @@ export default defineConfig({
         output: {
           manualChunks(id) {
             if (id.includes('node_modules/firebase/')) return 'firebase';
-            if (id.includes('/locales/')) return 'i18n-data';
           },
         },
       },

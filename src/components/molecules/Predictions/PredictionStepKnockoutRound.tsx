@@ -8,7 +8,8 @@ import { TeamSelector } from '@molecules/TeamSelector';
 
 import './PredictionStepKnockoutRound.css';
 
-import { BRACKET_MAP, formatSlotSource, SlotSourceLabels } from '@/utils/predictions-flow';
+import type { SlotSourceLabels } from '@/utils/predictions-flow';
+import { BRACKET_MAP, formatSlotSource } from '@/utils/predictions-flow';
 
 export interface KnockoutRoundMatch {
   slug: string;
