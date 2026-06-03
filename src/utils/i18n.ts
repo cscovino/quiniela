@@ -13,7 +13,7 @@ export interface Translations {
   common: typeof esCommon;
   auth: typeof esAuth;
   admin: typeof esAdmin;
-  rules: typeof esRules;
+  rules: typeof esRules; // esRules = { rules: { heading, scoring, ... } }
 }
 
 const translations: Record<Locale, Translations> = {

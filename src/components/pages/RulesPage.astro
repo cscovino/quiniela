@@ -1,5 +1,5 @@
 ---
-import { SCORING } from '@/config/scoring';
+import { SCORING } from '../../config/scoring';
 import { BADGE_DEFINITIONS } from '@app-types/badges';
 import { getTranslations } from '@utils/i18n';
 
@@ -8,7 +8,7 @@ export interface Props {
 }
 
 const { locale } = Astro.props;
-const t = getTranslations(locale).rules;
+const t = getTranslations(locale).rules.rules;
 
 const BADGE_ICONS: Record<string, string> = {
   star: '⭐',
