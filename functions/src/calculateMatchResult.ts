@@ -2,6 +2,8 @@ import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions/v1';
 
+import { SCORING } from './scoring';
+
 const db = admin.firestore();
 
 interface MatchData {
@@ -46,7 +48,7 @@ export function calculatePoints(
   const isWinner = betOutcome === actualOutcome;
 
   return {
-    points: isExact ? 3 : isWinner ? 1 : 0,
+    points: isExact ? SCORING.MATCH.EXACT : isWinner ? SCORING.MATCH.WINNER : SCORING.MATCH.WRONG,
     isExact,
     isWinner,
   };
