@@ -613,7 +613,7 @@ export function computeThirdPlaceStandings(
   for (const group of groups) {
     const positions = groupBets[group.slug];
     if (!positions || positions.length < 4) continue;
-    const thirdPlaceTeamId = positions[3];
+    const thirdPlaceTeamId = positions[2];
 
     const standings = calculateGroupStandings(matches, matchPredictions, teamsMap, group.slug);
     const teamStanding = standings.find((s) => s.teamId === thirdPlaceTeamId);
