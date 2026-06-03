@@ -13,6 +13,7 @@ export { live } from './api/live';
 export { rankings } from './api/rankings';
 export { setUserRole } from './api/setUserRole';
 export { standings } from './api/standings';
+export { calculateBestPlayerResults } from './calculateBestPlayerResults';
 export { calculateFinalFourResults } from './calculateFinalFourResults';
 export { calculateGroupResults } from './calculateGroupResults';
 export { calculateMatchResult } from './calculateMatchResult';
