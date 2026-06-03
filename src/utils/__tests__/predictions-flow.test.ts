@@ -801,14 +801,14 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
 
   // Group bets: 4 positions per group (index 3 = the third-place team)
   const groupBets8: GroupBetRecord = {
-    'group-a': ['arg', 'bra', 'ger', 'fra'], // fra is third-place
-    'group-b': ['mex', 'usa', 'ned', 'cro'], // cro is third-place
-    'group-c': ['por', 'esp', 'ita', 'eng'], // eng is third-place
-    'group-d': ['fra', 'ger', 'arg', 'bra'], // bra is third-place
-    'group-e': ['bra', 'arg', 'ger', 'esp'], // esp is third-place
-    'group-f': ['ita', 'por', 'mex', 'usa'], // usa is third-place
-    'group-g': ['mex', 'usa', 'bra', 'ger'], // ger is third-place (in group-g)
-    'group-h': ['ned', 'cro', 'por', 'esp'], // esp is third-place (in group-h)
+    'group-a': ['arg', 'bra', 'fra', 'ger'], // ger is third-place (positions[2])
+    'group-b': ['mex', 'usa', 'ned', 'cro'], // cro is third-place (positions[2])
+    'group-c': ['por', 'esp', 'ita', 'eng'], // eng is third-place (positions[2])
+    'group-d': ['fra', 'ger', 'arg', 'bra'], // bra is third-place (positions[2])
+    'group-e': ['bra', 'arg', 'ger', 'esp'], // esp is third-place (positions[2])
+    'group-f': ['ita', 'por', 'mex', 'usa'], // usa is third-place (positions[2])
+    'group-g': ['mex', 'usa', 'bra', 'ger'], // ger is third-place (positions[2]) (in group-g)
+    'group-h': ['ned', 'cro', 'por', 'esp'], // esp is third-place (positions[2]) (in group-h)
   };
 
   // Score predictions for group-a (fra = third-place team)
@@ -816,7 +816,7 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
   // We give fra 1 win to get non-zero points
   const matchPredictions: PredictionRecord = {
     'ga-m1': { home: 2, away: 0 }, // arg beats bra
-    'ga-m2': { home: 1, away: 0 }, // ger beats fra
+    'ga-m2': { home: 0, away: 1 }, // fra beats ger ← positions[2]='fra' (3rd) beats positions[3]='ger' (4th)
     'ga-m3': { home: 0, away: 1 }, // esp loses to ita
     'ga-m4': { home: 3, away: 0 }, // arg beats ger
     'ga-m5': { home: 2, away: 1 }, // bra beats esp
@@ -962,9 +962,9 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
   });
 
   it('positions[2] picks 3rd-place team, NOT 4th (D-06 regression)', () => {
-    // group-a: ['arg', 'bra', 'ger', 'fra'] → positions[2]='fra' (3rd), positions[3]='ger' (4th bug)
+    // group-a: ['arg', 'bra', 'fra', 'ger'] → positions[2]='fra' (3rd), positions[3]='ger' (4th bug)
     const singleGroupBets: GroupBetRecord = {
-      'group-a': ['arg', 'bra', 'ger', 'fra'],
+      'group-a': ['arg', 'bra', 'fra', 'ger'],
     };
     const singleGroup = [{ slug: 'group-a' }];
 
