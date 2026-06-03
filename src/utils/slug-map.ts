@@ -16,6 +16,7 @@ export const slugMap: LocaleSlugs = {
     { slug: 'perfil', page: 'profile', activeNav: 'profile' },
     { slug: 'login', page: 'login', activeNav: 'home' },
     { slug: 'register', page: 'register', activeNav: 'home' },
+    { slug: 'reglas', page: 'rules', activeNav: 'rules' },
   ],
   en: [
     { slug: 'tournament', page: 'tournament', activeNav: 'tournament' },
@@ -24,6 +25,7 @@ export const slugMap: LocaleSlugs = {
     { slug: 'profile', page: 'profile', activeNav: 'profile' },
     { slug: 'login', page: 'login', activeNav: 'home' },
     { slug: 'register', page: 'register', activeNav: 'home' },
+    { slug: 'rules', page: 'rules', activeNav: 'rules' },
   ],
 };
 
