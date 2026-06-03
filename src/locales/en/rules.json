@@ -1,0 +1,61 @@
+{
+  "rules": {
+    "heading": "Game Rules",
+    "scoring": {
+      "title": "Scoring Rules",
+      "match": "Match Predictions",
+      "group": "Group Classification",
+      "finalFour": "Final Four",
+      "bestPlayers": "Best Players",
+      "knockoutDisclaimer": "Knockout winner predictions are prediction-only and do not affect your ranking."
+    },
+    "outcomes": {
+      "exact": "Exact result",
+      "exactPosition": "Exact position",
+      "winner": "Correct winner",
+      "draw": "Correct draw",
+      "qualified": "Qualified",
+      "wrong": "Wrong",
+      "points": "Points",
+      "outcome": "Outcome"
+    },
+    "badges": {
+      "title": "Badges",
+      "howToEarn": "How to earn it",
+      "badge_first-blood": {
+        "name": "First Blood",
+        "description": "Made your first prediction",
+        "condition": "Make 1 prediction"
+      },
+      "badge_on-fire": {
+        "name": "On Fire",
+        "description": "3 exact predictions in a row",
+        "condition": "Get 3 exact predictions in a row"
+      },
+      "badge_consistent": {
+        "name": "Consistent",
+        "description": "10+ correct predictions total",
+        "condition": "Get 10 correct predictions"
+      },
+      "badge_top-10": {
+        "name": "Top 10",
+        "description": "Reached top 10% of the ranking",
+        "condition": "Be in the top 10% of the ranking"
+      },
+      "badge_perfect-group": {
+        "name": "Perfect Group",
+        "description": "All group stage predictions correct",
+        "condition": "Predict all group standings correctly"
+      },
+      "badge_clairvoyant": {
+        "name": "Clairvoyant",
+        "description": "Predicted the tournament winner early",
+        "condition": "Predict the tournament winner from group stage"
+      }
+    },
+    "predictionOnly": {
+      "label": "Prediction Only",
+      "description": "Knockout winner predictions are not scored. They are for fun only and do not affect your ranking position."
+    }
+  }
+}

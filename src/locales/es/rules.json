@@ -1,0 +1,61 @@
+{
+  "rules": {
+    "heading": "Reglas del Juego",
+    "scoring": {
+      "title": "Reglas de Puntuación",
+      "match": "Predicciones de Partido",
+      "group": "Clasificación de Grupo",
+      "finalFour": "Cuarteto Final",
+      "bestPlayers": "Mejores Jugadores",
+      "knockoutDisclaimer": "Las predicciones de ganador en eliminatorias son solo predictivas — no afectan tu clasificación."
+    },
+    "outcomes": {
+      "exact": "Resultado exacto",
+      "exactPosition": "Posición exacta",
+      "winner": "Ganador correcto",
+      "draw": "Empate correcto",
+      "qualified": "Clasificado",
+      "wrong": "Incorrecto",
+      "points": "Puntos",
+      "outcome": "Resultado"
+    },
+    "badges": {
+      "title": "Insignias",
+      "howToEarn": "Cómo obtenerla",
+      "badge_first-blood": {
+        "name": "Primera Sangre",
+        "description": "Hiciste tu primera predicción",
+        "condition": "Haz 1 predicción"
+      },
+      "badge_on-fire": {
+        "name": "En Llamas",
+        "description": "3 predicciones exactas seguidas",
+        "condition": "Acierta 3 predicciones exactas seguidas"
+      },
+      "badge_consistent": {
+        "name": "Consistente",
+        "description": "10+ predicciones correctas en total",
+        "condition": "Acierta 10 predicciones"
+      },
+      "badge_top-10": {
+        "name": "Top 10",
+        "description": "Llegaste al top 10% del ranking",
+        "condition": "Estar en el top 10% del ranking"
+      },
+      "badge_perfect-group": {
+        "name": "Grupo Perfecto",
+        "description": "Todas las predicciones de fase de grupos correctas",
+        "condition": "Predice todas las clasificaciones de grupos correctamente"
+      },
+      "badge_clairvoyant": {
+        "name": "Clarividente",
+        "description": "Predijiste el ganador del torneo temprano",
+        "condition": "Predice al ganador del torneo desde la fase de grupos"
+      }
+    },
+    "predictionOnly": {
+      "label": "Solo Predicción",
+      "description": "Las predicciones de ganador en la fase eliminatoria no se puntúan. Son solo para diversión y no afectan tu posición en la clasificación."
+    }
+  }
+}
