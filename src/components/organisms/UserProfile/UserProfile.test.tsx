@@ -1,4 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import { Timestamp } from 'firebase/firestore';
+
 import type { Predictor } from '@app-types/firestore';
 
 import { UserProfile } from './UserProfile';
@@ -19,7 +21,7 @@ const mockPredictor: Predictor = {
   userId: 'user-1',
   name: 'Carlos Enrique',
   avatar: undefined,
-  createdAt: {} as any,
+  createdAt: Timestamp.fromDate(new Date('2026-01-01')),
 };
 
 const mockProps = {
