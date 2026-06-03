@@ -173,7 +173,7 @@ Plans:
 | 21. Recolor Accent Button | v1.3 | 1/1 | Complete | 2026-06-03 |
 | 22. Scoring Constants Module | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 23. Group Classification Scoring | v1.4 | 0/1 | Planning | - |
-| 24. Final Four Scoring | v1.4 | 0/0 | Not started | - |
+| 24. Final Four Scoring | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 25. Best Players + Admin Surface | v1.4 | 0/0 | Not started | - |
 | 26. Badge Activation | v1.4 | 0/0 | Not started | - |
 | 27. Game Rules Page | v1.4 | 0/0 | Not started | - |
