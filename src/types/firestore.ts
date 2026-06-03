@@ -133,6 +133,10 @@ export interface FinalPhaseBet {
   third: string;
   fourth: string;
   points: number;
+  firstScoredAt?: Timestamp; // D-09: set when first position is scored
+  secondScoredAt?: Timestamp; // D-09: set when second position is scored
+  thirdScoredAt?: Timestamp; // D-09: set when third position is scored
+  fourthScoredAt?: Timestamp; // D-09: set when fourth position is scored
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
