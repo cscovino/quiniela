@@ -55,7 +55,8 @@
     },
     "predictionOnly": {
       "label": "Solo Predicción",
-      "description": "Las predicciones de ganador en la fase eliminatoria no se puntúan. Son solo para diversión y no afectan tu posición en la clasificación."
+      "description": "Las predicciones de ganador en la fase eliminatoria no se puntúan. Son solo para ayudarte a elegir el cuadro final y no afectan tu posición en la clasificación."
     }
   }
 }
+

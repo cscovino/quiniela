@@ -67,15 +67,15 @@ describe('getBadgeAwards', () => {
     expect(result['on-fire']).toBeDefined();
   });
 
-  it('awards consistent when winnerBets >= 10', () => {
+  it('awards consistent when winnerBets >= 20', () => {
     const stats = {
       predictorId: 'p1',
       tournamentId: 't1',
-      totalPoints: 15,
-      exactBets: 5,
-      winnerBets: 10,
-      totalBets: 12,
-      accuracy: 10 / 12,
+      totalPoints: 30,
+      exactBets: 10,
+      winnerBets: 20,
+      totalBets: 24,
+      accuracy: 10 / 24,
       currentStreak: 2,
       maxStreak: 4,
       pointsHistory: [],
@@ -86,20 +86,21 @@ describe('getBadgeAwards', () => {
     expect(result['consistent']).toBeDefined();
   });
 
-  it('awards perfect-group when exactBets >= 6', () => {
+  it('awards perfect-group when groupQualified >= 16', () => {
     const stats = {
       predictorId: 'p1',
       tournamentId: 't1',
-      totalPoints: 18,
-      exactBets: 6,
-      winnerBets: 6,
-      totalBets: 6,
+      totalPoints: 48,
+      exactBets: 16,
+      winnerBets: 16,
+      totalBets: 16,
       accuracy: 1,
-      currentStreak: 6,
-      maxStreak: 6,
+      currentStreak: 16,
+      maxStreak: 16,
       pointsHistory: [],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      groupQualified: 16,
     };
     const result = getBadgeAwards({}, stats);
     expect(result['perfect-group']).toBeDefined();
@@ -130,16 +131,17 @@ describe('getBadgeAwards', () => {
     const stats = {
       predictorId: 'p1',
       tournamentId: 't1',
-      totalPoints: 18,
-      exactBets: 6,
-      winnerBets: 10,
-      totalBets: 10,
+      totalPoints: 48,
+      exactBets: 1,
+      winnerBets: 20,
+      totalBets: 48,
       accuracy: 1,
-      currentStreak: 6,
-      maxStreak: 6,
+      currentStreak: 48,
+      maxStreak: 48,
       pointsHistory: [],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      groupQualified: 16,
     };
     const result = getBadgeAwards({}, stats);
     expect(result['first-blood']).toBeDefined();

@@ -197,6 +197,7 @@ export interface PredictorStats {
   percentile?: number;
   lastRankUpdate?: Timestamp;
   lastUpdated: Timestamp;
+  groupQualified?: number;
 }
 
 export interface Notification {

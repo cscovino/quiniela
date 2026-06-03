@@ -155,11 +155,14 @@ export const predictionService = {
       };
 
       const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'bets', betId);
-      await setDoc(betRef, {
-        ...betData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      await setDoc(
+        betRef,
+        {
+          ...betData,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       return { success: true };
     } catch (err) {
@@ -195,10 +198,14 @@ export const predictionService = {
       };
 
       const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
-      await setDoc(betRef, {
-        ...betData,
-        createdAt: serverTimestamp(),
-      });
+      await setDoc(
+        betRef,
+        {
+          ...betData,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       return { success: true };
     } catch (err) {
@@ -234,11 +241,14 @@ export const predictionService = {
       };
 
       const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
-      await setDoc(betRef, {
-        ...betData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      await setDoc(
+        betRef,
+        {
+          ...betData,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       return { success: true };
     } catch (err) {
@@ -288,18 +298,21 @@ export const predictionService = {
         const betId = `${predictorId}-${matchId}`;
         const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'bets', betId);
 
-        batch.set(betRef, {
-          userId,
-          predictorId,
-          matchId,
-          homeScore: prediction.home,
-          awayScore: prediction.away,
-          points: 0,
-          isExact: false,
-          isWinner: false,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
+        batch.set(
+          betRef,
+          {
+            userId,
+            predictorId,
+            matchId,
+            homeScore: prediction.home,
+            awayScore: prediction.away,
+            points: 0,
+            isExact: false,
+            isWinner: false,
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true },
+        );
       } else {
         if (!prediction.winner) {
           continue;
@@ -308,14 +321,18 @@ export const predictionService = {
         const betId = `${predictorId}-${matchId}`;
         const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
 
-        batch.set(betRef, {
-          userId,
-          predictorId,
-          matchId,
-          predictedWinner: prediction.winner,
-          points: 0,
-          createdAt: serverTimestamp(),
-        });
+        batch.set(
+          betRef,
+          {
+            userId,
+            predictorId,
+            matchId,
+            predictedWinner: prediction.winner,
+            points: 0,
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true },
+        );
       }
 
       successCount++;
@@ -368,15 +385,18 @@ export const predictionService = {
       const betId = `${predictorId}-${groupId}`;
       const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
 
-      batch.set(betRef, {
-        userId,
-        predictorId,
-        groupId,
-        positions,
-        points: 0,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      batch.set(
+        betRef,
+        {
+          userId,
+          predictorId,
+          groupId,
+          positions,
+          points: 0,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       successCount++;
     }
@@ -435,14 +455,18 @@ export const predictionService = {
       const betId = `${predictorId}-${matchSlug}`;
       const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'knockout_bets', betId);
 
-      batch.set(betRef, {
-        userId,
-        predictorId,
-        matchId: matchSlug,
-        predictedWinner: winner,
-        points: 0,
-        createdAt: serverTimestamp(),
-      });
+      batch.set(
+        betRef,
+        {
+          userId,
+          predictorId,
+          matchId: matchSlug,
+          predictedWinner: winner,
+          points: 0,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       successCount++;
     }
@@ -495,11 +519,14 @@ export const predictionService = {
         points: 0,
       };
 
-      await setDoc(betRef, {
-        ...betData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      await setDoc(
+        betRef,
+        {
+          ...betData,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       return { success: true };
     } catch (err) {
@@ -533,11 +560,14 @@ export const predictionService = {
         points: 0,
       };
 
-      await setDoc(betRef, {
-        ...betData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      await setDoc(
+        betRef,
+        {
+          ...betData,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       return { success: true };
     } catch (err) {

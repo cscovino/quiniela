@@ -20,6 +20,7 @@ interface PredictorStatsData {
   percentile?: number;
   lastRankUpdate?: admin.firestore.Timestamp;
   lastUpdated: admin.firestore.Timestamp;
+  groupQualified?: number;
 }
 
 interface BadgeCondition {
@@ -30,7 +31,7 @@ interface BadgeCondition {
 const BADGE_CONDITIONS: BadgeCondition[] = [
   {
     badgeId: 'first-blood',
-    check: (stats) => stats.totalBets >= 1,
+    check: (stats) => stats.exactBets >= 1,
   },
   {
     badgeId: 'on-fire',
@@ -38,11 +39,11 @@ const BADGE_CONDITIONS: BadgeCondition[] = [
   },
   {
     badgeId: 'consistent',
-    check: (stats) => stats.winnerBets >= 10,
+    check: (stats) => stats.winnerBets >= 20,
   },
   {
     badgeId: 'perfect-group',
-    check: (stats) => stats.exactBets >= 6,
+    check: (stats) => (stats.groupQualified ?? 0) >= 16,
   },
   {
     badgeId: 'top-10',

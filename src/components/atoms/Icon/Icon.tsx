@@ -23,7 +23,9 @@ import { Radio } from 'pixelarticons/react/Radio';
 import { Robot } from 'pixelarticons/react/Robot';
 import { Shuffle } from 'pixelarticons/react/Shuffle';
 import { Sparkle } from 'pixelarticons/react/Sparkle';
+import { Sparkles } from 'pixelarticons/react/Sparkles';
 import { SquareAlert } from 'pixelarticons/react/SquareAlert';
+import { Sword } from 'pixelarticons/react/Sword';
 import { Target } from 'pixelarticons/react/Target';
 import { Trash } from 'pixelarticons/react/Trash';
 import { Trophy } from 'pixelarticons/react/Trophy';
@@ -62,6 +64,7 @@ export type IconName =
   | 'shuffle'
   | 'sparkles'
   | 'star'
+  | 'sword'
   | 'target'
   | 'trash'
   | 'trophy'
@@ -105,8 +108,9 @@ const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: 
   plus: Plus,
   robot: Robot,
   shuffle: Shuffle,
-  sparkles: Sparkle,
+  sparkles: Sparkles,
   star: Sparkle,
+  sword: Sword,
   target: Target,
   trash: Trash,
   trophy: Trophy,

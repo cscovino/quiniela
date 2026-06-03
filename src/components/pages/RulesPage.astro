@@ -1,15 +1,8 @@
 ---
 import { SCORING } from '@/config/scoring';
 import { BADGE_DEFINITIONS } from '@app-types/badges';
+import { Icon } from '@atoms/Icon';
 import { getTranslations } from '@utils/i18n';
-
-// Pixelarticons SVGs for badge icons
-import SparkleSvg from 'pixelarticons/svg/sparkle.svg?raw';
-import FireSvg from 'pixelarticons/svg/fire.svg?raw';
-import TargetSvg from 'pixelarticons/svg/target.svg?raw';
-import CrownSvg from 'pixelarticons/svg/crown.svg?raw';
-import TrophySvg from 'pixelarticons/svg/trophy.svg?raw';
-import EyeSvg from 'pixelarticons/svg/eye.svg?raw';
 
 export interface Props {
   locale: 'en' | 'es';
@@ -17,16 +10,6 @@ export interface Props {
 
 const { locale } = Astro.props;
 const t = getTranslations(locale).rules.rules;
-
-const BADGE_ICONS: Record<string, string> = {
-  star: SparkleSvg,
-  fire: FireSvg,
-  target: TargetSvg,
-  award: CrownSvg,
-  trophy: TrophySvg,
-  eye: EyeSvg,
-};
-const getBadgeIcon = (icon: string) => BADGE_ICONS[icon] || SparkleSvg;
 
 // Scoring categories data for grid rendering
 const scoringCategories = [
@@ -97,16 +80,7 @@ const scoringCategories = [
     <!-- SCORE-04: Knockout Winners Disclaimer -->
     <div class="rules-callout rules-callout--warning">
       <span class="rules-callout__icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 2L2 22h20L12 2zm0 4l7.53 14H4.47L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z"
-          ></path>
-        </svg>
+        <Icon name="warning" />
       </span>
       <div>
         <strong>{t.predictionOnly.label}</strong>
@@ -122,7 +96,9 @@ const scoringCategories = [
       {
         BADGE_DEFINITIONS.map((badge) => (
           <div class="badge-card" data-badge-id={badge.id}>
-            <div class="badge-card__icon" set:html={getBadgeIcon(badge.icon)} />
+            <span class="badge-card__icon">
+              <Icon name={badge.icon} />
+            </span>
             <h3 class="badge-card__name">{badge.name[locale]}</h3>
             <p class="badge-card__description">{badge.description[locale]}</p>
             <p class="badge-card__condition">
@@ -285,11 +261,13 @@ const scoringCategories = [
   .badge-card__icon {
     margin-bottom: var(--space-2);
     color: var(--color-gold-500);
-  }
-
-  .badge-card__icon svg {
-    width: 32px;
-    height: 32px;
+    svg {
+      width: 32px;
+      height: 32px;
+      path {
+        fill: currentColor;
+      }
+    }
   }
 
   .badge-card__name {

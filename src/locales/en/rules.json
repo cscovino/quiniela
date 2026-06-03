@@ -55,7 +55,8 @@
     },
     "predictionOnly": {
       "label": "Prediction Only",
-      "description": "Knockout winner predictions are not scored. They are for fun only and do not affect your ranking position."
+      "description": "Knockout winner predictions are not scored. They are only to help to chose the final four and do not affect your ranking position."
     }
   }
 }
+

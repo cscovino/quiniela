@@ -59,35 +59,65 @@ describe('scoreGroupBet', () => {
   it('awards 12 points for exact prediction of all 4 positions', () => {
     const positions = ['ARG', 'BRA', 'MEX', 'CHI'];
     const result = scoreGroupBet(positions, standings);
-    expect(result).toEqual({ points: 12, exactMatches: 4, wrongPositionMatches: 0 });
+    expect(result).toEqual({
+      points: 12,
+      exactMatches: 4,
+      wrongPositionMatches: 0,
+      exactQualified: 4,
+    });
   });
 
   it('awards 8 points for mixed exact and wrong-position (ARG exact, MEX/BRA swapped, CHI exact)', () => {
     const positions = ['ARG', 'MEX', 'BRA', 'CHI'];
     const result = scoreGroupBet(positions, standings);
-    expect(result).toEqual({ points: 8, exactMatches: 2, wrongPositionMatches: 2 });
+    expect(result).toEqual({
+      points: 8,
+      exactMatches: 2,
+      wrongPositionMatches: 2,
+      exactQualified: 4,
+    });
   });
 
   it('awards 0 points for completely wrong prediction', () => {
     const positions = ['USA', 'ENG', 'GER', 'FRA'];
     const result = scoreGroupBet(positions, standings);
-    expect(result).toEqual({ points: 0, exactMatches: 0, wrongPositionMatches: 0 });
+    expect(result).toEqual({
+      points: 0,
+      exactMatches: 0,
+      wrongPositionMatches: 0,
+      exactQualified: 0,
+    });
   });
 
   it('awards 8 points when swapped teams qualify (BRA/ARG swap)', () => {
     const positions = ['BRA', 'ARG', 'MEX', 'CHI'];
     const result = scoreGroupBet(positions, standings);
-    expect(result).toEqual({ points: 8, exactMatches: 2, wrongPositionMatches: 2 });
+    expect(result).toEqual({
+      points: 8,
+      exactMatches: 2,
+      wrongPositionMatches: 2,
+      exactQualified: 4,
+    });
   });
 
   it('handles empty positions array', () => {
     const result = scoreGroupBet([], standings);
-    expect(result).toEqual({ points: 0, exactMatches: 0, wrongPositionMatches: 0 });
+    expect(result).toEqual({
+      points: 0,
+      exactMatches: 0,
+      wrongPositionMatches: 0,
+      exactQualified: 0,
+    });
   });
 
   it('handles empty standings array', () => {
     const positions = ['ARG', 'BRA', 'MEX', 'CHI'];
     const result = scoreGroupBet(positions, []);
-    expect(result).toEqual({ points: 0, exactMatches: 0, wrongPositionMatches: 0 });
+    expect(result).toEqual({
+      points: 0,
+      exactMatches: 0,
+      wrongPositionMatches: 0,
+      exactQualified: 0,
+    });
   });
 });

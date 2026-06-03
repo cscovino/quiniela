@@ -12,9 +12,9 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   {
     id: 'first-blood',
     name: { en: 'First Blood', es: 'Primera Sangre' },
-    description: { en: 'Made your first prediction', es: 'Hiciste tu primera predicción' },
-    icon: 'star',
-    condition: { en: 'Make 1 prediction', es: 'Haz 1 predicción' },
+    description: { en: 'Made your first prediction', es: 'Hiciste tu primera predicción exacta' },
+    icon: 'sword',
+    condition: { en: 'Make 1 exact prediction', es: 'Haz 1 predicción exacta' },
   },
   {
     id: 'on-fire',
@@ -29,9 +29,9 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   {
     id: 'consistent',
     name: { en: 'Consistent', es: 'Consistente' },
-    description: { en: '10+ correct predictions total', es: '10+ predicciones correctas en total' },
+    description: { en: '20+ correct predictions total', es: '20+ predicciones correctas en total' },
     icon: 'target',
-    condition: { en: 'Get 10 correct predictions', es: 'Acierta 10 predicciones' },
+    condition: { en: 'Get 20 correct predictions', es: 'Acierta 20 predicciones' },
   },
   {
     id: 'top-10',
@@ -44,13 +44,13 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     id: 'perfect-group',
     name: { en: 'Perfect Group', es: 'Grupo Perfecto' },
     description: {
-      en: 'All group stage predictions correct',
-      es: 'Todas las predicciones de fase de grupos correctas',
+      en: '16 group standings predicted correctly',
+      es: '16 clasificaciones de grupos acertadas',
     },
     icon: 'trophy',
     condition: {
-      en: 'Predict all group standings correctly',
-      es: 'Predice todas las clasificaciones de grupos correctamente',
+      en: 'Predict 16 group standings correctly',
+      es: 'Acerta 16 clasificaciones de grupos',
     },
   },
   {

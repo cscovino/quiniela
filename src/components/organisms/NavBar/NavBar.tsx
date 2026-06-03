@@ -195,7 +195,7 @@ export const NavBar: FC<NavBarProps> = ({
           onClick={toggleTheme}
           aria-label={translations.toggleTheme}
         >
-          <Icon name={theme === 'dark' ? 'moon' : 'sparkles'} size={18} />
+          <Icon name={theme === 'dark' ? 'sparkles' : 'moon'} size={18} />
         </Button>
 
         {notificationCount > 0 && (

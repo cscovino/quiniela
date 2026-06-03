@@ -45,10 +45,13 @@ interface GroupBetData {
 export function scoreGroupBet(
   positions: string[],
   standings: TeamStanding[],
-): { points: number; exactMatches: number; wrongPositionMatches: number } {
+): { points: number; exactMatches: number; wrongPositionMatches: number; exactQualified: number } {
   let points = 0;
   let exactMatches = 0;
   let wrongPositionMatches = 0;
+  let exactQualified = 0;
+
+  const qualifiedTeamIds = new Set(standings.slice(0, 4).map((s) => s.teamId));
 
   for (let i = 0; i < positions.length; i++) {
     const predictedTeam = positions[i];
@@ -61,10 +64,12 @@ export function scoreGroupBet(
       points += SCORING.GROUP.QUALIFIED; // 1
       wrongPositionMatches++;
     }
-    // Team not in standings → 0 pts (no action needed)
+    if (i < 4 && qualifiedTeamIds.has(predictedTeam)) {
+      exactQualified++;
+    }
   }
 
-  return { points, exactMatches, wrongPositionMatches };
+  return { points, exactMatches, wrongPositionMatches, exactQualified };
 }
 
 // -- Trigger handler --
@@ -108,13 +113,14 @@ export const calculateGroupResults = functions.firestore
     }
 
     // Collect scoring results per predictor for stats updates
-    const predictorScores: Map<string, { userId: string; points: number }> = new Map();
+    const predictorScores: Map<string, { userId: string; points: number; exactQualified: number }> =
+      new Map();
 
     const batch = db.batch();
 
     for (const betDoc of betsSnapshot.docs) {
       const bet = betDoc.data() as GroupBetData;
-      const { points } = scoreGroupBet(bet.positions, standings);
+      const { points, exactQualified } = scoreGroupBet(bet.positions, standings);
 
       batch.update(betDoc.ref, {
         points,
@@ -125,10 +131,12 @@ export const calculateGroupResults = functions.firestore
       predictorScores.set(bet.predictorId, {
         userId: bet.userId,
         points,
+        exactQualified,
       });
 
       functions.logger.log(
-        `Group bet ${betDoc.id}: scored ${points} pts ` + `(predicted ${bet.positions.join(',')})`,
+        `Group bet ${betDoc.id}: scored ${points} pts (${exactQualified} qualified) ` +
+          `(predicted ${bet.positions.join(',')})`,
       );
     }
 
@@ -149,6 +157,7 @@ export const calculateGroupResults = functions.firestore
       await statsRef.set(
         {
           totalPoints: FieldValue.increment(score.points),
+          groupQualified: FieldValue.increment(score.exactQualified),
           lastUpdated: FieldValue.serverTimestamp(),
         },
         { merge: true },
