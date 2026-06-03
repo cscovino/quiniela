@@ -1,9 +1,11 @@
 import enAdmin from '@locales/en/admin.json';
 import enAuth from '@locales/en/auth.json';
 import enCommon from '@locales/en/common.json';
+import enRules from '@locales/en/rules.json';
 import esAdmin from '@locales/es/admin.json';
 import esAuth from '@locales/es/auth.json';
 import esCommon from '@locales/es/common.json';
+import esRules from '@locales/es/rules.json';
 
 export type Locale = 'en' | 'es';
 
@@ -11,18 +13,26 @@ export interface Translations {
   common: typeof esCommon;
   auth: typeof esAuth;
   admin: typeof esAdmin;
+  rules: typeof esRules;
 }
 
 const translations: Record<Locale, Translations> = {
-  es: { common: esCommon, auth: esAuth, admin: esAdmin },
-  en: { common: enCommon, auth: enAuth, admin: enAdmin },
+  es: { common: esCommon, auth: esAuth, admin: esAdmin, rules: esRules },
+  en: { common: enCommon, auth: enAuth, admin: enAdmin, rules: enRules },
 };
 
 export function getTranslations(locale: Locale): Translations {
   return translations[locale];
 }
 
-export type ActiveNav = 'home' | 'tournament' | 'predictions' | 'rankings' | 'profile' | 'admin';
+export type ActiveNav =
+  | 'home'
+  | 'tournament'
+  | 'predictions'
+  | 'rankings'
+  | 'profile'
+  | 'rules'
+  | 'admin';
 
 export interface NavLink {
   href: string;
@@ -39,6 +49,7 @@ const ROUTE_SLUGS: Record<Locale, Record<Exclude<ActiveNav, 'admin'>, string>> =
     predictions: 'predictions',
     rankings: 'rankings',
     profile: 'profile',
+    rules: 'rules',
   },
   es: {
     home: '',
@@ -46,6 +57,7 @@ const ROUTE_SLUGS: Record<Locale, Record<Exclude<ActiveNav, 'admin'>, string>> =
     predictions: 'predicciones',
     rankings: 'clasificacion',
     profile: 'perfil',
+    rules: 'reglas',
   },
 };
 
@@ -63,6 +75,7 @@ export function getNavLinks(locale: Locale, activeNav: ActiveNav): NavLink[] {
       { key: 'tournament', label: nav.tournament, auth: false, core: true },
       { key: 'predictions', label: nav.predictions, auth: true, core: true },
       { key: 'rankings', label: nav.rankings, auth: true, core: true },
+      { key: 'rules', label: nav.rules, auth: false, core: false },
       { key: 'profile', label: nav.profile, auth: true, core: false },
     ];
 
