@@ -9,6 +9,7 @@ const VAPID_PUBLIC_KEY = import.meta.env.VITE_FIREBASE_VAPID_PUBLIC_KEY || '';
 // receive messages — fail loudly here instead of registering a dead token.
 function assertVapidKey(): boolean {
   if (!VAPID_PUBLIC_KEY) {
+    // eslint-disable-next-line no-console
     console.warn(
       '[fcm] VITE_FIREBASE_VAPID_PUBLIC_KEY is not set — push notifications are disabled.',
     );

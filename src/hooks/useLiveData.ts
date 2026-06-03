@@ -18,6 +18,13 @@ export function useLiveData<T>(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const mountedRef = useRef(true);
+  const fetcherRef = useRef(fetcher);
+  const initialDataRef = useRef(initialData);
+
+  useEffect(() => {
+    fetcherRef.current = fetcher;
+    initialDataRef.current = initialData;
+  });
 
   useEffect(() => {
     mountedRef.current = true;
@@ -31,17 +38,19 @@ export function useLiveData<T>(
 
     let cancelled = false;
     setLoading(true);
+    const currentFetcher = fetcherRef.current;
+    const currentInitial = initialDataRef.current;
 
-    fetcher()
+    currentFetcher()
       .then((freshData) => {
         if (cancelled || !mountedRef.current) return;
         if (
           Array.isArray(freshData) &&
           freshData.length === 0 &&
-          Array.isArray(initialData) &&
-          initialData.length > 0
+          Array.isArray(currentInitial) &&
+          currentInitial.length > 0
         ) {
-          setData(initialData);
+          setData(currentInitial);
           setLoading(false);
           return;
         }

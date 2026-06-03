@@ -381,6 +381,7 @@ export async function getBuildData() {
     }
   }
 
+  // eslint-disable-next-line no-console
   console.warn('[build-data] getBuildData failed, returning empty:', errors);
   return {
     matches: [],
@@ -408,6 +409,7 @@ export async function getBuildRankings() {
     }
   }
 
+  // eslint-disable-next-line no-console
   console.warn('[build-data] getBuildRankings failed, returning empty:', errors);
   return [];
 }

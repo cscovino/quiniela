@@ -410,6 +410,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       await loadPredictorEntries();
       setView('list');
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.warn('[PredictionsTemplate] createPredictor failed', err);
       useToastStore.getState().addToast({
         title: translations.submitError,
@@ -450,6 +451,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       setView('list');
       setEditingPredictor(null);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.warn('[PredictionsTemplate] updatePredictor failed', err);
       useToastStore.getState().addToast({
         title: translations.submitError,

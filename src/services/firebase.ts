@@ -28,6 +28,7 @@ function ensureApp(): FirebaseApp {
           // @ts-expect-error — Firebase reads this global at App Check init
           self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
         } else {
+          // eslint-disable-next-line no-console
           console.warn(
             '[firebase] App Check debug token not set. ' +
               'Set PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN in .env to a registered debug token UUID. ' +
