@@ -16,6 +16,9 @@ interface PredictorStatsData {
   maxStreak: number;
   pointsHistory: { timestamp: admin.firestore.Timestamp; points: number; matchId: string }[];
   badgesAwarded: Record<string, string>;
+  rank?: number;
+  percentile?: number;
+  lastRankUpdate?: admin.firestore.Timestamp;
   lastUpdated: admin.firestore.Timestamp;
 }
 
@@ -40,6 +43,10 @@ const BADGE_CONDITIONS: BadgeCondition[] = [
   {
     badgeId: 'perfect-group',
     check: (stats) => stats.exactBets >= 6,
+  },
+  {
+    badgeId: 'top-10',
+    check: (stats) => (stats.percentile ?? 1) <= 0.1,
   },
 ];
 
@@ -85,6 +92,31 @@ export const checkAndAwardBadges = functions.firestore
     await change.after.ref.update({
       badgesAwarded: newBadges,
     });
+
+    const tournamentId = context.params.tournamentId;
+    const predictorId = context.params.predictorId;
+
+    const finalPhaseBetSnap = await db
+      .doc(`tournaments/${tournamentId}/final_phase_bets/${predictorId}`)
+      .get();
+    const finalStandingsSnap = await db
+      .doc(`tournaments/${tournamentId}/final_standings/final`)
+      .get();
+
+    const predictedChampion = finalPhaseBetSnap.data()?.first;
+    const actualChampion = finalStandingsSnap.data()?.first;
+
+    if (
+      !newBadges['clairvoyant'] &&
+      predictedChampion &&
+      actualChampion &&
+      predictedChampion === actualChampion
+    ) {
+      newBadges['clairvoyant'] = new Date().toISOString();
+      await change.after.ref.update({
+        badgesAwarded: newBadges,
+      });
+    }
 
     const notificationBatch = db.batch();
 

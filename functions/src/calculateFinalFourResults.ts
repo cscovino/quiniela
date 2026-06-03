@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions/v1';
 
+import { doRecomputeRanks } from './recomputeRanks';
 import { SCORING } from './scoring';
 
 const db = admin.firestore();
@@ -265,6 +266,12 @@ export const calculateFinalFourResults = functions.firestore
     }
 
     functions.logger.log(`Updated stats for ${predictorScores.size} predictors`);
+
+    try {
+      await doRecomputeRanks(tournamentId);
+    } catch (err) {
+      functions.logger.error('Rank recompute failed after final four scoring', err);
+    }
 
     return null;
   });

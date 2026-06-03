@@ -19,6 +19,7 @@ export { calculateGroupResults } from './calculateGroupResults';
 export { calculateMatchResult } from './calculateMatchResult';
 export { checkAndAwardBadges } from './checkAndAwardBadges';
 export { deriveFinalStandings } from './deriveFinalStandings';
+export { recomputeRanks } from './recomputeRanks';
 export { updateGroupStandings } from './updateGroupStandings';
 export { updatePredictorStats } from './updatePredictorStats';
 
