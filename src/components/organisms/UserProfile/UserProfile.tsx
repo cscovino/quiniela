@@ -1,8 +1,8 @@
 import type { FC } from 'react';
 
 import type { Predictor } from '@app-types/firestore';
-import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Icon, type IconName } from '@atoms/Icon';
+import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Typography } from '@atoms/Typography';
 import { StatCard } from '@molecules/StatCard';
 
