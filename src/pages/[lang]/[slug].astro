@@ -6,6 +6,7 @@ import AuthPage from '@pages/AuthPage.astro';
 import ProfilePage from '@pages/ProfilePage.astro';
 import TournamentPage from '@pages/TournamentPage.astro';
 import RankingsPage from '@pages/RankingsPage.astro';
+import RulesPage from '@pages/RulesPage.astro';
 import { getTranslations } from '@utils/i18n';
 
 export function getStaticPaths() {
@@ -90,6 +91,19 @@ const tAuth = t.auth;
       activeNav={activeNav}
     >
       <RankingsPage locale={locale} />
+    </BaseLayout>
+  )
+}
+
+{
+  page === 'rules' && (
+    <BaseLayout
+      locale={locale}
+      title={t.rules.rules.heading}
+      description={t.rules.rules.heading}
+      activeNav={activeNav}
+    >
+      <RulesPage locale={locale} />
     </BaseLayout>
   )
 }
