@@ -1,4 +1,4 @@
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 
 import type { MatchStatus } from '../types/firestore';
 import { getDb } from './firebase';
@@ -29,4 +29,19 @@ export const updateMatchResult = async (
   };
 
   await updateDoc(matchRef, updateData);
+};
+
+export const setBestPlayersResult = async (
+  tournamentId: string,
+  topScorer: string,
+  bestGoalkeeper: string,
+): Promise<void> => {
+  const ref = doc(getDb(), 'tournaments', tournamentId, 'best_players_results', 'actual');
+  await setDoc(ref, {
+    topScorer,
+    bestGoalkeeper,
+    tournamentId,
+    pointsCalculated: false,
+    updatedAt: serverTimestamp(),
+  });
 };
