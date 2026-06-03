@@ -22,6 +22,8 @@
     "test:rules": "firebase emulators:exec --only firestore \"pnpm exec vitest run --project rules\"",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx,astro}\" --fix",
+    "lint:functions": "eslint \"functions/src/**/*.{js,ts}\"",
+    "lint:functions:fix": "eslint \"functions/src/**/*.{js,ts}\" --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,astro,css,json}\"",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

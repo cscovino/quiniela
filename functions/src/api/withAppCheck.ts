@@ -1,10 +1,8 @@
 import type * as functions from 'firebase-functions/v1';
+
 import { verifyAppCheckToken } from './appCheckMiddleware';
 
-type Handler = (
-  req: functions.https.Request,
-  res: functions.Response,
-) => Promise<void> | void;
+type Handler = (req: functions.https.Request, res: functions.Response) => Promise<void> | void;
 
 export function withAppCheck(handler: Handler, cacheControl: string): Handler {
   return async (req, res) => {

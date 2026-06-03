@@ -1,5 +1,5 @@
-import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
+import * as functions from 'firebase-functions/v1';
 
 const db = admin.firestore();
 
@@ -17,26 +17,17 @@ export const setUserRole = functions
     const callerRole = callerDoc.data()?.role;
 
     if (callerRole !== 'admin') {
-      throw new functions.https.HttpsError(
-        'permission-denied',
-        'Only admins can set user roles',
-      );
+      throw new functions.https.HttpsError('permission-denied', 'Only admins can set user roles');
     }
 
     const { uid, role } = data;
 
     if (!uid || !role) {
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        'uid and role are required',
-      );
+      throw new functions.https.HttpsError('invalid-argument', 'uid and role are required');
     }
 
     if (!['admin', 'user'].includes(role)) {
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        'Role must be "admin" or "user"',
-      );
+      throw new functions.https.HttpsError('invalid-argument', 'Role must be "admin" or "user"');
     }
 
     await admin.auth().setCustomUserClaims(uid, { role });
