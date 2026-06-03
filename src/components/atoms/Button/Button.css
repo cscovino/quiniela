@@ -71,14 +71,14 @@
 }
 
 .btn--accent {
-  background: var(--color-secondary-500);
+  background: var(--color-warm-500);
   color: var(--text-inverse);
-  border-color: var(--color-secondary-700);
-  filter: drop-shadow(4px 4px 0px var(--color-secondary-600));
+  border-color: var(--color-warm-700);
+  filter: drop-shadow(4px 4px 0px var(--color-warm-600));
 }
 
 .btn--accent:hover:not(:disabled) {
-  background: var(--color-secondary-400);
+  background: var(--color-warm-400);
 }
 
 .btn--gold {
