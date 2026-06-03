@@ -135,8 +135,7 @@ Plans:
   4. All badge criteria are documented (earned badges and how to earn them)
   5. Every point value on the page derives from the scoring constants module (not hardcoded separately)
   6. Page is responsive at 360px, passable in both themes, and meets WCAG AA
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 2 plans (infra in 27-01, page in 27-02)
 
 ## Backlog
 
@@ -180,7 +179,7 @@ Plans:
 | 24. Final Four Scoring | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 25. Best Players + Admin Surface | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 26. Badge Activation | v1.4 | 0/0 | Not started | - |
-| 27. Game Rules Page | v1.4 | 0/0 | Not started | - |
+| 27. Game Rules Page | v1.4 | 2/2 | Planning | - |
 
 ---
 
