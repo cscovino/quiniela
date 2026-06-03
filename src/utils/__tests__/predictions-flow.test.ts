@@ -1351,3 +1351,63 @@ describe('buildKnockoutBracket — R32 population from group predictions and thi
     expect(bySlug['r32-15'].awayTeam.resolvedTeam).toBe('TBD');
   });
 });
+
+describe('R16 bracket propagates from R32 knockoutBets + confirmedAdvancingMap', () => {
+  // Groups A-H advance, combination ABCDEFGH
+  // Matrix: M74→F, M82→A, M81→B, M77→H, M79→C, M80→E, M85→G, M87→D
+  const groupBetsR32: GroupBetRecord = {
+    'group-a': ['t1a', 't2a', 't3a', 't4a'],
+    'group-b': ['t1b', 't2b', 't3b', 't4b'],
+    'group-c': ['t1c', 't2c', 't3c', 't4c'],
+    'group-d': ['t1d', 't2d', 't3d', 't4d'],
+    'group-e': ['t1e', 't2e', 't3e', 't4e'],
+    'group-f': ['t1f', 't2f', 't3f', 't4f'],
+    'group-g': ['t1g', 't2g', 't3g', 't4g'],
+    'group-h': ['t1h', 't2h', 't3h', 't4h'],
+    // group-i: needed for r32-5 (1I vs 3H bracket slot)
+    'group-i': ['t1i', 't2i', 't3i', 't4i'],
+  };
+
+  const confirmedMap: Record<string, string> = {
+    'group-a': 't3a', 'group-b': 't3b', 'group-c': 't3c', 'group-d': 't3d',
+    'group-e': 't3e', 'group-f': 't3f', 'group-g': 't3g', 'group-h': 't3h',
+  };
+
+  // R32 winners stored in knockoutBets
+  const r32Winners: KnockoutBetRecord = {
+    'r32-2': 't1e', // 1E vs t3f → t1e wins
+    'r32-5': 't1i', // 1I vs t3h → t1i wins
+  };
+
+  const allMatches = [
+    'r32-1', 'r32-2', 'r32-3', 'r32-4', 'r32-5', 'r32-6', 'r32-7', 'r32-8',
+    'r32-9', 'r32-10', 'r32-11', 'r32-12', 'r32-13', 'r32-14', 'r32-15', 'r32-16',
+    'r16-1', 'r16-2', 'r16-3', 'r16-4', 'r16-5', 'r16-6', 'r16-7', 'r16-8',
+  ].map((slug) => makeMatch(slug, '', slug.startsWith('r32') ? 'round-of-32' : 'round-of-16', '', ''));
+
+  it('R16 home/away resolve from R32 knockoutBets winner-of (D-08)', () => {
+    // r16-1 = W-r32-2 vs W-r32-5
+    const bracket = buildKnockoutBracket(groupBetsR32, allMatches, r32Winners, confirmedMap);
+    const r16 = bracket.find((m) => m.slug === 'r16-1')!;
+
+    // r16-1 home = winner of r32-2 = 't1e' (from r32Winners)
+    expect(r16.homeTeam.resolvedTeam).toBe('t1e');
+    // r16-1 away = winner of r32-5 = 't1i' (from r32Winners)
+    expect(r16.awayTeam.resolvedTeam).toBe('t1i');
+  });
+
+  it('best-third R32 slots resolve via confirmedAdvancingMap matrix (D-11)', () => {
+    // r32-2 away = M74 best-third slot → group-f third = t3f (from confirmedMap)
+    const bracket = buildKnockoutBracket(groupBetsR32, allMatches, r32Winners, confirmedMap);
+    const r32_2 = bracket.find((m) => m.slug === 'r32-2')!;
+    expect(r32_2.awayTeam.resolvedTeam).toBe('t3f'); // M74 → group-f third
+  });
+
+  it('R16 shows TBD when R32 winner not in knockoutBets', () => {
+    const noR32Winners: KnockoutBetRecord = {};
+    const bracket = buildKnockoutBracket(groupBetsR32, allMatches, noR32Winners, confirmedMap);
+    const r16 = bracket.find((m) => m.slug === 'r16-1')!;
+    expect(r16.homeTeam.resolvedTeam).toBe('TBD');
+    expect(r16.awayTeam.resolvedTeam).toBe('TBD');
+  });
+});
