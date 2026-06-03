@@ -193,6 +193,9 @@ export interface PredictorStats {
   maxStreak: number;
   pointsHistory: { timestamp: Timestamp; points: number; matchId: string }[];
   badgesAwarded: Record<string, string>;
+  rank?: number;
+  percentile?: number;
+  lastRankUpdate?: Timestamp;
   lastUpdated: Timestamp;
 }
 
