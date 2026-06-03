@@ -51,9 +51,10 @@
 ### 🚧 v1.4 Full Scoring (planned)
 
 - [x] **Phase 22: Scoring Constants Module** — Extract hardcoded point values into a shared module (completed 2026-06-03)
-- [ ] **Phase 23: Group Classification Scoring** — Score group classification bets (3/1 pts)
-  - [ ] 23-01-PLAN.md — `scoreGroupBet` pure function + `calculateGroupResults` trigger handler + tests + wire export
-- [ ] **Phase 24: Final Four Scoring** — Score final four bets (5/3 pts)
+- [x] **Phase 23: Group Classification Scoring** — Score group classification bets (3/1 pts)
+  - [x] 23-01-PLAN.md — `scoreGroupBet` pure function + `calculateGroupResults` trigger handler + tests + wire export
+- [x] **Phase 24: Final Four Scoring** — Score final four bets (5/3 pts)
+  - [x] 24-01-PLAN.md — deriveFinalStandings CF + calculateFinalFourResults CF + scoreFinalFourBet pure function + unit tests
 - [ ] **Phase 25: Best Players + Admin Surface** — Admin best-player input + scoring (5 pts each)
 - [ ] **Phase 26: Badge Activation** — Award `top-10` and `clairvoyant` badges
 - [ ] **Phase 27: Game Rules Page** — Localized documentation of full scoring ruleset (deferred from v1.3, renumbered from Phase 20)
