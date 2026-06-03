@@ -107,6 +107,19 @@ const alternateUrl = canonicalUrl.replace(`/${locale}`, `/${otherLocale}`);
 
     <ClientRouter />
 
+    <script is:inline>
+      (function () {
+        function applyTheme() {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = saved || (prefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+        applyTheme();
+        document.addEventListener('astro:after-swap', applyTheme);
+      })();
+    </script>
+
     <!-- JSON-LD Structured Data -->
     <script
       type="application/ld+json"

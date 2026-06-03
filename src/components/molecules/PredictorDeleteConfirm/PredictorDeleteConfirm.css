@@ -19,7 +19,7 @@
 .predictor-delete-confirm__label {
   font-family: var(--font-pixel);
   font-size: var(--text-sm);
-  color: var(--color-primary-900);
+  color: var(--text-primary);
 }
 
 .predictor-delete-confirm__name {

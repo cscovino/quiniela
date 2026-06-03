@@ -1,10 +1,3 @@
-// Theme restoration from localStorage
-const html = document.documentElement;
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme) {
-  html.setAttribute('data-theme', savedTheme);
-}
-
 // Service worker registration (prod only)
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
