@@ -960,6 +960,29 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
     const groupLetters = result1.map((r) => r.groupLetter);
     expect(groupLetters).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']);
   });
+
+  it('positions[2] picks 3rd-place team, NOT 4th (D-06 regression)', () => {
+    // group-a: ['arg', 'bra', 'ger', 'fra'] → positions[2]='fra' (3rd), positions[3]='ger' (4th bug)
+    const singleGroupBets: GroupBetRecord = {
+      'group-a': ['arg', 'bra', 'ger', 'fra'],
+    };
+    const singleGroup = [{ slug: 'group-a' }];
+
+    // No match predictions — verify the teamId comes from groupBets positions[2], not standings computation
+    const result = computeThirdPlaceStandings(
+      singleGroupBets,
+      {},
+      [],
+      teamsMap,
+      singleGroup,
+    );
+
+    // Must be 'fra' (positions[2] = 3rd) — bug would return 'ger' (positions[3] = 4th)
+    const groupAEntry = result.find((r) => r.groupLetter === 'A');
+    expect(groupAEntry).toBeDefined();
+    expect(groupAEntry!.teamId).toBe('fra'); // 3rd place — not 'ger' (4th place)
+    expect(groupAEntry!.rank).toBe(1); // Only one group → rank 1
+  });
 });
 
 describe('computeThirdPlaceStandings — matrix-driven bracketMatchSlug derivation', () => {
