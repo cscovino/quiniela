@@ -1,0 +1,294 @@
+---
+import { SCORING } from '@config/scoring';
+import { BADGE_DEFINITIONS } from '@app-types/badges';
+import { getTranslations } from '@utils/i18n';
+
+export interface Props {
+  locale: 'en' | 'es';
+}
+
+const { locale } = Astro.props;
+const t = getTranslations(locale).rules;
+
+const BADGE_ICONS: Record<string, string> = {
+  star: '⭐',
+  fire: '🔥',
+  target: '🎯',
+  award: '🏆',
+  trophy: '🏅',
+  eye: '👁',
+};
+const getBadgeIcon = (icon: string) => BADGE_ICONS[icon] || '✨';
+---
+
+<main class="rules-page">
+  <!-- Section 1: Scoring Rules -->
+  <section class="rules-page__scoring">
+    <header class="rules-page__header">
+      <h1>{t.heading}</h1>
+    </header>
+
+    <!-- Match Scoring Table -->
+    <div class="rules-category">
+      <h2>{t.scoring.match}</h2>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>{t.outcomes.outcome}</th>
+            <th>{t.outcomes.points}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{t.outcomes.exact}</td>
+            <td><strong>{SCORING.MATCH.EXACT}</strong></td>
+          </tr>
+          <tr>
+            <td>{t.outcomes.winner}</td>
+            <td>{SCORING.MATCH.WINNER}</td>
+          </tr>
+          <tr>
+            <td>{t.outcomes.draw}</td>
+            <td>{SCORING.MATCH.DRAW}</td>
+          </tr>
+          <tr>
+            <td>{t.outcomes.wrong}</td>
+            <td>{SCORING.MATCH.WRONG}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Group Classification Table -->
+    <div class="rules-category">
+      <h2>{t.scoring.group}</h2>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>{t.outcomes.outcome}</th>
+            <th>{t.outcomes.points}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{t.outcomes.exactPosition}</td>
+            <td><strong>{SCORING.GROUP.EXACT_POSITION}</strong></td>
+          </tr>
+          <tr>
+            <td>{t.outcomes.qualified}</td>
+            <td>{SCORING.GROUP.QUALIFIED}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Final Four Table -->
+    <div class="rules-category">
+      <h2>{t.scoring.finalFour}</h2>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>{t.outcomes.outcome}</th>
+            <th>{t.outcomes.points}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{t.outcomes.exactPosition}</td>
+            <td><strong>{SCORING.FINAL_FOUR.EXACT_POSITION}</strong></td>
+          </tr>
+          <tr>
+            <td>{t.outcomes.qualified}</td>
+            <td>{SCORING.FINAL_FOUR.QUALIFIED}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Best Players Table -->
+    <div class="rules-category">
+      <h2>{t.scoring.bestPlayers}</h2>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>{t.outcomes.outcome}</th>
+            <th>{t.outcomes.points}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{t.outcomes.exact}</td>
+            <td><strong>{SCORING.BEST_PLAYER.CORRECT}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SCORE-04: Knockout Winners Disclaimer -->
+    <div class="rules-callout rules-callout--warning">
+      <span class="rules-callout__icon">⚠</span>
+      <div>
+        <strong>{t.predictionOnly.label}</strong>
+        <p>{t.predictionOnly.description}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Badges -->
+  <section class="rules-page__badges">
+    <h2>{t.badges.title}</h2>
+    <div class="badges-grid">
+      {
+        BADGE_DEFINITIONS.map((badge) => (
+          <div class="badge-card" data-badge-id={badge.id}>
+            <div class="badge-card__icon">
+              <span class="badge-icon">{getBadgeIcon(badge.icon)}</span>
+            </div>
+            <h3 class="badge-card__name">{badge.name[locale]}</h3>
+            <p class="badge-card__description">{badge.description[locale]}</p>
+            <p class="badge-card__condition">
+              <span>{t.badges.howToEarn}:</span> {badge.condition[locale]}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</main>
+
+<style>
+  .rules-page {
+    max-width: var(--container-xl);
+    margin: 0 auto;
+    padding: var(--space-2) var(--space-2);
+  }
+
+  .rules-page__header {
+    margin-bottom: var(--space-4);
+  }
+
+  .rules-page__header h1 {
+    font-family: var(--font-pixel);
+    font-size: var(--heading-sm);
+    background: linear-gradient(135deg, var(--color-gold-500), var(--color-warm-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .rules-page__scoring {
+    margin-bottom: var(--space-6);
+  }
+
+  .rules-category {
+    margin-bottom: var(--space-4);
+  }
+
+  .rules-category h2 {
+    font-family: var(--font-pixel);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-2);
+  }
+
+  .rules-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: var(--border-pixel-sm) solid var(--border-color);
+  }
+
+  .rules-table th,
+  .rules-table td {
+    padding: var(--space-2);
+    text-align: left;
+    border-bottom: var(--border-pixel-sm) solid var(--border-color);
+  }
+
+  .rules-table th {
+    background: var(--bg-input);
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+  }
+
+  .rules-table td strong {
+    color: var(--color-accent-500);
+  }
+
+  .rules-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: var(--border-pixel-sm) solid var(--border-color);
+    background: var(--bg-surface);
+    margin-top: var(--space-4);
+  }
+
+  .rules-callout--warning {
+    border-color: var(--color-warning-500);
+  }
+
+  .rules-callout__icon {
+    font-size: var(--text-lg);
+  }
+
+  .rules-page__badges h2 {
+    font-family: var(--font-pixel);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-3);
+  }
+
+  .badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .badge-card {
+    padding: var(--space-3);
+    border: var(--border-pixel-sm) solid var(--border-color);
+    background: var(--bg-surface);
+  }
+
+  .badge-card__icon {
+    margin-bottom: var(--space-2);
+  }
+
+  .badge-card__name {
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-1);
+  }
+
+  .badge-card__description {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-1);
+  }
+
+  .badge-card__condition {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  /* Responsive at 360px */
+  @media (max-width: 480px) {
+    .rules-page {
+      padding: var(--space-2);
+    }
+    .badges-grid {
+      grid-template-columns: 1fr;
+    }
+    .rules-table {
+      font-size: var(--text-xs);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .rules-page {
+      padding: var(--space-4) var(--space-4);
+    }
+    .rules-page__header h1 {
+      font-size: var(--heading-md);
+    }
+  }
+</style>
