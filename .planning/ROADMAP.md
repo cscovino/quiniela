@@ -6,7 +6,8 @@
 - ✅ **v1.1 Avatars & UX Polish** — Phases 1-9 (shipped 2026-06-01) → [full detail](milestones/v1.1-ROADMAP.md)
 - ✅ **v1.2 Bug Fixes** — Phases 10-13 (shipped 2026-06-02) → [full detail](milestones/v1.2-ROADMAP.md)
 - ✅ **v1.3 Knockout Flow Fixes** — Phases 14-19, 21 (shipped 2026-06-03) → [full detail](milestones/v1.3-ROADMAP.md)
-- 🚧 **v1.4 Full Scoring** — Phases 22-27 (planned)
+- ✅ **v1.4 Full Scoring** — Phases 22-27 (shipped 2026-06-03)
+- 🚧 **v1.5 Knockout Prediction Bugs Fix** — Phases 28-31 (planned)
 
 ## Phases
 
@@ -137,10 +138,18 @@ Plans:
   6. Page is responsive at 360px, passable in both themes, and meets WCAG AA
 **Plans**: 2 plans (infra in 27-01, page in 27-02)
 
+### 🚧 v1.5 Knockout Prediction Bugs Fix (planned)
+
+- [ ] **Phase 28: Fix third-place teams, standings points, and R32-to-R16 bracket propagation** (completed in execution, now part of v1.5)
+- [x] **Phase 29: Third-Place Points Fix** — Third-place teams display predicted group points (not 0) + match scores reset bug (same root cause: existingMatchValues state management) (completed 2026-06-04)
+- [ ] **Phase 30: Full Bracket Propagation Fix** — R32→R16→QF→SF→Final→Champion winner-of slots resolve recursively
+- [ ] **Phase 31: E2E Flow Verification** — Full prediction flow works end-to-end
+
+---
+
 ### Phase 28: Fix third-place teams, standings points, and R32-to-R16 bracket propagation
 
 **Goal:** Fix three bugs: (1) `computeThirdPlaceStandings` uses `positions[3]` instead of `positions[2]` — picks wrong 3rd-place team; (2) standings display shows wrong team/points; (3) R16 bracket doesn't populate from user's predicted R32 winners due to `confirmedAdvancingMap` not flowing to `buildKnockoutBracket`
-**Requirements**: TBD
 **Depends on:** Phase 27
 **Plans:** 1/1 plans complete
 
