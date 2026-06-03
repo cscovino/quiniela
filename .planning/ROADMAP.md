@@ -58,7 +58,7 @@
 - [x] **Phase 25: Best Players + Admin Surface** — Admin best-player input + scoring (5 pts each)
   - [x] 25-01-PLAN.md — admin surface + Cloud Function scoring + fuzzy matching
 - [ ] **Phase 26: Badge Activation** — Award `top-10` and `clairvoyant` badges
-- [ ] **Phase 27: Game Rules Page** — Localized documentation of full scoring ruleset (deferred from v1.3, renumbered from Phase 20)
+- [x] **Phase 27: Game Rules Page** — Localized documentation of full scoring ruleset (deferred from v1.3, renumbered from Phase 20) (completed 2026-06-03)
 
 ## Phase Details
 
@@ -137,6 +137,16 @@ Plans:
   6. Page is responsive at 360px, passable in both themes, and meets WCAG AA
 **Plans**: 2 plans (infra in 27-01, page in 27-02)
 
+### Phase 28: Fix third-place teams, standings points, and R32-to-R16 bracket propagation
+
+**Goal:** Fix three bugs: (1) `computeThirdPlaceStandings` uses `positions[3]` instead of `positions[2]` — picks wrong 3rd-place team; (2) standings display shows wrong team/points; (3) R16 bracket doesn't populate from user's predicted R32 winners due to `confirmedAdvancingMap` not flowing to `buildKnockoutBracket`
+**Requirements**: TBD
+**Depends on:** Phase 27
+**Plans:** 1/1 plans complete
+
+Plans:
+- [x] 28-01-PLAN.md — Fix `positions[3]` → `positions[2]` at line 616; add regression tests for 3rd-place team identification and R16 propagation
+
 ## Backlog
 
 ### Phase 999.1: Follow-up — Phase 16 R32 correctness test (backlog)
@@ -179,7 +189,7 @@ Plans:
 | 24. Final Four Scoring | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 25. Best Players + Admin Surface | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 26. Badge Activation | v1.4 | 0/0 | Not started | - |
-| 27. Game Rules Page | v1.4 | 2/2 | Planning | - |
+| 27. Game Rules Page | v1.4 | 2/2 | Complete    | 2026-06-03 |
 
 ---
 

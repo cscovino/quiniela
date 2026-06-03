@@ -688,6 +688,9 @@ export function usePredictionSteps(
         groups,
         confirmedAdvancingMap ? Object.keys(confirmedAdvancingMap) : undefined,
       ),
+    // Recompute when betsStatus transitions from 'loading' → 'loaded', ensuring
+    // existingMatchValues is fully populated from Firestore before computing third-place standings.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: trigger recompute on data load
     [
       groupBetsByGroupId,
       existingMatchValues,
@@ -695,6 +698,7 @@ export function usePredictionSteps(
       teamsMap,
       groups,
       confirmedAdvancingMap,
+      betsStatus,
     ],
   );
 
