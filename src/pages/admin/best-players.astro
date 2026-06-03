@@ -1,0 +1,12 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { AdminBestPlayersPage } from '@organisms/AdminBestPlayersPage/AdminBestPlayersPage';
+
+const title = 'Admin - Best Players';
+const description =
+  'Set the actual best players (top scorer and best goalkeeper) for scoring predictor bets';
+---
+
+<BaseLayout locale="en" title={title} description={description} activeNav="admin">
+  <AdminBestPlayersPage client:idle />
+</BaseLayout>
