@@ -55,7 +55,8 @@
   - [x] 23-01-PLAN.md — `scoreGroupBet` pure function + `calculateGroupResults` trigger handler + tests + wire export
 - [x] **Phase 24: Final Four Scoring** — Score final four bets (5/3 pts)
   - [x] 24-01-PLAN.md — deriveFinalStandings CF + calculateFinalFourResults CF + scoreFinalFourBet pure function + unit tests
-- [ ] **Phase 25: Best Players + Admin Surface** — Admin best-player input + scoring (5 pts each)
+- [x] **Phase 25: Best Players + Admin Surface** — Admin best-player input + scoring (5 pts each)
+  - [x] 25-01-PLAN.md — admin surface + Cloud Function scoring + fuzzy matching
 - [ ] **Phase 26: Badge Activation** — Award `top-10` and `clairvoyant` badges
 - [ ] **Phase 27: Game Rules Page** — Localized documentation of full scoring ruleset (deferred from v1.3, renumbered from Phase 20)
 
@@ -102,12 +103,15 @@ Plans:
 **Depends on**: Phase 22
 **Requirements**: SCORE-03, SCORE-06
 **Success Criteria** (what must be TRUE):
-  1. An admin-only surface (restricted to users with admin role) exists to input the actual top scorer and best goalkeeper
-  2. Admin-entered values persist to Firestore as the authoritative source of truth
-  3. A Cloud Function scores best-player bets: 5 pts each for correctly picking the top scorer and/or best goalkeeper
-  4. Scored points are reflected in the predictor's total
-**Plans**: TBD
+   1. An admin-only surface (restricted to users with admin role) exists to input the actual top scorer and best goalkeeper
+   2. Admin-entered values persist to Firestore as the authoritative source of truth
+   3. A Cloud Function scores best-player bets: 5 pts each for correctly picking the top scorer and/or best goalkeeper
+   4. Scored points are reflected in the predictor's total
+**Plans**: 1 plan
 **UI hint**: yes
+
+Plans:
+- [x] 25-01-PLAN.md — admin surface + Cloud Function scoring + fuzzy matching
 
 ### Phase 26: Badge Activation
 **Goal**: The `top-10` and `clairvoyant` badges are automatically awarded to qualifying predictors
@@ -174,7 +178,7 @@ Plans:
 | 22. Scoring Constants Module | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 23. Group Classification Scoring | v1.4 | 0/1 | Planning | - |
 | 24. Final Four Scoring | v1.4 | 1/1 | Complete   | 2026-06-03 |
-| 25. Best Players + Admin Surface | v1.4 | 0/0 | Not started | - |
+| 25. Best Players + Admin Surface | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 26. Badge Activation | v1.4 | 0/0 | Not started | - |
 | 27. Game Rules Page | v1.4 | 0/0 | Not started | - |
 
