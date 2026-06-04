@@ -1,5 +1,8 @@
 {
   "fifaCode": "CUW",
-  "name": "Curaçao",
+  "name": {
+    "es": "Curazao",
+    "en": "Curaçao"
+  },
   "groupId": "E"
 }

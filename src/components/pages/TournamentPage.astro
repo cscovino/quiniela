@@ -13,7 +13,7 @@ const { locale } = Astro.props;
 const isEs = locale === 'es';
 const t = getTranslations(locale).common;
 
-const buildData = await getBuildData();
+const buildData = await getBuildData(locale);
 
 const standings = isEs
   ? buildData.standings.map((g) => ({
@@ -66,6 +66,7 @@ const matches = buildData.allMatches as unknown as MatchCardProps[];
       initialGroups={standings}
       cacheKey="tournament-standings"
       translations={standingsTranslations}
+      locale={locale}
       client:load
     />
   </section>

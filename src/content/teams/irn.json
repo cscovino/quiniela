@@ -1,5 +1,8 @@
 {
   "fifaCode": "IRN",
-  "name": "Iran",
+  "name": {
+    "es": "Irán",
+    "en": "Iran"
+  },
   "groupId": "G"
 }

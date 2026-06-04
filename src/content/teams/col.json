@@ -1,5 +1,8 @@
 {
   "fifaCode": "COL",
-  "name": "Colombia",
-  "groupId": "J"
+  "name": {
+    "es": "Colombia",
+    "en": "Colombia"
+  },
+  "groupId": "K"
 }

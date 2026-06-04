@@ -1,5 +1,8 @@
 {
   "fifaCode": "NED",
-  "name": "Netherlands",
+  "name": {
+    "es": "Países Bajos",
+    "en": "Netherlands"
+  },
   "groupId": "F"
 }

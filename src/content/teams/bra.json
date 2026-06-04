@@ -1,5 +1,8 @@
 {
   "fifaCode": "BRA",
-  "name": "Brazil",
+  "name": {
+    "es": "Brasil",
+    "en": "Brazil"
+  },
   "groupId": "C"
 }

@@ -1,12 +1,24 @@
 import type { GroupStandingsProps } from '@organisms/GroupStandings';
 import type { RankingsTableProps } from '@organisms/RankingsTable';
+import { getLocalizedName, type Locale, type LocalizedName } from '@utils/i18n';
 
 import { TOURNAMENT_ID } from '../config/tournament';
 
 interface TeamData {
   fifaCode: string;
-  name: string;
+  name: LocalizedName;
   groupId: string;
+}
+
+const TBD_NAME: LocalizedName = { es: 'TBD', en: 'TBD' };
+
+// Defensive read for the migration window: production data may still have
+// legacy `name: string` until pnpm seed is re-run. Strict helper remains the
+// contract for new code; this is a build-time compatibility shim only.
+function readTeamName(name: LocalizedName | string | undefined, locale: Locale): string {
+  if (name == null) return '';
+  if (typeof name === 'string') return name;
+  return getLocalizedName(name, locale);
 }
 
 interface MatchData {
@@ -161,26 +173,42 @@ type MatchView = {
   result?: { home: number; away: number };
 };
 
-function toMatchView(m: MatchData & { id: string }, teams: Record<string, TeamData>): MatchView {
+function toMatchView(
+  m: MatchData & { id: string },
+  teams: Record<string, TeamData>,
+  locale: Locale,
+): MatchView {
   const homeTeam = m.homeTeamId
     ? teams[m.homeTeamId.toLowerCase()] || {
         fifaCode: m.homeTeamId.toUpperCase(),
-        name: m.homeTeamId.toUpperCase(),
+        name: {
+          es: m.homeTeamId.toUpperCase(),
+          en: m.homeTeamId.toUpperCase(),
+        } satisfies LocalizedName,
       }
-    : { fifaCode: 'TBD', name: 'TBD' };
+    : { fifaCode: 'TBD', name: TBD_NAME };
   const awayTeam = m.awayTeamId
     ? teams[m.awayTeamId.toLowerCase()] || {
         fifaCode: m.awayTeamId.toUpperCase(),
-        name: m.awayTeamId.toUpperCase(),
+        name: {
+          es: m.awayTeamId.toUpperCase(),
+          en: m.awayTeamId.toUpperCase(),
+        } satisfies LocalizedName,
       }
-    : { fifaCode: 'TBD', name: 'TBD' };
+    : { fifaCode: 'TBD', name: TBD_NAME };
   const result =
     m.result.home !== null && m.result.away !== null
       ? { home: m.result.home, away: m.result.away }
       : undefined;
   return {
-    homeTeam,
-    awayTeam,
+    homeTeam: {
+      fifaCode: homeTeam.fifaCode,
+      name: readTeamName(homeTeam.name, locale),
+    },
+    awayTeam: {
+      fifaCode: awayTeam.fifaCode,
+      name: readTeamName(awayTeam.name, locale),
+    },
     // Knockout slot label shown when the team isn't decided yet.
     homePlaceholder: m.homeTeamId ? undefined : m.tbdHome,
     awayPlaceholder: m.awayTeamId ? undefined : m.tbdAway,
@@ -195,6 +223,7 @@ function buildStandings(
   standingsSnap: QuerySnapshotLike,
   groupsMap: Map<string, GroupData>,
   teams: Record<string, TeamData>,
+  locale: Locale,
 ): GroupStandingsProps['groups'] {
   type StandingsRow = GroupStandingsProps['groups'][number];
   type StandingsRowWithOrder = StandingsRow & { __order: number };
@@ -205,19 +234,22 @@ function buildStandings(
     return {
       name: group?.name || data.groupId,
       __order: group?.order ?? 999,
-      standings: data.standings.map((s, idx) => ({
-        teamId: s.teamId,
-        fifaCode: teams[s.teamId.toLowerCase()]?.fifaCode || s.teamId.toUpperCase(),
-        teamName: teams[s.teamId.toLowerCase()]?.name || s.teamId.toUpperCase(),
-        position: s.position ?? idx + 1,
-        played: s.played,
-        won: s.won,
-        drawn: s.drawn,
-        lost: s.lost,
-        goalsFor: s.goalsFor,
-        goalsAgainst: s.goalsAgainst,
-        points: s.points,
-      })),
+      standings: data.standings.map((s, idx) => {
+        const team = teams[s.teamId.toLowerCase()];
+        return {
+          teamId: s.teamId,
+          fifaCode: team?.fifaCode || s.teamId.toUpperCase(),
+          teamName: team ? readTeamName(team.name, locale) : s.teamId.toUpperCase(),
+          position: s.position ?? idx + 1,
+          played: s.played,
+          won: s.won,
+          drawn: s.drawn,
+          lost: s.lost,
+          goalsFor: s.goalsFor,
+          goalsAgainst: s.goalsAgainst,
+          points: s.points,
+        };
+      }),
     };
   });
 
@@ -229,7 +261,7 @@ function buildStandings(
       byGroup.get(team.groupId)!.push({
         teamId: team.fifaCode,
         fifaCode: team.fifaCode,
-        teamName: team.name,
+        teamName: readTeamName(team.name, locale),
         position: 0,
         played: 0,
         won: 0,
@@ -256,7 +288,7 @@ function buildStandings(
   return standings.map((s) => ({ name: s.name, standings: s.standings }));
 }
 
-async function queryBuildData(db: DbClient) {
+async function queryBuildData(db: DbClient, locale: Locale) {
   const [teamsSnap, matchesSnap, standingsSnap, groupsSnap, tournamentSnap] = await Promise.all([
     db.query(`tournaments/${TOURNAMENT_ID}/teams`),
     db.query(`tournaments/${TOURNAMENT_ID}/matches`, { orderBy: 'date' }),
@@ -279,7 +311,7 @@ async function queryBuildData(db: DbClient) {
     participantCount: Object.keys(teams).length,
   };
 
-  const allMatches: MatchView[] = rawMatches.map((m) => toMatchView(m, teams));
+  const allMatches: MatchView[] = rawMatches.map((m) => toMatchView(m, teams, locale));
 
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -297,9 +329,9 @@ async function queryBuildData(db: DbClient) {
     .slice(0, 5);
 
   const displayMatches = todayMatches.length > 0 ? todayMatches : upcomingMatches;
-  const matches: MatchView[] = displayMatches.slice(0, 5).map((m) => toMatchView(m, teams));
+  const matches: MatchView[] = displayMatches.slice(0, 5).map((m) => toMatchView(m, teams, locale));
 
-  const standings = buildStandings(standingsSnap, groupsMap, teams);
+  const standings = buildStandings(standingsSnap, groupsMap, teams, locale);
 
   return { matches, standings, teams, allMatches, tournament };
 }
@@ -369,13 +401,13 @@ async function queryBuildRankings(db: DbClient) {
   return rankings;
 }
 
-export async function getBuildData() {
+export async function getBuildData(locale: Locale = 'en') {
   const errors: unknown[] = [];
 
   for (const create of [createAdminDb, createWebDb]) {
     try {
       const db = await create();
-      return await queryBuildData(db);
+      return await queryBuildData(db, locale);
     } catch (e) {
       errors.push(e);
     }

@@ -1,5 +1,8 @@
 {
   "fifaCode": "NZL",
-  "name": "New Zealand",
+  "name": {
+    "es": "Nueva Zelanda",
+    "en": "New Zealand"
+  },
   "groupId": "G"
 }

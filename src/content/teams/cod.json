@@ -1,5 +1,8 @@
 {
   "fifaCode": "COD",
-  "name": "DR Congo",
-  "groupId": "J"
+  "name": {
+    "es": "RD Congo",
+    "en": "DR Congo"
+  },
+  "groupId": "K"
 }

@@ -1,5 +1,8 @@
 {
   "fifaCode": "TUR",
-  "name": "Turkey",
+  "name": {
+    "es": "Turquía",
+    "en": "Turkey"
+  },
   "groupId": "D"
 }

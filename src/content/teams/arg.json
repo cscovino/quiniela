@@ -1,5 +1,8 @@
 {
   "fifaCode": "ARG",
-  "name": "Argentina",
-  "groupId": "I"
+  "name": {
+    "es": "Argentina",
+    "en": "Argentina"
+  },
+  "groupId": "J"
 }

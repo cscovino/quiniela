@@ -1,5 +1,8 @@
 {
   "fifaCode": "TUN",
-  "name": "Tunisia",
+  "name": {
+    "es": "Túnez",
+    "en": "Tunisia"
+  },
   "groupId": "F"
 }

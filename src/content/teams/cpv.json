@@ -1,5 +1,8 @@
 {
   "fifaCode": "CPV",
-  "name": "Cape Verde",
+  "name": {
+    "es": "Cabo Verde",
+    "en": "Cape Verde"
+  },
   "groupId": "H"
 }

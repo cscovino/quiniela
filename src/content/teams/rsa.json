@@ -1,5 +1,8 @@
 {
   "fifaCode": "RSA",
-  "name": "South Africa",
+  "name": {
+    "es": "Sudáfrica",
+    "en": "South Africa"
+  },
   "groupId": "A"
 }

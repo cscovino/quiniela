@@ -9,6 +9,15 @@ import esRules from '@locales/es/rules.json';
 
 export type Locale = 'en' | 'es';
 
+export interface LocalizedName {
+  en: string;
+  es: string;
+}
+
+export function getLocalizedName(name: LocalizedName, locale: Locale): string {
+  return name[locale];
+}
+
 export interface Translations {
   common: typeof esCommon;
   auth: typeof esAuth;

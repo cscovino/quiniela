@@ -1,5 +1,8 @@
 {
   "fifaCode": "POR",
-  "name": "Portugal",
+  "name": {
+    "es": "Portugal",
+    "en": "Portugal"
+  },
   "groupId": "K"
 }

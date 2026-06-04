@@ -14,6 +14,7 @@ import {
   type PredictionStepFinalPhaseProps,
 } from '@molecules/Predictions';
 import type { GroupForPrediction } from '@organisms/GroupPredictionForm';
+import { getLocalizedName } from '@utils/i18n';
 
 type GroupStepTranslations = PredictionStepGroupProps['translations'];
 type KnockoutStepTranslations = PredictionStepKnockoutRoundProps['translations'];
@@ -174,9 +175,10 @@ export function usePredictionSteps(
         const teamsList: { fifaCode: string; name: string }[] = [];
         if (t.status === 'fulfilled') {
           t.value.forEach((x) => {
-            tMap[x.fifaCode.toLowerCase()] = { fifaCode: x.fifaCode, name: x.name };
-            tMap[x.fifaCode] = { fifaCode: x.fifaCode, name: x.name };
-            teamsList.push({ fifaCode: x.fifaCode, name: x.name });
+            const resolvedName = getLocalizedName(x.name, locale);
+            tMap[x.fifaCode.toLowerCase()] = { fifaCode: x.fifaCode, name: resolvedName };
+            tMap[x.fifaCode] = { fifaCode: x.fifaCode, name: resolvedName };
+            teamsList.push({ fifaCode: x.fifaCode, name: resolvedName });
           });
         }
         setAllTeams(teamsList);
@@ -192,7 +194,10 @@ export function usePredictionSteps(
                 name: grp.name,
                 teams: t.value
                   .filter((x) => x.groupId === grp.slug)
-                  .map((x) => ({ fifaCode: x.fifaCode, name: x.name })),
+                  .map((x) => ({
+                    fifaCode: x.fifaCode,
+                    name: getLocalizedName(x.name, locale),
+                  })),
               })),
           );
         }

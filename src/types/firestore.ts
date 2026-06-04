@@ -1,5 +1,7 @@
 import type { Timestamp } from 'firebase/firestore';
 
+import type { LocalizedName } from '@utils/i18n';
+
 export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'cancelled';
 export type TournamentStatus = 'draft' | 'active' | 'finished';
 export type UserRole = 'user' | 'admin';
@@ -34,7 +36,7 @@ export interface Group {
 
 export interface Team {
   fifaCode: string;
-  name: string;
+  name: LocalizedName;
   flagUrl: string;
   groupId: string;
   createdAt: Timestamp;

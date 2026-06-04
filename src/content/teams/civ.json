@@ -1,5 +1,8 @@
 {
   "fifaCode": "CIV",
-  "name": "Ivory Coast",
+  "name": {
+    "es": "Costa de Marfil",
+    "en": "Ivory Coast"
+  },
   "groupId": "E"
 }

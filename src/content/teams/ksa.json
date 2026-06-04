@@ -1,5 +1,8 @@
 {
   "fifaCode": "KSA",
-  "name": "Saudi Arabia",
+  "name": {
+    "es": "Arabia Saudita",
+    "en": "Saudi Arabia"
+  },
   "groupId": "H"
 }

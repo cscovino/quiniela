@@ -1,5 +1,8 @@
 {
   "fifaCode": "BEL",
-  "name": "Belgium",
+  "name": {
+    "es": "Bélgica",
+    "en": "Belgium"
+  },
   "groupId": "G"
 }

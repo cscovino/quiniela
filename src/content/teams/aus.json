@@ -1,5 +1,8 @@
 {
   "fifaCode": "AUS",
-  "name": "Australia",
+  "name": {
+    "es": "Australia",
+    "en": "Australia"
+  },
   "groupId": "D"
 }

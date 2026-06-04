@@ -1,5 +1,8 @@
 {
   "fifaCode": "QAT",
-  "name": "Qatar",
+  "name": {
+    "es": "Catar",
+    "en": "Qatar"
+  },
   "groupId": "B"
 }

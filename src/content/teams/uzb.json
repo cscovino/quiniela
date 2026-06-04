@@ -1,5 +1,8 @@
 {
   "fifaCode": "UZB",
-  "name": "Uzbekistan",
+  "name": {
+    "es": "Uzbekistán",
+    "en": "Uzbekistan"
+  },
   "groupId": "K"
 }

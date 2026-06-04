@@ -1,5 +1,8 @@
 {
   "fifaCode": "ECU",
-  "name": "Ecuador",
+  "name": {
+    "es": "Ecuador",
+    "en": "Ecuador"
+  },
   "groupId": "E"
 }

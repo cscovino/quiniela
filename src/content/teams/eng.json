@@ -1,5 +1,8 @@
 {
   "fifaCode": "ENG",
-  "name": "England",
-  "groupId": "K"
+  "name": {
+    "es": "Inglaterra",
+    "en": "England"
+  },
+  "groupId": "L"
 }

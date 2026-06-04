@@ -1,5 +1,8 @@
 {
   "fifaCode": "SCO",
-  "name": "Scotland",
+  "name": {
+    "es": "Escocia",
+    "en": "Scotland"
+  },
   "groupId": "C"
 }

@@ -1,5 +1,8 @@
 {
   "fifaCode": "MAR",
-  "name": "Morocco",
+  "name": {
+    "es": "Marruecos",
+    "en": "Morocco"
+  },
   "groupId": "C"
 }

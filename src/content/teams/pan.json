@@ -1,5 +1,8 @@
 {
   "fifaCode": "PAN",
-  "name": "Panama",
-  "groupId": "J"
+  "name": {
+    "es": "Panamá",
+    "en": "Panama"
+  },
+  "groupId": "L"
 }

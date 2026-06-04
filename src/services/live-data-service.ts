@@ -3,6 +3,7 @@ import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import type { MatchCardProps } from '@molecules/MatchCard';
 import type { GroupStandingsProps } from '@organisms/GroupStandings';
 import type { RankingEntry, TodayMatchBet } from '@organisms/RankingsTable';
+import { getLocalizedName, type Locale, type LocalizedName } from '@utils/i18n';
 
 import { TOURNAMENT_ID } from '../config/tournament';
 import type { GroupStandings, Match, Team } from '../types/firestore';
@@ -19,31 +20,52 @@ async function getTeamsMap(): Promise<Map<string, Team>> {
   return map;
 }
 
-function toMatchCardProps(match: Match & { id: string }, teams: Map<string, Team>): MatchCardProps {
+const TBD_NAME: LocalizedName = { es: 'TBD', en: 'TBD' };
+
+// Defensive read for the migration window: production data may still have
+// legacy `name: string` until pnpm seed is re-run. Strict helper remains the
+// contract for new code; this is a build-time compatibility shim only.
+function readTeamName(name: LocalizedName | string | undefined, locale: Locale): string {
+  if (name == null) return '';
+  if (typeof name === 'string') return name;
+  return getLocalizedName(name, locale);
+}
+
+function toMatchCardProps(
+  match: Match & { id: string },
+  teams: Map<string, Team>,
+  locale: Locale,
+): MatchCardProps {
   const homeTeam = match.homeTeamId
     ? teams.get(match.homeTeamId.toLowerCase()) || {
         fifaCode: match.homeTeamId.toUpperCase(),
-        name: match.homeTeamId.toUpperCase(),
+        name: {
+          es: match.homeTeamId.toUpperCase(),
+          en: match.homeTeamId.toUpperCase(),
+        } satisfies LocalizedName,
       }
-    : { fifaCode: 'TBD', name: 'TBD' };
+    : { fifaCode: 'TBD', name: TBD_NAME };
 
   const awayTeam = match.awayTeamId
     ? teams.get(match.awayTeamId.toLowerCase()) || {
         fifaCode: match.awayTeamId.toUpperCase(),
-        name: match.awayTeamId.toUpperCase(),
+        name: {
+          es: match.awayTeamId.toUpperCase(),
+          en: match.awayTeamId.toUpperCase(),
+        } satisfies LocalizedName,
       }
-    : { fifaCode: 'TBD', name: 'TBD' };
+    : { fifaCode: 'TBD', name: TBD_NAME };
 
   return {
     id: match.id,
     slug: match.slug,
     homeTeam: {
       fifaCode: homeTeam.fifaCode,
-      name: homeTeam.name,
+      name: readTeamName(homeTeam.name, locale),
     },
     awayTeam: {
       fifaCode: awayTeam.fifaCode,
-      name: awayTeam.name,
+      name: readTeamName(awayTeam.name, locale),
     },
     // Knockout slot label shown when the team isn't decided yet.
     homePlaceholder: match.homeTeamId ? undefined : match.tbdHome,
@@ -66,7 +88,10 @@ function toMatchCardProps(match: Match & { id: string }, teams: Map<string, Team
   };
 }
 
-export async function fetchLiveMatches(limit = 5): Promise<MatchCardProps[]> {
+export async function fetchLiveMatches(
+  limit = 5,
+  locale: Locale = 'en',
+): Promise<MatchCardProps[]> {
   const teams = await getTeamsMap();
   const q = query(collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches'), orderBy('date'));
   const snapshot = await getDocs(q);
@@ -90,20 +115,22 @@ export async function fetchLiveMatches(limit = 5): Promise<MatchCardProps[]> {
     .sort((a, b) => a.date.toMillis() - b.date.toMillis());
 
   const displayMatches = todayMatches.length > 0 ? todayMatches : upcomingMatches;
-  return displayMatches.slice(0, limit).map((m) => toMatchCardProps(m, teams));
+  return displayMatches.slice(0, limit).map((m) => toMatchCardProps(m, teams, locale));
 }
 
-export async function fetchAllMatches(): Promise<MatchCardProps[]> {
+export async function fetchAllMatches(locale: Locale = 'en'): Promise<MatchCardProps[]> {
   const teams = await getTeamsMap();
   const q = query(collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches'), orderBy('date'));
   const snapshot = await getDocs(q);
 
   return snapshot.docs
     .map((d) => ({ ...d.data(), id: d.id }) as Match & { id: string })
-    .map((m) => toMatchCardProps(m, teams));
+    .map((m) => toMatchCardProps(m, teams, locale));
 }
 
-export async function fetchLiveStandings(): Promise<GroupStandingsProps['groups']> {
+export async function fetchLiveStandings(
+  locale: Locale = 'en',
+): Promise<GroupStandingsProps['groups']> {
   const teams = await getTeamsMap();
   const snapshot = await getDocs(
     collection(getDb(), 'tournaments', TOURNAMENT_ID, 'group_standings'),
@@ -129,19 +156,22 @@ export async function fetchLiveStandings(): Promise<GroupStandingsProps['groups'
     const group = groupsMap.get(data.groupId);
     return {
       name: group?.name || data.groupId,
-      standings: data.standings.map((s, idx) => ({
-        teamId: s.teamId,
-        fifaCode: teams.get(s.teamId.toLowerCase())?.fifaCode || s.teamId.toUpperCase(),
-        teamName: teams.get(s.teamId.toLowerCase())?.name || s.teamId.toUpperCase(),
-        position: s.position ?? idx + 1,
-        played: s.played,
-        won: s.won,
-        drawn: s.drawn,
-        lost: s.lost,
-        goalsFor: s.goalsFor,
-        goalsAgainst: s.goalsAgainst,
-        points: s.points,
-      })),
+      standings: data.standings.map((s, idx) => {
+        const team = teams.get(s.teamId.toLowerCase());
+        return {
+          teamId: s.teamId,
+          fifaCode: team?.fifaCode || s.teamId.toUpperCase(),
+          teamName: team ? readTeamName(team.name, locale) : s.teamId.toUpperCase(),
+          position: s.position ?? idx + 1,
+          played: s.played,
+          won: s.won,
+          drawn: s.drawn,
+          lost: s.lost,
+          goalsFor: s.goalsFor,
+          goalsAgainst: s.goalsAgainst,
+          points: s.points,
+        };
+      }),
     };
   });
 

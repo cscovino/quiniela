@@ -1,5 +1,8 @@
 {
   "fifaCode": "SWE",
-  "name": "Sweden",
+  "name": {
+    "es": "Suecia",
+    "en": "Sweden"
+  },
   "groupId": "F"
 }

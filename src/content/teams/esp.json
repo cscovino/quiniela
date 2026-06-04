@@ -1,5 +1,8 @@
 {
   "fifaCode": "ESP",
-  "name": "Spain",
+  "name": {
+    "es": "España",
+    "en": "Spain"
+  },
   "groupId": "H"
 }

@@ -14,7 +14,7 @@ vi.mock('../firebase', () => ({
 
 const mockTeam = {
   fifaCode: 'ARG',
-  name: 'Argentina',
+  name: { es: 'Argentina', en: 'Argentina' },
   group: 'A',
   flag: 'ar',
 };

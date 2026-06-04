@@ -18,9 +18,10 @@ export const LiveMatchList: FC<LiveMatchListProps> = ({
   cacheKey = 'live-matches',
   limit = 5,
   showAll = false,
+  locale = 'en',
   ...rest
 }) => {
-  const fetcher = showAll ? fetchAllMatches : () => fetchLiveMatches(limit);
+  const fetcher = showAll ? () => fetchAllMatches(locale) : () => fetchLiveMatches(limit, locale);
 
   const { data: matches, loading } = useLiveData<MatchCardProps[]>(
     cacheKey,

@@ -1,5 +1,8 @@
 {
   "fifaCode": "CZE",
-  "name": "Czech Republic",
+  "name": {
+    "es": "Chequia",
+    "en": "Czechia"
+  },
   "groupId": "A"
 }

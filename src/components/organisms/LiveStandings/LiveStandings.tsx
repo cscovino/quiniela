@@ -13,11 +13,12 @@ export interface LiveStandingsProps extends Omit<GroupStandingsProps, 'groups'> 
 export const LiveStandings: FC<LiveStandingsProps> = ({
   initialGroups,
   cacheKey = 'live-standings',
+  locale = 'en',
   ...rest
 }) => {
   const { data: groups, loading } = useLiveData<GroupStandingsProps['groups']>(
     cacheKey,
-    fetchLiveStandings,
+    () => fetchLiveStandings(locale),
     initialGroups,
   );
 

@@ -1,5 +1,8 @@
 {
   "fifaCode": "PAR",
-  "name": "Paraguay",
+  "name": {
+    "es": "Paraguay",
+    "en": "Paraguay"
+  },
   "groupId": "D"
 }

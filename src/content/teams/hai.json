@@ -1,5 +1,8 @@
 {
   "fifaCode": "HAI",
-  "name": "Haiti",
+  "name": {
+    "es": "Haití",
+    "en": "Haiti"
+  },
   "groupId": "C"
 }

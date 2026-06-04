@@ -1,5 +1,8 @@
 {
   "fifaCode": "GER",
-  "name": "Germany",
+  "name": {
+    "es": "Alemania",
+    "en": "Germany"
+  },
   "groupId": "E"
 }

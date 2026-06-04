@@ -1,5 +1,8 @@
 {
   "fifaCode": "KOR",
-  "name": "South Korea",
+  "name": {
+    "es": "Corea del Sur",
+    "en": "South Korea"
+  },
   "groupId": "A"
 }

@@ -1,5 +1,8 @@
 {
   "fifaCode": "GHA",
-  "name": "Ghana",
-  "groupId": "I"
+  "name": {
+    "es": "Ghana",
+    "en": "Ghana"
+  },
+  "groupId": "L"
 }

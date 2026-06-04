@@ -1,5 +1,8 @@
 {
   "fifaCode": "CAN",
-  "name": "Canada",
+  "name": {
+    "es": "Canadá",
+    "en": "Canada"
+  },
   "groupId": "B"
 }

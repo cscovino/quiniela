@@ -1,5 +1,8 @@
 {
   "fifaCode": "BIH",
-  "name": "Bosnia and Herzegovina",
+  "name": {
+    "es": "Bosnia y Herzegovina",
+    "en": "Bosnia and Herzegovina"
+  },
   "groupId": "B"
 }

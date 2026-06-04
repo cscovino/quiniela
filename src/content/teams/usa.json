@@ -1,5 +1,8 @@
 {
   "fifaCode": "USA",
-  "name": "United States",
+  "name": {
+    "es": "Estados Unidos",
+    "en": "United States"
+  },
   "groupId": "D"
 }

@@ -1,5 +1,8 @@
 {
   "fifaCode": "EGY",
-  "name": "Egypt",
+  "name": {
+    "es": "Egipto",
+    "en": "Egypt"
+  },
   "groupId": "G"
 }

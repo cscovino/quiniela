@@ -1,5 +1,8 @@
 {
   "fifaCode": "URU",
-  "name": "Uruguay",
+  "name": {
+    "es": "Uruguay",
+    "en": "Uruguay"
+  },
   "groupId": "H"
 }
