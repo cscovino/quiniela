@@ -48,7 +48,6 @@ export const PredictorAvatar: FC<PredictorAvatarProps> = ({
   size = 'md',
   className = '',
 }) => {
-  console.log(`PREDICTOR`, predictor);
   const seed = predictor.pixelArt?.seed ?? predictor.id;
   const options = predictor.pixelArt?.options ?? DEFAULT_OPTIONS;
   const isImage = Boolean(seed); // tiers 1 & 2 (real predictors always have id)

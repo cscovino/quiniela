@@ -14,13 +14,13 @@ const gamepadSvg = readFileSync(
   'utf-8',
 );
 
-// Create icon SVG with dark background and accent-colored gamepad
+// Create icon SVG with dark background and white gamepad for high contrast
 const svgIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="#0a0a0f" rx="64"/>
-  <rect x="32" y="32" width="448" height="448" fill="#12121a" stroke="#1D3557" stroke-width="16" rx="48"/>
+  <rect x="24" y="24" width="464" height="464" fill="#0a0a0f" stroke="#ffffff" stroke-width="16" rx="56"/>
   <g transform="translate(128, 128) scale(10.67)">
-    ${gamepadSvg.replace('fill="currentColor"', 'fill="#1D3557"')}
+    ${gamepadSvg.replace('fill="currentColor"', 'fill="#ffffff"')}
   </g>
 </svg>
 `;
