@@ -89,8 +89,8 @@ export const ProductTour: FC<ProductTourProps> = ({
       onCloseClick: () => {
         onClose?.();
       },
-      onNextClick: (_element, step) => {
-        if (step.index === driveSteps.length - 1) {
+      onNextClick: (_element, _step, opts) => {
+        if (opts.state.activeIndex === driveSteps.length - 1) {
           markTourCompleted(tourId);
           onComplete?.();
         }

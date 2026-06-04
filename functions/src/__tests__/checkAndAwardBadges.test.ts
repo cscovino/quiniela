@@ -23,9 +23,9 @@ describe('getBadgeAwards', () => {
       maxStreak: 0,
       pointsHistory: [],
       badgesAwarded: {},
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result).toEqual({});
   });
 
@@ -42,9 +42,9 @@ describe('getBadgeAwards', () => {
       maxStreak: 1,
       pointsHistory: [{ timestamp: { seconds: 0, nanoseconds: 0 }, points: 3, matchId: 'm1' }],
       badgesAwarded: {},
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['first-blood']).toBeDefined();
   });
 
@@ -61,9 +61,9 @@ describe('getBadgeAwards', () => {
       maxStreak: 3,
       pointsHistory: [],
       badgesAwarded: {},
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['on-fire']).toBeDefined();
   });
 
@@ -80,9 +80,9 @@ describe('getBadgeAwards', () => {
       maxStreak: 4,
       pointsHistory: [],
       badgesAwarded: {},
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['consistent']).toBeDefined();
   });
 
@@ -99,10 +99,10 @@ describe('getBadgeAwards', () => {
       maxStreak: 16,
       pointsHistory: [],
       badgesAwarded: {},
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
       groupQualified: 16,
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['perfect-group']).toBeDefined();
   });
 
@@ -120,9 +120,12 @@ describe('getBadgeAwards', () => {
       maxStreak: 2,
       pointsHistory: [],
       badgesAwarded: existingBadges,
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards(existingBadges, stats);
+    const result = getBadgeAwards(
+      existingBadges,
+      stats as unknown as Parameters<typeof getBadgeAwards>[1],
+    );
     expect(result['first-blood']).toBe('2024-01-01T00:00:00.000Z');
     expect(Object.keys(result).length).toBe(1);
   });
@@ -140,10 +143,10 @@ describe('getBadgeAwards', () => {
       maxStreak: 48,
       pointsHistory: [],
       badgesAwarded: {},
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
       groupQualified: 16,
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['first-blood']).toBeDefined();
     expect(result['on-fire']).toBeDefined();
     expect(result['perfect-group']).toBeDefined();
@@ -164,9 +167,12 @@ describe('getBadgeAwards', () => {
       maxStreak: 3,
       pointsHistory: [],
       badgesAwarded: existingBadges,
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards(existingBadges, stats);
+    const result = getBadgeAwards(
+      existingBadges,
+      stats as unknown as Parameters<typeof getBadgeAwards>[1],
+    );
     expect(result['first-blood']).toBe('2024-01-01T00:00:00.000Z');
     expect(result['on-fire']).toBeDefined();
   });
@@ -184,9 +190,12 @@ describe('getBadgeAwards', () => {
       maxStreak: 1,
       pointsHistory: [],
       badgesAwarded: {},
-      lastUpdated: { seconds: 0, nanoseconds: 0 } as TimestampLike,
+      lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards({} as Record<string, string>, stats);
+    const result = getBadgeAwards(
+      {} as Record<string, string>,
+      stats as unknown as Parameters<typeof getBadgeAwards>[1],
+    );
     expect(result['first-blood']).toBeDefined();
   });
 });

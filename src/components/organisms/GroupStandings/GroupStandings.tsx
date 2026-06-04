@@ -18,6 +18,7 @@ export interface GroupStandingsProps {
     qualified: string;
   };
   className?: string;
+  locale?: 'en' | 'es';
 }
 
 export const GroupStandings: FC<GroupStandingsProps> = ({

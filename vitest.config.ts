@@ -110,6 +110,9 @@ export default defineConfig({
           setupFiles: ['functions/src/__tests__/setup.ts'],
           include: ['functions/src/**/__tests__/**/*.test.ts'],
           globals: true,
+          // @ts-expect-error: per-project `coverage` block is supported at runtime
+          // by vitest workspaces but not in the public ProjectConfig type. Move to
+          // top-level `test.coverage` if/when this gets typed upstream.
           coverage: {
             thresholds: { lines: 60 },
             include: ['functions/src/**'],

@@ -96,7 +96,7 @@ export function usePredictionSteps(
   },
   locale: 'en' | 'es',
   selectedPredictorId: string | null,
-  deadline: Date | null = null,
+  deadline: Date | undefined = undefined,
   confirmedAdvancingMap?: Record<string, string>,
 ): UsePredictionStepsResult {
   const user = useAuthStore((s) => s.user);

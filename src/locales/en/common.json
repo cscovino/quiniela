@@ -153,7 +153,7 @@
     "predictions": {
       "title": "Predictions - Quiniela",
       "description": "Make your predictions for World Cup 2026 matches",
-      "heading": "Matchday Predictions",
+      "heading": "Predictions",
       "noMatches": "No matches available for prediction",
       "submitSuccess": "Predictions submitted!",
       "submitError": "Failed to submit predictions",

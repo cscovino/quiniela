@@ -26,9 +26,14 @@ export const ScoreDisplay: FC<ScoreDisplayProps> = ({
   const getPointsBadge = () => {
     if (pointsEarned === 0) return null;
     if (isExact)
-      return { variant: 'accent' as const, label: `+${pointsEarned} EXACT!`, icon: 'star' };
-    if (isWinner) return { variant: 'success' as const, label: `+${pointsEarned}`, icon: 'check' };
-    return { variant: 'info' as const, label: `+${pointsEarned}`, icon: 'check' };
+      return {
+        variant: 'accent' as const,
+        label: `+${pointsEarned} EXACT!`,
+        icon: 'star' as const,
+      };
+    if (isWinner)
+      return { variant: 'success' as const, label: `+${pointsEarned}`, icon: 'check' as const };
+    return { variant: 'info' as const, label: `+${pointsEarned}`, icon: 'check' as const };
   };
 
   const badge = getPointsBadge();

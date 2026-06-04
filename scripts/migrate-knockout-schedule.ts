@@ -38,7 +38,14 @@ function initAdmin(): admin.app.App {
 
 const db = admin.firestore(initAdmin());
 
-type Phase = 'round-of-32' | 'round-of-16' | 'quarterfinals' | 'semifinals' | 'third-place' | 'final';
+type Phase =
+  | 'group'
+  | 'round-of-32'
+  | 'round-of-16'
+  | 'quarterfinals'
+  | 'semifinals'
+  | 'third-place'
+  | 'final';
 
 interface KnockoutMatchDef {
   slug: string;

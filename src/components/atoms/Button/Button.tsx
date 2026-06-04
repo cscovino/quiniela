@@ -9,6 +9,7 @@ interface BaseProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
+  isDisabled?: boolean;
   fullWidth?: boolean;
   className?: string;
   children: ReactNode;
@@ -49,6 +50,7 @@ export const Button: FC<ButtonProps> = (props) => {
       variant: _v,
       size: _s,
       isLoading: _l,
+      isDisabled: _id,
       fullWidth: _fw,
       className: _c,
       children: _ch,
@@ -57,6 +59,7 @@ export const Button: FC<ButtonProps> = (props) => {
     void _v;
     void _s;
     void _l;
+    void _id;
     void _fw;
     void _c;
     void _ch;
@@ -71,6 +74,7 @@ export const Button: FC<ButtonProps> = (props) => {
     variant: _v,
     size: _s,
     isLoading: _l,
+    isDisabled: _id,
     fullWidth: _fw,
     className: _c,
     children: _ch,
@@ -80,12 +84,13 @@ export const Button: FC<ButtonProps> = (props) => {
   void _v;
   void _s;
   void _l;
+  void _id;
   void _fw;
   void _c;
   void _ch;
 
   return (
-    <button className={classes} disabled={disabled || isLoading} {...buttonProps}>
+    <button className={classes} disabled={disabled || isLoading || _id} {...buttonProps}>
       {content}
     </button>
   );

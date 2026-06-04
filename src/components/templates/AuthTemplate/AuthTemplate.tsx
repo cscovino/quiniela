@@ -31,17 +31,17 @@ export const AuthTemplate: FC<AuthTemplateProps> = ({
     <div className={`auth-template ${className}`}>
       <div className="auth-template__decorations">
         <PixelArt
-          sprite="football"
+          name="football"
           size={48}
           className="auth-template__sprite auth-template__sprite--football"
         />
         <PixelArt
-          sprite="trophy"
+          name="trophy"
           size={48}
           className="auth-template__sprite auth-template__sprite--trophy"
         />
         <PixelArt
-          sprite="stadium"
+          name="stadium"
           size={48}
           className="auth-template__sprite auth-template__sprite--stadium"
         />

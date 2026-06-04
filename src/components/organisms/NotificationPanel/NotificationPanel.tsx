@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { Button } from '@atoms/Button';
-import { Icon } from '@atoms/Icon';
+import { Icon, type IconName } from '@atoms/Icon';
 import { Typography } from '@atoms/Typography';
 
 import './NotificationPanel.css';
@@ -29,7 +29,7 @@ export interface NotificationPanelProps {
   className?: string;
 }
 
-const typeIcons: Record<NotificationType, string> = {
+const typeIcons: Record<NotificationType, IconName> = {
   match_start: 'clock',
   result_posted: 'check',
   badge_earned: 'trophy',

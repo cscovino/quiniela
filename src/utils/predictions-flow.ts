@@ -487,7 +487,7 @@ export function buildKnockoutBracket(
   confirmedAdvancingMap?: Record<string, string>,
 ): KnockoutMatch[] {
   return knockoutMatches
-    .map((match) => {
+    .map((match): KnockoutMatch => {
       const bracketEntry = BRACKET_MAP[match.slug];
       if (!bracketEntry) {
         return {

@@ -83,7 +83,10 @@ export interface IconProps {
   ariaLabel?: string;
 }
 
-const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: string }>> = {
+const iconMap: Record<
+  IconName,
+  FC<{ size?: number; color?: string; className?: string; width?: number; height?: number }>
+> = {
   award: Crown,
   bell: Bell,
   chart: Chart,

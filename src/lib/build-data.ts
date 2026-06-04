@@ -91,12 +91,15 @@ async function createAdminDb(): Promise<DbClient> {
   const db = getFirestore();
   return {
     query: async (path: string, opts?: QueryOptions): Promise<QuerySnapshotLike> => {
-      let ref: ReturnType<typeof db.collection> = db.collection(path);
-      if (opts?.orderBy) ref = ref.orderBy(opts.orderBy);
-      return ref.get();
+      const ref = db.collection(path);
+      if (opts?.orderBy) {
+        return (ref.orderBy(opts.orderBy) as unknown as { get: () => Promise<QuerySnapshotLike> })
+          .get() as unknown as Promise<QuerySnapshotLike>;
+      }
+      return ref.get() as unknown as Promise<QuerySnapshotLike>;
     },
     doc: async (path: string): Promise<RowDoc> => {
-      return db.doc(path).get();
+      return db.doc(path).get() as unknown as Promise<RowDoc>;
     },
     collectionGroup: async (id: string): Promise<QuerySnapshotLike> => {
       return db.collectionGroup(id).get();
@@ -136,7 +139,7 @@ async function createWebDb(): Promise<DbClient> {
 function toTeamsMap(teamsSnap: QuerySnapshotLike): Record<string, TeamData> {
   const teams: Record<string, TeamData> = {};
   teamsSnap.forEach((doc) => {
-    const data = doc.data() as TeamData;
+    const data = doc.data() as unknown as TeamData;
     teams[data.fifaCode.toLowerCase()] = data;
   });
   return teams;
@@ -157,7 +160,7 @@ function toGroupsMap(groupsSnap: QuerySnapshotLike): Map<string, GroupData> {
 
 function rawMatchesFromSnap(matchesSnap: QuerySnapshotLike): (MatchData & { id: string })[] {
   return matchesSnap.docs.map((doc) => ({
-    ...(doc.data() as MatchData),
+    ...(doc.data() as unknown as MatchData),
     id: doc.id,
   }));
 }
@@ -229,7 +232,7 @@ function buildStandings(
   type StandingsRowWithOrder = StandingsRow & { __order: number };
 
   let standings: StandingsRowWithOrder[] = standingsSnap.docs.map((doc) => {
-    const data = doc.data() as StandingData;
+    const data = doc.data() as unknown as StandingData;
     const group = groupsMap.get(data.groupId);
     return {
       name: group?.name || data.groupId,
@@ -336,7 +339,7 @@ async function queryBuildData(db: DbClient, locale: Locale) {
   return { matches, standings, teams, allMatches, tournament };
 }
 
-async function queryBuildRankings(db: DbClient) {
+export async function queryBuildRankings(db: DbClient) {
   const [predictorsSnap, statsSnap] = await Promise.all([
     db.collectionGroup('predictors'),
     db.collectionGroup('stats'),
@@ -354,7 +357,7 @@ async function queryBuildRankings(db: DbClient) {
     const userId = pathParts[1];
     const predictorId = pathParts[3];
     statsByKey.set(`${userId}/${predictorId}`, {
-      ...(doc.data() as PredictorStatsData),
+      ...(doc.data() as unknown as PredictorStatsData),
       userId,
       predictorId,
     });
@@ -409,18 +412,29 @@ async function queryBuildRankings(db: DbClient) {
         name: (data?.name as string) || null,
         avatar: (data?.avatar as { bgColor?: string; emoji?: string } | null) || null,
         avatarUrl: (data?.avatarUrl as string | null) || null,
+        pixelArt:
+          (data?.pixelArt as { seed: string; options: Record<string, unknown> } | null) ?? null,
       };
     }),
   );
 
   const nameMap = new Map<string, string>();
-  const avatarMap = new Map<string, { bgColor?: string; emoji?: string; avatarUrl?: string }>();
+  const avatarMap = new Map<
+    string,
+    {
+      bgColor?: string;
+      emoji?: string;
+      avatarUrl?: string;
+      pixelArt: { seed: string; options: Record<string, unknown> } | null;
+    }
+  >();
   for (const p of predictorDocs) {
-    nameMap.set(p.id, p.name || p.id.split('/').pop() || 'Unknown');
+    nameMap.set(p.id, p.name ?? p.id.split('/').pop() ?? 'Unknown');
     avatarMap.set(p.id, {
       bgColor: p.avatar?.bgColor,
       emoji: p.avatar?.emoji,
-      avatarUrl: p.avatarUrl,
+      avatarUrl: p.avatarUrl ?? undefined,
+      pixelArt: p.pixelArt,
     });
   }
 
@@ -436,6 +450,7 @@ async function queryBuildRankings(db: DbClient) {
         avatarData?.bgColor && avatarData?.emoji
           ? { bgColor: avatarData.bgColor, emoji: avatarData.emoji }
           : undefined,
+      pixelArt: avatarData?.pixelArt ?? undefined,
       points: s.totalPoints,
       accuracy: Math.round(s.accuracy * 100),
       streak: s.currentStreak,

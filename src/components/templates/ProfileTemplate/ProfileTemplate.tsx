@@ -226,17 +226,18 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
 
         if (cancelled) return;
 
-        if (statsResult.status === 'fulfilled' && statsResult.value) {
-          setStats(statsResult.value);
+        if (statsResult.status === 'fulfilled' && statsResult.value != null) {
+          const stats = statsResult.value;
+          setStats(stats);
 
-          const earnedBadgeIds = Object.keys(statsResult.value.badgesAwarded || {});
+          const earnedBadgeIds = Object.keys(stats.badgesAwarded || {});
 
           const earnedBadges: BadgeEarned[] = earnedBadgeIds.map((badgeId) => ({
             id: badgeId,
             name: getBadgeName(badgeId, locale),
             icon: BADGE_DEFINITIONS.find((b) => b.id === badgeId)?.icon || 'star',
             description: getBadgeDescription(badgeId, locale),
-            earnedAt: new Date(statsResult.value.badgesAwarded[badgeId]),
+            earnedAt: new Date(stats.badgesAwarded[badgeId]),
           }));
           setBadges(earnedBadges);
 

@@ -71,7 +71,7 @@ interface StatsDocData {
 interface MinimalDoc {
   id: string;
   ref: { path: string };
-  data: () => StatsDocData;
+  data: () => Record<string, unknown>;
 }
 
 /**
@@ -93,7 +93,7 @@ export function mergePredictorStats(
     const pathParts = doc.ref.path.split('/');
     const userId = pathParts[1];
     const predictorId = pathParts[3];
-    const data = doc.data();
+    const data = doc.data() as StatsDocData;
     const history = data.pointsHistory || [];
     statsByKey.set(`${userId}/${predictorId}`, {
       id: doc.id,

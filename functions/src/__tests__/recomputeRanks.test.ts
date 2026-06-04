@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { doRecomputeRanks, recomputeRanks } from '../recomputeRanks';
 import { mockBatch, mockDb } from './setup';
@@ -65,7 +65,7 @@ describe('top-10 badge condition', () => {
       lastRankUpdate: { seconds: 0, nanoseconds: 0 },
       lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['top-10']).toBeDefined();
   });
 
@@ -86,7 +86,7 @@ describe('top-10 badge condition', () => {
       percentile: 0.5,
       lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['top-10']).toBeUndefined();
   });
 
@@ -107,7 +107,7 @@ describe('top-10 badge condition', () => {
       percentile: undefined,
       lastUpdated: { seconds: 0, nanoseconds: 0 },
     };
-    const result = getBadgeAwards({}, stats);
+    const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['top-10']).toBeUndefined();
   });
 });

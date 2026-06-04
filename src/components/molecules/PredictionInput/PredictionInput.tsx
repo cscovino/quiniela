@@ -16,8 +16,6 @@ export interface PredictionInputProps {
 }
 
 export const PredictionInput: FC<PredictionInputProps> = ({
-  homeTeamName,
-  awayTeamName,
   homeScore = 0,
   awayScore = 0,
   onChange,

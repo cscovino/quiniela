@@ -9,6 +9,7 @@ export interface TypographyProps {
   children: ReactNode;
   className?: string;
   as?: ElementType;
+  id?: string;
 }
 
 const variantMap: Record<TypographyVariant, { tag: string; className: string }> = {
@@ -26,9 +27,14 @@ export const Typography: FC<TypographyProps> = ({
   children,
   className = '',
   as,
+  id,
 }) => {
   const { tag: defaultTag, className: variantClass } = variantMap[variant];
   const Component = as || defaultTag;
 
-  return <Component className={`typography ${variantClass} ${className}`}>{children}</Component>;
+  return (
+    <Component id={id} className={`typography ${variantClass} ${className}`}>
+      {children}
+    </Component>
+  );
 };

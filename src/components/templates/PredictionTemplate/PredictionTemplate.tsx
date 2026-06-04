@@ -38,7 +38,10 @@ export const PredictionTemplate: FC<PredictionTemplateProps> = ({
         </header>
 
         <section className="prediction-template__form">
-          <PredictionForm {...formProps} onSubmit={onSubmit} />
+          <PredictionForm
+            {...formProps}
+            onSubmit={onSubmit as unknown as (predictions: Record<string, unknown>) => void}
+          />
         </section>
       </main>
     </div>

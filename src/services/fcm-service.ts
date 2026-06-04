@@ -86,7 +86,7 @@ export const fcmService = {
     const msg = await getMessagingInstance();
     if (!msg || typeof window === 'undefined') return null;
     const { onMessage: fbOnMessage } = await import('firebase/messaging');
-    return fbOnMessage(msg, callback);
+    return fbOnMessage(msg, callback as (payload: unknown) => void);
   },
 
   async getCurrentToken(): Promise<string | null> {

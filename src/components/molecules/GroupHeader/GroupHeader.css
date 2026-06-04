@@ -21,6 +21,7 @@
   gap: var(--space-3);
   padding-top: var(--space-2);
   border-top: var(--border-width-sm) solid var(--border-color);
+  overflow-x: auto;
 }
 
 .group-header__teams {

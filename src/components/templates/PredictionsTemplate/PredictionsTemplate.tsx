@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { AvatarOptions, Predictor } from '@app-types/firestore';
 import type { DeadlineInfo } from '@app-types/prediction-steps';
@@ -196,13 +196,13 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Tournament deadline state
-  const [tournamentDeadline, setTournamentDeadline] = useState<Date | null>(null);
+  const [tournamentDeadline, setTournamentDeadline] = useState<Date | undefined>(undefined);
   const [deadlineLoading, setDeadlineLoading] = useState(true);
 
   useEffect(() => {
     tournamentService
       .getTournament()
-      .then((t) => setTournamentDeadline(t?.deadline?.toDate() || null))
+      .then((t) => setTournamentDeadline(t?.deadline?.toDate() ?? undefined))
       .catch(() => {})
       .finally(() => setDeadlineLoading(false));
   }, []);

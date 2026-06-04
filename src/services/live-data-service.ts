@@ -57,8 +57,6 @@ function toMatchCardProps(
     : { fifaCode: 'TBD', name: TBD_NAME };
 
   return {
-    id: match.id,
-    slug: match.slug,
     homeTeam: {
       fifaCode: homeTeam.fifaCode,
       name: readTeamName(homeTeam.name, locale),

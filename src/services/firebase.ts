@@ -64,7 +64,7 @@ export async function getAppCheckToken(): Promise<string | undefined> {
   if (!_appCheck) return undefined;
   const { getToken } = await import('firebase/app-check');
   try {
-    const result = await getToken(_appCheck, { forceRefresh: false });
+    const result = await getToken(_appCheck, false);
     return result.token;
   } catch {
     return undefined;
@@ -75,7 +75,7 @@ export async function getFreshAppCheckToken(): Promise<string | undefined> {
   if (!_appCheck) return undefined;
   const { getToken } = await import('firebase/app-check');
   try {
-    const result = await getToken(_appCheck, { forceRefresh: true });
+    const result = await getToken(_appCheck, true);
     return result.token;
   } catch {
     return undefined;
