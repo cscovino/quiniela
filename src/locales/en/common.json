@@ -196,7 +196,7 @@
         "edit": "Edit",
         "delete": "Delete",
         "empty": "No predictions yet",
-        "backToPredictors": "Back to predictions",
+        "backToPredictors": "Predictions",
         "listLabel": "Predictor list",
         "editPredictionsAria": "Edit predictions for {name}",
         "editProfileAria": "Edit name and avatar for {name}",

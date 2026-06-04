@@ -10,59 +10,45 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const ManySteps: Story = {
+export const ProgressManySteps: Story = {
   render: () => (
     <PredictionsProgress
-      stepLabels={[
-        'Group A',
-        'Group B',
-        'Group C',
-        'Group D',
-        'Group E',
-        'Group F',
-        'Group G',
-        'Group H',
-        'Round of 16',
-        'Quarterfinals',
-        'Semifinals',
-        'Final',
-      ]}
-      currentStep={3}
-      submittedSteps={new Set([0, 1, 2])}
       stepCounter="Step 4 of 12"
+      deadlineInfo={{
+        deadline: new Date('2026-06-15'),
+        state: 'before',
+        label: 'Deadline passed',
+      }}
     />
   ),
 };
 
-export const FewSteps: Story = {
+export const ProgressFewSteps: Story = {
   render: () => (
     <PredictionsProgress
-      stepLabels={['Matches', 'Groups', 'Knockout', 'Best Players']}
-      currentStep={1}
-      submittedSteps={new Set([0])}
       stepCounter="Step 2 of 4"
+      deadlineInfo={{
+        deadline: new Date('2026-06-15'),
+        state: 'before',
+        label: 'Deadline passed',
+      }}
     />
   ),
 };
 
-export const FirstStep: Story = {
-  render: () => (
-    <PredictionsProgress
-      stepLabels={['Matches', 'Groups', 'Knockout', 'Best Players']}
-      currentStep={0}
-      submittedSteps={new Set()}
-      stepCounter="Step 1 of 4"
-    />
-  ),
+export const ProgressFirstStep: Story = {
+  render: () => <PredictionsProgress stepCounter="Step 1 of 4" />,
 };
 
-export const LastStep: Story = {
+export const ProgressLastStep: Story = {
   render: () => (
     <PredictionsProgress
-      stepLabels={['Matches', 'Groups', 'Knockout', 'Best Players']}
-      currentStep={3}
-      submittedSteps={new Set([0, 1, 2])}
       stepCounter="Step 4 of 4"
+      deadlineInfo={{
+        deadline: new Date('2026-06-15'),
+        state: 'passed',
+        label: 'Deadline passed',
+      }}
     />
   ),
 };
@@ -89,13 +75,29 @@ const navTranslations = {
   buttonBack: 'Back to List',
   buttonNext: 'Next',
   buttonFinish: 'Finish',
+  stepsNavLabel: 'Prediction steps',
+  stepTooltipEdit: 'Not yet completed',
+  stepTooltipCompleted: 'Completed',
 };
 
 const navTranslationsWithFinish = {
   buttonBack: 'Back to List',
   buttonNext: 'Next Step',
   buttonFinish: 'Finish',
+  stepsNavLabel: 'Prediction steps',
+  stepTooltipEdit: 'Not yet completed',
+  stepTooltipCompleted: 'Completed',
 };
+
+const mockSteps = [
+  { id: 'group-a', label: 'Group A', isComplete: true, kind: 'group' as const },
+  { id: 'group-b', label: 'Group B', isComplete: true, kind: 'group' as const },
+  { id: 'group-c', label: 'Group C', isComplete: true, kind: 'group' as const },
+  { id: 'r32', label: 'Round of 32', isComplete: false, kind: 'knockout-round' as const },
+  { id: 'qf', label: 'Quarterfinals', isComplete: false, kind: 'knockout-round' as const },
+  { id: 'sf', label: 'Semifinals', isComplete: false, kind: 'knockout-round' as const },
+  { id: 'final', label: 'Final', isComplete: false, kind: 'final-positions' as const },
+];
 
 export const NavigationMiddleStep: Story = {
   render: () => (
@@ -103,10 +105,11 @@ export const NavigationMiddleStep: Story = {
       onBack={() => {}}
       onNext={() => {}}
       canAdvance={true}
-      currentStep={2}
-      totalSteps={5}
+      currentStep={3}
+      totalSteps={7}
       translations={navTranslations}
-      submittedSteps={new Set()}
+      steps={mockSteps}
+      onStepClick={() => {}}
     />
   ),
 };
@@ -117,11 +120,12 @@ export const NavigationSubmitting: Story = {
       onBack={() => {}}
       onNext={() => {}}
       canAdvance={true}
-      currentStep={2}
-      totalSteps={5}
+      currentStep={3}
+      totalSteps={7}
       isSubmitting={true}
       translations={navTranslations}
-      submittedSteps={new Set()}
+      steps={mockSteps}
+      onStepClick={() => {}}
     />
   ),
 };
@@ -132,10 +136,11 @@ export const NavigationLastStep: Story = {
       onBack={() => {}}
       onNext={() => {}}
       canAdvance={true}
-      currentStep={4}
-      totalSteps={5}
+      currentStep={6}
+      totalSteps={7}
       translations={navTranslationsWithFinish}
-      submittedSteps={new Set()}
+      steps={mockSteps}
+      onStepClick={() => {}}
     />
   ),
 };
@@ -147,23 +152,25 @@ export const NavigationCannotAdvance: Story = {
       onNext={() => {}}
       canAdvance={false}
       currentStep={1}
-      totalSteps={5}
+      totalSteps={7}
       translations={navTranslations}
-      submittedSteps={new Set()}
+      steps={mockSteps}
+      onStepClick={() => {}}
     />
   ),
 };
 
-export const NavigationSubmittedStep: Story = {
+export const NavigationFirstStep: Story = {
   render: () => (
     <PredictionsNavigation
       onBack={() => {}}
       onNext={() => {}}
       canAdvance={true}
-      currentStep={2}
-      totalSteps={5}
+      currentStep={0}
+      totalSteps={7}
       translations={navTranslations}
-      submittedSteps={new Set([2])}
+      steps={mockSteps}
+      onStepClick={() => {}}
     />
   ),
 };

@@ -121,7 +121,7 @@
 }
 
 /* UX-05: icon-only stacked buttons on mobile — labels hidden, actions right-aligned */
-@media (max-width: 479px) {
+@media (max-width: var(--breakpoint-sm)) {
   .predictor-list__btn-label {
     display: none;
   }

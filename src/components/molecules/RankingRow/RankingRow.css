@@ -175,7 +175,7 @@
    and predictor (avatar + name) columns frozen to the left via position: sticky
    while stats and match predictions scroll. Placed last so these rules win over
    the base .ranking-row__* declarations above when the viewport is small. */
-@media (max-width: 480px) {
+@media (max-width: var(--breakpoint-sm)) {
   .ranking-row {
     display: flex;
     align-items: center;

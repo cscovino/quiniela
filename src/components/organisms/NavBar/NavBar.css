@@ -235,7 +235,7 @@
   display: block;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: var(--breakpoint-md)) {
   .nav-bar {
     padding: var(--space-3) var(--space-4);
   }

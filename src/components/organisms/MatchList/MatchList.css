@@ -18,7 +18,7 @@
   gap: var(--space-3);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: var(--breakpoint-md)) {
   .match-list__items {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));

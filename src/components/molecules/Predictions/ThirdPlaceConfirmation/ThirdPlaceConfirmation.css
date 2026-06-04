@@ -227,7 +227,7 @@
 }
 
 /* Mobile responsive */
-@media (max-width: 480px) {
+@media (max-width: var(--breakpoint-sm)) {
   .third-place-confirmation {
     padding: var(--space-3);
   }

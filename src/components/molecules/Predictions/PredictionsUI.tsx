@@ -61,6 +61,9 @@ export interface PredictionsNavigationProps {
     buttonBack: string;
     buttonNext: string;
     buttonFinish?: string;
+    stepsNavLabel?: string;
+    stepTooltipEdit?: string;
+    stepTooltipCompleted?: string;
   };
 }
 
@@ -72,18 +75,20 @@ export const PredictionsNavigation: FC<PredictionsNavigationProps> = ({
   totalSteps,
   isSubmitting,
   translations,
-}) => (
-  <>
-    <div className="predictions-template__navigation">
-      <Button variant="ghost" size="sm" onClick={onBack} disabled={currentStep === 0}>
-        <Icon name="chevron-left" size={16} /> {translations.buttonBack}
-      </Button>
-      <Button variant="primary" size="sm" onClick={onNext} disabled={!canAdvance || isSubmitting}>
-        {isSubmitting ? <Spinner size="sm" /> : null}
-        {currentStep < totalSteps - 1
-          ? translations.buttonNext
-          : translations.buttonFinish || 'Finish'}
-      </Button>
-    </div>
-  </>
-);
+}) => {
+  return (
+    <>
+      <div className="predictions-template__navigation">
+        <Button variant="ghost" size="sm" onClick={onBack} disabled={currentStep === 0}>
+          <Icon name="chevron-left" size={16} /> {translations.buttonBack}
+        </Button>
+        <Button variant="primary" size="sm" onClick={onNext} disabled={!canAdvance || isSubmitting}>
+          {isSubmitting ? <Spinner size="sm" /> : null}
+          {currentStep < totalSteps - 1
+            ? translations.buttonNext
+            : translations.buttonFinish || 'Finish'}
+        </Button>
+      </div>
+    </>
+  );
+};

@@ -9,7 +9,6 @@ import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
 import { usePredictionSteps } from '@hooks/usePredictionSteps';
 import {
-  PredictionsFeedback,
   PredictionsNavigation,
   PredictionsProgress,
   type PredictionStepBestPlayersProps,
@@ -67,6 +66,9 @@ export interface PredictionsTemplateProps {
     buttonSubmit?: string;
     buttonFinish?: string;
     stepXofY: string;
+    stepsNavLabel?: string;
+    stepTooltipEdit?: string;
+    stepTooltipCompleted?: string;
     submitToAdvance?: string;
     stepDescriptionGroup?: string;
     stepDescriptionRound?: string;
@@ -77,6 +79,8 @@ export interface PredictionsTemplateProps {
     predictedStandings: string;
     team: string;
     pts: string;
+    feedbackSuccessTitle?: string;
+    feedbackErrorTitle?: string;
     feedback: {
       submittedCount: string;
       finalPhaseSubmitted: string;
@@ -266,6 +270,24 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
 
   const groupsCount = groups.length;
 
+  // Show feedback as toast instead of inline banner to avoid layout shift
+  useEffect(() => {
+    if (!feedback) return;
+    const id = `pred-feedback-${Date.now()}`;
+    useToastStore.getState().addToast({
+      type: feedback.type,
+      title:
+        feedback.type === 'success'
+          ? translations.feedbackSuccessTitle || 'Saved'
+          : translations.feedbackErrorTitle || 'Error',
+      message: feedback.message,
+    });
+    const timer = setTimeout(() => {
+      useToastStore.getState().dismissToast(id);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [feedback, translations.feedbackSuccessTitle, translations.feedbackErrorTitle]);
+
   useEffect(() => {
     if (confirmedThirdPlace) {
       setConfirmedThirdPlace(false);
@@ -305,6 +327,20 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     setConfirmedAdvancingMap(map);
     setCurrentStep(groupsCount);
   };
+
+  useEffect(() => {
+    if (!feedback) return;
+    useToastStore.getState().addToast({
+      type: feedback.type,
+      title:
+        feedback.type === 'success'
+          ? translations.feedbackSuccessTitle || 'Saved'
+          : translations.feedbackErrorTitle || 'Error',
+      message: feedback.message,
+    });
+    const timer = setTimeout(() => useToastStore.getState().dismissToast, 5000);
+    return () => clearTimeout(timer);
+  }, [feedback, translations.feedbackSuccessTitle, translations.feedbackErrorTitle]);
 
   useEffect(() => {
     if (!user) {
@@ -609,6 +645,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           <Button variant="ghost" size="sm" onClick={handleBackToList}>
             <Icon name="chevron-left" size={16} /> {listTranslations.backToPredictors}
           </Button>
+          <PredictionsProgress stepCounter={stepCounter} deadlineInfo={deadlineInfo} />
         </header>
 
         {showThirdPlaceConfirm ? (
@@ -645,8 +682,46 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           </section>
         ) : (
           <>
-            <PredictionsProgress stepCounter={stepCounter} deadlineInfo={deadlineInfo} />
-            <PredictionsFeedback feedback={feedback} />
+            {steps && steps.length > 1 && (
+              <nav
+                className="predictions-template__steps-nav"
+                aria-label={translations.stepsNavLabel || 'Prediction steps'}
+              >
+                <div className="steps-nav__track">
+                  {steps.map((step, idx) => {
+                    const isCurrent = idx === currentStep;
+                    const isComplete = step.isComplete;
+                    const isClickable = isComplete || idx < currentStep;
+
+                    return (
+                      <button
+                        key={step.id}
+                        className={[
+                          'steps-nav__step',
+                          isCurrent ? 'steps-nav__step--current' : '',
+                          isComplete ? 'steps-nav__step--complete' : '',
+                          !isClickable ? 'steps-nav__step--locked' : '',
+                        ]
+                          .filter(Boolean)
+                          .join(' ')}
+                        onClick={() => isClickable && setCurrentStep(idx)}
+                        disabled={!isClickable}
+                        aria-label={
+                          isClickable
+                            ? isComplete
+                              ? `${step.label} — ${translations.stepTooltipCompleted || 'Completed'}`
+                              : `${step.label}`
+                            : `${step.label} — ${translations.stepTooltipEdit || 'Not yet completed'}`
+                        }
+                        title={step.label}
+                      >
+                        <span className="steps-nav__step-label">{step.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </nav>
+            )}
 
             <section className="predictions-template__section">
               <div className="predictions-template__section-header">
@@ -684,6 +759,9 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
                 buttonBack: translations.buttonBack,
                 buttonNext: translations.buttonNext,
                 buttonFinish: translations.buttonFinish,
+                stepsNavLabel: translations.stepsNavLabel,
+                stepTooltipEdit: translations.stepTooltipEdit,
+                stepTooltipCompleted: translations.stepTooltipCompleted,
               }}
               submittedSteps={submittedSteps}
             />

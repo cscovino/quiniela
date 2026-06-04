@@ -17,7 +17,7 @@
 
 .prediction-step-group__matches {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: var(--space-3);
 }
 
@@ -145,7 +145,7 @@
   cursor: pointer;
 }
 
-@media (max-width: 480px) {
+@media (max-width: var(--breakpoint-sm)) {
   .prediction-step-group__col.position {
     width: auto;
     flex: 1;
