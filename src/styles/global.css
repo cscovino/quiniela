@@ -137,11 +137,11 @@
   --color-info-bg: #0a1f2e;
   --color-info-border: var(--color-accent-600);
 
-  /* Backgrounds (Dark stadium atmosphere) */
-  --bg-dark: #0a0a0f;
-  --bg-card: #12121a;
-  --bg-card-hover: #1a1a25;
-  --bg-input: #0d0d14;
+  /* Backgrounds (Deep navy night — ties to WC26 deep-blue brand) */
+  --bg-dark: #0d1322;
+  --bg-card: #161e2e;
+  --bg-card-hover: #1d2740;
+  --bg-input: #131a2c;
   --bg-overlay: rgba(0, 0, 0, 0.85);
 
   /* Text */
@@ -151,8 +151,8 @@
   --text-inverse: #000000;
 
   /* Borders */
-  --border-color: #2a2a3a;
-  --border-color-light: #3a3a4a;
+  --border-color: #2a3650;
+  --border-color-light: #38445e;
   --border-color-focus: var(--color-accent-500);
 }
 
@@ -274,11 +274,11 @@
   --color-info-bg: #e0f7ff;
   --color-info-border: var(--color-accent-500);
 
-  /* Backgrounds (Clean stadium day) */
-  --bg-dark: #f5f5f7;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f0f0f5;
-  --bg-input: #ffffff;
+  /* Backgrounds (Warm cream — ties to WC26 gold/warm brand) */
+  --bg-dark: #f5ecd0;
+  --bg-card: #fbf3db;
+  --bg-card-hover: #fef9e6;
+  --bg-input: #fdf7e2;
   --bg-overlay: rgba(255, 255, 255, 0.9);
 
   /* Text */
@@ -288,8 +288,8 @@
   --text-inverse: #ffffff;
 
   /* Borders */
-  --border-color: #d0d0e0;
-  --border-color-light: #e0e0f0;
+  --border-color: #c8b886;
+  --border-color-light: #d8caa0;
   --border-color-focus: var(--color-accent-500);
 }
 
@@ -619,6 +619,10 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+:root {
+  --container-xl: 1024px;
 }
 
 html,

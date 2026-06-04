@@ -258,8 +258,8 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
                       {labels.vs}
                     </Typography>
                     <div className="prediction-step-group__team">
-                      <TeamFlag fifaCode={awayTeam.fifaCode} size="sm" />
                       <Typography variant="small">{awayTeam.name}</Typography>
+                      <TeamFlag fifaCode={awayTeam.fifaCode} size="sm" />
                     </div>
                   </div>
                   <PredictionInput

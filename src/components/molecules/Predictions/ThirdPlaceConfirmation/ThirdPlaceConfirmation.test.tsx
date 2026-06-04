@@ -208,10 +208,11 @@ describe('ThirdPlaceConfirmation', () => {
       />,
     );
 
-    expect(screen.getByText('Brazil')).toBeInTheDocument();
-    expect(screen.getByText('(Group A)')).toBeInTheDocument();
-    expect(screen.getByText('Spain')).toBeInTheDocument();
-    expect(screen.getByText('(Group B)')).toBeInTheDocument();
+    // Team names appear in both desktop and mobile layouts
+    expect(screen.getAllByText('Brazil').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('A').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Spain').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('B').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows eliminated teams', () => {
@@ -224,8 +225,8 @@ describe('ThirdPlaceConfirmation', () => {
       />,
     );
 
-    expect(screen.getByText('Australia')).toBeInTheDocument();
-    expect(screen.getByText('Canada')).toBeInTheDocument();
+    expect(screen.getAllByText('Australia').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Canada').length).toBeGreaterThanOrEqual(1);
   });
 
   it('calls onAdjust when Adjust button is clicked', () => {
@@ -273,8 +274,9 @@ describe('ThirdPlaceConfirmation', () => {
       />,
     );
 
-    expect(screen.getByText(/74/)).toBeInTheDocument();
-    expect(screen.getByText(/77/)).toBeInTheDocument();
+    // Bracket labels appear in both desktop and mobile layouts
+    expect(screen.getAllByText(/74/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/77/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows correct point values', () => {
@@ -287,9 +289,12 @@ describe('ThirdPlaceConfirmation', () => {
       />,
     );
 
-    expect(screen.getByText(/6 pts/)).toBeInTheDocument();
-    expect(screen.getAllByText(/5 pts/).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/3 pts/).length).toBeGreaterThanOrEqual(1);
+    // Points are displayed as plain numbers in the pts column
+    const ptsColumns = screen.getAllByRole('button');
+    const allText = ptsColumns.map((btn) => btn.textContent).join(' ');
+    expect(allText).toContain('6');
+    expect(allText).toContain('5');
+    expect(allText).toContain('3');
   });
 
   it('toggle row changes advancing state: deselecting an advancing row disables Continue', () => {
@@ -555,11 +560,11 @@ describe('ThirdPlaceConfirmation', () => {
         translations={extendedTranslations}
       />,
     );
-    // Non-zero points visible
-    expect(screen.getByText(/6 pts/)).toBeInTheDocument();
+    // Non-zero points visible (appears in both desktop and mobile layouts)
+    expect(screen.getAllByText('6').length).toBeGreaterThanOrEqual(1);
     // Alphabetical fallback team not present
     expect(screen.queryByText('Czech Republic')).not.toBeInTheDocument();
     // Ranked list is rendered
-    expect(screen.getByText('Brazil')).toBeInTheDocument();
+    expect(screen.getAllByText('Brazil').length).toBeGreaterThanOrEqual(1);
   });
 });

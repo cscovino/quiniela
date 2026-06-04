@@ -13,6 +13,7 @@ import { Fire } from 'pixelarticons/react/Fire';
 import { Flag } from 'pixelarticons/react/Flag';
 import { Gamepad } from 'pixelarticons/react/Gamepad';
 import { InfoBox } from 'pixelarticons/react/InfoBox';
+import { Loader } from 'pixelarticons/react/Loader';
 import { Login } from 'pixelarticons/react/Login';
 import { Logout } from 'pixelarticons/react/Logout';
 import { Menu } from 'pixelarticons/react/Menu';
@@ -54,6 +55,7 @@ export type IconName =
   | 'info'
   | 'lightning'
   | 'live'
+  | 'loader'
   | 'login'
   | 'logout'
   | 'menu'
@@ -100,6 +102,7 @@ const iconMap: Record<IconName, FC<{ size?: number; color?: string; className?: 
   info: InfoBox,
   lightning: Zap,
   live: Radio,
+  loader: Loader,
   login: Login,
   logout: Logout,
   menu: Menu,

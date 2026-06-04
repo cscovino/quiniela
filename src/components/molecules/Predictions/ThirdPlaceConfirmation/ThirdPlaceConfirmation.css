@@ -6,6 +6,9 @@
   background: var(--bg-card);
   border: var(--border-width-md) solid var(--color-accent-500);
   filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.5));
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .third-place-confirmation__header {
@@ -24,47 +27,10 @@
   color: var(--text-muted);
 }
 
-.third-place-confirmation__advancing {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding-left: var(--space-3);
-  border-left: var(--border-width-md) solid var(--color-success);
-}
-
-.third-place-confirmation__section-title {
-  font-family: var(--font-pixel);
-  font-size: var(--text-xs);
-}
-
-.third-place-confirmation__section-title--advancing {
-  color: var(--color-success);
-}
-
-.third-place-confirmation__section-title--eliminated {
-  color: var(--color-error);
-}
-
-.third-place-confirmation__eliminated {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding-left: var(--space-3);
-  border-left: var(--border-width-md) solid var(--color-error);
-  opacity: 0.7;
-}
-
-.third-place-confirmation__list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
 .third-place-confirmation__counter {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-bottom: var(--space-2);
 }
 
 .third-place-confirmation__counter-chip {
@@ -89,24 +55,112 @@
   margin-top: var(--space-1);
 }
 
-.third-place-confirmation__row {
+/* Table layout using CSS Grid (desktop) */
+.third-place-confirmation__table {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  gap: 0;
+}
+
+.third-place-confirmation__table-header,
+.third-place-confirmation__row {
+  display: grid;
+  grid-template-columns: 32px 1fr 56px 48px 48px 48px 64px;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-2);
-  min-height: 44px;
+  align-items: center;
+  padding: var(--space-2) var(--space-2);
+}
+
+.third-place-confirmation__table-header {
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-2);
+  border-bottom: var(--border-width-sm) solid var(--border-color);
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.third-place-confirmation__col {
+  font-size: var(--text-sm);
+}
+
+.third-place-confirmation__col--rank {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.third-place-confirmation__col--team {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.third-place-confirmation__col--group {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.third-place-confirmation__col--gd,
+.third-place-confirmation__col--gf,
+.third-place-confirmation__col--pts {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  text-align: right;
+}
+
+.third-place-confirmation__col--gd {
+  color: var(--text-secondary);
+}
+
+.third-place-confirmation__col--gf {
+  color: var(--text-secondary);
+}
+
+.third-place-confirmation__col--pts {
+  color: var(--color-gold-500);
+}
+
+.third-place-confirmation__col--pts-eliminated {
+  color: var(--text-muted);
+}
+
+.third-place-confirmation__col--bracket {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--color-success);
+  text-align: center;
+}
+
+[data-theme='light'] .third-place-confirmation__col--bracket {
+  color: var(--color-tertiary-500);
+}
+
+/* Row states */
+.third-place-confirmation__row {
   cursor: pointer;
   border: none;
   width: 100%;
   text-align: left;
   background: transparent;
   font-family: var(--font-body);
+  min-height: 40px;
+  border-left: var(--border-width-md) solid transparent;
+  transition: background 0.1s ease;
+}
+
+.third-place-confirmation__row:hover:not(.third-place-confirmation__row--disabled) {
+  background: var(--bg-card-hover);
 }
 
 .third-place-confirmation__row--advancing {
   background: var(--color-success-bg);
-  border-left: var(--border-width-md) solid var(--color-success-border);
+  border-left-color: var(--color-success-border);
 }
 
 [data-theme='light'] .third-place-confirmation__row--advancing {
@@ -115,7 +169,7 @@
 
 .third-place-confirmation__row--eliminated {
   background: var(--bg-card);
-  border-left: var(--border-width-md) solid var(--border-color);
+  border-left-color: var(--border-color);
   opacity: 0.75;
 }
 
@@ -124,49 +178,12 @@
   opacity: 0.5;
 }
 
-.third-place-confirmation__rank {
-  min-width: 24px;
-  font-family: var(--font-pixel);
-  font-size: var(--text-xs);
-  color: var(--text-muted);
+/* Mobile card layout (hidden on desktop) */
+.third-place-confirmation__mobile-card {
+  display: none;
 }
 
-.third-place-confirmation__team-name {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.third-place-confirmation__group {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-}
-
-.third-place-confirmation__points {
-  margin-left: auto;
-  font-family: var(--font-pixel);
-  font-size: var(--text-xs);
-}
-
-.third-place-confirmation__points--advancing {
-  color: var(--color-gold-500);
-}
-
-.third-place-confirmation__points--eliminated {
-  color: var(--text-muted);
-}
-
-.third-place-confirmation__bracket-slot {
-  width: 100%;
-  font-family: var(--font-pixel);
-  font-size: var(--text-xs);
-  color: var(--color-success);
-  padding-left: calc(var(--space-4) + 24px);
-}
-
-[data-theme='light'] .third-place-confirmation__bracket-slot {
-  color: var(--color-tertiary-500);
-}
-
+/* Actions */
 .third-place-confirmation__actions {
   display: flex;
   justify-content: flex-end;
@@ -207,4 +224,114 @@
   font-size: var(--text-xs);
   color: var(--color-error);
   line-height: var(--leading-normal);
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .third-place-confirmation {
+    padding: var(--space-3);
+  }
+
+  /* Hide desktop grid columns */
+  .third-place-confirmation__table-header {
+    display: none;
+  }
+
+  .third-place-confirmation__col {
+    display: none;
+  }
+
+  /* Show mobile card layout */
+  .third-place-confirmation__mobile-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+  }
+
+  .third-place-confirmation__mobile-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .third-place-confirmation__mobile-rank {
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    min-width: 28px;
+  }
+
+  .third-place-confirmation__mobile-team {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .third-place-confirmation__mobile-fifa {
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    background: var(--bg-input);
+    border: var(--border-width-sm) solid var(--border-color);
+    padding: 2px var(--space-2);
+    white-space: nowrap;
+  }
+
+  .third-place-confirmation__mobile-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    padding-left: calc(var(--space-4) + 28px);
+  }
+
+  .third-place-confirmation__mobile-stat {
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .third-place-confirmation__mobile-stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .third-place-confirmation__mobile-stat--pts {
+    color: var(--color-gold-500);
+  }
+
+  .third-place-confirmation__mobile-stat--pts-eliminated {
+    color: var(--text-muted);
+  }
+
+  .third-place-confirmation__mobile-stat--bracket {
+    color: var(--color-success);
+  }
+
+  [data-theme='light'] .third-place-confirmation__mobile-stat--bracket {
+    color: var(--color-tertiary-500);
+  }
+
+  /* Row styling for mobile */
+  .third-place-confirmation__row {
+    padding: var(--space-3) var(--space-3);
+    min-height: auto;
+  }
+
+  .third-place-confirmation__actions {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .third-place-confirmation__actions button {
+    width: 100%;
+  }
 }

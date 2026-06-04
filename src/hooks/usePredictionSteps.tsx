@@ -149,11 +149,6 @@ export function usePredictionSteps(
     {},
   );
 
-  // Live predictions: mirrors knockoutBetsByMatchSlug but updates in real-time as user picks winners.
-  // Mirrors the same shape so buildKnockoutBracket sees picks immediately.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- plan calls for this as a named mirror; read via knockoutBetsByMatchSlug in steps useMemo
-  const [livePredictions, setLivePredictions] = useState<Record<string, string>>({});
-
   const [betsStatus, setBetsStatus] = useState<'loading' | 'error' | 'loaded'>('loading');
   const [fetchTrigger, setFetchTrigger] = useState(0);
 
@@ -408,7 +403,6 @@ export function usePredictionSteps(
   // Streams individual winner picks to livePredictions + knockoutBetsByMatchSlug in real-time,
   // so buildKnockoutBracket recomputes with updated picks before the round is submitted.
   const handlePredictionStreaming = useCallback((matchSlug: string, winnerFifaCode: string) => {
-    setLivePredictions((prev) => ({ ...prev, [matchSlug]: winnerFifaCode }));
     setKnockoutBetsByMatchSlug((prev) => ({ ...prev, [matchSlug]: winnerFifaCode }));
   }, []);
 
@@ -438,7 +432,6 @@ export function usePredictionSteps(
         setSubmittedSteps((prev) => new Set(prev).add(stepIndex));
 
         setKnockoutBetsByMatchSlug((prev) => ({ ...prev, ...predictions }));
-        setLivePredictions({}); // clear live picks after submit
       }
       if (result.errors.length > 0) {
         const error = result.errors[0];

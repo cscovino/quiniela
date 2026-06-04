@@ -32,6 +32,14 @@ export interface ThirdPlaceConfirmationProps {
     loading?: string;
     error?: string;
     retry?: string;
+    colRank?: string;
+    colTeam?: string;
+    colGroup?: string;
+    colGD?: string;
+    colGF?: string;
+    colPts?: string;
+    colBracket?: string;
+    colFifa?: string;
   };
 }
 
@@ -53,6 +61,14 @@ const defaultTranslations = {
   loading: 'Loading your predictions...',
   error: 'Could not load your predictions. Please try again.',
   retry: 'Retry',
+  colRank: '#',
+  colTeam: 'Team',
+  colGroup: 'Group',
+  colGD: 'GD',
+  colGF: 'GF',
+  colPts: 'Pts',
+  colBracket: 'Bracket',
+  colFifa: 'Code',
 };
 
 export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
@@ -153,56 +169,150 @@ export const ThirdPlaceConfirmation: FC<ThirdPlaceConfirmationProps> = ({
             )}
           </div>
 
-          <div className="third-place-confirmation__list">
-            {rankedTeams.map((team, index) => {
-              const groupSlug = `group-${team.groupLetter.toLowerCase()}`;
-              const isAdvancing = localAdvancingSet.has(groupSlug);
-              const isDisabledRow = !isAdvancing && isAtMax;
+          <div className="third-place-confirmation__table">
+            <div className="third-place-confirmation__table-header" role="row">
+              <span className="third-place-confirmation__col third-place-confirmation__col--rank">
+                {t.colRank}
+              </span>
+              <span className="third-place-confirmation__col third-place-confirmation__col--team">
+                {t.colTeam}
+              </span>
+              <span className="third-place-confirmation__col third-place-confirmation__col--group">
+                {t.colGroup}
+              </span>
+              <span className="third-place-confirmation__col third-place-confirmation__col--gd">
+                {t.colGD}
+              </span>
+              <span className="third-place-confirmation__col third-place-confirmation__col--gf">
+                {t.colGF}
+              </span>
+              <span className="third-place-confirmation__col third-place-confirmation__col--pts">
+                {t.colPts}
+              </span>
+              <span className="third-place-confirmation__col third-place-confirmation__col--bracket">
+                {t.colBracket}
+              </span>
+            </div>
 
-              return (
-                <button
-                  key={team.teamId}
-                  type="button"
-                  className={[
-                    'third-place-confirmation__row',
-                    isAdvancing
-                      ? 'third-place-confirmation__row--advancing'
-                      : 'third-place-confirmation__row--eliminated',
-                    isDisabledRow ? 'third-place-confirmation__row--disabled' : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                  onClick={() => !isDisabledRow && handleToggle(groupSlug)}
-                  aria-pressed={isAdvancing}
-                  aria-disabled={isDisabledRow}
-                  aria-label={
-                    isAdvancing
-                      ? (t.toggleAdvancing ?? 'Click to remove from advancing')
-                      : (t.toggleEliminated ?? 'Click to add to advancing')
-                  }
-                >
-                  <span className="third-place-confirmation__rank">{index + 1}.</span>
-                  <span className="third-place-confirmation__team-name">{team.teamName}</span>
-                  <span className="third-place-confirmation__group">
-                    ({t.group} {team.groupLetter})
-                  </span>
-                  <span
-                    className={`third-place-confirmation__points ${
+            <div className="third-place-confirmation__list" role="rowgroup">
+              {rankedTeams.map((team, index) => {
+                const groupSlug = `group-${team.groupLetter.toLowerCase()}`;
+                const isAdvancing = localAdvancingSet.has(groupSlug);
+                const isDisabledRow = !isAdvancing && isAtMax;
+                const gdDisplay =
+                  team.goalDifference > 0 ? `+${team.goalDifference}` : `${team.goalDifference}`;
+
+                return (
+                  <button
+                    key={team.teamId}
+                    type="button"
+                    className={[
+                      'third-place-confirmation__row',
                       isAdvancing
-                        ? 'third-place-confirmation__points--advancing'
-                        : 'third-place-confirmation__points--eliminated'
-                    }`}
+                        ? 'third-place-confirmation__row--advancing'
+                        : 'third-place-confirmation__row--eliminated',
+                      isDisabledRow ? 'third-place-confirmation__row--disabled' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    onClick={() => !isDisabledRow && handleToggle(groupSlug)}
+                    aria-pressed={isAdvancing}
+                    aria-disabled={isDisabledRow}
+                    aria-label={
+                      isAdvancing
+                        ? (t.toggleAdvancing ?? 'Click to remove from advancing')
+                        : (t.toggleEliminated ?? 'Click to add to advancing')
+                    }
                   >
-                    {team.points} {team.points === 1 ? t.pt : t.pts}
-                  </span>
-                  {isAdvancing && team.bracketSlotLabel && (
-                    <span className="third-place-confirmation__bracket-slot">
-                      &#8594; {t.bracketSlot} {team.bracketSlotLabel.replace('Match ', '')}
+                    {/* Desktop grid row */}
+                    <span className="third-place-confirmation__col third-place-confirmation__col--rank">
+                      {index + 1}
                     </span>
-                  )}
-                </button>
-              );
-            })}
+                    <span className="third-place-confirmation__col third-place-confirmation__col--team">
+                      {team.teamName}
+                    </span>
+                    <span className="third-place-confirmation__col third-place-confirmation__col--group">
+                      {team.groupLetter}
+                    </span>
+                    <span className="third-place-confirmation__col third-place-confirmation__col--gd">
+                      {gdDisplay}
+                    </span>
+                    <span className="third-place-confirmation__col third-place-confirmation__col--gf">
+                      {team.goalsScored}
+                    </span>
+                    <span
+                      className={`third-place-confirmation__col third-place-confirmation__col--pts ${
+                        isAdvancing
+                          ? 'third-place-confirmation__col--pts-advancing'
+                          : 'third-place-confirmation__col--pts-eliminated'
+                      }`}
+                    >
+                      {team.points}
+                    </span>
+                    <span className="third-place-confirmation__col third-place-confirmation__col--bracket">
+                      {isAdvancing && team.bracketSlotLabel
+                        ? team.bracketSlotLabel.replace('Match ', '')
+                        : '—'}
+                    </span>
+
+                    {/* Mobile card layout */}
+                    <div className="third-place-confirmation__mobile-card">
+                      <div className="third-place-confirmation__mobile-top">
+                        <span className="third-place-confirmation__mobile-rank">
+                          {index + 1}.
+                        </span>
+                        <span className="third-place-confirmation__mobile-team">
+                          {team.teamName}
+                        </span>
+                        <span className="third-place-confirmation__mobile-fifa">
+                          {team.teamId}
+                        </span>
+                      </div>
+                      <div className="third-place-confirmation__mobile-stats">
+                        <span className="third-place-confirmation__mobile-stat">
+                          <span className="third-place-confirmation__mobile-stat-label">
+                            {t.colGroup}
+                          </span>
+                          {team.groupLetter}
+                        </span>
+                        <span className="third-place-confirmation__mobile-stat">
+                          <span className="third-place-confirmation__mobile-stat-label">
+                            {t.colGD}
+                          </span>
+                          {gdDisplay}
+                        </span>
+                        <span className="third-place-confirmation__mobile-stat">
+                          <span className="third-place-confirmation__mobile-stat-label">
+                            {t.colGF}
+                          </span>
+                          {team.goalsScored}
+                        </span>
+                        <span
+                          className={`third-place-confirmation__mobile-stat third-place-confirmation__mobile-stat--pts ${
+                            isAdvancing
+                              ? 'third-place-confirmation__mobile-stat--pts-advancing'
+                              : 'third-place-confirmation__mobile-stat--pts-eliminated'
+                          }`}
+                        >
+                          <span className="third-place-confirmation__mobile-stat-label">
+                            {t.colPts}
+                          </span>
+                          {team.points}
+                        </span>
+                        {isAdvancing && team.bracketSlotLabel && (
+                          <span className="third-place-confirmation__mobile-stat third-place-confirmation__mobile-stat--bracket">
+                            <span className="third-place-confirmation__mobile-stat-label">
+                              {t.colBracket}
+                            </span>
+                            {team.bracketSlotLabel.replace('Match ', '')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="third-place-confirmation__actions">

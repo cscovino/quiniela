@@ -207,20 +207,6 @@ export const NavBar: FC<NavBarProps> = ({
           </Button>
         )}
 
-        {isLoggedIn ? (
-          <div className="nav-bar__group nav-bar__group--desktop">
-            <Icon name="user" size={18} />
-            <span className="nav-bar__username">{userDisplayName}</span>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <Icon name="logout" size={16} /> {translations.logout}
-            </Button>
-          </div>
-        ) : (
-          <a href={loginHref} className="nav-bar__group--desktop" data-astro-prefetch>
-            <Icon name="login" size={16} /> {translations.login}
-          </a>
-        )}
-
         <button
           ref={hamburgerRef}
           className="btn btn--ghost btn--sm"

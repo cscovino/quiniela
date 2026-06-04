@@ -616,7 +616,7 @@ export function computeThirdPlaceStandings(
     const thirdPlaceTeamId = positions[2];
 
     const standings = calculateGroupStandings(matches, matchPredictions, teamsMap, group.slug);
-    const teamStanding = standings.find((s) => s.teamId === thirdPlaceTeamId);
+    const teamStanding = standings.find((s) => s.fifaCode === thirdPlaceTeamId);
     const team = teamsMap[thirdPlaceTeamId];
 
     thirdPlacedRecords.push({
@@ -630,7 +630,6 @@ export function computeThirdPlaceStandings(
     });
   }
 
-  // D-03: deterministic sort — points (desc) → GD (desc) → GF (desc) → groupLetter (asc) → teamId (asc)
   thirdPlacedRecords.sort((a, b) => {
     if (b.points !== a.points) return b.points - a.points;
     if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
@@ -639,7 +638,6 @@ export function computeThirdPlaceStandings(
     return a.teamId.localeCompare(b.teamId);
   });
 
-  // D-04: use confirmed advancing set if provided; otherwise default to deterministic top-8
   const advancingSet =
     confirmedAdvancingGroupSlugs ?? thirdPlacedRecords.slice(0, 8).map((r) => r.groupSlug);
 
@@ -654,7 +652,6 @@ export function computeThirdPlaceStandings(
   }
 
   return thirdPlacedRecords.map((record) => {
-    // D-04: advancing reflects user's confirmed set, not a hardcoded slice
     const isAdvancing = advancingSet.includes(record.groupSlug);
 
     // Derive bracketMatchSlug: find which matrix slot this group's letter occupies,
@@ -683,15 +680,13 @@ export function computeThirdPlaceStandings(
 }
 
 export interface FinalFourResult {
-  first: string; // 'TBD' if final winner unknown
-  second: string; // 'TBD' if final loser unknown
-  third: string; // 'TBD' if third-place winner unknown
-  fourth: string; // 'TBD' if third-place loser unknown
+  first: string;
+  second: string;
+  third: string;
+  fourth: string;
 }
 
 // Derives the predicted final standings from knockout bets.
-// D-01: progressive — each field resolves independently; only truly-unknown slots return 'TBD'.
-// D-02: stale picks (stored winner not matching resolved feeders) return 'TBD' transitively.
 export function deriveFinalFour(
   knockoutBets: KnockoutBetRecord,
   groupBetsByGroupId: GroupBetRecord,
@@ -729,12 +724,12 @@ export function deriveFinalFour(
 
 // Labels passed to formatSlotSource — caller provides template strings from i18n
 export interface SlotSourceLabels {
-  groupWinner: string; // e.g. "Winner Group {group}"
-  groupRunnerUp: string; // e.g. "Runner-up Group {group}"
-  groupPosition: string; // e.g. "Position {n} Group {group}"
-  bestThird: string; // e.g. "Best 3rd place"
-  winnerOf: string; // e.g. "Winner of Match {match}"
-  loserOf: string; // e.g. "Loser of Match {match}"
+  groupWinner: string;
+  groupRunnerUp: string;
+  groupPosition: string;
+  bestThird: string;
+  winnerOf: string;
+  loserOf: string;
 }
 
 // Converts a KnockoutSlotSource to a human-readable localized string

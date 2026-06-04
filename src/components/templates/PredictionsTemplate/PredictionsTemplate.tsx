@@ -21,8 +21,6 @@ import {
 import { PredictorDeleteConfirm } from '@molecules/PredictorDeleteConfirm';
 import { PredictorEditor } from '@molecules/PredictorEditor';
 import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList';
-import { ProductTour, resetTour } from '@organisms/ProductTour';
-import { FIRST_PREDICTOR_TOUR, PREDICTION_WIZARD_TOUR } from '@organisms/ProductTour/tours';
 import { predictorService } from '@services/predictor-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
@@ -196,12 +194,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
   const [editingPredictor, setEditingPredictor] = useState<Predictor | null>(null);
   const [deletingPredictor, setDeletingPredictor] = useState<Predictor | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showWizardTour, setShowWizardTour] = useState(false);
-  const [showFirstTour, setShowFirstTour] = useState(false);
-
-  // Scroll back to the top of the step content when advancing, so the user
-  // lands on the first prediction input rather than wherever they scrolled to.
-  const stepTopRef = useRef<HTMLDivElement>(null);
 
   // Tournament deadline state
   const [tournamentDeadline, setTournamentDeadline] = useState<Date | null>(null);
@@ -290,11 +282,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     }
   }, [currentStep, groupsCount, showThirdPlaceConfirm, confirmedThirdPlace, steps, betsStatus]);
 
-  useEffect(() => {
-    if (view !== 'wizard') return;
-    stepTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [currentStep, showThirdPlaceConfirm, view]);
-
   const handleThirdPlaceAdjust = () => {
     setShowThirdPlaceConfirm(false);
     // Editing group standings can change which thirds rank — drop the confirmed
@@ -371,17 +358,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       cancelled = true;
     };
   }, [loadPredictorEntries]);
-
-  useEffect(() => {
-    if (view === 'list' && predictors.length === 0) {
-      const timer = setTimeout(() => {
-        if (!localStorage.getItem('tour_completed_first-predictor')) {
-          setShowFirstTour(true);
-        }
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [view, predictors.length]);
 
   const handleSelectPredictor = (predictorId: string) => {
     setSelectedPredictorId(predictorId);
@@ -632,17 +608,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           <Button variant="ghost" size="sm" onClick={handleBackToList}>
             <Icon name="chevron-left" size={16} /> {listTranslations.backToPredictors}
           </Button>
-          <Button
-            variant="accent"
-            size="sm"
-            onClick={() => {
-              resetTour('prediction-wizard');
-              setShowWizardTour(true);
-            }}
-            aria-label="Start guided tour"
-          >
-            <Icon name="robot" size={16} /> Tour
-          </Button>
         </header>
 
         {showThirdPlaceConfirm ? (
@@ -679,14 +644,12 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           </section>
         ) : (
           <>
-            <div ref={stepTopRef} />
             <PredictionsProgress stepCounter={stepCounter} deadlineInfo={deadlineInfo} />
             <PredictionsFeedback feedback={feedback} />
 
             <section className="predictions-template__section">
               <div className="predictions-template__section-header">
                 <Typography variant="h2">{activeStep.label}</Typography>
-                <Typography variant="body">{activeStep.description}</Typography>
               </div>
 
               {activeStep.content}
@@ -726,26 +689,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           </>
         )}
       </main>
-
-      {showWizardTour && (
-        <ProductTour
-          tourId="prediction-wizard"
-          steps={PREDICTION_WIZARD_TOUR}
-          onComplete={() => setShowWizardTour(false)}
-          onClose={() => setShowWizardTour(false)}
-          autoStart={true}
-        />
-      )}
-
-      {showFirstTour && (
-        <ProductTour
-          tourId="first-predictor"
-          steps={FIRST_PREDICTOR_TOUR}
-          onComplete={() => setShowFirstTour(false)}
-          onClose={() => setShowFirstTour(false)}
-          autoStart={true}
-        />
-      )}
     </div>
   );
 };

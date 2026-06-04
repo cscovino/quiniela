@@ -41,9 +41,6 @@ export const PredictionInput: FC<PredictionInputProps> = ({
   return (
     <div className={`prediction-input ${className}`}>
       <div className="prediction-input__team">
-        <Typography variant="small" className="prediction-input__label">
-          {homeTeamName}
-        </Typography>
         <Input
           type="text"
           inputMode="numeric"
@@ -73,9 +70,6 @@ export const PredictionInput: FC<PredictionInputProps> = ({
           min="0"
           max="15"
         />
-        <Typography variant="small" className="prediction-input__label">
-          {awayTeamName}
-        </Typography>
       </div>
     </div>
   );

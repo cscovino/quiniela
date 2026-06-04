@@ -117,81 +117,63 @@ export const PredictorList: FC<PredictorListProps> = ({
                   <div className="predictor-list__stat-cell">
                     <Icon
                       name="trophy"
-                      size={12}
+                      size={18}
                       color="var(--text-secondary)"
                       ariaLabel={(
                         labels.statGrid?.statPointsAriaLabel || 'Points: {value}'
                       ).replace('{value}', String(stats?.totalPoints ?? 0))}
                     />
                     <span className="predictor-list__stat-value">{stats?.totalPoints ?? 0}</span>
-                    <span className="predictor-list__stat-label">
-                      {labels.statGrid?.statPoints || 'Pts'}
-                    </span>
                   </div>
                   <div className="predictor-list__stat-cell">
                     <Icon
                       name="target"
-                      size={12}
+                      size={18}
                       color="var(--text-secondary)"
                       ariaLabel={(
                         labels.statGrid?.statAccuracyAriaLabel || 'Accuracy: {value}'
                       ).replace('{value}', accuracyDisplay)}
                     />
                     <span className="predictor-list__stat-value">{accuracyDisplay}</span>
-                    <span className="predictor-list__stat-label">
-                      {labels.statGrid?.statAccuracy || 'Acc'}
-                    </span>
                   </div>
                   <div className="predictor-list__stat-cell">
                     <Icon
                       name="fire"
-                      size={12}
+                      size={18}
                       color="var(--text-secondary)"
                       ariaLabel={(
                         labels.statGrid?.statCurrentStreakAriaLabel || 'Current streak: {value}'
                       ).replace('{value}', String(stats?.currentStreak ?? 0))}
                     />
                     <span className="predictor-list__stat-value">{stats?.currentStreak ?? 0}</span>
-                    <span className="predictor-list__stat-label">
-                      {labels.statGrid?.statCurrentStreak || 'Streak'}
-                    </span>
                   </div>
                   <div className="predictor-list__stat-cell">
                     <Icon
                       name="crown"
-                      size={12}
+                      size={18}
                       color="var(--text-secondary)"
                       ariaLabel={(
                         labels.statGrid?.statBestStreakAriaLabel || 'Best streak: {value}'
                       ).replace('{value}', String(stats?.maxStreak ?? 0))}
                     />
                     <span className="predictor-list__stat-value">{stats?.maxStreak ?? 0}</span>
-                    <span className="predictor-list__stat-label">
-                      {labels.statGrid?.statBestStreak || 'Best'}
-                    </span>
                   </div>
                   <div className="predictor-list__stat-cell">
                     <Icon
                       name="sparkles"
-                      size={12}
+                      size={18}
                       color="var(--text-secondary)"
                       ariaLabel={(
                         labels.statGrid?.statExactBetsAriaLabel || 'Exact bets: {value}'
                       ).replace('{value}', String(stats?.exactBets ?? 0))}
                     />
                     <span className="predictor-list__stat-value">{stats?.exactBets ?? 0}</span>
-                    <span className="predictor-list__stat-label">
-                      {labels.statGrid?.statExactBets || 'Exact'}
-                    </span>
                   </div>
                   <div className="predictor-list__stat-cell">
                     <span className="predictor-list__stat-value">
                       {groupsDone != null && groupsTotal != null
                         ? `${groupsDone}/${groupsTotal}`
                         : '—/—'}
-                    </span>
-                    <span className="predictor-list__stat-label">
-                      {labels.statGrid?.statGroups || 'Groups'}
                     </span>
                   </div>
                 </div>
