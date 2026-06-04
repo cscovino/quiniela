@@ -27,6 +27,7 @@ import {
   computeThirdPlaceStandings,
   deriveFinalFour,
   isGroupClassificationComplete,
+  isGroupMatchesComplete,
   KNOCKOUT_PHASES,
 } from '@utils/predictions-flow';
 
@@ -455,14 +456,26 @@ export function usePredictionSteps(
       const groupMatches = firestoreMatches.filter(
         (m) => m.phase === 'group' && m.groupId === group.slug,
       );
+      // Use the same `id = slug` shape rendered below so `m.id` keys line up with
+      // `existingMatchValues` (which is keyed by match slug).
+      const groupMatchesWithId = groupMatches.map((m) => ({ ...m, id: m.slug }));
       const existingGroupBet = groupBetsByGroupId[group.slug] || null;
+
+      // A group only counts complete once its match scores are persisted too — not on
+      // classification alone. Without this, the third-place screen is reachable with empty
+      // scores, which collapses every third-place team to 0 pts → alphabetical A-H.
+      const hasAllMatchScores = isGroupMatchesComplete(
+        groupMatchesWithId,
+        existingMatchValues,
+        group.slug,
+      );
 
       const isGroupComplete =
         existingGroupBet != null &&
-        isGroupClassificationComplete(existingGroupBet, group.teams.length);
+        isGroupClassificationComplete(existingGroupBet, group.teams.length) &&
+        hasAllMatchScores;
 
-      const canAdvanceGroup =
-        submittedSteps.has(stepIndex) || isGroupComplete || existingGroupBet != null;
+      const canAdvanceGroup = submittedSteps.has(stepIndex) || isGroupComplete;
 
       const stepDescription =
         translations.stepDescriptionGroup?.replace('{group}', group.name) ||
@@ -479,7 +492,7 @@ export function usePredictionSteps(
         content: (
           <PredictionStepGroup
             group={group}
-            groupMatches={groupMatches.map((m) => ({ ...m, id: m.slug }))}
+            groupMatches={groupMatchesWithId}
             teamsMap={teamsMap}
             existingMatchValues={existingMatchValues}
             existingGroupBet={existingGroupBet}
