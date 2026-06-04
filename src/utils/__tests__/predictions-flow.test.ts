@@ -1075,10 +1075,10 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
 
 describe('computeThirdPlaceStandings — matrix-driven bracketMatchSlug derivation', () => {
   // 8 groups A-H all advance → combination key ABCDEFGH
-  // THIRD_PLACE_MATRIX['ABCDEFGH'] = { M74:'F', M82:'A', M81:'B', M77:'H', M79:'C', M80:'E', M85:'G', M87:'D' }
+  // THIRD_PLACE_MATRIX['ABCDEFGH'] = { M74:'C', M77:'F', M79:'H', M80:'E', M81:'B', M82:'A', M85:'G', M87:'D' }
   // matrixSlot→seedSlug: M74→r32-2, M77→r32-5, M79→r32-7, M80→r32-8, M81→r32-9, M82→r32-10, M85→r32-13, M87→r32-15
-  // So: group-A→r32-10 (M82), group-B→r32-9 (M81), group-C→r32-7 (M79), group-D→r32-15 (M87),
-  //     group-E→r32-8 (M80), group-F→r32-2 (M74), group-G→r32-13 (M85), group-H→r32-5 (M77)
+  // So: group-A→r32-10 (M82), group-B→r32-9 (M81), group-C→r32-2 (M74), group-D→r32-15 (M87),
+  //     group-E→r32-8 (M80), group-F→r32-5 (M77), group-G→r32-13 (M85), group-H→r32-7 (M79)
   const groups8 = [
     { slug: 'group-a' },
     { slug: 'group-b' },

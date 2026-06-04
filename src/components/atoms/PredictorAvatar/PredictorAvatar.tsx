@@ -48,12 +48,11 @@ export const PredictorAvatar: FC<PredictorAvatarProps> = ({
   size = 'md',
   className = '',
 }) => {
-  // D-07: pure inline tier resolver
+  console.log(`PREDICTOR`, predictor);
   const seed = predictor.pixelArt?.seed ?? predictor.id;
   const options = predictor.pixelArt?.options ?? DEFAULT_OPTIONS;
   const isImage = Boolean(seed); // tiers 1 & 2 (real predictors always have id)
 
-  // D-05 / RESEARCH Q2 + Pitfall 2: serialized options key for cache correctness
   const optionsKey = JSON.stringify(options);
 
   // Reference only optionsKey in the closure (parse back inside) so the memo deps are
@@ -71,7 +70,6 @@ export const PredictorAvatar: FC<PredictorAvatarProps> = ({
     );
   }
 
-  // tier-3 (no id): keep current colored-initial behavior verbatim (D-04)
   const initial = predictor.name ? predictor.name.charAt(0).toUpperCase() : '?';
   return (
     <div
