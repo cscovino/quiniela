@@ -337,19 +337,63 @@ async function queryBuildData(db: DbClient, locale: Locale) {
 }
 
 async function queryBuildRankings(db: DbClient) {
-  const statsSnap = await db.collectionGroup('stats');
+  const [predictorsSnap, statsSnap] = await Promise.all([
+    db.collectionGroup('predictors'),
+    db.collectionGroup('stats'),
+  ]);
 
-  const allStats: Array<PredictorStatsData & { userId: string; predictorId: string }> = [];
+  const statsByKey = new Map<
+    string,
+    PredictorStatsData & { userId: string; predictorId: string }
+  >();
+  const predictorsByKey = new Map<string, { userId: string; predictorId: string }>();
 
   statsSnap.forEach((doc) => {
     const refPath = (doc as unknown as { ref: { path: string } }).ref.path;
     const pathParts = refPath.split('/');
     const userId = pathParts[1];
     const predictorId = pathParts[3];
-    allStats.push({ ...(doc.data() as PredictorStatsData), userId, predictorId });
+    statsByKey.set(`${userId}/${predictorId}`, {
+      ...(doc.data() as PredictorStatsData),
+      userId,
+      predictorId,
+    });
   });
 
-  const sorted = allStats.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 100);
+  predictorsSnap.forEach((doc) => {
+    const refPath = (doc as unknown as { ref: { path: string } }).ref.path;
+    const pathParts = refPath.split('/');
+    const userId = pathParts[1];
+    const predictorId = pathParts[3];
+    predictorsByKey.set(`${userId}/${predictorId}`, { userId, predictorId });
+  });
+
+  // Merge: predictors with stats get the stats, predictors without stats
+  // get a zero-points entry. Also include any stats whose predictor doc
+  // is missing (orphaned) — they still represent a participant.
+  const merged: Array<PredictorStatsData & { userId: string; predictorId: string }> = [];
+  const seen = new Set<string>();
+  for (const [key, meta] of predictorsByKey) {
+    seen.add(key);
+    const stats = statsByKey.get(key);
+    if (stats) {
+      merged.push(stats);
+    } else {
+      merged.push({
+        userId: meta.userId,
+        predictorId: meta.predictorId,
+        totalPoints: 0,
+        accuracy: 0,
+        currentStreak: 0,
+        exactBets: 0,
+      });
+    }
+  }
+  for (const [key, stats] of statsByKey) {
+    if (!seen.has(key)) merged.push(stats);
+  }
+
+  const sorted = merged.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 100);
 
   const predictorRefs = new Set<string>();
   for (const s of sorted) {

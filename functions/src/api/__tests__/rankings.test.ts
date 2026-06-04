@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildRankingEntries } from '../rankings';
+import { buildRankingEntries, mergePredictorStats } from '../rankings';
 
 import '../../__tests__/setup';
 
@@ -15,6 +15,22 @@ function sampleStat(userId: string, predictorId: string) {
     exactBets: 5,
     badgesAwarded: {},
     pointsHistory: [],
+  };
+}
+
+function makePredictorDoc(id: string, userId: string, predictorId: string) {
+  return {
+    id,
+    ref: { path: `users/${userId}/predictors/${predictorId}` },
+    data: () => ({ name: id }),
+  };
+}
+
+function makeStatDoc(id: string, userId: string, predictorId: string, totalPoints: number) {
+  return {
+    id,
+    ref: { path: `users/${userId}/predictors/${predictorId}/stats/world-cup-2026` },
+    data: () => ({ totalPoints, pointsHistory: [] }),
   };
 }
 
@@ -66,5 +82,52 @@ describe('buildRankingEntries', () => {
     const [entry] = buildRankingEntries([sampleStat('u1', 'p1')], profileMap);
     expect(entry).toHaveProperty('avatar');
     expect(entry).toHaveProperty('avatarUrl');
+  });
+});
+
+describe('mergePredictorStats', () => {
+  it('includes predictors without stats as zero-point entries', () => {
+    const predictors = [
+      makePredictorDoc('p1', 'u1', 'p1'),
+      makePredictorDoc('p2', 'u1', 'p2'),
+    ];
+    const stats = [makeStatDoc('p1-stats', 'u1', 'p1', 100)];
+
+    const merged = mergePredictorStats(predictors, stats);
+
+    const p1 = merged.find((m) => m.predictorId === 'p1');
+    const p2 = merged.find((m) => m.predictorId === 'p2');
+    expect(p1?.totalPoints).toBe(100);
+    expect(p2?.totalPoints).toBe(0);
+    expect(p2?.userId).toBe('u1');
+    expect(p2?.pointsHistory).toEqual([]);
+  });
+
+  it('uses stats points when both predictor and stats exist', () => {
+    const predictors = [makePredictorDoc('p1', 'u1', 'p1')];
+    const stats = [makeStatDoc('p1-stats', 'u1', 'p1', 250)];
+
+    const merged = mergePredictorStats(predictors, stats);
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0].totalPoints).toBe(250);
+  });
+
+  it('keeps orphaned stats whose predictor doc is missing', () => {
+    const predictors = [makePredictorDoc('p1', 'u1', 'p1')];
+    const stats = [
+      makeStatDoc('p1-stats', 'u1', 'p1', 50),
+      makeStatDoc('p2-stats', 'u1', 'p2', 80),
+    ];
+
+    const merged = mergePredictorStats(predictors, stats);
+
+    expect(merged).toHaveLength(2);
+    const ids = merged.map((m) => m.predictorId).sort();
+    expect(ids).toEqual(['p1', 'p2']);
+  });
+
+  it('returns empty array when both snapshots are empty', () => {
+    expect(mergePredictorStats([], [])).toEqual([]);
   });
 });
