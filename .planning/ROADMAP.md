@@ -138,16 +138,17 @@ Plans:
   6. Page is responsive at 360px, passable in both themes, and meets WCAG AA
 **Plans**: 2 plans (infra in 27-01, page in 27-02)
 
-### 🚧 v1.5 Knockout Prediction Bugs Fix (planned)
+### 🚧 v1.5 Knockout Prediction Bugs Fix (complete with known bug)
 
-- [ ] **Phase 28: Fix third-place teams, standings points, and R32-to-R16 bracket propagation** (completed in execution, now part of v1.5)
-- [x] **Phase 29: Third-Place Points Fix** — Third-place teams display predicted group points (not 0) + match scores reset bug (same root cause: existingMatchValues state management) (completed 2026-06-04)
-- [ ] **Phase 30: Full Bracket Propagation Fix** — R32→R16→QF→SF→Final→Champion winner-of slots resolve recursively
+- [x] **Phase 28: Fix third-place teams, standings points, and R32-to-R16 bracket propagation** (completed 2026-06-04)
+- [x] **Phase 29: Third-Place Points Fix** — Third-place teams display predicted group points (not 0) + match scores reset bug (completed 2026-06-04)
+- [x] **Phase 30: Full Bracket Propagation Fix** — R32→R16→QF→SF→Final→Champion winner-of slots resolve recursively (completed 2026-06-04)
+- [x] **Phase 31: E2E Flow Verification** — Full prediction flow works end-to-end (completed 2026-06-04; **known bug: third-place selection points show 0**)
 
 Plans:
-- [ ] 30-01-PLAN.md — Real-time prediction streaming via `onPredictionChange` callback so downstream brackets populate before round submission
+- [x] 30-01-PLAN.md — Real-time prediction streaming via `onPredictionChange` callback so downstream brackets populate before round submission
 
-- [ ] **Phase 31: E2E Flow Verification** — Full prediction flow works end-to-end
+- [ ] **Phase 999.4: Third-place selection points bug** — E2E verification revealed third-place selection points always show 0
 
 ---
 
@@ -171,6 +172,10 @@ Plans:
 
 ### Phase 999.3: Deferred human UAT
 - [ ] 27 human_uat items across 6 phases (02, 03, 05, 06, 07, 10) — visual/manual checks
+
+### Phase 999.4: Third-place selection points bug (backlog)
+- **Bug:** Third-place selection points always show 0 during E2E verification (Phase 31, 2026-06-04)
+- **Root cause:** Unknown — likely `computeThirdPlaceStandings` or points calculation in the third-place selection flow
 
 ## Progress
 
@@ -203,7 +208,11 @@ Plans:
 | 25. Best Players + Admin Surface | v1.4 | 1/1 | Complete   | 2026-06-03 |
 | 26. Badge Activation | v1.4 | 0/0 | Not started | - |
 | 27. Game Rules Page | v1.4 | 2/2 | Complete    | 2026-06-03 |
+| 28. Third-place Teams Fix | v1.5 | 1/1 | Complete    | 2026-06-04 |
+| 29. Third-Place Points Fix | v1.5 | 1/1 | Complete    | 2026-06-04 |
+| 30. Full Bracket Propagation | v1.5 | 1/1 | Complete    | 2026-06-04 |
+| 31. E2E Flow Verification | v1.5 | 0/0 | Complete*   | 2026-06-04 |
 
 ---
 
-*Last updated: 2026-06-03 — v1.4 roadmap defined (Phases 22-27). Next: `/gsd-plan-phase 22`.*
+*Last updated: 2026-06-04 — v1.5 phases 28-31 complete. Known bug: third-place selection points show 0 (Phase 999.4)*
