@@ -491,6 +491,10 @@ export function usePredictionSteps(
         deadline,
         content: (
           <PredictionStepGroup
+            // Remount when the predictor or group changes so the step re-seeds from that
+            // predictor's freshly loaded saved scores. Within a predictor it stays mounted,
+            // so in-progress edits survive prop updates (no more clobbering on submit/reload).
+            key={`${selectedPredictorId ?? 'none'}-${group.slug}`}
             group={group}
             groupMatches={groupMatchesWithId}
             teamsMap={teamsMap}
@@ -693,6 +697,7 @@ export function usePredictionSteps(
     registerStepState,
     deadline,
     confirmedAdvancingMap,
+    selectedPredictorId,
   ]);
 
   // Allow advancing when either the saved data already satisfies the step

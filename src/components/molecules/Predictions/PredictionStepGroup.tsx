@@ -106,11 +106,10 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isFirstRender = useRef(true);
 
-  // Re-sync local state when the saved bet changes (e.g. after a save or
-  // switching predictor) so edits reflect the latest persisted values.
-  useEffect(() => {
-    setMatchPredictions(initialScores);
-  }, [initialScores]);
+  // Match scores seed once from initialScores via the useState initializer above. We do NOT
+  // re-sync on existingMatchValues prop changes: doing so clobbered in-progress edits whenever
+  // the parent re-rendered (optimistic merge on submit, Firestore reload). Fresh saved values
+  // for a different predictor/group come through a remount keyed on predictor + group instead.
 
   useEffect(() => {
     if (existingGroupBet) setClassification([...existingGroupBet]);
