@@ -143,6 +143,10 @@ Plans:
 - [ ] **Phase 28: Fix third-place teams, standings points, and R32-to-R16 bracket propagation** (completed in execution, now part of v1.5)
 - [x] **Phase 29: Third-Place Points Fix** — Third-place teams display predicted group points (not 0) + match scores reset bug (same root cause: existingMatchValues state management) (completed 2026-06-04)
 - [ ] **Phase 30: Full Bracket Propagation Fix** — R32→R16→QF→SF→Final→Champion winner-of slots resolve recursively
+
+Plans:
+- [ ] 30-01-PLAN.md — Real-time prediction streaming via `onPredictionChange` callback so downstream brackets populate before round submission
+
 - [ ] **Phase 31: E2E Flow Verification** — Full prediction flow works end-to-end
 
 ---

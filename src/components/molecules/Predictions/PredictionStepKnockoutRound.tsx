@@ -29,6 +29,8 @@ export interface PredictionStepKnockoutRoundProps {
   previousRoundPredictions: Record<string, string>;
   onSubmit: (predictions: Record<string, string>) => Promise<void>;
   isDisabled: boolean;
+  /** When provided, called immediately on each winner pick — enables real-time bracket propagation. */
+  onPredictionChange?: (matchSlug: string, winnerFifaCode: string) => void;
   /** When provided, the step reports its submit/validity to the wizard's Next button. */
   onStateChange?: RegisterStepState;
   translations?: {
@@ -91,6 +93,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
   previousRoundPredictions,
   onSubmit,
   isDisabled,
+  onPredictionChange,
   onStateChange,
   translations = {},
 }) => {
@@ -129,6 +132,7 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
       ...prev,
       [matchSlug]: winner,
     }));
+    onPredictionChange?.(matchSlug, winner);
   };
 
   const [now, setNow] = useState(0);
