@@ -977,6 +977,100 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
     expect(groupAEntry!.teamId).toBe('fra'); // 3rd place — not 'ger' (4th place)
     expect(groupAEntry!.rank).toBe(1); // Only one group → rank 1
   });
+
+  // BUG #1 gating rationale: prove the top-8 ordering is RANK-driven (not alphabetical A-H)
+  // when real predicted scores are present, and that EMPTY scores collapse to the
+  // all-zero → alphabetical fallback that made the screen meaningless.
+  describe('top-8 ordering: rank-driven with scores vs alphabetical fallback when empty', () => {
+    // One isolated group per letter, each with its own unique third-place team and a
+    // single match that team plays. Distinct teams per group keep calculateGroupStandings
+    // point totals independent so we can dial each third-place team's points precisely.
+    const rankGroups = [
+      { slug: 'group-a', third: 't3a', opp: 't4a' },
+      { slug: 'group-b', third: 't3b', opp: 't4b' },
+      { slug: 'group-c', third: 't3c', opp: 't4c' },
+      { slug: 'group-d', third: 't3d', opp: 't4d' },
+      { slug: 'group-e', third: 't3e', opp: 't4e' },
+      { slug: 'group-f', third: 't3f', opp: 't4f' },
+      { slug: 'group-g', third: 't3g', opp: 't4g' },
+      { slug: 'group-h', third: 't3h', opp: 't4h' },
+    ];
+
+    const rankTeamsMap = Object.fromEntries(
+      rankGroups.flatMap((g) => [
+        [g.third, { fifaCode: g.third.toUpperCase(), name: g.third }],
+        [g.opp, { fifaCode: g.opp.toUpperCase(), name: g.opp }],
+      ]),
+    );
+
+    // positions[2] is the third-place team; positions[3] is its opponent (4th).
+    const rankGroupBets: GroupBetRecord = Object.fromEntries(
+      rankGroups.map((g) => [g.slug, [`1${g.slug}`, `2${g.slug}`, g.third, g.opp]]),
+    );
+
+    // One group match per group: the third-place team vs its 4th-place opponent.
+    const rankMatches: MatchWithId[] = rankGroups.map((g) =>
+      makeMatch(`${g.slug}-m1`, g.slug, 'group', g.third, g.opp),
+    );
+
+    it('orders advancing third-place teams by points (NOT alphabetical) when scores exist', () => {
+      // Deliberately INVERT alphabetical order via score margins:
+      // group-h's third team wins biggest, group-a's only draws. If the sort were
+      // alphabetical (the empty-score bug), 'A' would lead; rank-driven sort must put
+      // 'H' first.
+      const margins = [
+        { slug: 'group-a', home: 0, away: 0 }, // 1 pt (draw), GD 0
+        { slug: 'group-b', home: 1, away: 1 }, // 1 pt (draw), GD 0, GF 1
+        { slug: 'group-c', home: 1, away: 0 }, // 3 pts, GD +1
+        { slug: 'group-d', home: 2, away: 0 }, // 3 pts, GD +2
+        { slug: 'group-e', home: 3, away: 0 }, // 3 pts, GD +3
+        { slug: 'group-f', home: 4, away: 0 }, // 3 pts, GD +4
+        { slug: 'group-g', home: 5, away: 0 }, // 3 pts, GD +5
+        { slug: 'group-h', home: 6, away: 0 }, // 3 pts, GD +6  ← should rank #1
+      ];
+      const scored: PredictionRecord = Object.fromEntries(
+        margins.map((m) => [`${m.slug}-m1`, { home: m.home, away: m.away }]),
+      );
+
+      const result = computeThirdPlaceStandings(
+        rankGroupBets,
+        scored,
+        rankMatches,
+        rankTeamsMap,
+        rankGroups,
+      );
+
+      // Real scores → non-zero points for the winning groups.
+      expect(result.some((r) => r.points > 0)).toBe(true);
+
+      // Order is rank-driven: highest points/GD first. H > G > F > E > D > C, then the
+      // two 1-pt draws — B before A by GF tiebreak (B scored 1, A scored 0). NOT plain A-H.
+      const order = result.map((r) => r.groupLetter);
+      expect(order).toEqual(['H', 'G', 'F', 'E', 'D', 'C', 'B', 'A']);
+      // Explicitly assert it is NOT the alphabetical fallback.
+      expect(order).not.toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']);
+      // The #1 ranked team is group-H's third-place team, by points/GD — not group A.
+      expect(result[0].groupLetter).toBe('H');
+      expect(result[0].points).toBeGreaterThan(0);
+    });
+
+    it('with EMPTY scores every team computes 0 pts and falls back to alphabetical A-H (the documented bug)', () => {
+      // No match predictions at all → calculateGroupStandings yields 0 for every team →
+      // the deterministic tiebreak collapses to groupLetter asc → slice(0,8) is always A-H.
+      const result = computeThirdPlaceStandings(
+        rankGroupBets,
+        {}, // empty matchPredictions — the exact precondition the gating now blocks
+        rankMatches,
+        rankTeamsMap,
+        rankGroups,
+      );
+
+      // Every third-place team has 0 points (this is what made the screen meaningless).
+      expect(result.every((r) => r.points === 0)).toBe(true);
+      // Sort falls through to group letter → pure alphabetical A-H, the bug signature.
+      expect(result.map((r) => r.groupLetter)).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']);
+    });
+  });
 });
 
 describe('computeThirdPlaceStandings — matrix-driven bracketMatchSlug derivation', () => {
