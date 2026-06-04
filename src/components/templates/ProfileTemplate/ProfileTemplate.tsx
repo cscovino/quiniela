@@ -388,6 +388,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
               onCreate={() => {
                 window.location.href = predictionsRoute;
               }}
+              locale={locale}
               translations={
                 translations.predictorList
                   ? {

@@ -541,6 +541,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
                 setEditingPredictor(null);
                 setView('editor');
               }}
+              locale={locale}
               translations={listTranslations}
             />
           )}

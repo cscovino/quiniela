@@ -5,6 +5,7 @@ import type { Predictor, PredictorStats } from '@app-types/firestore';
 import { Button } from '@atoms/Button';
 import { Icon } from '@atoms/Icon';
 import { PredictorAvatar } from '@atoms/PredictorAvatar';
+import { Tooltip } from '@atoms/Tooltip';
 import { Typography } from '@atoms/Typography';
 
 import './PredictorList.css';
@@ -28,6 +29,7 @@ export interface PredictorListProps {
   onEdit: (predictorId: string) => void;
   onDelete: (predictorId: string) => void;
   onCreate: () => void;
+  locale?: 'en' | 'es';
   translations?: {
     newButton?: string;
     progress?: string;
@@ -57,6 +59,26 @@ export interface PredictorListProps {
   };
 }
 
+const STAT_LABELS: Record<
+  'en' | 'es',
+  { points: string; accuracy: string; currentStreak: string; bestStreak: string; exactBets: string }
+> = {
+  en: {
+    points: 'Total points',
+    accuracy: 'Accuracy',
+    currentStreak: 'Current streak',
+    bestStreak: 'Best streak',
+    exactBets: 'Exact bets',
+  },
+  es: {
+    points: 'Puntos totales',
+    accuracy: 'Precisión',
+    currentStreak: 'Racha actual',
+    bestStreak: 'Mejor racha',
+    exactBets: 'Apuestas exactas',
+  },
+};
+
 const t = {
   newButton: 'New prediction',
   progress: 'groups',
@@ -78,9 +100,11 @@ export const PredictorList: FC<PredictorListProps> = ({
   onEdit,
   onDelete,
   onCreate,
+  locale = 'en',
   translations = {},
 }) => {
   const labels = { ...t, ...translations };
+  const statLabels = STAT_LABELS[locale];
 
   return (
     <div className="predictor-list" role="list" aria-label={labels.listLabel}>
@@ -114,7 +138,7 @@ export const PredictorList: FC<PredictorListProps> = ({
                   {predictor.name}
                 </Typography>
                 <div className="predictor-list__stat-grid">
-                  <div className="predictor-list__stat-cell">
+                  <Tooltip content={statLabels.points} position="top" className="predictor-list__stat-cell">
                     <Icon
                       name="trophy"
                       size={18}
@@ -124,8 +148,8 @@ export const PredictorList: FC<PredictorListProps> = ({
                       ).replace('{value}', String(stats?.totalPoints ?? 0))}
                     />
                     <span className="predictor-list__stat-value">{stats?.totalPoints ?? 0}</span>
-                  </div>
-                  <div className="predictor-list__stat-cell">
+                  </Tooltip>
+                  <Tooltip content={statLabels.accuracy} position="top" className="predictor-list__stat-cell">
                     <Icon
                       name="target"
                       size={18}
@@ -135,8 +159,8 @@ export const PredictorList: FC<PredictorListProps> = ({
                       ).replace('{value}', accuracyDisplay)}
                     />
                     <span className="predictor-list__stat-value">{accuracyDisplay}</span>
-                  </div>
-                  <div className="predictor-list__stat-cell">
+                  </Tooltip>
+                  <Tooltip content={statLabels.currentStreak} position="top" className="predictor-list__stat-cell">
                     <Icon
                       name="fire"
                       size={18}
@@ -146,8 +170,8 @@ export const PredictorList: FC<PredictorListProps> = ({
                       ).replace('{value}', String(stats?.currentStreak ?? 0))}
                     />
                     <span className="predictor-list__stat-value">{stats?.currentStreak ?? 0}</span>
-                  </div>
-                  <div className="predictor-list__stat-cell">
+                  </Tooltip>
+                  <Tooltip content={statLabels.bestStreak} position="top" className="predictor-list__stat-cell">
                     <Icon
                       name="crown"
                       size={18}
@@ -157,8 +181,8 @@ export const PredictorList: FC<PredictorListProps> = ({
                       ).replace('{value}', String(stats?.maxStreak ?? 0))}
                     />
                     <span className="predictor-list__stat-value">{stats?.maxStreak ?? 0}</span>
-                  </div>
-                  <div className="predictor-list__stat-cell">
+                  </Tooltip>
+                  <Tooltip content={statLabels.exactBets} position="top" className="predictor-list__stat-cell">
                     <Icon
                       name="sparkles"
                       size={18}
@@ -168,7 +192,7 @@ export const PredictorList: FC<PredictorListProps> = ({
                       ).replace('{value}', String(stats?.exactBets ?? 0))}
                     />
                     <span className="predictor-list__stat-value">{stats?.exactBets ?? 0}</span>
-                  </div>
+                  </Tooltip>
                   <div className="predictor-list__stat-cell">
                     <span className="predictor-list__stat-value">
                       {groupsDone != null && groupsTotal != null
