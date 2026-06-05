@@ -28,6 +28,7 @@ export interface PredictorProfile {
   avatarUrl: string | null;
   avatar: { bgColor?: string; emoji?: string } | null;
   pixelArt: { seed: string; options: Record<string, unknown> } | null;
+  favouriteTeamId: string | null;
 }
 
 export function buildRankingEntries(
@@ -49,6 +50,7 @@ export function buildRankingEntries(
           ? { bgColor: profile.avatar.bgColor, emoji: profile.avatar.emoji }
           : null,
       pixelArt: profile?.pixelArt ?? null,
+      favouriteTeamId: profile?.favouriteTeamId ?? null,
       totalPoints: s.totalPoints,
       accuracy: s.accuracy,
       currentStreak: s.currentStreak,
@@ -160,9 +162,7 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
         statsSnap.docs as unknown as MinimalDoc[],
       );
 
-      const sorted = merged
-        .sort((a, b) => b.totalPoints - a.totalPoints)
-        .slice(0, 100);
+      const sorted = merged.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 100);
 
       const predictorRefs = new Set<string>();
       for (const s of sorted) {
@@ -180,6 +180,7 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
             avatar: (data?.avatar as { bgColor?: string; emoji?: string } | null) || null,
             pixelArt:
               (data?.pixelArt as { seed: string; options: Record<string, unknown> } | null) ?? null,
+            favouriteTeamId: (data?.favouriteTeamId as string | null) || null,
           };
         }),
       );
@@ -191,6 +192,7 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
           avatarUrl: p.avatarUrl,
           avatar: p.avatar,
           pixelArt: p.pixelArt,
+          favouriteTeamId: p.favouriteTeamId,
         });
       }
 

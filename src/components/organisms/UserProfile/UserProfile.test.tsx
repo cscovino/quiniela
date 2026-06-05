@@ -1,78 +1,80 @@
 import { render, screen } from '@testing-library/react';
-import { Timestamp } from 'firebase/firestore';
 
-import type { Predictor } from '@app-types/firestore';
+import { useAuthStore } from '@store/auth-store';
 
 import { UserProfile } from './UserProfile';
 
+const mockUser = {
+  uid: 'user-1',
+  displayName: 'Carlos Enrique',
+  email: 'carlos@example.com',
+  avatarUrl: undefined,
+  role: 'user' as const,
+  createdAt: new Date('2026-01-01'),
+  lastLoginAt: new Date('2026-01-01'),
+};
+
 const translations = {
-  totalPoints: 'Total Points',
-  accuracy: 'Accuracy',
-  currentStreak: 'Current Streak',
-  bestStreak: 'Best Streak',
-  exactBets: 'Exact Bets',
-  rank: 'Rank',
-  badges: 'Badges',
-  lockedBadges: 'Locked Badges',
+  editProfile: 'Edit Profile',
+  cancelEditing: 'Cancel',
+  saveProfile: 'Save Changes',
+  saving: 'Saving...',
+  profileSaved: 'Profile updated',
+  profileSaveError: 'Failed to update profile',
+  displayNameLabel: 'Display Name',
+  displayNameRequired: 'Display name is required',
+  avatarUrlLabel: 'Avatar URL',
+  avatarUrlHint: 'Enter a URL for your avatar',
 };
 
-const mockPredictor: Predictor = {
-  id: 'pred-1',
-  userId: 'user-1',
-  name: 'Carlos Enrique',
-  avatar: undefined,
-  createdAt: Timestamp.fromDate(new Date('2026-01-01')),
-};
-
-const mockProps = {
-  predictor: mockPredictor,
-  favoriteTeam: 'Argentina',
-  stats: {
-    totalPoints: 120,
-    exactBets: 8,
-    accuracy: 0.75,
-    currentStreak: 5,
-    maxStreak: 8,
-    rank: 12,
-  },
-  badges: [
-    { id: '1', name: 'On Fire', icon: 'fire' as const, earnedAt: new Date('2026-06-20') },
-    { id: '2', name: 'First Blood', icon: 'trophy' as const, earnedAt: new Date('2026-06-19') },
-  ],
-  translations,
-};
+vi.mock('@store/auth-store', () => ({
+  useAuthStore: vi.fn((selector) => {
+    const state = { user: mockUser };
+    return selector(state);
+  }),
+}));
 
 describe('UserProfile', () => {
-  it('renders predictor name in h2 (PROF-hdr)', () => {
-    render(<UserProfile {...mockProps} />);
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('renders user display name in h2', () => {
+    render(<UserProfile translations={translations} />);
     expect(screen.getByText('Carlos Enrique')).toBeInTheDocument();
   });
 
-  it('renders without crashing when predictor is null (PROF-hdr null)', () => {
-    // Should not throw; h2 with empty content exists
-    expect(() => render(<UserProfile {...mockProps} predictor={null} />)).not.toThrow();
-    expect(screen.queryByText('Carlos Enrique')).not.toBeInTheDocument();
+  it('renders edit button when editProfile translation provided', () => {
+    render(<UserProfile translations={translations} />);
+    expect(screen.getByRole('button', { name: 'Edit Profile' })).toBeInTheDocument();
   });
 
-  it('renders favorite team', () => {
-    render(<UserProfile {...mockProps} />);
-    expect(screen.getByText('Argentina')).toBeInTheDocument();
+  it('renders avatar placeholder with initial when no avatarUrl', () => {
+    render(<UserProfile translations={translations} />);
+    const placeholder = screen.getByText('CE', { hidden: true });
+    expect(placeholder).toBeInTheDocument();
   });
 
-  it('renders stats', () => {
-    render(<UserProfile {...mockProps} />);
-    expect(screen.getByText('120')).toBeInTheDocument();
-    expect(screen.getByText('75%')).toBeInTheDocument();
-    expect(screen.getByText('5')).toBeInTheDocument();
+  it('renders avatar image when avatarUrl is set', () => {
+    const userWithAvatar = { ...mockUser, avatarUrl: 'https://example.com/avatar.png' };
+    (useAuthStore as ReturnType<typeof vi.fn>).mockImplementation((selector) => {
+      const state = { user: userWithAvatar };
+      return selector(state);
+    });
+
+    render(<UserProfile translations={translations} />);
+    const img = screen.getByAltText('Carlos Enrique');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', 'https://example.com/avatar.png');
   });
 
-  it('renders badges', () => {
-    render(<UserProfile {...mockProps} />);
-    expect(screen.getByText('Badges')).toBeInTheDocument();
-  });
+  it('returns null when user is null', () => {
+    (useAuthStore as ReturnType<typeof vi.fn>).mockImplementation((selector) => {
+      const state = { user: null };
+      return selector(state);
+    });
 
-  it('hides badges section when empty', () => {
-    render(<UserProfile {...mockProps} badges={[]} />);
-    expect(screen.queryByText('Badges')).not.toBeInTheDocument();
+    const { container } = render(<UserProfile translations={translations} />);
+    expect(container).toBeEmptyDOMElement();
   });
 });

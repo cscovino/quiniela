@@ -99,3 +99,15 @@
   background: var(--color-primary-500);
   color: var(--bg-dark);
 }
+
+@media (max-width: 768px) {
+  .admin-match-list__match {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-match-result-form {
+    min-width: 0;
+    width: 100%;
+  }
+}

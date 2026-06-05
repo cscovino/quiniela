@@ -93,8 +93,9 @@ async function createAdminDb(): Promise<DbClient> {
     query: async (path: string, opts?: QueryOptions): Promise<QuerySnapshotLike> => {
       const ref = db.collection(path);
       if (opts?.orderBy) {
-        return (ref.orderBy(opts.orderBy) as unknown as { get: () => Promise<QuerySnapshotLike> })
-          .get() as unknown as Promise<QuerySnapshotLike>;
+        return (
+          ref.orderBy(opts.orderBy) as unknown as { get: () => Promise<QuerySnapshotLike> }
+        ).get() as unknown as Promise<QuerySnapshotLike>;
       }
       return ref.get() as unknown as Promise<QuerySnapshotLike>;
     },
@@ -414,6 +415,7 @@ export async function queryBuildRankings(db: DbClient) {
         avatarUrl: (data?.avatarUrl as string | null) || null,
         pixelArt:
           (data?.pixelArt as { seed: string; options: Record<string, unknown> } | null) ?? null,
+        favouriteTeamId: (data?.favouriteTeamId as string | null) || null,
       };
     }),
   );
@@ -426,6 +428,7 @@ export async function queryBuildRankings(db: DbClient) {
       emoji?: string;
       avatarUrl?: string;
       pixelArt: { seed: string; options: Record<string, unknown> } | null;
+      favouriteTeamId: string | null;
     }
   >();
   for (const p of predictorDocs) {
@@ -435,6 +438,7 @@ export async function queryBuildRankings(db: DbClient) {
       emoji: p.avatar?.emoji,
       avatarUrl: p.avatarUrl ?? undefined,
       pixelArt: p.pixelArt,
+      favouriteTeamId: p.favouriteTeamId,
     });
   }
 
@@ -446,6 +450,7 @@ export async function queryBuildRankings(db: DbClient) {
       predictorId: s.predictorId,
       displayName: nameMap.get(key) || s.predictorId,
       avatarUrl: avatarData?.avatarUrl,
+      favouriteTeamId: avatarData?.favouriteTeamId ?? undefined,
       avatar:
         avatarData?.bgColor && avatarData?.emoji
           ? { bgColor: avatarData.bgColor, emoji: avatarData.emoji }

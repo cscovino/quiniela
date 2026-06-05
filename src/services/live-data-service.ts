@@ -126,6 +126,13 @@ export async function fetchAllMatches(locale: Locale = 'en'): Promise<MatchCardP
     .map((m) => toMatchCardProps(m, teams, locale));
 }
 
+const localizeGroupName = (name: string, locale: Locale): string => {
+  if (locale === 'es') {
+    return name.replace(/^Group\b/i, 'Grupo');
+  }
+  return name;
+};
+
 export async function fetchLiveStandings(
   locale: Locale = 'en',
 ): Promise<GroupStandingsProps['groups']> {
@@ -153,7 +160,7 @@ export async function fetchLiveStandings(
     const data = d.data() as GroupStandings;
     const group = groupsMap.get(data.groupId);
     return {
-      name: group?.name || data.groupId,
+      name: localizeGroupName(group?.name || data.groupId, locale),
       standings: data.standings.map((s, idx) => {
         const team = teams.get(s.teamId.toLowerCase());
         return {
@@ -372,6 +379,7 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
       avatarUrl: s.avatarUrl || undefined,
       avatar: s.avatar || undefined,
       pixelArt: s.pixelArt ?? undefined,
+      favouriteTeamId: s.favouriteTeamId ?? undefined,
       points: s.totalPoints,
       todayPoints,
       accuracy: Math.round(s.accuracy * 100),

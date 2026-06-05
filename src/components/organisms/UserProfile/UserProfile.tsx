@@ -1,135 +1,70 @@
 import type { FC } from 'react';
+import { useState } from 'react';
 
-import type { Predictor } from '@app-types/firestore';
-import { Icon, type IconName } from '@atoms/Icon';
-import { PredictorAvatar } from '@atoms/PredictorAvatar';
+import { Button } from '@atoms/Button';
 import { Typography } from '@atoms/Typography';
-import { StatCard } from '@molecules/StatCard';
+import { EditProfileForm } from '@molecules/EditProfileForm';
+import { useAuthStore } from '@store/auth-store';
 
 import './UserProfile.css';
 
-export interface BadgeEarned {
-  id: string;
-  name: string;
-  icon: IconName;
-  earnedAt: Date;
-  description?: string;
-}
-
-export interface BadgeLocked {
-  id: string;
-  name: string;
-  icon: IconName;
-  description?: string;
-  condition?: string;
-}
+import { Avatar } from '@/components/atoms/Avatar';
 
 export interface UserProfileProps {
-  predictor: Predictor | null;
-  favoriteTeam?: string;
-  stats: {
-    totalPoints: number;
-    exactBets: number;
-    accuracy: number;
-    currentStreak: number;
-    maxStreak: number;
-    rank: number;
-  };
-  badges: BadgeEarned[];
-  lockedBadges?: BadgeLocked[];
   translations: {
-    totalPoints: string;
-    accuracy: string;
-    currentStreak: string;
-    bestStreak: string;
-    exactBets: string;
-    rank: string;
-    badges: string;
-    lockedBadges: string;
+    editProfile?: string;
+    cancelEditing?: string;
+    saveProfile?: string;
+    saving?: string;
+    profileSaved?: string;
+    profileSaveError?: string;
+    displayNameLabel?: string;
+    displayNameRequired?: string;
+    avatarUrlLabel?: string;
+    avatarUrlHint?: string;
   };
   className?: string;
 }
 
-export const UserProfile: FC<UserProfileProps> = ({
-  predictor,
-  favoriteTeam,
-  stats,
-  badges,
-  lockedBadges = [],
-  translations,
-  className = '',
-}) => {
+export const UserProfile: FC<UserProfileProps> = ({ translations, className = '' }) => {
+  const user = useAuthStore((s) => s.user);
+  const [editing, setEditing] = useState(false);
+
+  if (!user) return null;
+
+  const displayName = user.displayName || user.email?.split('@')[0] || '';
+  const avatarUrl = user.avatarUrl;
+
   return (
     <div className={`user-profile ${className}`}>
-      <div className="user-profile__header">
-        {predictor && <PredictorAvatar predictor={predictor} size="lg" />}
-        <div className="user-profile__info">
-          <Typography variant="h2">{predictor?.name ?? ''}</Typography>
-          {favoriteTeam && (
-            <div className="user-profile__team">
-              <Icon name="flag" size={14} />
-              <Typography variant="small">{favoriteTeam}</Typography>
+      {editing ? (
+        <EditProfileForm
+          translations={{
+            displayNameLabel: translations?.displayNameLabel || 'Display Name',
+            displayNameRequired: translations?.displayNameRequired || 'Display name is required',
+            avatarUrlLabel: translations?.avatarUrlLabel || 'Avatar URL',
+            avatarUrlHint: translations?.avatarUrlHint || '',
+            saveProfile: translations?.saveProfile || 'Save Changes',
+            cancelEditing: translations?.cancelEditing || 'Cancel',
+            saving: translations?.saving || 'Saving...',
+            profileSaved: translations?.profileSaved || 'Profile updated',
+            profileSaveError: translations?.profileSaveError || 'Failed to update profile',
+          }}
+          onCancel={() => setEditing(false)}
+          onSaved={() => setEditing(false)}
+        />
+      ) : (
+        <>
+          <div className="user-profile__header">
+            <Avatar src={avatarUrl} name={displayName} />
+            <div className="user-profile__info">
+              <Typography variant="h2">{displayName}</Typography>
             </div>
-          )}
-        </div>
-      </div>
-
-      <div className="user-profile__stats">
-        <StatCard label={translations.totalPoints} value={stats.totalPoints} icon="star" />
-        <StatCard
-          label={translations.accuracy}
-          value={`${Math.round(stats.accuracy * 100)}%`}
-          icon="target"
-        />
-        <StatCard
-          label={translations.currentStreak}
-          value={stats.currentStreak}
-          icon="fire"
-          trend={stats.currentStreak > 2 ? 'up' : 'neutral'}
-        />
-        <StatCard label={translations.bestStreak} value={stats.maxStreak} icon="lightning" />
-        <StatCard label={translations.exactBets} value={stats.exactBets} icon="trophy" />
-        <StatCard label={translations.rank} value={`#${stats.rank}`} icon="award" />
-      </div>
-
-      {badges.length > 0 && (
-        <div className="user-profile__badges">
-          <Typography variant="h4">{translations.badges}</Typography>
-          <div className="user-profile__badges-list">
-            {badges.map((badge) => (
-              <div
-                key={badge.id}
-                className="user-profile__badge"
-                title={`${badge.name}${badge.description ? ` - ${badge.description}` : ''}`}
-              >
-                <Icon name={badge.icon} size={24} />
-                <Typography variant="caption" className="user-profile__badge-name">
-                  {badge.name}
-                </Typography>
-              </div>
-            ))}
           </div>
-        </div>
-      )}
-
-      {lockedBadges.length > 0 && (
-        <div className="user-profile__locked-badges">
-          <Typography variant="h4">{translations.lockedBadges}</Typography>
-          <div className="user-profile__badges-list">
-            {lockedBadges.map((badge) => (
-              <div
-                key={badge.id}
-                className="user-profile__badge user-profile__badge--locked"
-                title={`${badge.name}${badge.condition ? ` - ${badge.condition}` : ''}`}
-              >
-                <Icon name={badge.icon} size={24} />
-                <Typography variant="caption" className="user-profile__badge-name">
-                  {badge.name}
-                </Typography>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Button type="button" variant="secondary" size="sm" onClick={() => setEditing(true)}>
+            {translations.editProfile}
+          </Button>
+        </>
       )}
     </div>
   );

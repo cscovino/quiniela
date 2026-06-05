@@ -62,11 +62,11 @@ const getStatusConfig = (
     MatchStatus,
     { variant: 'info' | 'warning' | 'success' | 'error' | 'accent'; label: string; icon?: IconName }
   > = {
-    scheduled: { variant: 'info', label: translations.scheduled },
+    scheduled: { variant: 'info', label: translations.scheduled, icon: 'calendar' },
     live: { variant: 'warning', label: translations.live, icon: 'live' },
-    finished: { variant: 'success', label: translations.finished },
-    postponed: { variant: 'accent', label: translations.postponed },
-    cancelled: { variant: 'error', label: translations.cancelled },
+    finished: { variant: 'success', label: translations.finished, icon: 'finished' },
+    postponed: { variant: 'accent', label: translations.postponed, icon: 'clock' },
+    cancelled: { variant: 'error', label: translations.cancelled, icon: 'cancel' },
   };
   return config[status];
 };
@@ -92,7 +92,6 @@ export const MatchCard: FC<MatchCardProps> = ({
   const formattedDate = date.toLocaleDateString(localeCode, {
     month: 'short',
     day: 'numeric',
-    year: 'numeric',
   });
   const formattedTime = date.toLocaleTimeString(localeCode, {
     hour: '2-digit',
@@ -139,45 +138,45 @@ export const MatchCard: FC<MatchCardProps> = ({
       <div className="match-card__teams">
         <div className="match-card__team match-card__team--home">
           {renderTeam(homeTeam, homePlaceholder)}
-          {result && (
-            <Typography variant={compact ? 'h3' : 'h2'} className="match-card__score">
-              {result.home}
-            </Typography>
-          )}
         </div>
 
         <div className="match-card__vs">
-          <Typography variant="caption">{translations.vs}</Typography>
+          {status === 'finished' && result ? (
+            <Typography
+              variant={compact ? 'h3' : 'h2'}
+              className="match-card__score match-card__score--result"
+            >
+              {result.home}
+              <span className="match-card__score-separator">-</span>
+              {result.away}
+            </Typography>
+          ) : (
+            <Typography variant="caption">{translations.vs}</Typography>
+          )}
         </div>
 
         <div className="match-card__team match-card__team--away">
-          {result && (
-            <Typography variant={compact ? 'h3' : 'h2'} className="match-card__score">
-              {result.away}
-            </Typography>
-          )}
           {renderTeam(awayTeam, awayPlaceholder)}
         </div>
       </div>
 
       <div className="match-card__footer">
-        <div className="match-card__meta">
-          <Icon name="clock" size={16} />
-          <Typography variant="small">
-            {formattedDate} • {formattedTime}
-          </Typography>
+        <div className="match-card__info">
+          <div className="match-card__meta">
+            <Icon name="clock" size={16} />
+            <Typography variant="small">
+              {formattedDate} • {formattedTime}
+            </Typography>
+          </div>
+          {stadium && (
+            <Typography variant="small" className="match-card__stadium">
+              {stadium}
+            </Typography>
+          )}
         </div>
-        {stadium && (
-          <Typography variant="small" className="match-card__stadium">
-            {stadium}
-          </Typography>
-        )}
-        {status !== 'scheduled' && (
-          <Badge variant={config.variant} size="sm">
-            {config.icon && <Icon name={config.icon} size={12} />}
-            {config.label}
-          </Badge>
-        )}
+        <Badge variant={config.variant} size="sm">
+          {config.icon && <Icon name={config.icon} size={14} />}
+        </Badge>
       </div>
     </div>
   );

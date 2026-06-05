@@ -69,18 +69,6 @@ export const updateUserProfile = async (
   }
 };
 
-const createDefaultPredictor = async (userId: string, displayName: string) => {
-  const predictorId = `${userId}-default`;
-  await setDoc(doc(ensureDb(), 'users', userId, 'predictors', predictorId), {
-    id: predictorId,
-    userId,
-    name: displayName,
-    avatarUrl: null,
-    createdAt: serverTimestamp(),
-  });
-  return predictorId;
-};
-
 export const registerWithEmail = async (
   email: string,
   password: string,
@@ -102,8 +90,6 @@ export const registerWithEmail = async (
     createdAt: serverTimestamp(),
     lastLoginAt: serverTimestamp(),
   });
-
-  await createDefaultPredictor(credential.user.uid, displayName);
 
   return credential;
 };
@@ -127,8 +113,6 @@ export const loginWithGoogle = async (): Promise<UserCredential> => {
       createdAt: serverTimestamp(),
       lastLoginAt: serverTimestamp(),
     });
-
-    await createDefaultPredictor(credential.user.uid, credential.user.displayName || 'Predictor');
   }
 
   return credential;

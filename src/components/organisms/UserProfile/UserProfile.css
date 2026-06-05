@@ -16,6 +16,26 @@
   border-bottom: var(--border-width-sm) solid var(--border-color);
 }
 
+.user-profile__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.user-profile__avatar-placeholder {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: var(--border-pixel-sm);
+  font-family: var(--font-pixel);
+  font-size: var(--text-xl);
+  color: var(--text-primary);
+}
+
 .user-profile__info {
   display: flex;
   flex-direction: column;

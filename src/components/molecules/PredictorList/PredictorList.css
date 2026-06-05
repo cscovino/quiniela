@@ -56,10 +56,32 @@
   min-width: 0;
 }
 
+.predictor-list__card-name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  width: 100%;
+}
+
+.predictor-list__card-name-scroller {
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.predictor-list__card-name-scroller::-webkit-scrollbar {
+  display: none;
+}
+
 .predictor-list__card-name {
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+.predictor-list__card-fav-flag {
+  flex-shrink: 0;
 }
 
 .predictor-list__stat-grid {

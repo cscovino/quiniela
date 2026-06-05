@@ -40,8 +40,11 @@ describe('MatchCard', () => {
         translations={translations}
       />,
     );
-    expect(screen.getByText('2')).toBeInTheDocument();
-    expect(screen.getByText('1')).toBeInTheDocument();
+    const scoreElements = screen.getAllByText((_, node) => {
+      const text = node?.textContent || '';
+      return text === '2-1';
+    });
+    expect(scoreElements.length).toBeGreaterThan(0);
   });
 
   it('shows status badge', () => {
@@ -54,7 +57,7 @@ describe('MatchCard', () => {
         translations={translations}
       />,
     );
-    expect(screen.getByText('LIVE')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /live/i })).toBeInTheDocument();
   });
 
   it('shows phase when provided', () => {

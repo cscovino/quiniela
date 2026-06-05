@@ -1,20 +1,18 @@
 import type { FC } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
-import { BADGE_DEFINITIONS, getBadgeDescription, getBadgeName } from '@app-types/badges';
-import type { Predictor, PredictorStats } from '@app-types/firestore';
+import type { Predictor } from '@app-types/firestore';
 import { Button } from '@atoms/Button';
 import { Spinner } from '@atoms/Spinner';
 import { Typography } from '@atoms/Typography';
-import { EditProfileForm } from '@molecules/EditProfileForm';
 import type { PredictorSeries } from '@molecules/PointsChart';
 import { PointsChart } from '@molecules/PointsChart';
 import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList';
-import { type BadgeEarned, type BadgeLocked, UserProfile } from '@organisms/UserProfile';
+import { UserProfile } from '@organisms/UserProfile';
 import { predictorService } from '@services/predictor-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
-import { getLoginRoute, getRoute } from '@utils/i18n';
+import { getLoginRoute } from '@utils/i18n';
 
 import './ProfileTemplate.css';
 
@@ -92,16 +90,11 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
   const [loading, setLoading] = useState(!!user);
-  const [stats, setStats] = useState<PredictorStats | null>(null);
-  const [rank, setRank] = useState(0);
-  const [badges, setBadges] = useState<BadgeEarned[]>([]);
-  const [lockedBadges, setLockedBadges] = useState<BadgeLocked[]>([]);
   const [chartSeriesData, setChartSeriesData] = useState<PredictorSeries[]>([]);
   const [predictors, setPredictors] = useState<Predictor[]>([]);
   const [predictorEntries, setPredictorEntries] = useState<PredictorListEntry[]>([]);
   const [selectedPredictorId, setSelectedPredictorId] = useState<string | null>(null);
   const [entriesLoading, setEntriesLoading] = useState(false);
-  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -120,6 +113,7 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
           const def = preds.find((x) => x.id === `${user.uid}-default`);
           setSelectedPredictorId(def?.id || preds[0].id);
         }
+        setLoading(false);
       } catch {
         // Silently fail
       }
@@ -209,74 +203,6 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
     };
   }, [user, predictors]);
 
-  useEffect(() => {
-    if (!user || !selectedPredictorId) {
-      setLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    const fetchData = async () => {
-      try {
-        const [statsResult, allStatsResult] = await Promise.allSettled([
-          tournamentService.getPredictorStats(user.uid, selectedPredictorId),
-          tournamentService.getAllPredictorStats(),
-        ]);
-
-        if (cancelled) return;
-
-        if (statsResult.status === 'fulfilled' && statsResult.value != null) {
-          const stats = statsResult.value;
-          setStats(stats);
-
-          const earnedBadgeIds = Object.keys(stats.badgesAwarded || {});
-
-          const earnedBadges: BadgeEarned[] = earnedBadgeIds.map((badgeId) => ({
-            id: badgeId,
-            name: getBadgeName(badgeId, locale),
-            icon: BADGE_DEFINITIONS.find((b) => b.id === badgeId)?.icon || 'star',
-            description: getBadgeDescription(badgeId, locale),
-            earnedAt: new Date(stats.badgesAwarded[badgeId]),
-          }));
-          setBadges(earnedBadges);
-
-          const lockedBadgeDefs = BADGE_DEFINITIONS.filter((b) => !earnedBadgeIds.includes(b.id));
-          const locked: BadgeLocked[] = lockedBadgeDefs.map((def) => ({
-            id: def.id,
-            name: def.name[locale],
-            icon: def.icon,
-            description: def.description[locale],
-            condition: def.condition[locale],
-          }));
-          setLockedBadges(locked);
-        }
-
-        if (allStatsResult.status === 'fulfilled') {
-          const userIndex = allStatsResult.value.findIndex(
-            (s) => s.userId === user.uid && s.predictorId === selectedPredictorId,
-          );
-          setRank(userIndex !== -1 ? userIndex + 1 : 0);
-        }
-      } catch {
-        // Silently fail
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, selectedPredictorId, locale]);
-
-  const handleSelectPredictor = (predictorId: string) => {
-    setSelectedPredictorId(predictorId);
-  };
-
   if (loading || isAuthLoading) {
     return (
       <div className={`profile-template ${className}`}>
@@ -302,73 +228,19 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
     );
   }
 
-  const displayStats = {
-    totalPoints: stats?.totalPoints ?? 0,
-    exactBets: stats?.exactBets ?? 0,
-    accuracy: stats?.accuracy ?? 0,
-    currentStreak: stats?.currentStreak ?? 0,
-    maxStreak: stats?.maxStreak ?? 0,
-    rank: rank || 0,
-  };
-
-  const selectedPredictor = predictors.find((p) => p.id === selectedPredictorId) ?? null;
-
-  const predictionsRoute = getRoute(locale, 'predictions');
-
   return (
     <div className={`profile-template ${className}`}>
       <main className="profile-template__content">
         <header className="profile-template__header">
-          <div className="profile-template__header-row">
-            <Typography variant="h1">{translations.title}</Typography>
-            {!editing && translations.editProfile && (
-              <Button type="button" variant="secondary" size="sm" onClick={() => setEditing(true)}>
-                {translations.editProfile}
-              </Button>
-            )}
-          </div>
+          <Typography variant="h1">{translations.title}</Typography>
         </header>
 
         <section className="profile-template__user">
-          {editing ? (
-            <EditProfileForm
-              translations={{
-                displayNameLabel: translations.displayNameLabel || 'Display Name',
-                displayNameRequired: translations.displayNameRequired || 'Display name is required',
-                avatarUrlLabel: translations.avatarUrlLabel || 'Avatar URL',
-                avatarUrlHint: translations.avatarUrlHint || '',
-                saveProfile: translations.saveProfile || 'Save Changes',
-                cancelEditing: translations.cancelEditing || 'Cancel',
-                saving: translations.saving || 'Saving...',
-                profileSaved: translations.profileSaved || 'Profile updated',
-                profileSaveError: translations.profileSaveError || 'Failed to update profile',
-              }}
-              onCancel={() => setEditing(false)}
-              onSaved={() => setEditing(false)}
-            />
-          ) : (
-            <UserProfile
-              predictor={selectedPredictor}
-              stats={displayStats}
-              badges={badges}
-              lockedBadges={lockedBadges}
-              translations={{
-                totalPoints: translations.totalPoints,
-                accuracy: translations.accuracy,
-                currentStreak: translations.currentStreak,
-                bestStreak: translations.bestStreak,
-                exactBets: translations.exactBets,
-                rank: translations.rank,
-                badges: translations.badges,
-                lockedBadges: translations.lockedBadges,
-              }}
-            />
-          )}
+          <UserProfile translations={translations} />
         </section>
 
         <section className="profile-template__predictors">
           <Typography variant="h2">{translations.yourPredictors}</Typography>
-          <Typography variant="body">{translations.selectPredictor}</Typography>
 
           {entriesLoading ? (
             <div className="profile-template__loading">
@@ -377,17 +249,6 @@ export const ProfileTemplate: FC<ProfileTemplateProps> = ({
           ) : (
             <PredictorList
               predictors={predictorEntries}
-              activeId={selectedPredictorId ?? undefined}
-              onSelect={(id) => {
-                handleSelectPredictor(id);
-              }}
-              onEdit={(predictorId) => {
-                window.location.href = `${predictionsRoute}?predictor=${predictorId}`;
-              }}
-              onDelete={() => {}}
-              onCreate={() => {
-                window.location.href = predictionsRoute;
-              }}
               locale={locale}
               translations={
                 translations.predictorList

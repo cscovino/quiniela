@@ -44,6 +44,7 @@ describe('buildRankingEntries', () => {
           avatarUrl: null,
           avatar: null,
           pixelArt: { seed: 'p1', options: { hair: 'short01' } },
+          favouriteTeamId: null,
         },
       ],
     ]);
@@ -60,6 +61,7 @@ describe('buildRankingEntries', () => {
           avatarUrl: null,
           avatar: null,
           pixelArt: null,
+          favouriteTeamId: null,
         },
       ],
     ]);
@@ -76,6 +78,7 @@ describe('buildRankingEntries', () => {
           avatarUrl: 'https://example.com/avatar.png',
           avatar: { bgColor: '#ff0000', emoji: '🏆' },
           pixelArt: null,
+          favouriteTeamId: null,
         },
       ],
     ]);
@@ -83,14 +86,45 @@ describe('buildRankingEntries', () => {
     expect(entry).toHaveProperty('avatar');
     expect(entry).toHaveProperty('avatarUrl');
   });
+
+  it('threads favouriteTeamId from the predictor profile to the entry', () => {
+    const profileMap = new Map([
+      [
+        'users/u1/predictors/p1',
+        {
+          name: 'Carlos',
+          avatarUrl: null,
+          avatar: null,
+          pixelArt: null,
+          favouriteTeamId: 'ARG',
+        },
+      ],
+    ]);
+    const [entry] = buildRankingEntries([sampleStat('u1', 'p1')], profileMap);
+    expect(entry.favouriteTeamId).toBe('ARG');
+  });
+
+  it('returns favouriteTeamId: null when the predictor doc has no favouriteTeamId', () => {
+    const profileMap = new Map([
+      [
+        'users/u1/predictors/p1',
+        {
+          name: 'Carlos',
+          avatarUrl: null,
+          avatar: null,
+          pixelArt: null,
+          favouriteTeamId: null,
+        },
+      ],
+    ]);
+    const [entry] = buildRankingEntries([sampleStat('u1', 'p1')], profileMap);
+    expect(entry.favouriteTeamId).toBeNull();
+  });
 });
 
 describe('mergePredictorStats', () => {
   it('includes predictors without stats as zero-point entries', () => {
-    const predictors = [
-      makePredictorDoc('p1', 'u1', 'p1'),
-      makePredictorDoc('p2', 'u1', 'p2'),
-    ];
+    const predictors = [makePredictorDoc('p1', 'u1', 'p1'), makePredictorDoc('p2', 'u1', 'p2')];
     const stats = [makeStatDoc('p1-stats', 'u1', 'p1', 100)];
 
     const merged = mergePredictorStats(predictors, stats);

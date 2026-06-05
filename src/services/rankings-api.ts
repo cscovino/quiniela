@@ -18,6 +18,7 @@ export interface ApiRankingEntry {
   avatarUrl: string | null;
   avatar: { bgColor: string; emoji: string } | null;
   pixelArt?: { seed: string; options: AvatarOptions } | null;
+  favouriteTeamId?: string | null;
   totalPoints: number;
   /** Raw accuracy in the 0..1 range (multiply by 100 for a percentage). */
   accuracy: number;

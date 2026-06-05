@@ -7,6 +7,7 @@ import { Icon } from '@atoms/Icon';
 import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Tooltip } from '@atoms/Tooltip';
 import { Typography } from '@atoms/Typography';
+import { TeamFlag } from '@molecules/TeamFlag';
 
 import './PredictorList.css';
 
@@ -25,10 +26,10 @@ export interface PredictorListEntry {
 export interface PredictorListProps {
   predictors: PredictorListEntry[];
   activeId?: string;
-  onSelect: (predictorId: string) => void;
-  onEdit: (predictorId: string) => void;
-  onDelete: (predictorId: string) => void;
-  onCreate: () => void;
+  onSelect?: (predictorId: string) => void;
+  onEdit?: (predictorId: string) => void;
+  onDelete?: (predictorId: string) => void;
+  onCreate?: () => void;
   locale?: 'en' | 'es';
   translations?: {
     newButton?: string;
@@ -124,8 +125,8 @@ export const PredictorList: FC<PredictorListProps> = ({
             className={`predictor-list__card${predictor.id === activeId ? ' predictor-list__card--active' : ''}`}
             role="button"
             tabIndex={0}
-            onClick={() => onSelect(predictor.id)}
-            onKeyDown={(e) => e.key === 'Enter' && onSelect(predictor.id)}
+            onClick={() => onSelect && onSelect(predictor.id)}
+            onKeyDown={(e) => e.key === 'Enter' && onSelect && onSelect(predictor.id)}
             aria-label={(labels.viewAria || labels.editPredictionsAria).replace(
               '{name}',
               predictor.name,
@@ -134,11 +135,26 @@ export const PredictorList: FC<PredictorListProps> = ({
             <div className="predictor-list__card-content">
               <PredictorAvatar predictor={predictor} size="md" />
               <div className="predictor-list__card-info">
-                <Typography variant="body" className="predictor-list__card-name">
-                  {predictor.name}
-                </Typography>
+                <div className="predictor-list__card-name-row">
+                  <div className="predictor-list__card-name-scroller">
+                    <Typography variant="body" className="predictor-list__card-name">
+                      {predictor.name}
+                    </Typography>
+                  </div>
+                  {predictor.favouriteTeamId && (
+                    <TeamFlag
+                      fifaCode={predictor.favouriteTeamId}
+                      size="sm"
+                      className="predictor-list__card-fav-flag"
+                    />
+                  )}
+                </div>
                 <div className="predictor-list__stat-grid">
-                  <Tooltip content={statLabels.points} position="top" className="predictor-list__stat-cell">
+                  <Tooltip
+                    content={statLabels.points}
+                    position="top"
+                    className="predictor-list__stat-cell"
+                  >
                     <Icon
                       name="trophy"
                       size={18}
@@ -149,7 +165,11 @@ export const PredictorList: FC<PredictorListProps> = ({
                     />
                     <span className="predictor-list__stat-value">{stats?.totalPoints ?? 0}</span>
                   </Tooltip>
-                  <Tooltip content={statLabels.accuracy} position="top" className="predictor-list__stat-cell">
+                  <Tooltip
+                    content={statLabels.accuracy}
+                    position="top"
+                    className="predictor-list__stat-cell"
+                  >
                     <Icon
                       name="target"
                       size={18}
@@ -160,7 +180,11 @@ export const PredictorList: FC<PredictorListProps> = ({
                     />
                     <span className="predictor-list__stat-value">{accuracyDisplay}</span>
                   </Tooltip>
-                  <Tooltip content={statLabels.currentStreak} position="top" className="predictor-list__stat-cell">
+                  <Tooltip
+                    content={statLabels.currentStreak}
+                    position="top"
+                    className="predictor-list__stat-cell"
+                  >
                     <Icon
                       name="fire"
                       size={18}
@@ -171,7 +195,11 @@ export const PredictorList: FC<PredictorListProps> = ({
                     />
                     <span className="predictor-list__stat-value">{stats?.currentStreak ?? 0}</span>
                   </Tooltip>
-                  <Tooltip content={statLabels.bestStreak} position="top" className="predictor-list__stat-cell">
+                  <Tooltip
+                    content={statLabels.bestStreak}
+                    position="top"
+                    className="predictor-list__stat-cell"
+                  >
                     <Icon
                       name="crown"
                       size={18}
@@ -182,7 +210,11 @@ export const PredictorList: FC<PredictorListProps> = ({
                     />
                     <span className="predictor-list__stat-value">{stats?.maxStreak ?? 0}</span>
                   </Tooltip>
-                  <Tooltip content={statLabels.exactBets} position="top" className="predictor-list__stat-cell">
+                  <Tooltip
+                    content={statLabels.exactBets}
+                    position="top"
+                    className="predictor-list__stat-cell"
+                  >
                     <Icon
                       name="sparkles"
                       size={18}
@@ -220,38 +252,44 @@ export const PredictorList: FC<PredictorListProps> = ({
               </div>
             )}
             <div className="predictor-list__card-actions">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(predictor.id);
-                }}
-                aria-label={labels.editProfileAria.replace('{name}', predictor.name)}
-              >
-                <Icon name="pen-square" size={16} />
-                <span className="predictor-list__btn-label">{labels.editProfile}</span>
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(predictor.id);
-                }}
-                aria-label={labels.deleteAria.replace('{name}', predictor.name)}
-              >
-                <Icon name="trash" size={16} />
-                <span className="predictor-list__btn-label">{labels.delete}</span>
-              </Button>
+              {onEdit && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(predictor.id);
+                  }}
+                  aria-label={labels.editProfileAria.replace('{name}', predictor.name)}
+                >
+                  <Icon name="pen-square" size={16} />
+                  <span className="predictor-list__btn-label">{labels.editProfile}</span>
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(predictor.id);
+                  }}
+                  aria-label={labels.deleteAria.replace('{name}', predictor.name)}
+                >
+                  <Icon name="trash" size={16} />
+                  <span className="predictor-list__btn-label">{labels.delete}</span>
+                </Button>
+              )}
             </div>
           </div>
         );
       })}
 
-      <Button variant="primary" fullWidth onClick={onCreate} aria-label={labels.newButton}>
-        <Icon name="plus" size={18} /> {labels.newButton}
-      </Button>
+      {onCreate && (
+        <Button variant="primary" fullWidth onClick={onCreate} aria-label={labels.newButton}>
+          <Icon name="plus" size={18} /> {labels.newButton}
+        </Button>
+      )}
     </div>
   );
 };

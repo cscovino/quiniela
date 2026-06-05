@@ -25,6 +25,7 @@ export interface RankingRowProps {
   rankChange?: 'up' | 'down' | 'same';
   todayMatchBets?: TodayMatchBet[];
   isCurrentUser?: boolean;
+  favouriteTeamId?: string;
   locale?: 'en' | 'es';
   className?: string;
 }
@@ -68,6 +69,7 @@ export const RankingRow: FC<RankingRowProps> = ({
   rankChange,
   todayMatchBets,
   isCurrentUser = false,
+  favouriteTeamId,
   locale = 'en',
   className = '',
 }) => {
@@ -107,9 +109,16 @@ export const RankingRow: FC<RankingRowProps> = ({
           size="sm"
         />
         <div className="ranking-row__user-text">
-          <Typography variant="small" className="ranking-row__name">
-            {displayName}
-          </Typography>
+          <div className="ranking-row__name-block">
+            <div className="ranking-row__name-scroller">
+              <Typography variant="small" className="ranking-row__name">
+                {displayName}
+              </Typography>
+            </div>
+            {favouriteTeamId && (
+              <TeamFlag fifaCode={favouriteTeamId} size="sm" className="ranking-row__fav-flag" />
+            )}
+          </div>
           {earnedBadges.length > 0 && (
             <div className="ranking-row__badges">
               {earnedBadges.map((def) => (

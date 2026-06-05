@@ -55,4 +55,34 @@ describe('PredictionInput', () => {
     expect(inputs[0]).toHaveValue('2');
     expect(inputs[1]).toHaveValue('1');
   });
+
+  it('shows empty inputs when no scores are provided', () => {
+    render(<PredictionInput homeTeamName="Argentina" awayTeamName="France" onChange={() => {}} />);
+
+    const inputs = screen.getAllByRole('textbox');
+    expect(inputs[0]).toHaveValue('');
+    expect(inputs[1]).toHaveValue('');
+  });
+
+  it('allows clearing the input and retyping a new value', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    render(
+      <PredictionInput
+        homeTeamName="Argentina"
+        awayTeamName="France"
+        homeScore={5}
+        awayScore={2}
+        onChange={handleChange}
+      />,
+    );
+
+    const inputs = screen.getAllByRole('textbox');
+    await user.clear(inputs[0]);
+    expect(inputs[0]).toHaveValue('');
+
+    await user.type(inputs[0], '7');
+    expect(handleChange).toHaveBeenLastCalledWith(7, 2);
+    expect(inputs[0]).toHaveValue('7');
+  });
 });

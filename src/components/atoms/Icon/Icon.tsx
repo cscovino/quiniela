@@ -1,6 +1,9 @@
 import { Bell } from 'pixelarticons/react/Bell';
+import { Calendar } from 'pixelarticons/react/Calendar';
+import { Cancel } from 'pixelarticons/react/Cancel';
 import { Chart } from 'pixelarticons/react/Chart';
 import { Check } from 'pixelarticons/react/Check';
+import { CheckboxOn } from 'pixelarticons/react/CheckboxOn';
 import { ChevronDown2 } from 'pixelarticons/react/ChevronDown2';
 import { ChevronLeft } from 'pixelarticons/react/ChevronLeft';
 import { ChevronRight2 } from 'pixelarticons/react/ChevronRight2';
@@ -39,6 +42,8 @@ import './Icon.css';
 export type IconName =
   | 'award'
   | 'bell'
+  | 'calendar'
+  | 'cancel'
   | 'chart'
   | 'check'
   | 'chevron-down'
@@ -49,6 +54,7 @@ export type IconName =
   | 'close'
   | 'crown'
   | 'eye'
+  | 'finished'
   | 'fire'
   | 'flag'
   | 'football'
@@ -89,6 +95,8 @@ const iconMap: Record<
 > = {
   award: Crown,
   bell: Bell,
+  calendar: Calendar,
+  cancel: Cancel,
   chart: Chart,
   check: Check,
   'chevron-down': ChevronDown2,
@@ -99,6 +107,7 @@ const iconMap: Record<
   close: Close,
   crown: Crown,
   eye: Eye,
+  finished: CheckboxOn,
   fire: Fire,
   flag: Flag,
   football: Gamepad,

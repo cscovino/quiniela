@@ -696,6 +696,16 @@ code {
   border: var(--border-pixel-sm);
 }
 
+/* Prevent iOS Safari viewport zoom on input focus.
+   Any input/select/textarea with computed font-size below 16px triggers
+   an unwanted page zoom on iOS. Clamping to max(1rem, design-token) keeps
+   the design system's relative sizing while guaranteeing >= 16px. */
+input,
+select,
+textarea {
+  font-size: max(1rem, var(--text-base));
+}
+
 /* ============================================
    VIEW TRANSITIONS
    ============================================ */

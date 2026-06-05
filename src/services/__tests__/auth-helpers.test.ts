@@ -55,7 +55,7 @@ describe('auth-helpers', () => {
       expect(firebaseAuth.updateProfile).toHaveBeenCalledWith(mockUser, {
         displayName: 'Test User',
       });
-      expect(firebaseFirestore.setDoc).toHaveBeenCalledTimes(2);
+      expect(firebaseFirestore.setDoc).toHaveBeenCalledTimes(1);
       expect(result.user).toEqual(mockUser);
     });
 
@@ -87,27 +87,6 @@ describe('auth-helpers', () => {
       expect(callArgs).toMatchObject({
         avatarUrl: 'https://example.com/avatar.jpg',
       });
-    });
-
-    it('writes the default predictor with `id` (not `uid`) so updatePredictor works (AUTH-default-id)', async () => {
-      // Regression test for the bug introduced in f555b97: createDefaultPredictor
-      // wrote the predictor id under the `uid` field, which made predictor.id
-      // undefined for default predictors and broke the editor save.
-      vi.mocked(firebaseAuth.createUserWithEmailAndPassword).mockResolvedValue(
-        mockCredential as any,
-      );
-      vi.mocked(firebaseAuth.updateProfile).mockResolvedValue();
-      vi.mocked(firebaseFirestore.setDoc).mockResolvedValue();
-
-      await authHelpers.registerWithEmail('test@example.com', 'password123', 'Test User');
-
-      // Two setDoc calls: profile doc + default predictor doc.
-      const setDocCalls = vi.mocked(firebaseFirestore.setDoc).mock.calls;
-      const predictorCall = setDocCalls.find(([, payload]) => payload && payload.userId);
-      expect(predictorCall).toBeDefined();
-      const payload = predictorCall![1] as Record<string, unknown>;
-      expect(payload.id).toBe(`${mockUser.uid}-default`);
-      expect(payload).not.toHaveProperty('uid');
     });
   });
 

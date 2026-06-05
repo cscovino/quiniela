@@ -34,6 +34,7 @@ export interface RankingEntry {
   badges?: Record<string, string>;
   rankChange?: 'up' | 'down' | 'same';
   todayMatchBets?: TodayMatchBet[];
+  favouriteTeamId?: string;
 }
 
 export interface RankingsTableProps {
@@ -93,6 +94,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             rankChange={entry.rankChange}
             todayMatchBets={entry.todayMatchBets}
             isCurrentUser={entry.userId === currentUserId}
+            favouriteTeamId={entry.favouriteTeamId}
             locale={locale}
           />
         ))}

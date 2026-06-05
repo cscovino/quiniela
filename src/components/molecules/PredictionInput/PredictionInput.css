@@ -29,3 +29,14 @@
   -webkit-appearance: none;
   margin: 0;
 }
+
+.prediction-input__field input {
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.prediction-input__field input::-webkit-outer-spin-button,
+.prediction-input__field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

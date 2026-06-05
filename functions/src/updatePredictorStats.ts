@@ -13,26 +13,19 @@ interface BetData {
   isWinner: boolean;
 }
 
-interface PredictorStatsData {
-  predictorId: string;
-  tournamentId: string;
-  totalPoints: number;
-  exactBets: number;
-  winnerBets: number;
-  totalBets: number;
-  accuracy: number;
-  currentStreak: number;
-  maxStreak: number;
-  pointsHistory: { timestamp: admin.firestore.Timestamp; points: number; matchId: string }[];
-  badgesAwarded: Record<string, string>;
-  lastUpdated: admin.firestore.Timestamp;
+interface MatchStatusData {
+  status: string;
 }
 
-export function computeStatsFromBets(bets: BetData[]): {
+export function computeStatsFromBets(
+  bets: BetData[],
+  matchStatuses: Map<string, string>,
+): {
   totalPoints: number;
   exactBets: number;
   winnerBets: number;
   totalBets: number;
+  finishedBets: number;
   accuracy: number;
   currentStreak: number;
   maxStreak: number;
@@ -42,6 +35,7 @@ export function computeStatsFromBets(bets: BetData[]): {
   let exactBets = 0;
   let winnerBets = 0;
   let totalBets = 0;
+  let finishedBets = 0;
   let currentStreak = 0;
   let maxStreak = 0;
   let tempStreak = 0;
@@ -51,8 +45,14 @@ export function computeStatsFromBets(bets: BetData[]): {
     totalBets += 1;
     totalPoints += data.points;
 
-    if (data.isExact) exactBets += 1;
-    if (data.isWinner) winnerBets += 1;
+    const matchStatus = matchStatuses.get(data.matchId);
+    const isFinished = matchStatus === 'finished';
+
+    if (isFinished) {
+      finishedBets += 1;
+      if (data.isExact) exactBets += 1;
+      if (data.isWinner) winnerBets += 1;
+    }
 
     if (data.points > 0) {
       tempStreak += 1;
@@ -73,18 +73,35 @@ export function computeStatsFromBets(bets: BetData[]): {
     }
   }
 
-  const accuracy = totalBets > 0 ? winnerBets / totalBets : 0;
+  const accuracy = finishedBets > 0 ? winnerBets / finishedBets : 0;
 
   return {
     totalPoints,
     exactBets,
     winnerBets,
     totalBets,
+    finishedBets,
     accuracy,
     currentStreak,
     maxStreak,
     pointsHistory,
   };
+}
+
+interface PredictorStatsData {
+  predictorId: string;
+  tournamentId: string;
+  totalPoints: number;
+  exactBets: number;
+  winnerBets: number;
+  totalBets: number;
+  finishedBets: number;
+  accuracy: number;
+  currentStreak: number;
+  maxStreak: number;
+  pointsHistory: { timestamp: admin.firestore.Timestamp; points: number; matchId: string }[];
+  badgesAwarded: Record<string, string>;
+  lastUpdated: admin.firestore.Timestamp;
 }
 
 export const updatePredictorStats = functions.firestore
@@ -111,7 +128,21 @@ export const updatePredictorStats = functions.firestore
 
     const bets: BetData[] = allBetsSnapshot.docs.map((doc) => doc.data() as BetData);
 
-    const computed = computeStatsFromBets(bets);
+    // Fetch match statuses to calculate accuracy against finished matches only
+    const matchIds = [...new Set(bets.map((b) => b.matchId))];
+    const matchStatuses = new Map<string, string>();
+    if (matchIds.length > 0) {
+      const matchesSnapshot = await db
+        .collection(`tournaments/${tournamentId}/matches`)
+        .where(admin.firestore.FieldPath.documentId(), 'in', matchIds)
+        .get();
+      matchesSnapshot.forEach((doc) => {
+        const data = doc.data() as MatchStatusData;
+        matchStatuses.set(doc.id, data.status);
+      });
+    }
+
+    const computed = computeStatsFromBets(bets, matchStatuses);
 
     const statsRef = db
       .collection(`users/${userId}/predictors/${predictorId}/stats`)
@@ -136,6 +167,7 @@ export const updatePredictorStats = functions.firestore
         exactBets: computed.exactBets,
         winnerBets: computed.winnerBets,
         totalBets: computed.totalBets,
+        finishedBets: computed.finishedBets,
         accuracy: computed.accuracy,
         currentStreak: computed.currentStreak,
         maxStreak: computed.maxStreak,

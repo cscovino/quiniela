@@ -132,11 +132,11 @@ describe('ProfileTemplate', () => {
     });
 
     expect(screen.getByText('My Profile')).toBeInTheDocument();
-    // Header shows predictor name, not user.displayName
+    // Header shows user displayName, not predictor name
     await waitFor(() => {
-      const matches = screen.getAllByText('Tigre FC');
+      const matches = screen.getAllByText('Carlos');
       expect(matches.length).toBeGreaterThan(0);
-      // The h2 header specifically shows the predictor name
+      // The h2 header specifically shows the user displayName
       const h2Match = matches.find((el) => el.tagName === 'H2');
       expect(h2Match).toBeInTheDocument();
     });
@@ -239,64 +239,5 @@ describe('ProfileTemplate', () => {
     // Stat grid is rendered when stats are present (stats threaded through to PredictorList)
     const statGrid = document.querySelector('.predictor-list__stat-grid');
     expect(statGrid).not.toBeNull();
-  });
-
-  it('onEdit uses the clicked predictor id (PROF-edit)', async () => {
-    mockAuthState.user = mockUser;
-    mockAuthState.isAuthLoading = false;
-
-    const pred1 = { ...mockPredictor, id: 'user-1-default', name: 'Tigre FC' };
-    const pred2 = {
-      id: 'pred-42',
-      userId: 'user-1',
-      name: 'León',
-      avatar: undefined,
-      createdAt: {} as any,
-    };
-
-    vi.mocked(predictorService.getUserPredictors).mockResolvedValue([pred1, pred2]);
-    vi.mocked(predictorService.getUserPredictorsWithStats).mockResolvedValue([
-      { ...pred1, stats: undefined, progress: { groupsSubmitted: 0, totalGroups: 8 } },
-      { ...pred2, stats: undefined, progress: { groupsSubmitted: 0, totalGroups: 8 } },
-    ] as any);
-
-    vi.mocked(tournamentService.getPredictorStats).mockResolvedValue({
-      totalPoints: 0,
-      exactBets: 0,
-      accuracy: 0,
-      currentStreak: 0,
-      maxStreak: 0,
-      badgesAwarded: {},
-      pointsHistory: [],
-    } as any);
-
-    vi.mocked(tournamentService.getAllPredictorStats).mockResolvedValue([]);
-
-    render(<ProfileTemplate translations={translations} locale="en" />);
-
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
-
-    // Wait for both predictor cards to render
-    await waitFor(() => {
-      expect(screen.getByText('León')).toBeInTheDocument();
-    });
-
-    // Find the edit button for "León" (pred-42) and click it
-    // Edit buttons are within each predictor card
-    const leonCard = screen.getByText('León').closest('[role="button"]')?.parentElement;
-    const editButtons = leonCard
-      ? leonCard.querySelectorAll('button')
-      : document.querySelectorAll('button');
-    // The edit button is the first action button on the León card
-    const editBtn = Array.from(editButtons).find((btn) =>
-      btn.getAttribute('aria-label')?.includes('León'),
-    );
-    if (editBtn) fireEvent.click(editBtn);
-
-    // Navigation uses the clicked predictor id 'pred-42', not 'user-1-default'
-    expect((window as any).location.href).toContain('pred-42');
-    expect((window as any).location.href).not.toContain('user-1-default');
   });
 });

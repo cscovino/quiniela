@@ -85,6 +85,30 @@
   min-width: 0;
 }
 
+.ranking-row__name-block {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  flex: 1;
+}
+
+.ranking-row__name-scroller {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.ranking-row__name-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.ranking-row__fav-flag {
+  flex-shrink: 0;
+}
+
 .ranking-row__badges {
   display: flex;
   align-items: center;
@@ -99,9 +123,8 @@
 }
 
 .ranking-row__name {
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+  display: inline-block;
 }
 
 .ranking-row__stats {
@@ -214,7 +237,7 @@
     width: 132px;
     min-width: 132px;
     flex: 0 0 auto;
-    padding: 0 var(--space-2);
+    padding: 0 var(--space-2) 0 0;
     background: inherit;
     box-shadow: 1px 0 0 var(--border-color);
   }
@@ -228,13 +251,21 @@
     font-size: var(--text-sm);
   }
 
-  /* Stack badges beneath the name; reserve height so badge-less rows align. */
+  /* Stack name-block content (name + fav flag) and badges vertically; reserve
+     height so badge-less rows align. */
   .ranking-row__user-text {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
     gap: 2px;
     min-height: 34px;
+  }
+
+  .ranking-row__name-block {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
   }
 
   .ranking-row__match-predictions {
@@ -255,6 +286,7 @@
     left: 48px;
     width: 116px;
     min-width: 116px;
+    padding-right: var(--space-1);
   }
 
   .ranking-row__stats {

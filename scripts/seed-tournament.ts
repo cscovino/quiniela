@@ -1394,6 +1394,34 @@ async function seedTournament() {
   }
   console.log(`✅ ${groups.length} groups created`);
 
+  // 2b. Initialize group_standings for all groups with all teams set to 0
+  for (const group of groups) {
+    const groupTeams = teams.filter((t) => t.groupId === group.slug);
+    const standings = groupTeams.map((team, idx) => ({
+      teamId: team.fifaCode,
+      position: idx + 1,
+      played: 0,
+      won: 0,
+      drawn: 0,
+      lost: 0,
+      goalsFor: 0,
+      goalsAgainst: 0,
+      goalDifference: 0,
+      points: 0,
+    }));
+    await db
+      .collection('tournaments')
+      .doc(TOURNAMENT_ID)
+      .collection('group_standings')
+      .doc(group.slug)
+      .set({
+        groupId: group.slug,
+        lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        standings,
+      });
+  }
+  console.log(`✅ ${groups.length} group_standings initialized with all teams at 0`);
+
   // 3. Create teams
   for (const team of teams) {
     await db

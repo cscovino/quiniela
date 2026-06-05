@@ -190,6 +190,7 @@ export interface PredictorStats {
   exactBets: number;
   winnerBets: number;
   totalBets: number;
+  finishedBets: number;
   accuracy: number;
   currentStreak: number;
   maxStreak: number;
