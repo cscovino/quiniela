@@ -494,18 +494,23 @@ export function usePredictionSteps(
     ],
   );
 
+  const groupMatchesBySlug = useMemo(() => {
+    const map: Record<string, (typeof firestoreMatches)[number][]> = {};
+    for (const group of groups) {
+      map[group.slug] = firestoreMatches
+        .filter((m) => m.phase === 'group' && m.groupId === group.slug)
+        .map((m) => ({ ...m, id: m.slug }));
+    }
+    return map;
+  }, [firestoreMatches, groups]);
+
   const steps = useMemo(() => {
     const result: PredictionStepModel[] = [];
     let stepIndex = 0;
 
     for (const group of groups) {
       const idx = stepIndex;
-      const groupMatches = firestoreMatches.filter(
-        (m) => m.phase === 'group' && m.groupId === group.slug,
-      );
-      // Use the same `id = slug` shape rendered below so `m.id` keys line up with
-      // `existingMatchValues` (which is keyed by match slug).
-      const groupMatchesWithId = groupMatches.map((m) => ({ ...m, id: m.slug }));
+      const groupMatchesWithId = groupMatchesBySlug[group.slug] || [];
       const existingGroupBet = groupBetsByGroupId[group.slug] || null;
 
       // A group only counts complete once its match scores are persisted too — not on
@@ -772,6 +777,7 @@ export function usePredictionSteps(
     submitting,
     locale,
     groups,
+    groupMatchesBySlug,
     firestoreMatches,
     existingMatchValues,
     groupBetsByGroupId,

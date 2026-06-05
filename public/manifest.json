@@ -62,22 +62,6 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/home-mobile.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Home screen with upcoming matches"
-    },
-    {
-      "src": "/screenshots/predictions-mobile.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Prediction wizard"
-    }
-  ],
   "shortcuts": [
     {
       "name": "Make Predictions",
