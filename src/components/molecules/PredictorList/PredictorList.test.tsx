@@ -118,6 +118,7 @@ describe('PredictorList', () => {
         maxStreak: 5,
         exactBets: 7,
         totalBets: 10,
+        finishedBets: 8,
       },
     };
 
@@ -135,6 +136,7 @@ describe('PredictorList', () => {
         maxStreak: 0,
         exactBets: 0,
         totalBets: 0,
+        finishedBets: 0,
       },
     };
 

@@ -114,10 +114,12 @@ service cloud.firestore {
           request.resource.data.awayScore is int &&
           request.resource.data.awayScore >= 0 &&
           request.resource.data.awayScore <= 15;
+        // Editable until the match starts; client-side prediction-service.ts
+        // skips finished/live/postponed/cancelled/deadline-passed matches at
+        // submit time. Ownership checks mirror create.
         allow update: if
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
-          canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
           request.resource.data.homeScore is int &&
           request.resource.data.homeScore >= 0 &&
           request.resource.data.homeScore <= 15 &&

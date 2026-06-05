@@ -19,7 +19,13 @@ export interface PredictorListEntry {
   badgesAwarded?: Record<string, string>;
   stats?: Pick<
     PredictorStats,
-    'totalPoints' | 'accuracy' | 'currentStreak' | 'maxStreak' | 'exactBets' | 'totalBets'
+    | 'totalPoints'
+    | 'accuracy'
+    | 'currentStreak'
+    | 'maxStreak'
+    | 'exactBets'
+    | 'totalBets'
+    | 'finishedBets'
   >;
 }
 
@@ -117,7 +123,7 @@ export const PredictorList: FC<PredictorListProps> = ({
 
       {predictors.map(({ predictor, groupsDone, groupsTotal, badgesAwarded, stats }) => {
         const accuracyDisplay =
-          (stats?.totalBets ?? 0) === 0 ? '—' : Math.round((stats?.accuracy ?? 0) * 100) + '%';
+          (stats?.finishedBets ?? 0) === 0 ? '—' : Math.round((stats?.accuracy ?? 0) * 100) + '%';
 
         return (
           <div
