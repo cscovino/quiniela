@@ -119,4 +119,29 @@ describe('scoreFinalFourBet', () => {
       totalPoints: 0,
     });
   });
+
+  it('is case-insensitive: uppercase bet vs lowercase standings (legacy data)', () => {
+    const bet = { first: 'ARG', second: 'BRA', third: 'MEX', fourth: 'CHI' };
+    const standings = { first: 'arg', second: 'bra', third: 'mex', fourth: 'chi' };
+    const result = scoreFinalFourBet(bet, standings);
+    expect(result.totalPoints).toBe(20);
+  });
+
+  it('is case-insensitive: lowercase bet vs uppercase standings (canonical)', () => {
+    const bet = { first: 'arg', second: 'bra', third: 'mex', fourth: 'chi' };
+    const standings = { first: 'ARG', second: 'BRA', third: 'MEX', fourth: 'CHI' };
+    const result = scoreFinalFourBet(bet, standings);
+    expect(result.totalPoints).toBe(20);
+  });
+
+  it('is case-insensitive for QUALIFIED scoring', () => {
+    const bet = { first: 'BRA', second: 'ARG', third: 'JPN', fourth: 'KOR' };
+    const standings = { first: 'arg', second: 'bra', third: 'mex', fourth: 'chi' };
+    const result = scoreFinalFourBet(bet, standings);
+    expect(result.firstPoints).toBe(3);
+    expect(result.secondPoints).toBe(3);
+    expect(result.thirdPoints).toBe(0);
+    expect(result.fourthPoints).toBe(0);
+    expect(result.totalPoints).toBe(6);
+  });
 });

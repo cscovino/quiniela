@@ -57,10 +57,13 @@ export function scoreGroupBet(
     const predictedTeam = positions[i];
     const actualTeamAtPosition = standings[i]?.teamId;
 
-    if (predictedTeam === actualTeamAtPosition) {
+    if (predictedTeam?.toUpperCase() === actualTeamAtPosition?.toUpperCase()) {
       points += SCORING.GROUP.EXACT_POSITION; // 3
       exactMatches++;
-    } else if (standings.some((s) => s.teamId === predictedTeam)) {
+    } else if (
+      actualTeamAtPosition &&
+      standings.some((s) => s.teamId?.toUpperCase() === predictedTeam?.toUpperCase())
+    ) {
       points += SCORING.GROUP.QUALIFIED; // 1
       wrongPositionMatches++;
     }

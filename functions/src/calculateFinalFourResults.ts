@@ -70,10 +70,10 @@ export function scoreFinalFourBet(bet: FinalFourBet, standings: FinalStandings):
   ) as string[];
 
   function scorePosition(predicted: string, actual: string | undefined): number {
-    if (predicted === actual) {
+    if (predicted?.toUpperCase() === actual?.toUpperCase()) {
       return SCORING.FINAL_FOUR.EXACT_POSITION; // 5
     }
-    if (actual && finalFour.includes(predicted)) {
+    if (actual && finalFour.map((t) => t.toUpperCase()).includes(predicted.toUpperCase())) {
       return SCORING.FINAL_FOUR.QUALIFIED; // 3
     }
     return 0;
@@ -159,8 +159,12 @@ export const calculateFinalFourResults = functions.firestore
             standings.third,
             standings.fourth,
           ].filter(Boolean) as string[];
-          if (predicted === actual) return SCORING.FINAL_FOUR.EXACT_POSITION;
-          if (actual && finalFour.includes(predicted)) return SCORING.FINAL_FOUR.QUALIFIED;
+          if (predicted?.toUpperCase() === actual?.toUpperCase()) {
+            return SCORING.FINAL_FOUR.EXACT_POSITION;
+          }
+          if (actual && finalFour.map((t) => t.toUpperCase()).includes(predicted.toUpperCase())) {
+            return SCORING.FINAL_FOUR.QUALIFIED;
+          }
           return 0;
         };
         const firstPts = scorePosition(bet.first, standings.first);
@@ -178,8 +182,12 @@ export const calculateFinalFourResults = functions.firestore
             standings.third,
             standings.fourth,
           ].filter(Boolean) as string[];
-          if (predicted === actual) return SCORING.FINAL_FOUR.EXACT_POSITION;
-          if (actual && finalFour.includes(predicted)) return SCORING.FINAL_FOUR.QUALIFIED;
+          if (predicted?.toUpperCase() === actual?.toUpperCase()) {
+            return SCORING.FINAL_FOUR.EXACT_POSITION;
+          }
+          if (actual && finalFour.map((t) => t.toUpperCase()).includes(predicted.toUpperCase())) {
+            return SCORING.FINAL_FOUR.QUALIFIED;
+          }
           return 0;
         };
         const secondPts = scorePosition(bet.second, standings.second);
@@ -197,8 +205,12 @@ export const calculateFinalFourResults = functions.firestore
             standings.third,
             standings.fourth,
           ].filter(Boolean) as string[];
-          if (predicted === actual) return SCORING.FINAL_FOUR.EXACT_POSITION;
-          if (actual && finalFour.includes(predicted)) return SCORING.FINAL_FOUR.QUALIFIED;
+          if (predicted?.toUpperCase() === actual?.toUpperCase()) {
+            return SCORING.FINAL_FOUR.EXACT_POSITION;
+          }
+          if (actual && finalFour.map((t) => t.toUpperCase()).includes(predicted.toUpperCase())) {
+            return SCORING.FINAL_FOUR.QUALIFIED;
+          }
           return 0;
         };
         const thirdPts = scorePosition(bet.third, standings.third);
@@ -216,8 +228,12 @@ export const calculateFinalFourResults = functions.firestore
             standings.third,
             standings.fourth,
           ].filter(Boolean) as string[];
-          if (predicted === actual) return SCORING.FINAL_FOUR.EXACT_POSITION;
-          if (actual && finalFour.includes(predicted)) return SCORING.FINAL_FOUR.QUALIFIED;
+          if (predicted?.toUpperCase() === actual?.toUpperCase()) {
+            return SCORING.FINAL_FOUR.EXACT_POSITION;
+          }
+          if (actual && finalFour.map((t) => t.toUpperCase()).includes(predicted.toUpperCase())) {
+            return SCORING.FINAL_FOUR.QUALIFIED;
+          }
           return 0;
         };
         const fourthPts = scorePosition(bet.fourth, standings.fourth);

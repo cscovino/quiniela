@@ -120,4 +120,28 @@ describe('scoreGroupBet', () => {
       exactQualified: 0,
     });
   });
+
+  it('is case-insensitive: uppercase predictions vs lowercase standings (legacy data)', () => {
+    const lowercaseStandings = standings.map((s) => ({ ...s, teamId: s.teamId.toLowerCase() }));
+    const positions = ['ARG', 'BRA', 'MEX', 'CHI'];
+    const result = scoreGroupBet(positions, lowercaseStandings);
+    expect(result.points).toBe(12);
+    expect(result.exactMatches).toBe(4);
+  });
+
+  it('is case-insensitive: lowercase predictions vs uppercase standings (canonical)', () => {
+    const positions = ['arg', 'bra', 'mex', 'chi'];
+    const result = scoreGroupBet(positions, standings);
+    expect(result.points).toBe(12);
+    expect(result.exactMatches).toBe(4);
+  });
+
+  it('is case-insensitive for QUALIFIED scoring when teams are in different case', () => {
+    const lowercaseStandings = standings.map((s) => ({ ...s, teamId: s.teamId.toLowerCase() }));
+    const positions = ['BRA', 'ARG', 'MEX', 'CHI'];
+    const result = scoreGroupBet(positions, lowercaseStandings);
+    expect(result.points).toBe(8);
+    expect(result.exactMatches).toBe(2);
+    expect(result.wrongPositionMatches).toBe(2);
+  });
 });

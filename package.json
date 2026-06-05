@@ -34,6 +34,8 @@
     "migrate:knockout:phase2": "tsx --env-file=.env scripts/migrate-knockout-schedule.ts --phase2",
     "migrate:avatars": "tsx --env-file=.env scripts/migrate-predictor-avatars.ts",
     "migrate:avatars:apply": "tsx --env-file=.env scripts/migrate-predictor-avatars.ts --apply",
+    "migrate:case": "tsx --env-file=.env scripts/migrate-team-ids-case.ts",
+    "migrate:case:execute": "tsx --env-file=.env scripts/migrate-team-ids-case.ts --execute",
     "prepare": "husky"
   },
   "lint-staged": {
