@@ -329,6 +329,13 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
   // Heavy work (collectionGroup stats scan + per-predictor profile reads) runs
   // server-side in the cached `/api/rankings` function. On any failure we return
   // an empty array; useLiveData keeps the server-rendered initial rankings.
+  // In dev, `/api/rankings` is a Cloud Function that isn't running locally
+  // (no emulator is wired up), so the client fetch would 404. Skip the call
+  // and rely on the SSR data from getBuildRankings, which is fresh enough
+  // for a dev session.
+  if (import.meta.env.DEV) {
+    return [];
+  }
   let apiStats;
   try {
     apiStats = await fetchRankingsFromApi();
