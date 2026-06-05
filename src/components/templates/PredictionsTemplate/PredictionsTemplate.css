@@ -73,9 +73,28 @@
 }
 
 .predictions-template__section {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+}
+
+.predictions-template__section--loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg-card);
+  opacity: 0.7;
+  z-index: 10;
+}
+
+.predictions-template__section-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .predictions-template__section-header {

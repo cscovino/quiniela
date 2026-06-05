@@ -255,6 +255,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     thirdPlaceTeams,
     groups,
     allTeams,
+    betsStatus,
   } = usePredictionSteps(
     {
       ...translations,
@@ -262,7 +263,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       knockoutStep: translations.knockoutStep,
       finalPhaseStep: translations.finalPhaseStep,
       bestPlayersStep: translations.bestPlayersStep,
-      thirdPlaceStep: translations.thirdPlaceStep,
       thirdPlaceHeading: translations.thirdPlaceHeading,
       thirdPlaceSubtitle: translations.thirdPlaceSubtitle,
       thirdPlaceAdvancing: translations.thirdPlaceAdvancing,
@@ -327,7 +327,7 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     handleThirdPlaceContinueRef.current = handleThirdPlaceContinue;
   }, [handleThirdPlaceContinue]);
 
-// Show feedback as toast instead of inline banner to avoid layout shift.
+  // Show feedback as toast instead of inline banner to avoid layout shift.
   // Deduplicate by tracking the full feedback object reference so identical
   // objects (e.g. from multiple step submits before the 5s clear) don't duplicate.
   const prevFeedbackRef = useRef<typeof feedback>(null);
@@ -338,8 +338,8 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       type: feedback.type,
       title:
         feedback.type === 'success'
-          ? (translations.feedbackSuccessTitle || 'Saved')
-          : (translations.feedbackErrorTitle || 'Error'),
+          ? translations.feedbackSuccessTitle || 'Saved'
+          : translations.feedbackErrorTitle || 'Error',
       message: feedback.message,
     });
   }, [feedback, translations.feedbackSuccessTitle, translations.feedbackErrorTitle]);
@@ -692,20 +692,25 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
         )}
 
         {activeStep && (
-          <section className="predictions-template__section">
+          <section
+            className={`predictions-template__section${betsStatus === 'loading' ? ' predictions-template__section--loading' : ''}`}
+          >
             <div className="predictions-template__section-header">
               <Typography variant="h2">{activeStep.label}</Typography>
             </div>
 
             {activeStep.content}
+            {betsStatus === 'loading' && (
+              <div className="predictions-template__section-loading">
+                <Spinner />
+              </div>
+            )}
           </section>
         )}
 
         <PredictionsNavigation
           onBack={
-            currentStep === 0
-              ? handleBackToList
-              : () => setCurrentStep((p) => Math.max(0, p - 1))
+            currentStep === 0 ? handleBackToList : () => setCurrentStep((p) => Math.max(0, p - 1))
           }
           onNext={async () => {
             // Single button: save the current step, then advance (or finish).

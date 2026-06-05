@@ -7,8 +7,6 @@ import { Typography } from '@atoms/Typography';
 import './PredictionInput.css';
 
 export interface PredictionInputProps {
-  homeTeamName: string;
-  awayTeamName: string;
   homeScore?: number;
   awayScore?: number;
   onChange: (home: number, away: number) => void;
@@ -20,8 +18,6 @@ const scoreToString = (value: number | undefined): string =>
   value != null ? value.toString() : '';
 
 export const PredictionInput: FC<PredictionInputProps> = ({
-  homeTeamName,
-  awayTeamName,
   homeScore,
   awayScore,
   onChange,
@@ -40,9 +36,9 @@ export const PredictionInput: FC<PredictionInputProps> = ({
   }, [awayScore]);
 
   const emitChange = (nextHomeStr: string, nextAwayStr: string) => {
-    if (nextHomeStr === '' && nextAwayStr === '') return;
-    const home = nextHomeStr === '' ? 0 : parseInt(nextHomeStr, 10);
-    const away = nextAwayStr === '' ? 0 : parseInt(nextAwayStr, 10);
+    if (nextHomeStr === '' || nextAwayStr === '') return;
+    const home = parseInt(nextHomeStr, 10);
+    const away = parseInt(nextAwayStr, 10);
     if (isNaN(home) || isNaN(away) || home < 0 || home > 15 || away < 0 || away > 15) {
       return;
     }
@@ -64,9 +60,6 @@ export const PredictionInput: FC<PredictionInputProps> = ({
   return (
     <div className={`prediction-input ${className}`}>
       <div className="prediction-input__team">
-        <Typography variant="small" className="prediction-input__name">
-          {homeTeamName}
-        </Typography>
         <Input
           type="text"
           inputMode="numeric"
@@ -84,9 +77,6 @@ export const PredictionInput: FC<PredictionInputProps> = ({
       </div>
 
       <div className="prediction-input__team">
-        <Typography variant="small" className="prediction-input__name">
-          {awayTeamName}
-        </Typography>
         <Input
           type="text"
           inputMode="numeric"

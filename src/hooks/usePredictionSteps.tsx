@@ -13,7 +13,6 @@ import {
   PredictionStepFinalPhase,
   type PredictionStepFinalPhaseProps,
   ThirdPlaceConfirmation,
-  type ThirdPlaceConfirmationProps,
 } from '@molecules/Predictions';
 import type { GroupForPrediction } from '@organisms/GroupPredictionForm';
 import { getLocalizedGroupName, getLocalizedName } from '@utils/i18n';
@@ -22,7 +21,6 @@ type GroupStepTranslations = PredictionStepGroupProps['translations'];
 type KnockoutStepTranslations = PredictionStepKnockoutRoundProps['translations'];
 type FinalPhaseStepTranslations = PredictionStepFinalPhaseProps['translations'];
 type BestPlayersStepTranslations = PredictionStepBestPlayersProps['translations'];
-type ThirdPlaceStepTranslations = ThirdPlaceConfirmationProps['translations'];
 import { predictionService } from '@services/prediction-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
@@ -96,7 +94,6 @@ export function usePredictionSteps(
     knockoutStep?: KnockoutStepTranslations;
     finalPhaseStep?: FinalPhaseStepTranslations;
     bestPlayersStep?: BestPlayersStepTranslations;
-    thirdPlaceStep?: ThirdPlaceStepTranslations;
     thirdPlaceHeading?: string;
     thirdPlaceSubtitle?: string;
     thirdPlaceAdvancing?: string;
@@ -233,6 +230,11 @@ export function usePredictionSteps(
 
   useEffect(() => {
     setBetsStatus('loading');
+    setExistingMatchValues({});
+    setGroupBetsByGroupId({});
+    setKnockoutBetsByMatchSlug({});
+    setExistingFinalPhase(null);
+    setExistingBestPlayers(null);
     if (!user || !selectedPredictorId) {
       setBetsStatus('loaded');
       return;
@@ -536,9 +538,6 @@ export function usePredictionSteps(
         deadline,
         content: (
           <PredictionStepGroup
-            // Remount when the predictor or group changes so the step re-seeds from that
-            // predictor's freshly loaded saved scores. Within a predictor it stays mounted,
-            // so in-progress edits survive prop updates (no more clobbering on submit/reload).
             key={`${selectedPredictorId ?? 'none'}-${group.slug}`}
             group={group}
             groupMatches={groupMatchesWithId}

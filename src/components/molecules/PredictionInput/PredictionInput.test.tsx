@@ -4,35 +4,26 @@ import userEvent from '@testing-library/user-event';
 import { PredictionInput } from './PredictionInput';
 
 describe('PredictionInput', () => {
-  it('renders team names', () => {
-    render(<PredictionInput homeTeamName="Argentina" awayTeamName="France" onChange={() => {}} />);
-    expect(screen.getByText('Argentina')).toBeInTheDocument();
-    expect(screen.getByText('France')).toBeInTheDocument();
+  it('renders two score inputs', () => {
+    render(<PredictionInput onChange={() => {}} />);
+    const inputs = screen.getAllByRole('textbox');
+    expect(inputs).toHaveLength(2);
   });
 
-  it('calls onChange with correct scores', async () => {
+  it('calls onChange with correct scores when both fields are filled', async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
-    render(
-      <PredictionInput homeTeamName="Argentina" awayTeamName="France" onChange={handleChange} />,
-    );
+    render(<PredictionInput onChange={handleChange} />);
 
     const inputs = screen.getAllByRole('textbox');
-    await user.clear(inputs[0]);
     await user.type(inputs[0], '3');
+    await user.type(inputs[1], '0');
 
     expect(handleChange).toHaveBeenCalledWith(3, 0);
   });
 
   it('disables inputs when disabled prop is true', () => {
-    render(
-      <PredictionInput
-        homeTeamName="Argentina"
-        awayTeamName="France"
-        onChange={() => {}}
-        disabled
-      />,
-    );
+    render(<PredictionInput onChange={() => {}} disabled />);
 
     const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input) => {
@@ -41,15 +32,7 @@ describe('PredictionInput', () => {
   });
 
   it('shows initial scores', () => {
-    render(
-      <PredictionInput
-        homeTeamName="Argentina"
-        awayTeamName="France"
-        homeScore={2}
-        awayScore={1}
-        onChange={() => {}}
-      />,
-    );
+    render(<PredictionInput homeScore={2} awayScore={1} onChange={() => {}} />);
 
     const inputs = screen.getAllByRole('textbox');
     expect(inputs[0]).toHaveValue('2');
@@ -57,7 +40,7 @@ describe('PredictionInput', () => {
   });
 
   it('shows empty inputs when no scores are provided', () => {
-    render(<PredictionInput homeTeamName="Argentina" awayTeamName="France" onChange={() => {}} />);
+    render(<PredictionInput onChange={() => {}} />);
 
     const inputs = screen.getAllByRole('textbox');
     expect(inputs[0]).toHaveValue('');
@@ -67,15 +50,7 @@ describe('PredictionInput', () => {
   it('allows clearing the input and retyping a new value', async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
-    render(
-      <PredictionInput
-        homeTeamName="Argentina"
-        awayTeamName="France"
-        homeScore={5}
-        awayScore={2}
-        onChange={handleChange}
-      />,
-    );
+    render(<PredictionInput homeScore={5} awayScore={2} onChange={handleChange} />);
 
     const inputs = screen.getAllByRole('textbox');
     await user.clear(inputs[0]);

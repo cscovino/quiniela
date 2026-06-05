@@ -93,8 +93,6 @@ export const PredictionForm: FC<PredictionFormProps> = ({
 
             {match.phase === 'group' ? (
               <PredictionInput
-                homeTeamName=""
-                awayTeamName=""
                 homeScore={predictions[match.matchId]?.home}
                 awayScore={predictions[match.matchId]?.away}
                 onChange={(home, away) => handleGroupPrediction(match.matchId, home, away)}

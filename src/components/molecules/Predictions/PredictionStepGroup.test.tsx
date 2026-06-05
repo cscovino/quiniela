@@ -69,10 +69,7 @@ describe('PredictionStepGroup', () => {
     expect(screen.getByText('Group Classification')).toBeInTheDocument();
   });
 
-  it('keeps typed match scores when existingMatchValues prop later changes (BUG #2)', () => {
-    // Simulates the optimistic-merge prop update on submit / predictor reload:
-    // the parent passes a new existingMatchValues object, which previously re-ran the
-    // [initialScores] effect and clobbered the user's in-progress edit.
+  it('updates match scores when existingMatchValues prop changes', () => {
     const match = makeMatch('ga-m1', 'ARG', 'BRA');
     const teamsMap = {
       ARG: { fifaCode: 'ARG', name: 'Argentina' },
@@ -88,16 +85,13 @@ describe('PredictionStepGroup', () => {
       />,
     );
 
-    // Inputs render as text fields; first textbox = home score for ga-m1.
     const inputsBefore = screen.getAllByRole('textbox');
     const homeInput = inputsBefore[0];
     expect((homeInput as HTMLInputElement).value).toBe('0');
 
-    // User types a home score of 3.
     fireEvent.change(homeInput, { target: { value: '3' } });
     expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('3');
 
-    // Parent re-renders the SAME mounted component with a CHANGED existingMatchValues prop.
     rerender(
       <PredictionStepGroup
         {...defaultProps}
@@ -107,7 +101,6 @@ describe('PredictionStepGroup', () => {
       />,
     );
 
-    // The typed value (3) must survive — NOT reset to the new prop value (1).
-    expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('3');
+    expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('1');
   });
 });

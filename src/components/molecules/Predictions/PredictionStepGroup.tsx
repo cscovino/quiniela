@@ -88,17 +88,9 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
 }) => {
   const labels = { ...defaultTranslations, ...translations };
 
-  // Every match stays editable until the deadline; prefill from any saved bet.
-  const initialScores = useMemo(() => {
-    const scores: Record<string, { home: number; away: number }> = {};
-    groupMatches.forEach((m) => {
-      scores[m.id] = existingMatchValues[m.id] ?? { home: 0, away: 0 };
-    });
-    return scores;
-  }, [groupMatches, existingMatchValues]);
-
-  const [matchPredictions, setMatchPredictions] =
-    useState<Record<string, { home?: number; away?: number }>>(initialScores);
+  const [matchPredictions, setMatchPredictions] = useState<
+    Record<string, { home?: number; away?: number }>
+  >({});
   const [classification, setClassification] = useState<string[]>(
     existingGroupBet ? [...existingGroupBet] : group.teams.map((t) => t.fifaCode),
   );
@@ -106,10 +98,19 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isFirstRender = useRef(true);
 
-  // Match scores seed once from initialScores via the useState initializer above. We do NOT
-  // re-sync on existingMatchValues prop changes: doing so clobbered in-progress edits whenever
-  // the parent re-rendered (optimistic merge on submit, Firestore reload). Fresh saved values
-  // for a different predictor/group come through a remount keyed on predictor + group instead.
+  useEffect(() => {
+    setMatchPredictions(() => {
+      const scores: Record<string, { home: number; away: number }> = {};
+      groupMatches.forEach((m) => {
+        scores[m.id] = existingMatchValues[m.id] ?? { home: '', away: '' };
+      });
+      return scores;
+    });
+
+    return () => {
+      setMatchPredictions({});
+    };
+  }, [groupMatches, existingMatchValues]);
 
   useEffect(() => {
     if (existingGroupBet) setClassification([...existingGroupBet]);
@@ -262,8 +263,6 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
                     </div>
                   </div>
                   <PredictionInput
-                    homeTeamName=""
-                    awayTeamName=""
                     homeScore={matchPredictions[match.id]?.home}
                     awayScore={matchPredictions[match.id]?.away}
                     onChange={(home, away) => handleMatchChange(match.id, home, away)}
