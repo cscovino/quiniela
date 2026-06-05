@@ -56,6 +56,22 @@ const teamsMap = {
   usa: { fifaCode: 'USA', name: 'United States' },
   ned: { fifaCode: 'NED', name: 'Netherlands' },
   cro: { fifaCode: 'CRO', name: 'Croatia' },
+  // Uppercase keys mirror the lowercase ones so third-place teamIds written in
+  // groupBets as their FIFA code (e.g. 'FRA') resolve both in
+  // `standings.find((s) => s.fifaCode === thirdPlaceTeamId)` and in the
+  // `teamsMap[thirdPlaceTeamId]` lookup.
+  ARG: { fifaCode: 'ARG', name: 'Argentina' },
+  BRA: { fifaCode: 'BRA', name: 'Brazil' },
+  GER: { fifaCode: 'GER', name: 'Germany' },
+  FRA: { fifaCode: 'FRA', name: 'France' },
+  ESP: { fifaCode: 'ESP', name: 'Spain' },
+  ENG: { fifaCode: 'ENG', name: 'England' },
+  POR: { fifaCode: 'POR', name: 'Portugal' },
+  ITA: { fifaCode: 'ITA', name: 'Italy' },
+  MEX: { fifaCode: 'MEX', name: 'Mexico' },
+  USA: { fifaCode: 'USA', name: 'United States' },
+  NED: { fifaCode: 'NED', name: 'Netherlands' },
+  CRO: { fifaCode: 'CRO', name: 'Croatia' },
 };
 
 describe('getGroupMatches', () => {
@@ -801,7 +817,7 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
 
   // Group bets: 4 positions per group (index 3 = the third-place team)
   const groupBets8: GroupBetRecord = {
-    'group-a': ['arg', 'bra', 'fra', 'ger'], // ger is third-place (positions[2])
+    'group-a': ['arg', 'bra', 'FRA', 'ger'], // FRA is third-place (positions[2]) — uppercase to match teamsMap.fifaCode
     'group-b': ['mex', 'usa', 'ned', 'cro'], // cro is third-place (positions[2])
     'group-c': ['por', 'esp', 'ita', 'eng'], // eng is third-place (positions[2])
     'group-d': ['fra', 'ger', 'arg', 'bra'], // bra is third-place (positions[2])
@@ -832,9 +848,9 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
       groups8,
     );
 
-    // fra is group-a's third-place team and has 3 points from beating ita
+    // FRA is group-a's third-place team and has 3 points from beating ita
     // groupLetter is now a bare letter 'A', not the slug 'group-a'
-    const fraEntry = result.find((r) => r.teamId === 'fra' && r.groupLetter === 'A');
+    const fraEntry = result.find((r) => r.teamId === 'FRA' && r.groupLetter === 'A');
     expect(fraEntry).toBeDefined();
     expect(fraEntry!.points).toBeGreaterThan(0);
   });
@@ -986,20 +1002,20 @@ describe('computeThirdPlaceStandings (rewrite)', () => {
     // single match that team plays. Distinct teams per group keep calculateGroupStandings
     // point totals independent so we can dial each third-place team's points precisely.
     const rankGroups = [
-      { slug: 'group-a', third: 't3a', opp: 't4a' },
-      { slug: 'group-b', third: 't3b', opp: 't4b' },
-      { slug: 'group-c', third: 't3c', opp: 't4c' },
-      { slug: 'group-d', third: 't3d', opp: 't4d' },
-      { slug: 'group-e', third: 't3e', opp: 't4e' },
-      { slug: 'group-f', third: 't3f', opp: 't4f' },
-      { slug: 'group-g', third: 't3g', opp: 't4g' },
-      { slug: 'group-h', third: 't3h', opp: 't4h' },
+      { slug: 'group-a', third: 'T3A', opp: 'T4A' },
+      { slug: 'group-b', third: 'T3B', opp: 'T4B' },
+      { slug: 'group-c', third: 'T3C', opp: 'T4C' },
+      { slug: 'group-d', third: 'T3D', opp: 'T4D' },
+      { slug: 'group-e', third: 'T3E', opp: 'T4E' },
+      { slug: 'group-f', third: 'T3F', opp: 'T4F' },
+      { slug: 'group-g', third: 'T3G', opp: 'T4G' },
+      { slug: 'group-h', third: 'T3H', opp: 'T4H' },
     ];
 
     const rankTeamsMap = Object.fromEntries(
       rankGroups.flatMap((g) => [
-        [g.third, { fifaCode: g.third.toUpperCase(), name: g.third }],
-        [g.opp, { fifaCode: g.opp.toUpperCase(), name: g.opp }],
+        [g.third, { fifaCode: g.third, name: g.third }],
+        [g.opp, { fifaCode: g.opp, name: g.opp }],
       ]),
     );
 
@@ -1361,17 +1377,17 @@ describe('buildKnockoutBracket — R32 population from group predictions and thi
     expect(bySlug['r32-1'].homeTeam.resolvedTeam).toBe('t2a');
     expect(bySlug['r32-1'].awayTeam.resolvedTeam).toBe('t2b');
     expect(bySlug['r32-2'].homeTeam.resolvedTeam).toBe('t1e');
-    expect(bySlug['r32-2'].awayTeam.resolvedTeam).toBe('t3f');
+    expect(bySlug['r32-2'].awayTeam.resolvedTeam).toBe('t3c');
     expect(bySlug['r32-3'].homeTeam.resolvedTeam).toBe('t1f');
     expect(bySlug['r32-3'].awayTeam.resolvedTeam).toBe('t2c');
     expect(bySlug['r32-4'].homeTeam.resolvedTeam).toBe('t1c');
     expect(bySlug['r32-4'].awayTeam.resolvedTeam).toBe('t2f');
     expect(bySlug['r32-5'].homeTeam.resolvedTeam).toBe('t1i');
-    expect(bySlug['r32-5'].awayTeam.resolvedTeam).toBe('t3h');
+    expect(bySlug['r32-5'].awayTeam.resolvedTeam).toBe('t3f');
     expect(bySlug['r32-6'].homeTeam.resolvedTeam).toBe('t2e');
     expect(bySlug['r32-6'].awayTeam.resolvedTeam).toBe('t2i');
     expect(bySlug['r32-7'].homeTeam.resolvedTeam).toBe('t1a');
-    expect(bySlug['r32-7'].awayTeam.resolvedTeam).toBe('t3c');
+    expect(bySlug['r32-7'].awayTeam.resolvedTeam).toBe('t3h');
     expect(bySlug['r32-8'].homeTeam.resolvedTeam).toBe('t1l');
     expect(bySlug['r32-8'].awayTeam.resolvedTeam).toBe('t3e');
     expect(bySlug['r32-9'].homeTeam.resolvedTeam).toBe('t1d');
@@ -1414,10 +1430,10 @@ describe('buildKnockoutBracket — R32 population from group predictions and thi
     const bySlug = Object.fromEntries(bracket.map((m) => [m.slug, m]));
 
     // matrix slots: M74→r32-2, M77→r32-5, M79→r32-7, M80→r32-8, M81→r32-9, M82→r32-10, M85→r32-13, M87→r32-15
-    // ABCDEFGH → { M74:'F', M82:'A', M81:'B', M77:'H', M79:'C', M80:'E', M85:'G', M87:'D' }
-    expect(bySlug['r32-2'].awayTeam.resolvedTeam).toBe('t3f'); // M74→group-f
-    expect(bySlug['r32-5'].awayTeam.resolvedTeam).toBe('t3h'); // M77→group-h
-    expect(bySlug['r32-7'].awayTeam.resolvedTeam).toBe('t3c'); // M79→group-c
+    // ABCDEFGH → { M74:'C', M82:'A', M81:'B', M77:'F', M79:'H', M80:'E', M85:'G', M87:'D' }
+    expect(bySlug['r32-2'].awayTeam.resolvedTeam).toBe('t3c'); // M74→group-c
+    expect(bySlug['r32-5'].awayTeam.resolvedTeam).toBe('t3f'); // M77→group-f
+    expect(bySlug['r32-7'].awayTeam.resolvedTeam).toBe('t3h'); // M79→group-h
     expect(bySlug['r32-8'].awayTeam.resolvedTeam).toBe('t3e'); // M80→group-e
     expect(bySlug['r32-9'].awayTeam.resolvedTeam).toBe('t3b'); // M81→group-b
     expect(bySlug['r32-10'].awayTeam.resolvedTeam).toBe('t3a'); // M82→group-a
@@ -1469,8 +1485,8 @@ describe('R16 bracket propagates from R32 knockoutBets + confirmedAdvancingMap',
 
   // R32 winners stored in knockoutBets
   const r32Winners: KnockoutBetRecord = {
-    'r32-2': 't1e', // 1E vs t3f → t1e wins
-    'r32-5': 't1i', // 1I vs t3h → t1i wins
+    'r32-2': 't1e', // 1E vs t3c → t1e wins
+    'r32-5': 't1i', // 1I vs t3f → t1i wins
   };
 
   const allMatches = [
@@ -1514,10 +1530,10 @@ describe('R16 bracket propagates from R32 knockoutBets + confirmedAdvancingMap',
   });
 
   it('best-third R32 slots resolve via confirmedAdvancingMap matrix (D-11)', () => {
-    // r32-2 away = M74 best-third slot → group-f third = t3f (from confirmedMap)
+    // r32-2 away = M74 best-third slot → group-c third = t3c (from confirmedMap)
     const bracket = buildKnockoutBracket(groupBetsR32, allMatches, r32Winners, confirmedMap);
     const r32_2 = bracket.find((m) => m.slug === 'r32-2')!;
-    expect(r32_2.awayTeam.resolvedTeam).toBe('t3f'); // M74 → group-f third
+    expect(r32_2.awayTeam.resolvedTeam).toBe('t3c'); // M74 → group-c third
   });
 
   it('R16 shows TBD when R32 winner not in knockoutBets', () => {
