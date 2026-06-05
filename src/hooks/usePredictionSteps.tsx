@@ -16,7 +16,7 @@ import {
   type ThirdPlaceConfirmationProps,
 } from '@molecules/Predictions';
 import type { GroupForPrediction } from '@organisms/GroupPredictionForm';
-import { getLocalizedGroupName,getLocalizedName } from '@utils/i18n';
+import { getLocalizedGroupName, getLocalizedName } from '@utils/i18n';
 
 type GroupStepTranslations = PredictionStepGroupProps['translations'];
 type KnockoutStepTranslations = PredictionStepKnockoutRoundProps['translations'];
@@ -195,7 +195,6 @@ export function usePredictionSteps(
         if (t.status === 'fulfilled') {
           t.value.forEach((x) => {
             const resolvedName = getLocalizedName(x.name, locale);
-            tMap[x.fifaCode.toLowerCase()] = { fifaCode: x.fifaCode, name: resolvedName };
             tMap[x.fifaCode] = { fifaCode: x.fifaCode, name: resolvedName };
             teamsList.push({ fifaCode: x.fifaCode, name: resolvedName });
           });
@@ -563,7 +562,9 @@ export function usePredictionSteps(
       id: 'third-place',
       kind: 'third-place',
       label: 'Third Place',
-      description: translations.stepDescriptionRound?.replace('{round}', 'third place') || 'Confirm which third-placed teams advance',
+      description:
+        translations.stepDescriptionRound?.replace('{round}', 'third place') ||
+        'Confirm which third-placed teams advance',
       isComplete: confirmedThirdPlace ?? false,
       canAdvance: true,
       deadline,
@@ -577,7 +578,9 @@ export function usePredictionSteps(
           onRetry={retryBets}
           translations={{
             heading: translations.thirdPlaceHeading || 'Third-Placed Teams Qualification',
-            subtitle: translations.thirdPlaceSubtitle || 'Best 8 of 12 third-placed teams advance to Round of 32',
+            subtitle:
+              translations.thirdPlaceSubtitle ||
+              'Best 8 of 12 third-placed teams advance to Round of 32',
             advancing: translations.thirdPlaceAdvancing || 'Advancing to Round of 32',
             eliminated: translations.thirdPlaceEliminated || 'Eliminated',
             bracketSlot: translations.thirdPlaceBracketSlotLabel || 'Match',

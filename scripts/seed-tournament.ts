@@ -1400,7 +1400,7 @@ async function seedTournament() {
       .collection('tournaments')
       .doc(TOURNAMENT_ID)
       .collection('teams')
-      .doc(team.fifaCode.toLowerCase())
+      .doc(team.fifaCode)
       .set({
         fifaCode: team.fifaCode,
         name: team.name,
@@ -1423,8 +1423,8 @@ async function seedTournament() {
         slug: m.slug,
         phase: 'group',
         groupId: m.groupId,
-        homeTeamId: m.homeTeamId.toLowerCase(),
-        awayTeamId: m.awayTeamId.toLowerCase(),
+        homeTeamId: m.homeTeamId,
+        awayTeamId: m.awayTeamId,
         date: admin.firestore.Timestamp.fromDate(new Date(m.date)),
         stadium: stadium.name,
         result: { home: null, away: null },

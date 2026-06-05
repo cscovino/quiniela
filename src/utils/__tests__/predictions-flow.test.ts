@@ -44,22 +44,6 @@ const makeMatch = (
 });
 
 const teamsMap = {
-  arg: { fifaCode: 'ARG', name: 'Argentina' },
-  bra: { fifaCode: 'BRA', name: 'Brazil' },
-  ger: { fifaCode: 'GER', name: 'Germany' },
-  fra: { fifaCode: 'FRA', name: 'France' },
-  esp: { fifaCode: 'ESP', name: 'Spain' },
-  eng: { fifaCode: 'ENG', name: 'England' },
-  por: { fifaCode: 'POR', name: 'Portugal' },
-  ita: { fifaCode: 'ITA', name: 'Italy' },
-  mex: { fifaCode: 'MEX', name: 'Mexico' },
-  usa: { fifaCode: 'USA', name: 'United States' },
-  ned: { fifaCode: 'NED', name: 'Netherlands' },
-  cro: { fifaCode: 'CRO', name: 'Croatia' },
-  // Uppercase keys mirror the lowercase ones so third-place teamIds written in
-  // groupBets as their FIFA code (e.g. 'FRA') resolve both in
-  // `standings.find((s) => s.fifaCode === thirdPlaceTeamId)` and in the
-  // `teamsMap[thirdPlaceTeamId]` lookup.
   ARG: { fifaCode: 'ARG', name: 'Argentina' },
   BRA: { fifaCode: 'BRA', name: 'Brazil' },
   GER: { fifaCode: 'GER', name: 'Germany' },

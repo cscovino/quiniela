@@ -16,6 +16,10 @@ export const SCORING = {
     EXACT_POSITION: 5, // SCORE-02: exact 1st/2nd/3rd/4th position
     QUALIFIED: 3, // SCORE-02: among final four, wrong position
   },
+  KNOCKOUT: {
+    CORRECT: 1, // KO-01: correct winner of an R32/R16/QF/SF match
+    WRONG: 0, // KO-01: wrong winner
+  },
   BEST_PLAYER: {
     CORRECT: 5, // SCORE-03: correct top scorer or best goalkeeper pick
   },

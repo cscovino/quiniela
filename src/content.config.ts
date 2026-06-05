@@ -4,7 +4,7 @@ import { defineCollection, z } from 'astro:content';
 const teamsCollection = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/teams' }),
   schema: z.object({
-    fifaCode: z.string().length(3),
+    fifaCode: z.string().regex(/^[A-Z]{3}$/),
     name: z.object({ es: z.string(), en: z.string() }),
     groupId: z.string(),
   }),
