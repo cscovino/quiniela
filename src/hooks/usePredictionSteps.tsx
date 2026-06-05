@@ -16,7 +16,7 @@ import {
   type ThirdPlaceConfirmationProps,
 } from '@molecules/Predictions';
 import type { GroupForPrediction } from '@organisms/GroupPredictionForm';
-import { getLocalizedName } from '@utils/i18n';
+import { getLocalizedGroupName,getLocalizedName } from '@utils/i18n';
 
 type GroupStepTranslations = PredictionStepGroupProps['translations'];
 type KnockoutStepTranslations = PredictionStepKnockoutRoundProps['translations'];
@@ -530,7 +530,7 @@ export function usePredictionSteps(
       result.push({
         id: `group-${group.slug}`,
         kind: 'group',
-        label: group.name,
+        label: getLocalizedGroupName(group.name, locale),
         description: stepDescription,
         isComplete: submittedSteps.has(stepIndex) || isGroupComplete,
         canAdvance: canAdvanceGroup,

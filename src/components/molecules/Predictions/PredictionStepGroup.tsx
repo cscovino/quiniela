@@ -230,7 +230,6 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
     <div className="prediction-step-group">
       {groupMatches.length > 0 && (
         <section className="prediction-step-group__section">
-          <Typography variant="h3">{labels.matches}</Typography>
           <div className="prediction-step-group__matches">
             {groupMatches.map((match) => {
               const homeTeam = match.homeTeamId
@@ -285,39 +284,41 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
       <section className="prediction-step-group__section prediction-step-group__section-standings">
         <div className="prediction-step-group__standings-help">
           <Typography variant="h3">{labels.standings}</Typography>
-          <table className="prediction-step-group__standings">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>{labels.team}</th>
-                <th>P</th>
-                <th>W</th>
-                <th>D</th>
-                <th>L</th>
-                <th>GF</th>
-                <th>GA</th>
-                <th>{labels.pts}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {standings.map((s, i) => (
-                <tr key={s.teamId}>
-                  <td>{i + 1}</td>
-                  <td className="prediction-step-group__team-cell">
-                    <TeamFlag fifaCode={s.fifaCode} size="sm" />
-                    {s.fifaCode}
-                  </td>
-                  <td>{s.played}</td>
-                  <td>{s.won}</td>
-                  <td>{s.drawn}</td>
-                  <td>{s.lost}</td>
-                  <td>{s.goalsFor}</td>
-                  <td>{s.goalsAgainst}</td>
-                  <td className="prediction-step-group__pts-cell">{s.points}</td>
+          <div className="prediction-step-group__standings-scroll">
+            <table className="prediction-step-group__standings">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>{labels.team}</th>
+                  <th>P</th>
+                  <th>W</th>
+                  <th>D</th>
+                  <th>L</th>
+                  <th>GF</th>
+                  <th>GA</th>
+                  <th>{labels.pts}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {standings.map((s, i) => (
+                  <tr key={s.teamId}>
+                    <td>{i + 1}</td>
+                    <td className="prediction-step-group__team-cell">
+                      <TeamFlag fifaCode={s.fifaCode} size="sm" />
+                      {s.fifaCode}
+                    </td>
+                    <td>{s.played}</td>
+                    <td>{s.won}</td>
+                    <td>{s.drawn}</td>
+                    <td>{s.lost}</td>
+                    <td>{s.goalsFor}</td>
+                    <td>{s.goalsAgainst}</td>
+                    <td className="prediction-step-group__pts-cell">{s.points}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div className="prediction-step-group__classification-help">
           <div className="prediction-step-group__classification-header">

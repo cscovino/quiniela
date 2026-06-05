@@ -123,6 +123,13 @@ export function getOtherLocale(locale: Locale): Locale {
   return locale === 'en' ? 'es' : 'en';
 }
 
+export function getLocalizedGroupName(name: string, locale: Locale): string {
+  if (locale === 'es') {
+    return name.replace(/^Group /, 'Grupo ');
+  }
+  return name;
+}
+
 const LOCALE_CODES: Record<Locale, { dateLocale: string; ogLocale: string }> = {
   en: { dateLocale: 'en-US', ogLocale: 'en_US' },
   es: { dateLocale: 'es-ES', ogLocale: 'es_ES' },

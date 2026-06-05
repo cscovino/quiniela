@@ -62,8 +62,21 @@
 }
 
 .prediction-step-group__standings {
+  display: flex;
+  flex-direction: row;
   width: 100%;
   border-collapse: collapse;
+}
+
+@media (min-width: 1024px) {
+  .prediction-step-group__section-standings {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+}
+
+table.prediction-step-group__standings {
+  display: table;
 }
 
 .prediction-step-group__standings th,
@@ -77,6 +90,25 @@
   background: var(--bg-card);
   font-family: var(--font-pixel);
   font-size: var(--text-xs);
+}
+
+.prediction-step-group__standings-help {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.prediction-step-group__standings-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prediction-step-group__classification-help {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .prediction-step-group__team-cell {
