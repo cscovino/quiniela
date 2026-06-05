@@ -16,6 +16,8 @@ export interface PredictionInputProps {
 }
 
 export const PredictionInput: FC<PredictionInputProps> = ({
+  homeTeamName,
+  awayTeamName,
   homeScore = 0,
   awayScore = 0,
   onChange,
@@ -39,6 +41,9 @@ export const PredictionInput: FC<PredictionInputProps> = ({
   return (
     <div className={`prediction-input ${className}`}>
       <div className="prediction-input__team">
+        <Typography variant="small" className="prediction-input__name">
+          {homeTeamName}
+        </Typography>
         <Input
           type="text"
           inputMode="numeric"
@@ -57,6 +62,9 @@ export const PredictionInput: FC<PredictionInputProps> = ({
       </div>
 
       <div className="prediction-input__team">
+        <Typography variant="small" className="prediction-input__name">
+          {awayTeamName}
+        </Typography>
         <Input
           type="text"
           inputMode="numeric"
