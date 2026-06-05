@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { AvatarOptions, Predictor } from '@app-types/firestore';
 import type { DeadlineInfo } from '@app-types/prediction-steps';
@@ -270,22 +270,21 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
 
   const groupsCount = groups.length;
 
-  // Show feedback as toast instead of inline banner to avoid layout shift
+// Show feedback as toast instead of inline banner to avoid layout shift.
+  // Deduplicate by tracking the full feedback object reference so identical
+  // objects (e.g. from multiple step submits before the 5s clear) don't duplicate.
+  const prevFeedbackRef = useRef<typeof feedback>(null);
   useEffect(() => {
-    if (!feedback) return;
-    const id = `pred-feedback-${Date.now()}`;
+    if (!feedback || feedback === prevFeedbackRef.current) return;
+    prevFeedbackRef.current = feedback;
     useToastStore.getState().addToast({
       type: feedback.type,
       title:
         feedback.type === 'success'
-          ? translations.feedbackSuccessTitle || 'Saved'
-          : translations.feedbackErrorTitle || 'Error',
+          ? (translations.feedbackSuccessTitle || 'Saved')
+          : (translations.feedbackErrorTitle || 'Error'),
       message: feedback.message,
     });
-    const timer = setTimeout(() => {
-      useToastStore.getState().dismissToast(id);
-    }, 5000);
-    return () => clearTimeout(timer);
   }, [feedback, translations.feedbackSuccessTitle, translations.feedbackErrorTitle]);
 
   useEffect(() => {

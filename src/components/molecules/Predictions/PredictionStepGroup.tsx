@@ -282,8 +282,8 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
         </section>
       )}
 
-      {standings.length > 0 && (
-        <section className="prediction-step-group__section">
+      <section className="prediction-step-group__section prediction-step-group__section-standings">
+        <div className="prediction-step-group__standings-help">
           <Typography variant="h3">{labels.standings}</Typography>
           <table className="prediction-step-group__standings">
             <thead>
@@ -318,61 +318,62 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
               ))}
             </tbody>
           </table>
-        </section>
-      )}
-
-      <section className="prediction-step-group__section">
-        <div className="prediction-step-group__classification-header">
-          <Typography variant="h3">{labels.classification}</Typography>
         </div>
-        <div className="prediction-step-group__classification">
-          <div className="prediction-step-group__row prediction-step-group__row--header">
-            <span className="prediction-step-group__col team">{labels.team}</span>
-            <span className="prediction-step-group__col position">{labels.position}</span>
+        <div className="prediction-step-group__classification-help">
+          <div className="prediction-step-group__classification-header">
+            <Typography variant="h3">{labels.classification}</Typography>
           </div>
-          {group.teams.map((team) => {
-            const currentPosition = classification.indexOf(team.fifaCode);
-            const positionValue = currentPosition !== -1 ? (currentPosition + 1).toString() : '';
+          <div className="prediction-step-group__classification">
+            <div className="prediction-step-group__row prediction-step-group__row--header">
+              <span className="prediction-step-group__col team">{labels.team}</span>
+              <span className="prediction-step-group__col position">{labels.position}</span>
+            </div>
+            {group.teams.map((team) => {
+              const currentPosition = classification.indexOf(team.fifaCode);
+              const positionValue = currentPosition !== -1 ? (currentPosition + 1).toString() : '';
 
-            return (
-              <div key={team.fifaCode} className="prediction-step-group__row">
-                <span className="prediction-step-group__col team">
-                  <TeamFlag fifaCode={team.fifaCode} size="sm" />
-                  {team.name}
-                </span>
-                <span className="prediction-step-group__col position">
-                  <select
-                    className="prediction-step-group__select"
-                    value={positionValue}
-                    onChange={(e) => handleTeamPositionChange(team.fifaCode, e.target.value)}
-                    disabled={isDisabled}
-                    aria-label={`Position for ${team.name}`}
-                  >
-                    <option value="">{labels.selectOption}</option>
-                    {Array.from({ length: group.teams.length }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1}
-                        {i === 0
-                          ? labels.ordinal1
-                          : i === 1
-                            ? labels.ordinal2
-                            : i === 2
-                              ? labels.ordinal3
-                              : labels.ordinalOther}
-                      </option>
-                    ))}
-                  </select>
-                </span>
-              </div>
-            );
-          })}
+              return (
+                <div key={team.fifaCode} className="prediction-step-group__row">
+                  <span className="prediction-step-group__col team">
+                    <TeamFlag fifaCode={team.fifaCode} size="sm" />
+                    {team.name}
+                  </span>
+                  <span className="prediction-step-group__col position">
+                    <select
+                      className="prediction-step-group__select"
+                      value={positionValue}
+                      onChange={(e) => handleTeamPositionChange(team.fifaCode, e.target.value)}
+                      disabled={isDisabled}
+                      aria-label={`Position for ${team.name}`}
+                    >
+                      <option value="">{labels.selectOption}</option>
+                      {Array.from({ length: group.teams.length }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                          {i === 0
+                            ? labels.ordinal1
+                            : i === 1
+                              ? labels.ordinal2
+                              : i === 2
+                                ? labels.ordinal3
+                                : labels.ordinalOther}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          {!classificationComplete && classification.length > 0 && (
+            <Typography variant="caption" className="prediction-step-group__hint">
+              {labels.hintRankAllTeams}
+            </Typography>
+          )}
         </div>
-        {!classificationComplete && classification.length > 0 && (
-          <Typography variant="caption" className="prediction-step-group__hint">
-            {labels.hintRankAllTeams}
-          </Typography>
-        )}
       </section>
+
+      <section className="prediction-step-group__section"></section>
 
       {!onStateChange && (
         <div className="prediction-step-group__actions">

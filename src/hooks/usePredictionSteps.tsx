@@ -294,7 +294,7 @@ export function usePredictionSteps(
         });
       }
       setSubmitting(false);
-      setTimeout(() => setFeedback(null), 5000);
+      setTimeout(() => setFeedback(null), 3000);
     },
     [user, selectedPredictorId, translations, groups.length],
   );
@@ -333,7 +333,7 @@ export function usePredictionSteps(
         });
       }
       setSubmitting(false);
-      setTimeout(() => setFeedback(null), 5000);
+      setTimeout(() => setFeedback(null), 3000);
     },
     [user, selectedPredictorId, translations, groups.length],
   );
@@ -395,7 +395,7 @@ export function usePredictionSteps(
           message: error === 'CAPTCHA_ERROR' ? translations.captchaError : error,
         });
       }
-      setTimeout(() => setFeedback(null), 5000);
+      setTimeout(() => setFeedback(null), 3000);
     },
     [user, selectedPredictorId, firestoreMatches, translations],
   );
@@ -440,7 +440,7 @@ export function usePredictionSteps(
           message: error === 'CAPTCHA_ERROR' ? translations.captchaError : error,
         });
       }
-      setTimeout(() => setFeedback(null), 5000);
+      setTimeout(() => setFeedback(null), 3000);
     },
     [user, selectedPredictorId, firestoreMatches, translations],
   );
