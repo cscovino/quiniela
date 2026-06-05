@@ -118,7 +118,7 @@
 }
 
 .ranking-row__stat--today {
-  color: var(--color-accent-500);
+  color: var(--text-secondary);
   font-weight: var(--font-weight-bold);
 }
 
