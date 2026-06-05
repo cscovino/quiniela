@@ -12,11 +12,10 @@ const allFinished = new Map<string, string>([
   ['m5', 'finished'],
   ['m6', 'finished'],
 ]);
-const totalFinishedMatches = 6;
 
 describe('computeStatsFromBets', () => {
   it('returns zeros for empty bets array', () => {
-    const result = computeStatsFromBets([], new Map(), 0);
+    const result = computeStatsFromBets([], new Map());
     expect(result.totalPoints).toBe(0);
     expect(result.exactBets).toBe(0);
     expect(result.winnerBets).toBe(0);
@@ -32,13 +31,13 @@ describe('computeStatsFromBets', () => {
     const bets = [
       { userId: 'u1', predictorId: 'p1', matchId: 'm1', points: 3, isExact: true, isWinner: true },
     ];
-    const result = computeStatsFromBets(bets, allFinished, totalFinishedMatches);
+    const result = computeStatsFromBets(bets, allFinished);
     expect(result.totalPoints).toBe(3);
     expect(result.exactBets).toBe(1);
     expect(result.winnerBets).toBe(1);
     expect(result.totalBets).toBe(1);
     expect(result.finishedBets).toBe(1);
-    expect(result.accuracy).toBeCloseTo(1 / 6); // 1 winner / 6 total finished matches
+    expect(result.accuracy).toBeCloseTo(1); // 1 winner / 1 finished bet
     expect(result.currentStreak).toBe(1);
     expect(result.maxStreak).toBe(1);
   });
@@ -56,13 +55,13 @@ describe('computeStatsFromBets', () => {
         isWinner: false,
       },
     ];
-    const result = computeStatsFromBets(bets, allFinished, totalFinishedMatches);
+    const result = computeStatsFromBets(bets, allFinished);
     expect(result.totalPoints).toBe(4);
     expect(result.exactBets).toBe(1);
     expect(result.winnerBets).toBe(2);
     expect(result.totalBets).toBe(3);
     expect(result.finishedBets).toBe(3);
-    expect(result.accuracy).toBeCloseTo(2 / 6); // 2 winners / 6 total finished matches
+    expect(result.accuracy).toBeCloseTo(2 / 3); // 2 winners / 3 finished bets
     expect(result.currentStreak).toBe(0);
     expect(result.maxStreak).toBe(2);
   });
@@ -82,7 +81,7 @@ describe('computeStatsFromBets', () => {
       { userId: 'u1', predictorId: 'p1', matchId: 'm4', points: 3, isExact: true, isWinner: true },
       { userId: 'u1', predictorId: 'p1', matchId: 'm5', points: 1, isExact: false, isWinner: true },
     ];
-    const result = computeStatsFromBets(bets, allFinished, totalFinishedMatches);
+    const result = computeStatsFromBets(bets, allFinished);
     expect(result.currentStreak).toBe(2);
     expect(result.maxStreak).toBe(2);
   });
@@ -103,7 +102,7 @@ describe('computeStatsFromBets', () => {
       { userId: 'u1', predictorId: 'p1', matchId: 'm5', points: 3, isExact: true, isWinner: true },
       { userId: 'u1', predictorId: 'p1', matchId: 'm6', points: 3, isExact: true, isWinner: true },
     ];
-    const result = computeStatsFromBets(bets, allFinished, totalFinishedMatches);
+    const result = computeStatsFromBets(bets, allFinished);
     expect(result.currentStreak).toBe(3);
     expect(result.maxStreak).toBe(3);
   });
@@ -121,7 +120,7 @@ describe('computeStatsFromBets', () => {
       },
       { userId: 'u1', predictorId: 'p1', matchId: 'm3', points: 1, isExact: false, isWinner: true },
     ];
-    const result = computeStatsFromBets(bets, allFinished, totalFinishedMatches);
+    const result = computeStatsFromBets(bets, allFinished);
     expect(result.pointsHistory).toEqual([
       { points: 3, matchId: 'm1' },
       { points: 1, matchId: 'm3' },
@@ -153,12 +152,12 @@ describe('computeStatsFromBets', () => {
       ['m2', 'scheduled'],
       ['m3', 'finished'],
     ]);
-    // 2 finished matches in tournament (m1, m3), 1 winner bet
-    const result = computeStatsFromBets(bets, matchStatuses, 2);
+    // 2 finished bets (m1, m3), 1 winner bet
+    const result = computeStatsFromBets(bets, matchStatuses);
     expect(result.totalBets).toBe(3);
     expect(result.finishedBets).toBe(2);
     expect(result.winnerBets).toBe(1);
-    expect(result.accuracy).toBeCloseTo(1 / 2); // 1 winner / 2 total finished matches
+    expect(result.accuracy).toBeCloseTo(1 / 2); // 1 winner / 2 finished bets
   });
 
   it('returns 0 accuracy when no matches are finished', () => {
@@ -173,7 +172,7 @@ describe('computeStatsFromBets', () => {
       },
     ];
     const matchStatuses = new Map<string, string>([['m1', 'scheduled']]);
-    const result = computeStatsFromBets(bets, matchStatuses, 0);
+    const result = computeStatsFromBets(bets, matchStatuses);
     expect(result.finishedBets).toBe(0);
     expect(result.accuracy).toBe(0);
   });

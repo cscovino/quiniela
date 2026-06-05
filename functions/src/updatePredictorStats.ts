@@ -20,7 +20,6 @@ interface MatchStatusData {
 export function computeStatsFromBets(
   bets: BetData[],
   matchStatuses: Map<string, string>,
-  totalFinishedMatchesInTournament: number,
 ): {
   totalPoints: number;
   exactBets: number;
@@ -74,8 +73,7 @@ export function computeStatsFromBets(
     }
   }
 
-  const accuracy =
-    totalFinishedMatchesInTournament > 0 ? winnerBets / totalFinishedMatchesInTournament : 0;
+  const accuracy = finishedBets > 0 ? winnerBets / finishedBets : 0;
 
   return {
     totalPoints,
@@ -172,12 +170,11 @@ export const updatePredictorStats = functions.firestore
       .collection(`tournaments/${tournamentId}/matches`)
       .where('status', '==', 'finished')
       .get();
-    const totalFinishedMatchesInTournament = finishedMatchesSnapshot.size;
     functions.logger.log(
-      `[updatePredictorStats] Total finished matches in tournament: ${totalFinishedMatchesInTournament}`,
+      `[updatePredictorStats] Total finished matches in tournament: ${finishedMatchesSnapshot.size}`,
     );
 
-    const computed = computeStatsFromBets(bets, matchStatuses, totalFinishedMatchesInTournament);
+    const computed = computeStatsFromBets(bets, matchStatuses);
 
     functions.logger.log(
       `[updatePredictorStats] Computed stats: totalPoints=${computed.totalPoints}, exactBets=${computed.exactBets}, winnerBets=${computed.winnerBets}, accuracy=${computed.accuracy.toFixed(3)}`,
