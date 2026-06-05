@@ -34,7 +34,10 @@ service cloud.firestore {
     }
     
     function isBeforeTournamentStart() {
-      return request.time < timestamp.date(2026, 6, 11);
+      return request.time < timestamp.date(2026, 6, 12) &&
+             !(request.time >= timestamp.date(2026, 6, 11) &&
+               request.time < timestamp.date(2026, 6, 12) &&
+               request.time.hour >= 21);
     }
     
     function canPredictOnMatch(tournamentId, matchId) {
@@ -108,18 +111,17 @@ service cloud.firestore {
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
           canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
+          isBeforeTournamentStart() &&
           request.resource.data.homeScore is int &&
           request.resource.data.homeScore >= 0 &&
           request.resource.data.homeScore <= 15 &&
           request.resource.data.awayScore is int &&
           request.resource.data.awayScore >= 0 &&
           request.resource.data.awayScore <= 15;
-        // Editable until the match starts; client-side prediction-service.ts
-        // skips finished/live/postponed/cancelled/deadline-passed matches at
-        // submit time. Ownership checks mirror create.
         allow update: if
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
+          isBeforeTournamentStart() &&
           request.resource.data.homeScore is int &&
           request.resource.data.homeScore >= 0 &&
           request.resource.data.homeScore <= 15 &&
@@ -134,12 +136,12 @@ service cloud.firestore {
         allow read: if request.auth != null;
         allow create: if
           isOwnerNew() &&
-          isPredictorOwner(request.resource.data.predictorId);
-        // Editable until the group starts; the client enforces "group started"
-        // (any match live/finished). Ownership checks mirror create.
+          isPredictorOwner(request.resource.data.predictorId) &&
+          isBeforeTournamentStart();
         allow update: if
           isOwnerNew() &&
-          isPredictorOwner(request.resource.data.predictorId);
+          isPredictorOwner(request.resource.data.predictorId) &&
+          isBeforeTournamentStart();
         allow delete: if isAdmin();
       }
       
@@ -150,13 +152,14 @@ service cloud.firestore {
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
           canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
+          isBeforeTournamentStart() &&
           request.resource.data.predictedWinner != null &&
           request.resource.data.predictedWinner != '';
-        // Editable until the match's prediction deadline (canPredictOnMatch).
         allow update: if
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
           canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
+          isBeforeTournamentStart() &&
           request.resource.data.predictedWinner != null &&
           request.resource.data.predictedWinner != '';
         allow delete: if isAdmin();
