@@ -36,6 +36,8 @@
     "migrate:avatars:apply": "tsx --env-file=.env scripts/migrate-predictor-avatars.ts --apply",
     "migrate:case": "tsx --env-file=.env scripts/migrate-team-ids-case.ts",
     "migrate:case:execute": "tsx --env-file=.env scripts/migrate-team-ids-case.ts --execute",
+    "migrate:rescore": "tsx --env-file=.env scripts/rescore-group-bets.ts",
+    "migrate:rescore:execute": "tsx --env-file=.env scripts/rescore-group-bets.ts --execute",
     "prepare": "husky"
   },
   "lint-staged": {
