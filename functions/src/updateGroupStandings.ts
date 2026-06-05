@@ -126,19 +126,37 @@ export const updateGroupStandings = functions.firestore
   .onUpdate(async (change, context) => {
     const before = change.before.data() as MatchData;
     const after = change.after.data() as MatchData;
+    const tournamentId = context.params.tournamentId;
+    const matchId = context.params.matchId;
 
-    if (!after.pointsCalculated || before.pointsCalculated) {
+    functions.logger.log(
+      `[updateGroupStandings] Triggered: tournament=${tournamentId}, match=${matchId}, phase=${after.phase}, groupId=${after.groupId}`,
+    );
+
+    if (!after.pointsCalculated) {
+      functions.logger.log(
+        `[updateGroupStandings] Match ${matchId} points not calculated yet — skipping`,
+      );
+      return null;
+    }
+
+    if (before.pointsCalculated) {
+      functions.logger.log(
+        `[updateGroupStandings] Match ${matchId} standings already updated — skipping`,
+      );
       return null;
     }
 
     if (!after.groupId || after.phase !== 'group') {
+      functions.logger.log(
+        `[updateGroupStandings] Match ${matchId} is not a group match (phase=${after.phase}) — skipping`,
+      );
       return null;
     }
 
-    const tournamentId = context.params.tournamentId;
     const groupId = after.groupId;
 
-    functions.logger.log(`Updating standings for ${tournamentId}/${groupId}`);
+    functions.logger.log(`[updateGroupStandings] Computing standings for group ${groupId}`);
 
     const matchesSnapshot = await db
       .collection(`tournaments/${tournamentId}/matches`)
@@ -146,10 +164,15 @@ export const updateGroupStandings = functions.firestore
       .where('status', '==', 'finished')
       .get();
 
+    functions.logger.log(
+      `[updateGroupStandings] Found ${matchesSnapshot.size} finished matches in group ${groupId}`,
+    );
+
     const matches = matchesSnapshot.docs.map((doc) => doc.data() as MatchData);
 
     const standings = computeStandings(matches);
 
+    const standingsPath = `tournaments/${tournamentId}/group_standings/${groupId}`;
     await db.collection(`tournaments/${tournamentId}/group_standings`).doc(groupId).set(
       {
         groupId,
@@ -160,7 +183,7 @@ export const updateGroupStandings = functions.firestore
     );
 
     functions.logger.log(
-      `Updated standings for ${groupId}: ${standings.map((t) => `${t.teamId}=${t.points}`).join(', ')}`,
+      `[updateGroupStandings] Wrote standings to ${standingsPath}: ${standings.map((t) => `${t.position}.${t.teamId}(${t.points}pts)`).join(', ')}`,
     );
 
     return null;

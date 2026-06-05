@@ -43,23 +43,34 @@ interface FinalStandingsData {
 export const deriveFinalStandings = functions.firestore
   .document('tournaments/{tournamentId}/matches/{matchId}')
   .onUpdate(async (change, context) => {
+    const before = change.before.data() as MatchData;
     const after = change.after.data() as MatchData;
     const tournamentId = context.params.tournamentId;
     const matchId = context.params.matchId;
 
+    functions.logger.log(
+      `[deriveFinalStandings] Triggered: tournament=${tournamentId}, match=${matchId}, slug=${after.slug}, status=${after.status}, beforeStatus=${before.status}`,
+    );
+
     // Slug filter: only process 'final' or 'third-place' matches
     if (after.slug !== 'final' && after.slug !== 'third-place') {
+      functions.logger.log(
+        `[deriveFinalStandings] Match ${matchId} slug='${after.slug}' not final/third-place — skipping`,
+      );
       return null;
     }
 
     // Status guard: only proceed when match is finished
     if (after.status !== 'finished') {
+      functions.logger.log(
+        `[deriveFinalStandings] Match ${matchId} status='${after.status}' not finished — skipping`,
+      );
       return null;
     }
 
     // Match-result guard: skip if already scored
     if (after.pointsCalculated) {
-      functions.logger.log(`Match ${matchId} already scored — skipping deriveFinalStandings`);
+      functions.logger.log(`[deriveFinalStandings] Match ${matchId} already scored — skipping`);
       return null;
     }
 
@@ -68,7 +79,7 @@ export const deriveFinalStandings = functions.firestore
 
     // Determine winner/loser from result
     if (after.result.home === null || after.result.away === null) {
-      functions.logger.error(`Match ${matchId} finished but result is null`);
+      functions.logger.error(`[deriveFinalStandings] Match ${matchId} finished but result is null`);
       return null;
     }
 
@@ -77,7 +88,7 @@ export const deriveFinalStandings = functions.firestore
     const loserTeamId = homeWin ? after.awayTeamId : after.homeTeamId;
 
     functions.logger.log(
-      `deriveFinalStandings: ${after.slug} finished — winner: ${winnerTeamId}, loser: ${loserTeamId}`,
+      `[deriveFinalStandings] ${after.slug} finished: winner=${winnerTeamId}, loser=${loserTeamId}`,
     );
 
     // Query for the other match (final or third-place)
@@ -91,15 +102,17 @@ export const deriveFinalStandings = functions.firestore
     const updateData: FinalStandingsData = { tournamentId };
 
     if (isThirdPlace) {
-      // third-place match: winner = 3rd, loser = 4th
       updateData.third = winnerTeamId as string;
       updateData.fourth = loserTeamId as string;
-      functions.logger.log(`Writing third=${winnerTeamId}, fourth=${loserTeamId}`);
+      functions.logger.log(
+        `[deriveFinalStandings] Writing third=${winnerTeamId}, fourth=${loserTeamId}`,
+      );
     } else {
-      // final match: winner = 1st, loser = 2nd
       updateData.first = winnerTeamId as string;
       updateData.second = loserTeamId as string;
-      functions.logger.log(`Writing first=${winnerTeamId}, second=${loserTeamId}`);
+      functions.logger.log(
+        `[deriveFinalStandings] Writing first=${winnerTeamId}, second=${loserTeamId}`,
+      );
     }
 
     // Check if the other match is also finished (for complete first/second or third/fourth)
@@ -107,7 +120,11 @@ export const deriveFinalStandings = functions.firestore
     if (!otherMatchSnapshot.empty) {
       const otherMatchData = otherMatchSnapshot.docs[0].data() as MatchData;
       otherMatchFinished = otherMatchData.status === 'finished';
-      functions.logger.log(`Other match (${otherSlug}) status: ${otherMatchData.status}`);
+      functions.logger.log(
+        `[deriveFinalStandings] Other match (${otherSlug}) status: ${otherMatchData.status}, finished=${otherMatchFinished}`,
+      );
+    } else {
+      functions.logger.log(`[deriveFinalStandings] No other match found with slug=${otherSlug}`);
     }
 
     // Write to final_standings/final with merge: true
@@ -117,7 +134,7 @@ export const deriveFinalStandings = functions.firestore
 
     await finalStandingsRef.set(updateData, { merge: true });
     functions.logger.log(
-      `Wrote to final_standings/final: ${JSON.stringify(updateData)} (other match finished: ${otherMatchFinished})`,
+      `[deriveFinalStandings] Wrote to final_standings/final: ${JSON.stringify(updateData)} (otherMatchFinished=${otherMatchFinished})`,
     );
 
     return null;

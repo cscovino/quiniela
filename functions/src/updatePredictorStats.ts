@@ -111,22 +111,42 @@ export const updatePredictorStats = functions.firestore
   .onUpdate(async (change, context) => {
     const before = change.before.data() as BetData;
     const after = change.after.data() as BetData;
+    const tournamentId = context.params.tournamentId;
+    const betId = context.params.betId;
+
+    functions.logger.log(
+      `[updatePredictorStats] Triggered: tournament=${tournamentId}, bet=${betId}`,
+    );
+    functions.logger.log(
+      `[updatePredictorStats] Before: points=${before.points}, after: points=${after.points}`,
+    );
 
     if (before.points === after.points) {
+      functions.logger.log(`[updatePredictorStats] Points unchanged (${before.points}) — skipping`);
       return null;
     }
 
-    const tournamentId = context.params.tournamentId;
     const { userId, predictorId } = after;
 
+    if (!userId || !predictorId) {
+      functions.logger.error(
+        `[updatePredictorStats] Missing userId or predictorId: userId=${userId}, predictorId=${predictorId}`,
+      );
+      return null;
+    }
+
     functions.logger.log(
-      `Updating stats for predictor ${predictorId} in tournament ${tournamentId}`,
+      `[updatePredictorStats] Processing: predictor=${predictorId}, user=${userId}, points ${before.points} → ${after.points}`,
     );
 
     const allBetsSnapshot = await db
       .collection(`tournaments/${tournamentId}/bets`)
       .where('predictorId', '==', predictorId)
       .get();
+
+    functions.logger.log(
+      `[updatePredictorStats] Found ${allBetsSnapshot.size} total bets for predictor ${predictorId}`,
+    );
 
     const bets: BetData[] = allBetsSnapshot.docs.map((doc) => doc.data() as BetData);
 
@@ -142,6 +162,9 @@ export const updatePredictorStats = functions.firestore
         const data = doc.data() as MatchStatusData;
         matchStatuses.set(doc.id, data.status);
       });
+      functions.logger.log(`[updatePredictorStats] Fetched ${matchStatuses.size} match statuses`);
+    } else {
+      functions.logger.log(`[updatePredictorStats] No match IDs found in bets`);
     }
 
     // Get total finished matches in tournament (not just the predictor's bets)
@@ -150,14 +173,24 @@ export const updatePredictorStats = functions.firestore
       .where('status', '==', 'finished')
       .get();
     const totalFinishedMatchesInTournament = finishedMatchesSnapshot.size;
+    functions.logger.log(
+      `[updatePredictorStats] Total finished matches in tournament: ${totalFinishedMatchesInTournament}`,
+    );
 
     const computed = computeStatsFromBets(bets, matchStatuses, totalFinishedMatchesInTournament);
+
+    functions.logger.log(
+      `[updatePredictorStats] Computed stats: totalPoints=${computed.totalPoints}, exactBets=${computed.exactBets}, winnerBets=${computed.winnerBets}, accuracy=${computed.accuracy.toFixed(3)}`,
+    );
 
     const statsRef = db
       .collection(`users/${userId}/predictors/${predictorId}/stats`)
       .doc(tournamentId);
 
+    functions.logger.log(`[updatePredictorStats] Stats doc path: ${statsRef.path}`);
+
     const statsDoc = await statsRef.get();
+    functions.logger.log(`[updatePredictorStats] Stats doc exists: ${statsDoc.exists}`);
 
     const existingBadges = statsDoc.exists
       ? (statsDoc.data() as PredictorStatsData).badgesAwarded || {}
@@ -188,7 +221,7 @@ export const updatePredictorStats = functions.firestore
     );
 
     functions.logger.log(
-      `Stats updated: ${computed.totalPoints}pts, ${computed.exactBets} exact, ${computed.winnerBets} winner, ${computed.accuracy.toFixed(2)} accuracy`,
+      `[updatePredictorStats] SUCCESS: Updated ${statsRef.path} with ${computed.totalPoints}pts, ${computed.exactBets} exact, ${computed.winnerBets} winner, accuracy=${computed.accuracy.toFixed(3)}`,
     );
 
     return null;

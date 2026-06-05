@@ -72,6 +72,16 @@ export const checkAndAwardBadges = functions.firestore
   .onUpdate(async (change, context) => {
     const before = change.before.data() as PredictorStatsData;
     const after = change.after.data() as PredictorStatsData;
+    const userId = context.params.userId;
+    const predictorId = context.params.predictorId;
+    const tournamentId = context.params.tournamentId;
+
+    functions.logger.log(
+      `[checkAndAwardBadges] Triggered: user=${userId}, predictor=${predictorId}, tournament=${tournamentId}`,
+    );
+    functions.logger.log(
+      `[checkAndAwardBadges] Stats change: totalPoints ${before.totalPoints} → ${after.totalPoints}, accuracy ${before.accuracy?.toFixed(3)} → ${after.accuracy?.toFixed(3)}`,
+    );
 
     const existingBadges = before.badgesAwarded || {};
     const newBadges = getBadgeAwards(existingBadges, after);
@@ -79,23 +89,22 @@ export const checkAndAwardBadges = functions.firestore
     const awardedAny = Object.keys(newBadges).some((k) => !existingBadges[k]);
 
     if (!awardedAny) {
+      functions.logger.log(`[checkAndAwardBadges] No new badges to award — skipping`);
       return null;
     }
 
-    for (const [badgeId] of Object.entries(newBadges)) {
-      if (!existingBadges[badgeId]) {
-        functions.logger.log(
-          `Awarding badge ${badgeId} to predictor ${context.params.predictorId}`,
-        );
-      }
-    }
+    const newlyAwarded = Object.keys(newBadges).filter((k) => !existingBadges[k]);
+    functions.logger.log(
+      `[checkAndAwardBadges] Awarding ${newlyAwarded.length} new badge(s): ${newlyAwarded.join(', ')}`,
+    );
 
     await change.after.ref.update({
       badgesAwarded: newBadges,
     });
 
-    const tournamentId = context.params.tournamentId;
-    const predictorId = context.params.predictorId;
+    functions.logger.log(
+      `[checkAndAwardBadges] Updated badgesAwarded for predictor ${predictorId}`,
+    );
 
     const finalPhaseBetSnap = await db
       .doc(`tournaments/${tournamentId}/final_phase_bets/${predictorId}`)
@@ -117,6 +126,9 @@ export const checkAndAwardBadges = functions.firestore
       await change.after.ref.update({
         badgesAwarded: newBadges,
       });
+      functions.logger.log(
+        `[checkAndAwardBadges] Awarded 'clairvoyant' badge (predicted champion=${predictedChampion}, actual=${actualChampion})`,
+      );
     }
 
     const notificationBatch = db.batch();
@@ -132,10 +144,14 @@ export const checkAndAwardBadges = functions.firestore
           read: false,
           createdAt: FieldValue.serverTimestamp(),
         });
+        functions.logger.log(
+          `[checkAndAwardBadges] Creating notification for badge '${badgeId}' to user ${context.params.userId}`,
+        );
       }
     }
 
     await notificationBatch.commit();
+    functions.logger.log(`[checkAndAwardBadges] Created ${newlyAwarded.length} notification(s)`);
 
     return null;
   });

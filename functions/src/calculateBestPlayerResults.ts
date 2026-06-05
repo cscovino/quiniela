@@ -87,30 +87,41 @@ export const calculateBestPlayerResults = functions.firestore
     const after = change.after.data() as BestPlayersResultDoc | undefined;
     const tournamentId = context.params.tournamentId;
 
+    functions.logger.log(`[calculateBestPlayerResults] Triggered: tournament=${tournamentId}`);
+
     // Guard: skip on delete
     if (!after) {
-      functions.logger.log(`best_players_results/actual deleted — skipping`);
+      functions.logger.log(
+        `[calculateBestPlayerResults] best_players_results/actual deleted — skipping`,
+      );
       return null;
     }
 
     // Guard: skip if already scored
     if (after.pointsCalculated) {
-      functions.logger.log(`best_players_results/actual already scored — skipping`);
+      functions.logger.log(
+        `[calculateBestPlayerResults] best_players_results/actual already scored — skipping`,
+      );
       return null;
     }
 
     const { topScorer, bestGoalkeeper } = after;
 
     functions.logger.log(
-      `Scoring best player bets for ${tournamentId} — topScorer: "${topScorer}", bestGoalkeeper: "${bestGoalkeeper}"`,
+      `[calculateBestPlayerResults] Scoring best player bets for ${tournamentId} — topScorer: "${topScorer}", bestGoalkeeper: "${bestGoalkeeper}"`,
     );
 
     // Query all best_players_bets for this tournament
     const betsSnapshot = await db.collection(`tournaments/${tournamentId}/best_players_bets`).get();
 
+    functions.logger.log(
+      `[calculateBestPlayerResults] Found ${betsSnapshot.size} best player bets`,
+    );
+
     if (betsSnapshot.empty) {
-      functions.logger.log(`No best player bets found for ${tournamentId}`);
-      // Mark as scored to prevent re-triggering
+      functions.logger.log(
+        `[calculateBestPlayerResults] No best player bets found for ${tournamentId} — marking as scored`,
+      );
       await change.after.ref.update({ pointsCalculated: true });
       return null;
     }
@@ -144,7 +155,7 @@ export const calculateBestPlayerResults = functions.firestore
       });
 
       functions.logger.log(
-        `Best player bet ${betDoc.id}: scored ${points} pts ` +
+        `[calculateBestPlayerResults] Best player bet ${betDoc.id} (predictor=${bet.predictorId}): scored ${points} pts ` +
           `(topScorer: ${scoreTopScorer}, goalkeeper: ${scoreGoalkeeper})`,
       );
     }
@@ -155,7 +166,9 @@ export const calculateBestPlayerResults = functions.firestore
     });
 
     await batch.commit();
-    functions.logger.log(`Scored ${betsSnapshot.size} best player bets for ${tournamentId}`);
+    functions.logger.log(
+      `[calculateBestPlayerResults] Committed batch: ${betsSnapshot.size} best player bets scored`,
+    );
 
     // Update predictor stats for each affected predictor
     for (const [predictorId, score] of predictorScores) {
@@ -170,14 +183,23 @@ export const calculateBestPlayerResults = functions.firestore
         },
         { merge: true },
       );
+      functions.logger.log(
+        `[calculateBestPlayerResults] Updated stats for predictor ${predictorId}: +${score.points} pts`,
+      );
     }
 
-    functions.logger.log(`Updated stats for ${predictorScores.size} predictors`);
+    functions.logger.log(
+      `[calculateBestPlayerResults] Updated stats for ${predictorScores.size} predictors`,
+    );
 
     try {
       await doRecomputeRanks(tournamentId);
+      functions.logger.log(`[calculateBestPlayerResults] Rank recompute completed`);
     } catch (err) {
-      functions.logger.error('Rank recompute failed after best player scoring', err);
+      functions.logger.error(
+        '[calculateBestPlayerResults] Rank recompute failed after best player scoring',
+        err,
+      );
     }
 
     return null;

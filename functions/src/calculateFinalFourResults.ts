@@ -101,9 +101,13 @@ export const calculateFinalFourResults = functions.firestore
     const after = change.after.data() as FinalStandingsDoc;
     const tournamentId = context.params.tournamentId;
 
+    functions.logger.log(`[calculateFinalFourResults] Triggered: tournament=${tournamentId}`);
+
     // Guard (D-12): skip if already scored
     if (after.pointsCalculated === true) {
-      functions.logger.log(`final_standings/final already scored — skipping`);
+      functions.logger.log(
+        `[calculateFinalFourResults] final_standings/final already scored — skipping`,
+      );
       return null;
     }
 
@@ -121,20 +125,25 @@ export const calculateFinalFourResults = functions.firestore
     );
 
     if (populatedPositions.length === 0) {
-      functions.logger.log(`No final standings positions populated yet — skipping`);
+      functions.logger.log(
+        `[calculateFinalFourResults] No final standings positions populated yet — skipping`,
+      );
       return null;
     }
 
     functions.logger.log(
-      `Scoring final four bets for ${tournamentId} — standings: ${JSON.stringify(standings)}`,
+      `[calculateFinalFourResults] Scoring final four bets for ${tournamentId} — populated positions: ${populatedPositions.join(',')}`,
     );
 
     // Query all final_phase_bets for this tournament
     const betsSnapshot = await db.collection(`tournaments/${tournamentId}/final_phase_bets`).get();
 
+    functions.logger.log(`[calculateFinalFourResults] Found ${betsSnapshot.size} final phase bets`);
+
     if (betsSnapshot.empty) {
-      functions.logger.log(`No final phase bets found for ${tournamentId}`);
-      // Mark as scored to prevent re-triggering
+      functions.logger.log(
+        `[calculateFinalFourResults] No final phase bets found for ${tournamentId} — marking as scored`,
+      );
       await change.after.ref.update({ pointsCalculated: true });
       return null;
     }
@@ -264,7 +273,9 @@ export const calculateFinalFourResults = functions.firestore
     });
 
     await batch.commit();
-    functions.logger.log(`Scored ${predictorScores.size} final phase bets`);
+    functions.logger.log(
+      `[calculateFinalFourResults] Committed batch: ${predictorScores.size} final phase bets scored`,
+    );
 
     // Update predictor stats for each affected predictor (D-10)
     for (const [predictorId, score] of predictorScores) {
@@ -279,14 +290,23 @@ export const calculateFinalFourResults = functions.firestore
         },
         { merge: true },
       );
+      functions.logger.log(
+        `[calculateFinalFourResults] Updated stats for predictor ${predictorId}: +${score.points} pts`,
+      );
     }
 
-    functions.logger.log(`Updated stats for ${predictorScores.size} predictors`);
+    functions.logger.log(
+      `[calculateFinalFourResults] Updated stats for ${predictorScores.size} predictors`,
+    );
 
     try {
       await doRecomputeRanks(tournamentId);
+      functions.logger.log(`[calculateFinalFourResults] Rank recompute completed`);
     } catch (err) {
-      functions.logger.error('Rank recompute failed after final four scoring', err);
+      functions.logger.error(
+        '[calculateFinalFourResults] Rank recompute failed after final four scoring',
+        err,
+      );
     }
 
     return null;

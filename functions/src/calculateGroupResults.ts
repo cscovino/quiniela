@@ -84,9 +84,15 @@ export const calculateGroupResults = functions.firestore
     const tournamentId = context.params.tournamentId;
     const groupId = context.params.groupId;
 
+    functions.logger.log(
+      `[calculateGroupResults] Triggered: tournament=${tournamentId}, group=${groupId}`,
+    );
+
     // Guard 1: skip if already scored
     if (after.pointsCalculated) {
-      functions.logger.log(`Group ${groupId} already scored — skipping`);
+      functions.logger.log(
+        `[calculateGroupResults] Group ${groupId} already scored (pointsCalculated=true) — skipping`,
+      );
       return null;
     }
 
@@ -94,12 +100,15 @@ export const calculateGroupResults = functions.firestore
 
     // Guard 2: check standings exist
     if (!standings || standings.length === 0) {
-      functions.logger.error(`Group ${groupId} has no standings`);
+      functions.logger.error(`[calculateGroupResults] Group ${groupId} has no standings`);
       return null;
     }
 
     functions.logger.log(
-      `Scoring group bets for ${tournamentId}/${groupId} — ${standings.length} teams`,
+      `[calculateGroupResults] Scoring group bets for ${tournamentId}/${groupId} — ${standings.length} teams (top: ${standings
+        .slice(0, 4)
+        .map((t) => t.teamId)
+        .join(',')})`,
     );
 
     // Query all group_bets for this group
@@ -108,9 +117,14 @@ export const calculateGroupResults = functions.firestore
       .where('groupId', '==', groupId)
       .get();
 
+    functions.logger.log(
+      `[calculateGroupResults] Found ${betsSnapshot.size} group bets for group ${groupId}`,
+    );
+
     if (betsSnapshot.empty) {
-      functions.logger.log(`No group bets found for ${groupId}`);
-      // Still mark as scored to prevent re-triggering
+      functions.logger.log(
+        `[calculateGroupResults] No group bets found for ${groupId} — marking as scored`,
+      );
       await change.after.ref.update({ pointsCalculated: true });
       return null;
     }
@@ -138,7 +152,7 @@ export const calculateGroupResults = functions.firestore
       });
 
       functions.logger.log(
-        `Group bet ${betDoc.id}: scored ${points} pts (${exactQualified} qualified) ` +
+        `[calculateGroupResults] Group bet ${betDoc.id} (predictor=${bet.predictorId}): scored ${points} pts (${exactQualified} qualified) ` +
           `(predicted ${bet.positions.join(',')})`,
       );
     }
@@ -149,9 +163,11 @@ export const calculateGroupResults = functions.firestore
     });
 
     await batch.commit();
-    functions.logger.log(`Scored ${betsSnapshot.size} group bets for ${groupId}`);
+    functions.logger.log(
+      `[calculateGroupResults] Committed batch: ${betsSnapshot.size} group bets scored`,
+    );
 
-    // Update predictor stats for each affected predictor (D-10)
+    // Update predictor stats for each affected predictor
     for (const [predictorId, score] of predictorScores) {
       const statsRef = db
         .collection(`users/${score.userId}/predictors/${predictorId}/stats`)
@@ -165,14 +181,23 @@ export const calculateGroupResults = functions.firestore
         },
         { merge: true },
       );
+      functions.logger.log(
+        `[calculateGroupResults] Updated stats for predictor ${predictorId}: +${score.points} pts, +${score.exactQualified} qualified`,
+      );
     }
 
-    functions.logger.log(`Updated stats for ${predictorScores.size} predictors`);
+    functions.logger.log(
+      `[calculateGroupResults] Updated stats for ${predictorScores.size} predictors`,
+    );
 
     try {
       await doRecomputeRanks(tournamentId);
+      functions.logger.log(`[calculateGroupResults] Rank recompute completed`);
     } catch (err) {
-      functions.logger.error('Rank recompute failed after group scoring', err);
+      functions.logger.error(
+        '[calculateGroupResults] Rank recompute failed after group scoring',
+        err,
+      );
     }
 
     return null;

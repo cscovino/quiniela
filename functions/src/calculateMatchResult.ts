@@ -59,30 +59,48 @@ export const calculateMatchResult = functions.firestore
   .onUpdate(async (change, context) => {
     const before = change.before.data() as MatchData;
     const after = change.after.data() as MatchData;
+    const tournamentId = context.params.tournamentId;
+    const matchId = context.params.matchId;
+
+    functions.logger.log(
+      `[calculateMatchResult] Triggered: tournament=${tournamentId}, match=${matchId}, beforeStatus=${before.status}, afterStatus=${after.status}`,
+    );
 
     const wasAlreadyFinished = before.status === 'finished';
     const isNowFinished = after.status === 'finished';
 
-    if (!isNowFinished || wasAlreadyFinished) {
+    if (!isNowFinished) {
+      functions.logger.log(
+        `[calculateMatchResult] Match ${matchId} not finished yet (status=${after.status}) — skipping`,
+      );
+      return null;
+    }
+
+    if (wasAlreadyFinished) {
+      functions.logger.log(
+        `[calculateMatchResult] Match ${matchId} was already finished — skipping`,
+      );
       return null;
     }
 
     if (after.result.home === null || after.result.away === null) {
-      functions.logger.error(`Match ${context.params.matchId} finished but result is null`);
+      functions.logger.error(`[calculateMatchResult] Match ${matchId} finished but result is null`);
       return null;
     }
 
     if (after.pointsCalculated) {
-      functions.logger.log(`Match ${context.params.matchId} already processed`);
+      functions.logger.log(
+        `[calculateMatchResult] Match ${matchId} already processed (pointsCalculated=true)`,
+      );
       return null;
     }
 
-    const tournamentId = context.params.tournamentId;
-    const matchId = context.params.matchId;
     const actualHome = after.result.home;
     const actualAway = after.result.away;
 
-    functions.logger.log(`Calculating points for match ${matchId}: ${actualHome}-${actualAway}`);
+    functions.logger.log(
+      `[calculateMatchResult] Processing match ${matchId}: ${actualHome}-${actualAway}`,
+    );
 
     const betsSnapshot = await db
       .collection(`tournaments/${tournamentId}/bets`)
@@ -109,7 +127,7 @@ export const calculateMatchResult = functions.firestore
       });
 
       functions.logger.log(
-        `Bet ${betDoc.id}: predicted ${bet.homeScore}-${bet.awayScore}, got ${points} points`,
+        `[calculateMatchResult] Bet ${betDoc.id} (predictor=${bet.predictorId}): predicted ${bet.homeScore}-${bet.awayScore} → ${points} pts (exact=${isExact}, winner=${isWinner})`,
       );
     }
 
@@ -119,7 +137,9 @@ export const calculateMatchResult = functions.firestore
 
     await batch.commit();
 
-    functions.logger.log(`Processed ${betsSnapshot.size} bets for match ${matchId}`);
+    functions.logger.log(
+      `[calculateMatchResult] Committing batch: ${betsSnapshot.size} bets updated for match ${matchId}`,
+    );
 
     return null;
   });
