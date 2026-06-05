@@ -106,10 +106,6 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
       });
       return scores;
     });
-
-    return () => {
-      setMatchPredictions({});
-    };
   }, [groupMatches, existingMatchValues]);
 
   useEffect(() => {
