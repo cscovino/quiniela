@@ -12,6 +12,8 @@ import {
   type PredictionStepBestPlayersProps,
   PredictionStepFinalPhase,
   type PredictionStepFinalPhaseProps,
+  ThirdPlaceConfirmation,
+  type ThirdPlaceConfirmationProps,
 } from '@molecules/Predictions';
 import type { GroupForPrediction } from '@organisms/GroupPredictionForm';
 import { getLocalizedName } from '@utils/i18n';
@@ -20,6 +22,7 @@ type GroupStepTranslations = PredictionStepGroupProps['translations'];
 type KnockoutStepTranslations = PredictionStepKnockoutRoundProps['translations'];
 type FinalPhaseStepTranslations = PredictionStepFinalPhaseProps['translations'];
 type BestPlayersStepTranslations = PredictionStepBestPlayersProps['translations'];
+type ThirdPlaceStepTranslations = ThirdPlaceConfirmationProps['translations'];
 import { predictionService } from '@services/prediction-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
@@ -93,11 +96,32 @@ export function usePredictionSteps(
     knockoutStep?: KnockoutStepTranslations;
     finalPhaseStep?: FinalPhaseStepTranslations;
     bestPlayersStep?: BestPlayersStepTranslations;
+    thirdPlaceStep?: ThirdPlaceStepTranslations;
+    thirdPlaceHeading?: string;
+    thirdPlaceSubtitle?: string;
+    thirdPlaceAdvancing?: string;
+    thirdPlaceEliminated?: string;
+    thirdPlaceBracketSlotLabel?: string;
+    thirdPlaceAdjust?: string;
+    thirdPlaceContinue?: string;
+    thirdPlaceGroup?: string;
+    thirdPlacePts?: string;
+    thirdPlacePt?: string;
+    thirdPlaceSelectionCount?: string;
+    thirdPlaceToggleAdvancing?: string;
+    thirdPlaceToggleEliminated?: string;
+    thirdPlaceMaxSelected?: string;
+    thirdPlaceLoading?: string;
+    thirdPlaceError?: string;
+    thirdPlaceRetry?: string;
   },
   locale: 'en' | 'es',
   selectedPredictorId: string | null,
   deadline: Date | undefined = undefined,
   confirmedAdvancingMap?: Record<string, string>,
+  confirmedThirdPlace?: boolean,
+  onThirdPlaceAdjust?: () => void,
+  onThirdPlaceContinue?: (confirmedSlugs: string[]) => void,
 ): UsePredictionStepsResult {
   const user = useAuthStore((s) => s.user);
 
@@ -445,6 +469,30 @@ export function usePredictionSteps(
     [user, selectedPredictorId, firestoreMatches, translations],
   );
 
+  const thirdPlaceTeams = useMemo(
+    () =>
+      computeThirdPlaceStandings(
+        groupBetsByGroupId,
+        existingMatchValues,
+        firestoreMatches,
+        teamsMap,
+        groups,
+        confirmedAdvancingMap ? Object.keys(confirmedAdvancingMap) : undefined,
+      ),
+    // Recompute when betsStatus transitions from 'loading' → 'loaded', ensuring
+    // existingMatchValues is fully populated from Firestore before computing third-place standings.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: trigger recompute on data load
+    [
+      groupBetsByGroupId,
+      existingMatchValues,
+      firestoreMatches,
+      teamsMap,
+      groups,
+      confirmedAdvancingMap,
+      betsStatus,
+    ],
+  );
+
   const steps = useMemo(() => {
     const result: PredictionStepModel[] = [];
     let stepIndex = 0;
@@ -509,6 +557,48 @@ export function usePredictionSteps(
       });
       stepIndex++;
     }
+
+    // Third-place confirmation step
+    result.push({
+      id: 'third-place',
+      kind: 'third-place',
+      label: 'Third Place',
+      description: translations.stepDescriptionRound?.replace('{round}', 'third place') || 'Confirm which third-placed teams advance',
+      isComplete: confirmedThirdPlace ?? false,
+      canAdvance: true,
+      deadline,
+      content: (
+        <ThirdPlaceConfirmation
+          rankedTeams={thirdPlaceTeams}
+          onAdjust={onThirdPlaceAdjust || (() => {})}
+          onContinue={onThirdPlaceContinue || (() => {})}
+          isLoading={betsStatus === 'loading'}
+          hasError={betsStatus === 'error'}
+          onRetry={retryBets}
+          translations={{
+            heading: translations.thirdPlaceHeading || 'Third-Placed Teams Qualification',
+            subtitle: translations.thirdPlaceSubtitle || 'Best 8 of 12 third-placed teams advance to Round of 32',
+            advancing: translations.thirdPlaceAdvancing || 'Advancing to Round of 32',
+            eliminated: translations.thirdPlaceEliminated || 'Eliminated',
+            bracketSlot: translations.thirdPlaceBracketSlotLabel || 'Match',
+            adjust: translations.thirdPlaceAdjust || 'Adjust Group Predictions',
+            continue: translations.thirdPlaceContinue || 'Continue to Knockout',
+            group: translations.thirdPlaceGroup || 'Group',
+            pts: translations.thirdPlacePts || 'pts',
+            pt: translations.thirdPlacePt || 'pt',
+            selectionCount: translations.thirdPlaceSelectionCount,
+            toggleAdvancing: translations.thirdPlaceToggleAdvancing,
+            toggleEliminated: translations.thirdPlaceToggleEliminated,
+            maxSelected: translations.thirdPlaceMaxSelected,
+            loading: translations.thirdPlaceLoading,
+            error: translations.thirdPlaceError,
+            retry: translations.thirdPlaceRetry,
+          }}
+        />
+      ),
+      onSubmit: () => Promise.resolve(),
+    });
+    stepIndex++;
 
     const knockoutMatchesList = firestoreMatches.filter((m) =>
       (KNOCKOUT_PHASES as string[]).includes(m.phase),
@@ -695,6 +785,12 @@ export function usePredictionSteps(
     registerStepState,
     deadline,
     confirmedAdvancingMap,
+    confirmedThirdPlace,
+    onThirdPlaceAdjust,
+    onThirdPlaceContinue,
+    thirdPlaceTeams,
+    betsStatus,
+    retryBets,
     selectedPredictorId,
   ]);
 
@@ -708,30 +804,6 @@ export function usePredictionSteps(
   const submitCurrentStep = useCallback(async () => {
     await stepSubmitRef.current[currentStep]?.();
   }, [currentStep]);
-
-  const thirdPlaceTeams = useMemo(
-    () =>
-      computeThirdPlaceStandings(
-        groupBetsByGroupId,
-        existingMatchValues,
-        firestoreMatches,
-        teamsMap,
-        groups,
-        confirmedAdvancingMap ? Object.keys(confirmedAdvancingMap) : undefined,
-      ),
-    // Recompute when betsStatus transitions from 'loading' → 'loaded', ensuring
-    // existingMatchValues is fully populated from Firestore before computing third-place standings.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: trigger recompute on data load
-    [
-      groupBetsByGroupId,
-      existingMatchValues,
-      firestoreMatches,
-      teamsMap,
-      groups,
-      confirmedAdvancingMap,
-      betsStatus,
-    ],
-  );
 
   return {
     loading,

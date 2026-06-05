@@ -81,7 +81,7 @@
   display: inline;
 }
 
-@media (min-width: var(--breakpoint-md)) {
+@media (min-width: 1024px) {
   .group-standings__team-name {
     display: inline;
   }

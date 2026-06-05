@@ -120,8 +120,7 @@
   border-left: var(--border-width-sm) solid var(--border-color);
 }
 
-/* UX-05: icon-only stacked buttons on mobile — labels hidden, actions right-aligned */
-@media (max-width: var(--breakpoint-sm)) {
+@media (max-width: 480px) {
   .predictor-list__btn-label {
     display: none;
   }

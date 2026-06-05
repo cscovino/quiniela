@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type PredictionStepKind = 'group' | 'knockout-round' | 'final-positions' | 'best-players';
+export type PredictionStepKind = 'group' | 'knockout-round' | 'third-place' | 'final-positions' | 'best-players';
 
 export interface ThirdPlacedTeam {
   rank: number;

@@ -78,13 +78,13 @@
   text-overflow: unset;
 }
 
-@media (min-width: var(--breakpoint-sm)) {
+@media (min-width: 480px) {
   .team-flag__name {
     max-width: 80px;
   }
 }
 
-@media (min-width: var(--breakpoint-md)) {
+@media (min-width: 1024px) {
   .team-flag__name {
     font-size: var(--text-xs);
     max-width: none;

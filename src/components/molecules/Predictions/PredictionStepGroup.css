@@ -15,7 +15,7 @@
   gap: var(--space-4);
 }
 
-@media (min-width: var(--breakpoint-md)) {
+@media (min-width: 1024px) {
   &.prediction-step-group__section-standings {
     flex-direction: row;
   }
@@ -151,7 +151,7 @@
   cursor: pointer;
 }
 
-@media (max-width: var(--breakpoint-sm)) {
+@media (max-width: 480px) {
   .prediction-step-group__col.position {
     width: auto;
     flex: 1;

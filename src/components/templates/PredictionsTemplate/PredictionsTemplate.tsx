@@ -15,7 +15,6 @@ import {
   type PredictionStepFinalPhaseProps,
   type PredictionStepGroupProps,
   type PredictionStepKnockoutRoundProps,
-  ThirdPlaceConfirmation,
 } from '@molecules/Predictions';
 import { PredictorDeleteConfirm } from '@molecules/PredictorDeleteConfirm';
 import { PredictorEditor } from '@molecules/PredictorEditor';
@@ -232,11 +231,15 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     return { deadline: tournamentDeadline, state, label, countdownLabel };
   }, [tournamentDeadline, now, translations.deadlinePassed, translations.deadlineCountdown]);
 
-  const [showThirdPlaceConfirm, setShowThirdPlaceConfirm] = useState(false);
-  const [confirmedThirdPlace, setConfirmedThirdPlace] = useState(false);
   const [confirmedAdvancingMap, setConfirmedAdvancingMap] = useState<
     Record<string, string> | undefined
   >(undefined);
+  const [confirmedThirdPlace, setConfirmedThirdPlace] = useState(false);
+
+  // Handlers are defined after usePredictionSteps but referenced via refs to avoid
+  // circular dependency (handlers need setCurrentStep/thirdPlaceTeams from the hook).
+  const handleThirdPlaceAdjustRef = useRef<() => void>(() => {});
+  const handleThirdPlaceContinueRef = useRef<(slugs: string[]) => void>(() => {});
 
   const {
     loading: stepsLoading,
@@ -252,8 +255,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     thirdPlaceTeams,
     groups,
     allTeams,
-    betsStatus,
-    retryBets,
   } = usePredictionSteps(
     {
       ...translations,
@@ -261,14 +262,70 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
       knockoutStep: translations.knockoutStep,
       finalPhaseStep: translations.finalPhaseStep,
       bestPlayersStep: translations.bestPlayersStep,
+      thirdPlaceStep: translations.thirdPlaceStep,
+      thirdPlaceHeading: translations.thirdPlaceHeading,
+      thirdPlaceSubtitle: translations.thirdPlaceSubtitle,
+      thirdPlaceAdvancing: translations.thirdPlaceAdvancing,
+      thirdPlaceEliminated: translations.thirdPlaceEliminated,
+      thirdPlaceBracketSlotLabel: translations.thirdPlaceBracketSlotLabel,
+      thirdPlaceAdjust: translations.thirdPlaceAdjust,
+      thirdPlaceContinue: translations.thirdPlaceContinue,
+      thirdPlaceGroup: translations.thirdPlaceGroup,
+      thirdPlacePts: translations.thirdPlacePts,
+      thirdPlacePt: translations.thirdPlacePt,
+      thirdPlaceSelectionCount: translations.thirdPlaceSelectionCount,
+      thirdPlaceToggleAdvancing: translations.thirdPlaceToggleAdvancing,
+      thirdPlaceToggleEliminated: translations.thirdPlaceToggleEliminated,
+      thirdPlaceMaxSelected: translations.thirdPlaceMaxSelected,
+      thirdPlaceLoading: translations.thirdPlaceLoading,
+      thirdPlaceError: translations.thirdPlaceError,
+      thirdPlaceRetry: translations.thirdPlaceRetry,
     },
     locale,
     selectedPredictorId,
     tournamentDeadline,
     confirmedAdvancingMap,
+    confirmedThirdPlace,
+    () => handleThirdPlaceAdjustRef.current(),
+    (slugs) => handleThirdPlaceContinueRef.current(slugs),
   );
 
   const groupsCount = groups.length;
+
+  const handleThirdPlaceAdjust = useCallback(() => {
+    // Editing group standings can change which thirds rank — drop the confirmed
+    // advancing set so the bracket falls back to the deterministic default until
+    // the user re-confirms, rather than resolving from a now-stale selection.
+    setConfirmedAdvancingMap(undefined);
+    setConfirmedThirdPlace(false);
+    const firstGroupIdx = steps.findIndex((s) => s.kind === 'group');
+    if (firstGroupIdx >= 0) {
+      setCurrentStep(firstGroupIdx);
+    }
+  }, [steps, setCurrentStep]);
+
+  const handleThirdPlaceContinue = useCallback(
+    (confirmedSlugs: string[]) => {
+      setConfirmedThirdPlace(true);
+      const map: Record<string, string> = {};
+      confirmedSlugs.forEach((slug) => {
+        const team = thirdPlaceTeams.find((t) => `group-${t.groupLetter.toLowerCase()}` === slug);
+        if (team) map[slug] = team.teamId;
+      });
+      setConfirmedAdvancingMap(map);
+      setCurrentStep(groupsCount + 1); // +1 because third-place step is now in the array
+    },
+    [thirdPlaceTeams, groupsCount, setCurrentStep],
+  );
+
+  // Update refs after handlers are defined
+  useEffect(() => {
+    handleThirdPlaceAdjustRef.current = handleThirdPlaceAdjust;
+  }, [handleThirdPlaceAdjust]);
+
+  useEffect(() => {
+    handleThirdPlaceContinueRef.current = handleThirdPlaceContinue;
+  }, [handleThirdPlaceContinue]);
 
 // Show feedback as toast instead of inline banner to avoid layout shift.
   // Deduplicate by tracking the full feedback object reference so identical
@@ -285,60 +342,6 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           : (translations.feedbackErrorTitle || 'Error'),
       message: feedback.message,
     });
-  }, [feedback, translations.feedbackSuccessTitle, translations.feedbackErrorTitle]);
-
-  useEffect(() => {
-    if (confirmedThirdPlace) {
-      setConfirmedThirdPlace(false);
-      return;
-    }
-    const lastGroupStep = groupsCount - 1;
-    if (
-      currentStep === lastGroupStep &&
-      !showThirdPlaceConfirm &&
-      steps[lastGroupStep]?.isComplete &&
-      betsStatus === 'loaded'
-    ) {
-      setShowThirdPlaceConfirm(true);
-    }
-  }, [currentStep, groupsCount, showThirdPlaceConfirm, confirmedThirdPlace, steps, betsStatus]);
-
-  const handleThirdPlaceAdjust = () => {
-    setShowThirdPlaceConfirm(false);
-    // Editing group standings can change which thirds rank — drop the confirmed
-    // advancing set so the bracket falls back to the deterministic default until
-    // the user re-confirms, rather than resolving from a now-stale selection.
-    setConfirmedAdvancingMap(undefined);
-    const firstGroupIdx = steps.findIndex((s) => s.kind === 'group');
-    if (firstGroupIdx >= 0) {
-      setCurrentStep(firstGroupIdx);
-    }
-  };
-
-  const handleThirdPlaceContinue = (confirmedSlugs: string[]) => {
-    setShowThirdPlaceConfirm(false);
-    setConfirmedThirdPlace(true);
-    const map: Record<string, string> = {};
-    confirmedSlugs.forEach((slug) => {
-      const team = thirdPlaceTeams.find((t) => `group-${t.groupLetter.toLowerCase()}` === slug);
-      if (team) map[slug] = team.teamId;
-    });
-    setConfirmedAdvancingMap(map);
-    setCurrentStep(groupsCount);
-  };
-
-  useEffect(() => {
-    if (!feedback) return;
-    useToastStore.getState().addToast({
-      type: feedback.type,
-      title:
-        feedback.type === 'success'
-          ? translations.feedbackSuccessTitle || 'Saved'
-          : translations.feedbackErrorTitle || 'Error',
-      message: feedback.message,
-    });
-    const timer = setTimeout(() => useToastStore.getState().dismissToast, 5000);
-    return () => clearTimeout(timer);
   }, [feedback, translations.feedbackSuccessTitle, translations.feedbackErrorTitle]);
 
   useEffect(() => {
@@ -647,125 +650,86 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
           <PredictionsProgress stepCounter={stepCounter} deadlineInfo={deadlineInfo} />
         </header>
 
-        {showThirdPlaceConfirm ? (
-          <section className="predictions-template__section">
-            <ThirdPlaceConfirmation
-              rankedTeams={thirdPlaceTeams}
-              onAdjust={handleThirdPlaceAdjust}
-              onContinue={handleThirdPlaceContinue}
-              isLoading={betsStatus === 'loading'}
-              hasError={betsStatus === 'error'}
-              onRetry={retryBets}
-              translations={{
-                heading: translations.thirdPlaceHeading || 'Third-Placed Teams Qualification',
-                subtitle:
-                  translations.thirdPlaceSubtitle ||
-                  'Best 8 of 12 third-placed teams advance to Round of 32',
-                advancing: translations.thirdPlaceAdvancing || 'Advancing to Round of 32',
-                eliminated: translations.thirdPlaceEliminated || 'Eliminated',
-                bracketSlot: translations.thirdPlaceBracketSlotLabel || 'Match',
-                adjust: translations.thirdPlaceAdjust || 'Adjust Group Predictions',
-                continue: translations.thirdPlaceContinue || 'Continue to Knockout',
-                group: translations.thirdPlaceGroup || 'Group',
-                pts: translations.thirdPlacePts || 'pts',
-                pt: translations.thirdPlacePt || 'pt',
-                selectionCount: translations.thirdPlaceSelectionCount,
-                toggleAdvancing: translations.thirdPlaceToggleAdvancing,
-                toggleEliminated: translations.thirdPlaceToggleEliminated,
-                maxSelected: translations.thirdPlaceMaxSelected,
-                loading: translations.thirdPlaceLoading,
-                error: translations.thirdPlaceError,
-                retry: translations.thirdPlaceRetry,
-              }}
-            />
-          </section>
-        ) : (
-          <>
-            {steps && steps.length > 1 && (
-              <nav
-                className="predictions-template__steps-nav"
-                aria-label={translations.stepsNavLabel || 'Prediction steps'}
-              >
-                <div className="steps-nav__track">
-                  {steps.map((step, idx) => {
-                    const isCurrent = idx === currentStep;
-                    const isComplete = step.isComplete;
-                    const isClickable = isComplete || idx < currentStep;
+        {steps && steps.length > 1 && (
+          <nav
+            className="predictions-template__steps-nav"
+            aria-label={translations.stepsNavLabel || 'Prediction steps'}
+          >
+            <div className="steps-nav__track">
+              {steps.map((step, idx) => {
+                const isCurrent = idx === currentStep;
+                const isComplete = step.isComplete;
+                const isClickable = isComplete || idx < currentStep;
 
-                    return (
-                      <button
-                        key={step.id}
-                        className={[
-                          'steps-nav__step',
-                          isCurrent ? 'steps-nav__step--current' : '',
-                          isComplete ? 'steps-nav__step--complete' : '',
-                          !isClickable ? 'steps-nav__step--locked' : '',
-                        ]
-                          .filter(Boolean)
-                          .join(' ')}
-                        onClick={() => isClickable && setCurrentStep(idx)}
-                        disabled={!isClickable}
-                        aria-label={
-                          isClickable
-                            ? isComplete
-                              ? `${step.label} — ${translations.stepTooltipCompleted || 'Completed'}`
-                              : `${step.label}`
-                            : `${step.label} — ${translations.stepTooltipEdit || 'Not yet completed'}`
-                        }
-                        title={step.label}
-                      >
-                        <span className="steps-nav__step-label">{step.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </nav>
-            )}
-
-            <section className="predictions-template__section">
-              <div className="predictions-template__section-header">
-                <Typography variant="h2">{activeStep.label}</Typography>
-              </div>
-
-              {activeStep.content}
-            </section>
-
-            <PredictionsNavigation
-              onBack={
-                currentStep === 0
-                  ? handleBackToList
-                  : () => setCurrentStep((p) => Math.max(0, p - 1))
-              }
-              onNext={async () => {
-                // Single button: save the current step, then advance (or finish).
-                await submitCurrentStep();
-                // Leaving the last group: saving marks it complete and the
-                // third-place confirmation effect takes over advancing.
-                if (groupsCount > 0 && currentStep === groupsCount - 1) {
-                  return;
-                }
-                if (currentStep < totalSteps - 1) {
-                  setCurrentStep((p) => p + 1);
-                } else {
-                  handleBackToList();
-                }
-              }}
-              canAdvance={canAdvance}
-              currentStep={currentStep}
-              totalSteps={totalSteps}
-              isSubmitting={submitting}
-              translations={{
-                buttonBack: translations.buttonBack,
-                buttonNext: translations.buttonNext,
-                buttonFinish: translations.buttonFinish,
-                stepsNavLabel: translations.stepsNavLabel,
-                stepTooltipEdit: translations.stepTooltipEdit,
-                stepTooltipCompleted: translations.stepTooltipCompleted,
-              }}
-              submittedSteps={submittedSteps}
-            />
-          </>
+                return (
+                  <button
+                    key={step.id}
+                    className={[
+                      'steps-nav__step',
+                      isCurrent ? 'steps-nav__step--current' : '',
+                      isComplete ? 'steps-nav__step--complete' : '',
+                      !isClickable ? 'steps-nav__step--locked' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    onClick={() => isClickable && setCurrentStep(idx)}
+                    disabled={!isClickable}
+                    aria-label={
+                      isClickable
+                        ? isComplete
+                          ? `${step.label} — ${translations.stepTooltipCompleted || 'Completed'}`
+                          : `${step.label}`
+                        : `${step.label} — ${translations.stepTooltipEdit || 'Not yet completed'}`
+                    }
+                    title={step.label}
+                  >
+                    <span className="steps-nav__step-label">{step.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
         )}
+
+        {activeStep && (
+          <section className="predictions-template__section">
+            <div className="predictions-template__section-header">
+              <Typography variant="h2">{activeStep.label}</Typography>
+            </div>
+
+            {activeStep.content}
+          </section>
+        )}
+
+        <PredictionsNavigation
+          onBack={
+            currentStep === 0
+              ? handleBackToList
+              : () => setCurrentStep((p) => Math.max(0, p - 1))
+          }
+          onNext={async () => {
+            // Single button: save the current step, then advance (or finish).
+            await submitCurrentStep();
+            if (currentStep < totalSteps - 1) {
+              setCurrentStep((p) => p + 1);
+            } else {
+              handleBackToList();
+            }
+          }}
+          canAdvance={canAdvance}
+          currentStep={currentStep}
+          totalSteps={totalSteps}
+          isSubmitting={submitting}
+          translations={{
+            buttonBack: translations.buttonBack,
+            buttonNext: translations.buttonNext,
+            buttonFinish: translations.buttonFinish,
+            stepsNavLabel: translations.stepsNavLabel,
+            stepTooltipEdit: translations.stepTooltipEdit,
+            stepTooltipCompleted: translations.stepTooltipCompleted,
+          }}
+          submittedSteps={submittedSteps}
+        />
       </main>
     </div>
   );

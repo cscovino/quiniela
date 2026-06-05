@@ -67,7 +67,7 @@
   padding-top: var(--space-6);
 }
 
-@media (max-width: var(--breakpoint-sm)) {
+@media (max-width: 480px) {
   .prediction-form__grid {
     grid-template-columns: 1fr;
   }

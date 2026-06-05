@@ -227,7 +227,7 @@
 }
 
 /* Mobile responsive */
-@media (max-width: var(--breakpoint-sm)) {
+@media (max-width: 480px) {
   .third-place-confirmation {
     padding: var(--space-3);
   }
@@ -235,6 +235,10 @@
   /* Hide desktop grid columns */
   .third-place-confirmation__table-header {
     display: none;
+  }
+
+  .third-place-confirmation__row {
+    display: block;
   }
 
   .third-place-confirmation__col {
