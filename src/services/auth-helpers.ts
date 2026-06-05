@@ -72,7 +72,7 @@ export const updateUserProfile = async (
 const createDefaultPredictor = async (userId: string, displayName: string) => {
   const predictorId = `${userId}-default`;
   await setDoc(doc(ensureDb(), 'users', userId, 'predictors', predictorId), {
-    uid: predictorId,
+    id: predictorId,
     userId,
     name: displayName,
     avatarUrl: null,

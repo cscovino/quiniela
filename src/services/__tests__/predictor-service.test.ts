@@ -23,7 +23,7 @@ describe('predictor-service', () => {
         { id: 'user-1-friends', userId: 'user-1', name: 'Friends' },
       ];
       vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({
-        docs: mockPredictors.map((p) => ({ data: () => p })),
+        docs: mockPredictors.map((p) => ({ id: p.id, data: () => p })),
       } as any);
 
       const result = await predictorService.getUserPredictors('user-1');
@@ -43,6 +43,20 @@ describe('predictor-service', () => {
       const result = await predictorService.getUserPredictors('user-1');
 
       expect(result).toEqual([]);
+    });
+
+    it('backfills id from the Firestore document id when the legacy `uid` field is present (and `id` is missing)', async () => {
+      // Reproduces the bug introduced in f555b97: createDefaultPredictor wrote `uid`
+      // instead of `id`, so default predictors came back from Firestore with `id === undefined`.
+      const legacyDefault = { uid: 'user-1-default', userId: 'user-1', name: 'Default' };
+      vi.mocked(firebaseFirestore.getDocs).mockResolvedValue({
+        docs: [{ id: 'user-1-default', data: () => legacyDefault }],
+      } as any);
+
+      const result = await predictorService.getUserPredictors('user-1');
+
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('user-1-default');
     });
   });
 

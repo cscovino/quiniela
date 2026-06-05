@@ -120,7 +120,13 @@ export const predictorService = {
   async getUserPredictors(userId: string): Promise<Predictor[]> {
     const predictorsRef = collection(getDb(), 'users', userId, 'predictors');
     const snapshot = await getDocs(predictorsRef);
-    return snapshot.docs.map((doc) => doc.data() as Predictor);
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data() as Partial<Predictor>;
+      // Backfill `id` from the Firestore document ID when the field is missing.
+      // (Earlier releases accidentally stored the value under `uid`, which broke
+      // updatePredictor and surfaced a React key warning in PredictorList.)
+      return { ...data, id: data.id ?? docSnap.id } as Predictor;
+    });
   },
 
   async createPredictor(
