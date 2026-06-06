@@ -152,15 +152,21 @@ export const updatePredictorStats = functions.firestore
     const matchIds = [...new Set(bets.map((b) => b.matchId))];
     const matchStatuses = new Map<string, string>();
     if (matchIds.length > 0) {
-      const matchesSnapshot = await db
-        .collection(`tournaments/${tournamentId}/matches`)
-        .where(admin.firestore.FieldPath.documentId(), 'in', matchIds)
-        .get();
-      matchesSnapshot.forEach((doc) => {
-        const data = doc.data() as MatchStatusData;
-        matchStatuses.set(doc.id, data.status);
-      });
-      functions.logger.log(`[updatePredictorStats] Fetched ${matchStatuses.size} match statuses`);
+      const batchSize = 30;
+      for (let i = 0; i < matchIds.length; i += batchSize) {
+        const batch = matchIds.slice(i, i + batchSize);
+        const matchesSnapshot = await db
+          .collection(`tournaments/${tournamentId}/matches`)
+          .where(admin.firestore.FieldPath.documentId(), 'in', batch)
+          .get();
+        matchesSnapshot.forEach((doc) => {
+          const data = doc.data() as MatchStatusData;
+          matchStatuses.set(doc.id, data.status);
+        });
+      }
+      functions.logger.log(
+        `[updatePredictorStats] Fetched ${matchStatuses.size} match statuses (from ${matchIds.length} bets)`,
+      );
     } else {
       functions.logger.log(`[updatePredictorStats] No match IDs found in bets`);
     }

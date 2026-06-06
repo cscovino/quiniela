@@ -1,4 +1,4 @@
-import { getCombinationKey, THIRD_PLACE_MATRIX } from '../../../src/data/third-place-matrix';
+import { getCombinationKey, THIRD_PLACE_MATRIX } from '../data/third-place-matrix';
 import { BRACKET_MAP, type BracketEntry, type KnockoutMatchSlot } from './bracket';
 
 export interface TeamStanding {

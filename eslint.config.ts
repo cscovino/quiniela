@@ -60,5 +60,5 @@ export default [
     },
   },
   ...astroPlugin.configs.recommended,
-  { ignores: ['dist/', 'node_modules/', '.astro/', 'storybook-static/'] },
+  { ignores: ['dist/', 'node_modules/', '.astro/', 'storybook-static/', 'src/data/third-place-matrix.js', 'src/data/third-place-matrix.js.map'] },
 ] as Linter.Config[];
