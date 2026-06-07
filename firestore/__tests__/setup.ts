@@ -5,7 +5,7 @@ import {
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
 
-const RULES_FILE = resolve(__dirname, '../../firestore.rules');
+const RULES_FILE = resolve(__dirname, '../../firestore/firestore.rules');
 
 /**
  * Build a RulesTestEnvironment connected to the Firestore emulator on port 8080.

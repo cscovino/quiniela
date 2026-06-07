@@ -39,6 +39,10 @@
     "migrate:case:execute": "tsx --env-file=.env scripts/migrate-team-ids-case.ts --execute",
     "migrate:rescore": "tsx --env-file=.env scripts/rescore-group-bets.ts",
     "migrate:rescore:execute": "tsx --env-file=.env scripts/rescore-group-bets.ts --execute",
+    "migrate:schedule": "tsx --env-file=.env scripts/migrate-match-schedule.ts",
+    "migrate:schedule:execute": "tsx --env-file=.env scripts/migrate-match-schedule.ts --execute",
+    "audit:completion": "tsx --env-file=.env scripts/audit-predictor-completion.ts",
+    "audit:completion:csv": "tsx --env-file=.env scripts/audit-predictor-completion.ts --csv",
     "prepare": "husky"
   },
   "lint-staged": {

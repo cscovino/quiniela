@@ -53,10 +53,11 @@ service cloud.firestore {
       allow delete: if isAdmin();
       
       // Predictors - user manages their own predictors
+      // Locked at tournament start: no new brackets, no edits to existing ones
       match /predictors/{predictorId} {
         allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
-        allow create: if request.auth != null && request.auth.uid == userId;
-        allow update: if request.auth.uid == userId;
+        allow create: if request.auth != null && request.auth.uid == userId && isBeforeTournamentStart();
+        allow update: if request.auth.uid == userId && isBeforeTournamentStart();
         allow delete: if request.auth.uid == userId;
         
         // Predictor stats - read own, Cloud Functions write
@@ -122,6 +123,8 @@ service cloud.firestore {
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
           isBeforeTournamentStart() &&
+          canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
+          request.resource.data.matchId == resource.data.matchId &&
           request.resource.data.homeScore is int &&
           request.resource.data.homeScore >= 0 &&
           request.resource.data.homeScore <= 15 &&

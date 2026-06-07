@@ -7,7 +7,7 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 
 import { buildPastDeadlineEnv, RULES_FILE_PATH } from './setup';
 
@@ -92,7 +92,7 @@ describe('best_players_bets — deadline rejection (SEC-04)', () => {
       }),
     );
     await assertSucceeds(
-      setDoc(
+      updateDoc(
         doc(ownerCtx.firestore(), 'tournaments/t1/best_players_bets/p1'),
         { topScorer: 'haaland' },
       ),
@@ -109,7 +109,7 @@ describe('best_players_bets — deadline rejection (SEC-04)', () => {
     );
     const pastCtx = pastDeadlineEnv.authenticatedContext('user1');
     await assertFails(
-      setDoc(
+      updateDoc(
         doc(pastCtx.firestore(), 'tournaments/t1/best_players_bets/p1'),
         { topScorer: 'haaland' },
       ),

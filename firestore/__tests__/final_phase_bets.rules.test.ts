@@ -7,7 +7,7 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 
 import { buildPastDeadlineEnv, RULES_FILE_PATH } from './setup';
 
@@ -93,9 +93,9 @@ describe('final_phase_bets — deadline rejection (SEC-03)', () => {
         topScorer: 'messi',
       }),
     );
-    // Update it
+    // Update only the topScorer field
     await assertSucceeds(
-      setDoc(
+      updateDoc(
         doc(ownerCtx.firestore(), 'tournaments/t1/final_phase_bets/p1'),
         { topScorer: 'mbappe' },
       ),
@@ -114,7 +114,7 @@ describe('final_phase_bets — deadline rejection (SEC-03)', () => {
     // Now try to update via past-deadline env
     const pastCtx = pastDeadlineEnv.authenticatedContext('user1');
     await assertFails(
-      setDoc(
+      updateDoc(
         doc(pastCtx.firestore(), 'tournaments/t1/final_phase_bets/p1'),
         { topScorer: 'haaland' },
       ),
