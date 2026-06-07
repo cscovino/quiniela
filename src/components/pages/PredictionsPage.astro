@@ -57,4 +57,21 @@ const translations = {
 };
 ---
 
-<PredictionsTemplate translations={translations} locale={locale} client:load />
+<main class="predictions-template__page">
+  <PredictionsTemplate translations={translations} locale={locale} client:load />
+</main>
+
+<style>
+  .predictions-template__page {
+    width: 100%;
+    max-width: var(--container-xl);
+    margin: 0 auto;
+    padding: var(--space-2) var(--space-2);
+  }
+
+  @media (min-width: 1024px) {
+    .pedictions-template__content {
+      padding: var(--space-4) var(--space-4);
+    }
+  }
+</style>

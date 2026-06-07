@@ -1,12 +1,3 @@
-.predictions-template {
-  width: 100%;
-  max-width: var(--container-xl);
-  margin: 0 auto;
-  padding: var(--space-4) var(--space-3);
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
 .predictions-template__content {
   display: flex;
   flex-direction: column;
