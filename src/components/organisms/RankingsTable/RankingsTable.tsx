@@ -78,7 +78,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
     <div className={`rankings-table ${className}`}>
       <Typography variant="h3">{title}</Typography>
 
-      <div className="rankings-table__list">
+      <div className="rankings-table__list" data-tour="rankings-list">
         {rankings.map((entry, index) => (
           <RankingRow
             key={entry.predictorId || entry.userId}
@@ -96,6 +96,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             isCurrentUser={entry.userId === currentUserId}
             favouriteTeamId={entry.favouriteTeamId}
             locale={locale}
+            isFirst={index === 0}
           />
         ))}
       </div>

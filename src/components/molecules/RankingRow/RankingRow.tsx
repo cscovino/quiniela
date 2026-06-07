@@ -28,6 +28,12 @@ export interface RankingRowProps {
   favouriteTeamId?: string;
   locale?: 'en' | 'es';
   className?: string;
+  /**
+   * Marks this row as the top-of-list row used as a tour target. When true, the
+   * row's sub-elements expose `data-tour` hooks that the product tour uses to
+   * highlight each column. Defaults to false.
+   */
+  isFirst?: boolean;
 }
 
 const RANK_ARROW: Record<string, IconName> = {
@@ -72,6 +78,7 @@ export const RankingRow: FC<RankingRowProps> = ({
   favouriteTeamId,
   locale = 'en',
   className = '',
+  isFirst = false,
 }) => {
   const statLabels = STAT_LABELS[locale];
 
@@ -82,8 +89,11 @@ export const RankingRow: FC<RankingRowProps> = ({
     : [];
 
   return (
-    <div className={`ranking-row ${isCurrentUser ? 'ranking-row--current' : ''} ${className}`}>
-      <div className="ranking-row__position">
+    <div
+      className={`ranking-row ${isCurrentUser ? 'ranking-row--current' : ''} ${className}`}
+      data-tour={isFirst ? 'ranking-row' : undefined}
+    >
+      <div className="ranking-row__position" data-tour={isFirst ? 'ranking-position' : undefined}>
         {rankChange && (
           <span
             className={`ranking-row__rank-change ranking-row__rank-change--${rankChange}`}
@@ -97,7 +107,7 @@ export const RankingRow: FC<RankingRowProps> = ({
         </span>
       </div>
 
-      <div className="ranking-row__user">
+      <div className="ranking-row__user" data-tour={isFirst ? 'ranking-user' : undefined}>
         <PredictorAvatar
           predictor={
             {
@@ -106,7 +116,7 @@ export const RankingRow: FC<RankingRowProps> = ({
               pixelArt: pixelArt ?? undefined,
             } as Predictor
           }
-          size="sm"
+          size="lg"
         />
         <div className="ranking-row__user-text">
           <div className="ranking-row__name-block">
@@ -120,7 +130,7 @@ export const RankingRow: FC<RankingRowProps> = ({
             )}
           </div>
           {earnedBadges.length > 0 && (
-            <div className="ranking-row__badges">
+            <div className="ranking-row__badges" data-tour={isFirst ? 'ranking-badges' : undefined}>
               {earnedBadges.map((def) => (
                 <Tooltip
                   key={def!.id}
@@ -136,8 +146,13 @@ export const RankingRow: FC<RankingRowProps> = ({
         </div>
       </div>
 
-      <div className="ranking-row__stats">
-        <Tooltip className="ranking-row__stat" content={statLabels.points} position="top">
+      <div className="ranking-row__stats" data-tour={isFirst ? 'ranking-stats' : undefined}>
+        <Tooltip
+          className="ranking-row__stat"
+          content={statLabels.points}
+          position="top"
+          data-tour={isFirst ? 'ranking-points' : undefined}
+        >
           <Icon name="star" size={14} />
           <Typography variant="small">{points}</Typography>
         </Tooltip>
@@ -146,17 +161,28 @@ export const RankingRow: FC<RankingRowProps> = ({
             className="ranking-row__stat ranking-row__stat--today"
             content={statLabels.today}
             position="top"
+            data-tour={isFirst ? 'ranking-today' : undefined}
           >
             <Icon name="zap" size={14} />
             <Typography variant="small">+{todayPoints}</Typography>
           </Tooltip>
         )}
-        <Tooltip className="ranking-row__stat" content={statLabels.accuracy} position="top">
+        <Tooltip
+          className="ranking-row__stat"
+          content={statLabels.accuracy}
+          position="top"
+          data-tour={isFirst ? 'ranking-accuracy' : undefined}
+        >
           <Icon name="target" size={14} />
           <Typography variant="small">{accuracy}%</Typography>
         </Tooltip>
         {streak > 0 && (
-          <Tooltip className="ranking-row__stat" content={statLabels.streak} position="top">
+          <Tooltip
+            className="ranking-row__stat"
+            content={statLabels.streak}
+            position="top"
+            data-tour={isFirst ? 'ranking-streak' : undefined}
+          >
             <Icon name="fire" size={14} />
             <Typography variant="small">{streak}</Typography>
           </Tooltip>
@@ -164,7 +190,10 @@ export const RankingRow: FC<RankingRowProps> = ({
       </div>
 
       {todayMatchBets && todayMatchBets.length > 0 && (
-        <div className="ranking-row__match-predictions">
+        <div
+          className="ranking-row__match-predictions"
+          data-tour={isFirst ? 'ranking-matches' : undefined}
+        >
           {todayMatchBets.map((bet) => {
             const isFinished = bet.status === 'finished';
             const isCorrect = bet.isExact;

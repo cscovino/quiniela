@@ -7,6 +7,14 @@ vi.mock('@services/live-data-service', () => ({
   fetchLiveRankings: vi.fn(),
 }));
 
+vi.mock('driver.js', () => ({
+  driver: vi.fn(() => ({
+    drive: vi.fn(),
+    destroy: vi.fn(),
+    moveNext: vi.fn(),
+  })),
+}));
+
 import { fetchLiveRankings } from '@services/live-data-service';
 
 const mockFetch = vi.mocked(fetchLiveRankings);
@@ -125,9 +133,7 @@ describe('LiveRankings', () => {
   it('refetches on every mount (no shared cache across navigations)', async () => {
     mockFetch.mockResolvedValue([]);
 
-    const { unmount } = render(
-      <LiveRankings initialRankings={[]} title="Rankings" />,
-    );
+    const { unmount } = render(<LiveRankings initialRankings={[]} title="Rankings" />);
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledTimes(1);
     });

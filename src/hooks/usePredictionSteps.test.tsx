@@ -24,11 +24,14 @@ vi.mock('@services/tournament-service', () => ({
   },
 }));
 
-vi.mock('@store/auth-store', () => ({
-  useAuthStore: vi.fn((selector: (s: { user: { uid: string } | null }) => unknown) =>
-    selector({ user: { uid: 'test-uid' } }),
-  ),
-}));
+vi.mock('@store/auth-store', () => {
+  const mockUser = { uid: 'test-uid' };
+  return {
+    useAuthStore: vi.fn((selector: (s: { user: { uid: string } | null }) => unknown) =>
+      selector({ user: mockUser }),
+    ),
+  };
+});
 
 const minimalTranslations = {
   stepFinalPhase: 'Final Phase',

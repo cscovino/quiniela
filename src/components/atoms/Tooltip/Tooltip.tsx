@@ -12,6 +12,11 @@ export interface TooltipProps {
   className?: string;
   /** Accessible label for the trigger. Defaults to `content`. */
   label?: string;
+  /**
+   * Optional data-tour attribute exposed on the wrapper element so the product
+   * tour can target specific tooltip triggers (e.g. ranking-row stat cells).
+   */
+  'data-tour'?: string;
 }
 
 // Gap between trigger and bubble, and minimum margin from the viewport edge (px).
@@ -33,6 +38,7 @@ export const Tooltip: FC<TooltipProps> = ({
   children,
   className = '',
   label,
+  ...rest
 }) => {
   const [visible, setVisible] = useState(false);
   const [box, setBox] = useState<{ top: number; left: number } | null>(null);
@@ -106,6 +112,7 @@ export const Tooltip: FC<TooltipProps> = ({
       role="button"
       aria-label={label ?? content}
       aria-describedby={visible && box ? tooltipId : undefined}
+      {...rest}
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}

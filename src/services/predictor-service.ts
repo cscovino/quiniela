@@ -312,9 +312,10 @@ export const predictorService = {
   > {
     const predictors = await predictorService.getUserPredictors(userId);
 
+    const allMatches = await tournamentService.getMatches();
+
     const results = await Promise.all(
       predictors.map(async (predictor) => {
-        // Get stats
         let stats: PredictorStats | null = null;
         try {
           const statsRef = doc(
@@ -334,12 +335,8 @@ export const predictorService = {
           // Stats collection may not exist
         }
 
-        // Get progress
         const { groupBets, knockoutBets, finalPhase, bestPlayers } =
           await predictionService.getExistingBets(userId, predictor.id);
-
-        // We need all matches to calculate total counts
-        const allMatches = await tournamentService.getMatches();
 
         const groupBetsRecord: GroupBetRecord = {};
         groupBets.forEach((v, k) => {

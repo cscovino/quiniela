@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Input } from '@atoms/Input';
 import { Typography } from '@atoms/Typography';
@@ -27,11 +27,19 @@ export const PredictionInput: FC<PredictionInputProps> = ({
   const [homeStr, setHomeStr] = useState<string>(scoreToString(homeScore));
   const [awayStr, setAwayStr] = useState<string>(scoreToString(awayScore));
 
+  // Once the user types into a field, that field is owned by local state and
+  // must not be clobbered by prop updates (e.g., async Firestore fetch
+  // completing while the user is mid-typing, or sibling-step submit ripples).
+  const homeDirtyRef = useRef(false);
+  const awayDirtyRef = useRef(false);
+
   useEffect(() => {
+    if (homeDirtyRef.current) return;
     setHomeStr(scoreToString(homeScore));
   }, [homeScore]);
 
   useEffect(() => {
+    if (awayDirtyRef.current) return;
     setAwayStr(scoreToString(awayScore));
   }, [awayScore]);
 
@@ -47,12 +55,14 @@ export const PredictionInput: FC<PredictionInputProps> = ({
 
   const handleHomeChange = (value: string) => {
     if (!/^\d{0,2}$/.test(value)) return;
+    homeDirtyRef.current = true;
     setHomeStr(value);
     emitChange(value, awayStr);
   };
 
   const handleAwayChange = (value: string) => {
     if (!/^\d{0,2}$/.test(value)) return;
+    awayDirtyRef.current = true;
     setAwayStr(value);
     emitChange(homeStr, value);
   };

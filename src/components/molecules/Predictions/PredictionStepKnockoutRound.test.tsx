@@ -301,3 +301,69 @@ describe('knockout pick survival across recompute', () => {
     expect(screen.getByRole('radio', { name: /ARG/i })).toBeChecked();
   });
 });
+
+describe('deadline-tick cadence', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-01T12:00:00Z'));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const makeMatchWithDeadline = (slug: string, deadline: Date) => ({
+    ...makeMatch(slug, 'round-of-32', 'arg', 'esp'),
+    predictionDeadline: deadline,
+  });
+
+  it('uses 30s tick when the nearest deadline is more than an hour away', () => {
+    const setIntervalSpy = vi.spyOn(global, 'setInterval');
+    const farFuture = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000); // 5 days
+    render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[makeMatchWithDeadline('r32-m1', farFuture)]}
+        previousRoundPredictions={{}}
+      />,
+    );
+    const calls = setIntervalSpy.mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    // The implementation may call setInterval a few times during the initial
+    // schedule (the schedule() recursion after the first tick is irrelevant
+    // before any tick has fired). Find the first call's delay.
+    const firstDelay = calls[0]?.[1] as number | undefined;
+    expect(firstDelay).toBe(30 * 1000);
+    setIntervalSpy.mockRestore();
+  });
+
+  it('uses 1s tick when the nearest deadline is within an hour', () => {
+    const setIntervalSpy = vi.spyOn(global, 'setInterval');
+    const soon = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+    render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[makeMatchWithDeadline('r32-m1', soon)]}
+        previousRoundPredictions={{}}
+      />,
+    );
+    const calls = setIntervalSpy.mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    const firstDelay = calls[0]?.[1] as number | undefined;
+    expect(firstDelay).toBe(1000);
+    setIntervalSpy.mockRestore();
+  });
+
+  it('does not schedule a tick when all deadlines are in the past', () => {
+    const setIntervalSpy = vi.spyOn(global, 'setInterval');
+    const past = new Date(Date.now() - 60 * 1000); // 1 minute ago
+    render(
+      <PredictionStepKnockoutRound
+        {...defaultProps}
+        roundMatches={[makeMatchWithDeadline('r32-m1', past)]}
+        previousRoundPredictions={{}}
+      />,
+    );
+    expect(setIntervalSpy).not.toHaveBeenCalled();
+    setIntervalSpy.mockRestore();
+  });
+});

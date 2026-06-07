@@ -69,38 +69,119 @@ describe('PredictionStepGroup', () => {
     expect(screen.getByText('Group Classification')).toBeInTheDocument();
   });
 
-  it('updates match scores when existingMatchValues prop changes', () => {
+  describe('existingMatchValues handling', () => {
     const match = makeMatch('ga-m1', 'ARG', 'BRA');
     const teamsMap = {
       ARG: { fifaCode: 'ARG', name: 'Argentina' },
       BRA: { fifaCode: 'BRA', name: 'Brazil' },
     };
 
-    const { rerender } = render(
-      <PredictionStepGroup
-        {...defaultProps}
-        groupMatches={[match]}
-        teamsMap={teamsMap}
-        existingMatchValues={{ 'ga-m1': { home: 0, away: 0 } }}
-      />,
-    );
+    it('initializes inputs from existingMatchValues on mount', () => {
+      render(
+        <PredictionStepGroup
+          {...defaultProps}
+          groupMatches={[match]}
+          teamsMap={teamsMap}
+          existingMatchValues={{ 'ga-m1': { home: 2, away: 1 } }}
+        />,
+      );
+      const inputs = screen.getAllByRole('textbox');
+      expect((inputs[0] as HTMLInputElement).value).toBe('2');
+      expect((inputs[1] as HTMLInputElement).value).toBe('1');
+    });
 
-    const inputsBefore = screen.getAllByRole('textbox');
-    const homeInput = inputsBefore[0];
-    expect((homeInput as HTMLInputElement).value).toBe('0');
+    it('fills inputs from existingMatchValues when they arrive after mount (async load)', () => {
+      const { rerender } = render(
+        <PredictionStepGroup
+          {...defaultProps}
+          groupMatches={[match]}
+          teamsMap={teamsMap}
+          existingMatchValues={{}}
+        />,
+      );
+      expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('');
 
-    fireEvent.change(homeInput, { target: { value: '3' } });
-    expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('3');
+      rerender(
+        <PredictionStepGroup
+          {...defaultProps}
+          groupMatches={[match]}
+          teamsMap={teamsMap}
+          existingMatchValues={{ 'ga-m1': { home: 2, away: 1 } }}
+        />,
+      );
+      const inputs = screen.getAllByRole('textbox');
+      expect((inputs[0] as HTMLInputElement).value).toBe('2');
+      expect((inputs[1] as HTMLInputElement).value).toBe('1');
+    });
 
-    rerender(
-      <PredictionStepGroup
-        {...defaultProps}
-        groupMatches={[match]}
-        teamsMap={teamsMap}
-        existingMatchValues={{ 'ga-m1': { home: 1, away: 1 } }}
-      />,
-    );
+    it('preserves user input when existingMatchValues updates (regression: inputs-reset bug)', () => {
+      const { rerender } = render(
+        <PredictionStepGroup
+          {...defaultProps}
+          groupMatches={[match]}
+          teamsMap={teamsMap}
+          existingMatchValues={{ 'ga-m1': { home: 0, away: 0 } }}
+        />,
+      );
 
-    expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('1');
+      const homeInput = screen.getAllByRole('textbox')[0];
+      fireEvent.change(homeInput, { target: { value: '3' } });
+      expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('3');
+
+      // Simulate existingMatchValues updating for any reason: refetch, post-submit
+      // ripple, or sibling step re-render that flows a new prop reference.
+      rerender(
+        <PredictionStepGroup
+          {...defaultProps}
+          groupMatches={[match]}
+          teamsMap={teamsMap}
+          existingMatchValues={{ 'ga-m1': { home: 1, away: 1 } }}
+        />,
+      );
+
+      // User's typed value (3) must NOT be overwritten by the new saved value (1).
+      expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('3');
+    });
+
+    it('fills a different still-empty slot while preserving a typed one', () => {
+      const match2 = makeMatch('ga-m2', 'GER', 'FRA');
+      const { rerender } = render(
+        <PredictionStepGroup
+          {...defaultProps}
+          groupMatches={[match, match2]}
+          teamsMap={teamsMap}
+          existingMatchValues={{}}
+        />,
+      );
+
+      // User completes match 1 (both sides) so it commits to parent state.
+      fireEvent.change(screen.getAllByRole('textbox')[0], { target: { value: '3' } });
+      fireEvent.change(screen.getAllByRole('textbox')[1], { target: { value: '0' } });
+      expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('3');
+      expect((screen.getAllByRole('textbox')[1] as HTMLInputElement).value).toBe('0');
+      // match 2 is in the next pair of inputs (indexes 2-3); still empty.
+      expect((screen.getAllByRole('textbox')[2] as HTMLInputElement).value).toBe('');
+      expect((screen.getAllByRole('textbox')[3] as HTMLInputElement).value).toBe('');
+
+      // Saved values arrive for both matches.
+      rerender(
+        <PredictionStepGroup
+          {...defaultProps}
+          groupMatches={[match, match2]}
+          teamsMap={teamsMap}
+          existingMatchValues={{
+            'ga-m1': { home: 1, away: 1 },
+            'ga-m2': { home: 2, away: 2 },
+          }}
+        />,
+      );
+
+      // match 1 keeps the user's typed value (3, 0), not the saved (1, 1).
+      expect((screen.getAllByRole('textbox')[0] as HTMLInputElement).value).toBe('3');
+      expect((screen.getAllByRole('textbox')[1] as HTMLInputElement).value).toBe('0');
+      // match 2 was empty, so it adopts the saved value.
+      expect((screen.getAllByRole('textbox')[2] as HTMLInputElement).value).toBe('2');
+      expect((screen.getAllByRole('textbox')[3] as HTMLInputElement).value).toBe('2');
+    });
   });
 });

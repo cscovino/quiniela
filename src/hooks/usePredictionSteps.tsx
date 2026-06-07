@@ -145,15 +145,25 @@ export function usePredictionSteps(
   const stepSubmitRef = useRef<Record<number, () => Promise<void>>>({});
   const [stepCanAdvance, setStepCanAdvance] = useState<Record<number, boolean>>({});
 
-  const registerStepState = useCallback(
-    (idx: number) => (state: PredictionStepState) => {
-      stepSubmitRef.current[idx] = state.submit;
-      setStepCanAdvance((prev) =>
-        prev[idx] === state.canAdvance ? prev : { ...prev, [idx]: state.canAdvance },
-      );
-    },
-    [],
-  );
+  // Precompute a stable per-idx dispatcher so the same step receives the same
+  // onStateChange reference across renders. Children that register
+  // `useEffect([onStateChange], ...)` refire on every parent render when the
+  // callback is unstable, which causes wasted work and stale-state flicker.
+  // The map size (MAX_STEP_INDICES) is generous; the wizard has ~20 steps in
+  // practice (12 groups + ~6 knockout/best-players).
+  const MAX_STEP_INDICES = 64;
+  const registerStepState = useMemo(() => {
+    const map: Record<number, (state: PredictionStepState) => void> = {};
+    for (let i = 0; i < MAX_STEP_INDICES; i++) {
+      map[i] = (state: PredictionStepState) => {
+        stepSubmitRef.current[i] = state.submit;
+        setStepCanAdvance((prev) =>
+          prev[i] === state.canAdvance ? prev : { ...prev, [i]: state.canAdvance },
+        );
+      };
+    }
+    return (idx: number) => map[idx] ?? map[0];
+  }, []);
   const [existingFinalPhase, setExistingFinalPhase] = useState<{
     first?: string;
     second?: string;

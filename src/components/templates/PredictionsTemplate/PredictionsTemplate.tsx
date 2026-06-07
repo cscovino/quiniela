@@ -19,6 +19,11 @@ import {
 import { PredictorDeleteConfirm } from '@molecules/PredictorDeleteConfirm';
 import { PredictorEditor } from '@molecules/PredictorEditor';
 import { PredictorList, type PredictorListEntry } from '@molecules/PredictorList';
+import {
+  buildPredictorManagementTour,
+  PREDICTOR_MANAGEMENT_TOUR_ID,
+  useProductTour,
+} from '@organisms/ProductTour';
 import { predictorService } from '@services/predictor-service';
 import { tournamentService } from '@services/tournament-service';
 import { useAuthStore } from '@store/auth-store';
@@ -139,6 +144,24 @@ export interface PredictionsTemplateProps {
       placeholder?: string;
       confirmButton?: string;
       cancelButton?: string;
+    };
+    tour?: {
+      buttonLabel?: string;
+      buttonAriaLabel?: string;
+      nextButton?: string;
+      previousButton?: string;
+      doneButton?: string;
+      progressText?: string;
+      welcomeTitle?: string;
+      welcomeDescription?: string;
+      createTitle?: string;
+      createDescription?: string;
+      cardTitle?: string;
+      cardDescription?: string;
+      editTitle?: string;
+      editDescription?: string;
+      deleteTitle?: string;
+      deleteDescription?: string;
     };
     thirdPlaceAdvancing?: string;
     thirdPlaceEliminated?: string;
@@ -499,6 +522,68 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
     loadPredictorEntries();
   };
 
+  const tourLabels = useMemo(
+    () => ({
+      buttonLabel: translations.tour?.buttonLabel || 'Tour',
+      buttonAriaLabel: translations.tour?.buttonAriaLabel || 'Start guided tour',
+      nextButton: translations.tour?.nextButton || 'Next',
+      previousButton: translations.tour?.previousButton || 'Back',
+      doneButton: translations.tour?.doneButton || 'Got it!',
+      progressText: translations.tour?.progressText || 'Step {{current}} of {{total}}',
+    }),
+    [translations.tour],
+  );
+
+  const tourSteps = useMemo(
+    () =>
+      buildPredictorManagementTour({
+        welcomeTitle: translations.tour?.welcomeTitle || 'Welcome to Predictions',
+        welcomeDescription:
+          translations.tour?.welcomeDescription ||
+          'This is where you manage your predictors. Each predictor keeps its own set of picks for the tournament.',
+        createTitle: translations.tour?.createTitle || 'Create a predictor',
+        createDescription:
+          translations.tour?.createDescription ||
+          'Tap here to create a new predictor. Pick a name, design a pixel avatar, and choose your favorite team.',
+        cardTitle: translations.tour?.cardTitle || 'Open and edit predictions',
+        cardDescription:
+          translations.tour?.cardDescription ||
+          'Click anywhere on a predictor card — including the avatar — to start or update its predictions.',
+        editTitle: translations.tour?.editTitle || 'Edit avatar & favorite team',
+        editDescription:
+          translations.tour?.editDescription ||
+          "Use Edit Profile to change the predictor's name, redesign the avatar, or switch its favorite team.",
+        deleteTitle: translations.tour?.deleteTitle || 'Delete a predictor',
+        deleteDescription:
+          translations.tour?.deleteDescription ||
+          'Remove a predictor permanently. Heads up: this also wipes out all of its saved predictions.',
+      }),
+    [translations.tour],
+  );
+
+  const tour = useProductTour({
+    tourId: PREDICTOR_MANAGEMENT_TOUR_ID,
+    steps: tourSteps,
+    buttons: {
+      next: tourLabels.nextButton,
+      previous: tourLabels.previousButton,
+      done: tourLabels.doneButton,
+      progress: tourLabels.progressText,
+    },
+  });
+
+  // Auto-start the tour on first visit once the predictor list is mounted and
+  // its target elements are in the DOM. We wait for view === 'list' and that
+  // entries are not loading; missing-element steps are filtered by the hook.
+  useEffect(() => {
+    if (tour.isCompleted) return;
+    if (view !== 'list') return;
+    if (predictorsLoading || entriesLoading) return;
+    if (!user) return;
+    const timer = setTimeout(() => tour.start(), 800);
+    return () => clearTimeout(timer);
+  }, [tour, view, predictorsLoading, entriesLoading, user]);
+
   const loading = stepsLoading || isAuthLoading || predictorsLoading || deadlineLoading;
 
   if (loading) {
@@ -550,6 +635,16 @@ export const PredictionsTemplate: FC<PredictionsTemplateProps> = ({
         <main className="predictions-template__content">
           <header className="predictions-template__header">
             <Typography variant="h1">{translations.title}</Typography>
+            <Button
+              variant="accent"
+              size="sm"
+              onClick={() => tour.start()}
+              aria-label={tourLabels.buttonAriaLabel}
+              className="predictions-template__tour-btn"
+            >
+              <Icon name="robot" size={16} />
+              <span className="predictions-template__tour-btn-label">{tourLabels.buttonLabel}</span>
+            </Button>
           </header>
 
           {entriesLoading ? (

@@ -1,0 +1,21 @@
+.live-rankings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.live-rankings__header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.live-rankings__tour-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.live-rankings__tour-btn-label {
+  font-size: var(--text-sm);
+}

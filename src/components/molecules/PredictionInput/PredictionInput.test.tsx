@@ -60,4 +60,45 @@ describe('PredictionInput', () => {
     expect(handleChange).toHaveBeenLastCalledWith(7, 2);
     expect(inputs[0]).toHaveValue('7');
   });
+
+  it('preserves in-progress single-field input when props update (regression)', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const { rerender } = render(<PredictionInput onChange={handleChange} />);
+
+    // User types ONLY into home; away is still empty, so onChange has not fired
+    // and the parent has no record of the typed value.
+    const inputs = screen.getAllByRole('textbox');
+    await user.type(inputs[0], '3');
+    expect(inputs[0]).toHaveValue('3');
+    expect(inputs[1]).toHaveValue('');
+
+    // An external update arrives (e.g., sibling step submitted). The local
+    // typed value must NOT be clobbered just because the prop equals ''.
+    rerender(
+      <PredictionInput homeScore={undefined} awayScore={undefined} onChange={handleChange} />,
+    );
+    expect(inputs[0]).toHaveValue('3');
+    expect(inputs[1]).toHaveValue('');
+  });
+
+  it('preserves both fields once user has typed, even if props revert to undefined', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const { rerender } = render(
+      <PredictionInput homeScore={2} awayScore={1} onChange={handleChange} />,
+    );
+
+    // User clears both fields (intentionally).
+    const inputs = screen.getAllByRole('textbox');
+    await user.clear(inputs[0]);
+    await user.clear(inputs[1]);
+    expect(inputs[0]).toHaveValue('');
+    expect(inputs[1]).toHaveValue('');
+
+    // Rerender with the original scores; the user-emptied state wins.
+    rerender(<PredictionInput homeScore={2} awayScore={1} onChange={handleChange} />);
+    expect(inputs[0]).toHaveValue('');
+    expect(inputs[1]).toHaveValue('');
+  });
 });

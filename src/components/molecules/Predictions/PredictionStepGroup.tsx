@@ -75,6 +75,13 @@ const defaultTranslations = {
   ordinalOther: 'th',
 };
 
+function isSlotEmpty(slot: { home?: number; away?: number } | undefined): boolean {
+  if (!slot) return true;
+  if (slot.home == null || slot.home === '') return true;
+  if (slot.away == null || slot.away === '') return true;
+  return false;
+}
+
 export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   group,
   groupMatches,
@@ -97,19 +104,52 @@ export const PredictionStepGroup: FC<PredictionStepGroupProps> = ({
   const [isClassificationManual, setIsClassificationManual] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isFirstRender = useRef(true);
+  const matchPredictionsInitialized = useRef(false);
+  const classificationInitialized = useRef(false);
 
   useEffect(() => {
-    setMatchPredictions(() => {
-      const scores: Record<string, { home: number; away: number }> = {};
-      groupMatches.forEach((m) => {
-        scores[m.id] = existingMatchValues[m.id] ?? { home: '', away: '' };
+    if (!matchPredictionsInitialized.current) {
+      matchPredictionsInitialized.current = true;
+      setMatchPredictions((prev) => {
+        const next: Record<string, { home: number; away: number }> = { ...prev };
+        for (const m of groupMatches) {
+          next[m.id] = existingMatchValues[m.id] ?? { home: '', away: '' };
+        }
+        return next;
       });
-      return scores;
+      return;
+    }
+    // Subsequent updates (async Firestore load, retry, sibling submit ripple):
+    // only fill in still-empty slots. Never overwrite a value the user typed
+    // or that is already present locally. The '' default counts as empty.
+    setMatchPredictions((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const m of groupMatches) {
+        const saved = existingMatchValues[m.id];
+        if (!saved) continue;
+        if (isSlotEmpty(next[m.id])) {
+          next[m.id] = saved;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
     });
   }, [groupMatches, existingMatchValues]);
 
   useEffect(() => {
-    if (existingGroupBet) setClassification([...existingGroupBet]);
+    if (existingGroupBet && !classificationInitialized.current) {
+      classificationInitialized.current = true;
+      setClassification((prev) => {
+        if (
+          prev.length === existingGroupBet.length &&
+          prev.every((v, i) => v === existingGroupBet[i])
+        ) {
+          return prev;
+        }
+        return [...existingGroupBet];
+      });
+    }
   }, [existingGroupBet]);
 
   const allPredictions = useMemo(() => {

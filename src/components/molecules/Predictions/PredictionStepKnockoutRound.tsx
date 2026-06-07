@@ -139,9 +139,43 @@ export const PredictionStepKnockoutRound: FC<PredictionStepKnockoutRoundProps> =
 
   useEffect(() => {
     setNow(Date.now());
-    const interval = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(interval);
-  }, []);
+
+    // Tick cadence depends on how soon the nearest deadline is. Deadlines are
+    // usually days/weeks away during the group stage, so a 1s tick re-renders
+    // 16 R32 matches every second for no behavioral change. Use a coarse tick
+    // far from the deadline and switch to 1s only inside the last hour.
+    const computeDelay = (): number | null => {
+      let nearest = Infinity;
+      for (const m of roundMatches) {
+        const t = m.predictionDeadline.getTime();
+        if (t > Date.now() && t < nearest) nearest = t;
+      }
+      if (nearest === Infinity) return null; // all past, no more ticks
+      if (nearest - Date.now() < 60 * 60 * 1000) return 1000;
+      return 30 * 1000;
+    };
+
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const schedule = () => {
+      const delay = computeDelay();
+      if (delay == null) {
+        if (interval) clearInterval(interval);
+        interval = null;
+        return;
+      }
+      if (interval) clearInterval(interval);
+      interval = setInterval(() => {
+        setNow(Date.now());
+        // After each tick, re-evaluate cadence (deadline may have passed,
+        // or we may be entering the last-hour window).
+        schedule();
+      }, delay);
+    };
+    schedule();
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [roundMatches]);
 
   const isMatchDisabled = (match: KnockoutRoundMatch) => {
     if (isDisabled) return true;

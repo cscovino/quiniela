@@ -114,16 +114,22 @@ export const PredictorList: FC<PredictorListProps> = ({
   const statLabels = STAT_LABELS[locale];
 
   return (
-    <div className="predictor-list" role="list" aria-label={labels.listLabel}>
+    <div
+      className="predictor-list"
+      role="list"
+      aria-label={labels.listLabel}
+      data-tour="predictor-list"
+    >
       {predictors.length === 0 && (
         <div className="predictor-list__empty">
           <Typography variant="body">{labels.empty}</Typography>
         </div>
       )}
 
-      {predictors.map(({ predictor, groupsDone, groupsTotal, badgesAwarded, stats }) => {
+      {predictors.map(({ predictor, groupsDone, groupsTotal, badgesAwarded, stats }, idx) => {
         const accuracyDisplay =
           (stats?.finishedBets ?? 0) === 0 ? '—' : Math.round((stats?.accuracy ?? 0) * 100) + '%';
+        const isFirstCard = idx === 0;
 
         return (
           <div
@@ -137,9 +143,10 @@ export const PredictorList: FC<PredictorListProps> = ({
               '{name}',
               predictor.name,
             )}
+            data-tour={isFirstCard ? 'predictor-card' : undefined}
           >
             <div className="predictor-list__card-content">
-              <PredictorAvatar predictor={predictor} size="md" />
+              <PredictorAvatar predictor={predictor} size="lg" />
               <div className="predictor-list__card-info">
                 <div className="predictor-list__card-name-row">
                   <div className="predictor-list__card-name-scroller">
@@ -267,6 +274,7 @@ export const PredictorList: FC<PredictorListProps> = ({
                     onEdit(predictor.id);
                   }}
                   aria-label={labels.editProfileAria.replace('{name}', predictor.name)}
+                  data-tour={isFirstCard ? 'predictor-edit' : undefined}
                 >
                   <Icon name="pen-square" size={16} />
                   <span className="predictor-list__btn-label">{labels.editProfile}</span>
@@ -281,6 +289,7 @@ export const PredictorList: FC<PredictorListProps> = ({
                     onDelete(predictor.id);
                   }}
                   aria-label={labels.deleteAria.replace('{name}', predictor.name)}
+                  data-tour={isFirstCard ? 'predictor-delete' : undefined}
                 >
                   <Icon name="trash" size={16} />
                   <span className="predictor-list__btn-label">{labels.delete}</span>
@@ -292,7 +301,13 @@ export const PredictorList: FC<PredictorListProps> = ({
       })}
 
       {onCreate && (
-        <Button variant="primary" fullWidth onClick={onCreate} aria-label={labels.newButton}>
+        <Button
+          variant="primary"
+          fullWidth
+          onClick={onCreate}
+          aria-label={labels.newButton}
+          data-tour="predictor-create"
+        >
           <Icon name="plus" size={18} /> {labels.newButton}
         </Button>
       )}

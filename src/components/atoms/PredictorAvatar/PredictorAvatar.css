@@ -1,4 +1,5 @@
 .predictor-avatar {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   justify-content: center;

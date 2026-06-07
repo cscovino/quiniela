@@ -93,9 +93,35 @@
     },
     "rankings": {
       "title": "Clasificación - Quiniela",
-      "description": "Clasificación y tabla de posiciones de pronosticadores",
+      "description": "Clasificación de pronosticadores y tabla de posiciones",
       "heading": "Clasificación de Pronosticadores",
-      "empty": "¡Aún no hay clasificación. ¡Haz predicciones para aparecer aquí!"
+      "empty": "Aún no hay clasificaciones. ¡Haz predicciones para aparecer aquí!",
+      "tour": {
+        "buttonLabel": "Tour",
+        "buttonAriaLabel": "Iniciar tour guiado por la clasificación",
+        "nextButton": "Siguiente",
+        "previousButton": "Atrás",
+        "doneButton": "¡Entendido!",
+        "progressText": "Paso {{current}} de {{total}}",
+        "boardTitle": "La tabla",
+        "boardDescription": "Cada pronosticador aparece ordenado de arriba a abajo. Cuanto más subas, mejor están rindiendo tus predicciones.",
+        "positionTitle": "Tu posición",
+        "positionDescription": "El número grande a la izquierda es tu posición. La flecha pequeña al lado indica si subiste, bajaste o te mantuviste igual desde la última actualización.",
+        "userTitle": "Pronosticador y equipo favorito",
+        "userDescription": "El avatar pixelado, el nombre y la banderita son tu pronosticador. La bandera es el equipo que elegiste como favorito al crearlo.",
+        "badgesTitle": "Insignias conseguidas",
+        "badgesDescription": "Los iconos pequeños bajo el nombre son insignias que ganaste por logros — fase de grupos perfecta, racha encendida, apuesta sorpresa, y más. Pasa el cursor para ver cada una.",
+        "pointsTitle": "Puntos totales",
+        "pointsDescription": "El ícono de estrella y el número son tus puntos acumulados. Cuanto más precisas sean tus predicciones, más rápido crece este número.",
+        "todayTitle": "Puntos de hoy",
+        "todayDescription": "El rayo muestra los puntos que sumaste en los partidos de hoy. Un número alto significa que estás alcanzando a los líderes rápido.",
+        "accuracyTitle": "Precisión",
+        "accuracyDescription": "El ícono de diana es el porcentaje de tus predicciones finalizadas que fueron correctas — marcador exacto, ganador y posiciones de grupo incluidos.",
+        "streakTitle": "Racha actual",
+        "streakDescription": "El ícono de llama es la cantidad de predicciones correctas seguidas que has acertado. Mantenla viva para subir en la tabla.",
+        "matchesTitle": "Predicciones de hoy",
+        "matchesDescription": "Cada par de banderitas es uno de los partidos de hoy con el marcador que predijiste. Verde es acierto exacto, amarillo significa que acertaste al ganador pero no al marcador, y rojo es fallo."
+      }
     },
     "profile": {
       "title": "Perfil - Quiniela",
@@ -329,7 +355,25 @@
       "deadlinePassed": "Plazo vencido — predicciones bloqueadas",
       "captchaError": "No se pudo verificar el CAPTCHA. Intenta de nuevo.",
       "stepDescriptionGroup": "Predice marcadores y clasifica equipos para {group}",
-      "stepDescriptionRound": "Elige ganadores para {round}"
+      "stepDescriptionRound": "Elige ganadores para {round}",
+      "tour": {
+        "buttonLabel": "Tour",
+        "buttonAriaLabel": "Iniciar tour guiado",
+        "nextButton": "Siguiente",
+        "previousButton": "Atrás",
+        "doneButton": "¡Entendido!",
+        "progressText": "Paso {{current}} de {{total}}",
+        "welcomeTitle": "Bienvenido a Predicciones",
+        "welcomeDescription": "Aquí gestionas tus pronosticadores. Cada pronosticador guarda su propio set de predicciones para el torneo.",
+        "createTitle": "Crea un pronosticador",
+        "createDescription": "Toca aquí para crear un nuevo pronosticador. Elige un nombre, diseña un avatar pixel art y selecciona tu equipo favorito.",
+        "cardTitle": "Abre y edita tus predicciones",
+        "cardDescription": "Haz clic en cualquier parte de la tarjeta —incluido el avatar— para empezar o actualizar las predicciones de partidos, grupos, eliminatorias y finalistas.",
+        "editTitle": "Edita avatar y equipo favorito",
+        "editDescription": "Usa Editar Perfil para cambiar el nombre del pronosticador, rediseñar el avatar o cambiar su equipo favorito cuando quieras.",
+        "deleteTitle": "Elimina un pronosticador",
+        "deleteDescription": "Borra un pronosticador de forma permanente. Atención: esto también elimina todas sus predicciones guardadas."
+      }
     }
   }
 }
