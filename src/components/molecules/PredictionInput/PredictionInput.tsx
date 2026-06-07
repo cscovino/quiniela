@@ -78,7 +78,6 @@ export const PredictionInput: FC<PredictionInputProps> = ({
           onChange={(e) => handleHomeChange(e.target.value)}
           disabled={disabled}
           className="prediction-input__field"
-          placeholder="0"
         />
       </div>
 
@@ -95,7 +94,6 @@ export const PredictionInput: FC<PredictionInputProps> = ({
           onChange={(e) => handleAwayChange(e.target.value)}
           disabled={disabled}
           className="prediction-input__field"
-          placeholder="0"
         />
       </div>
     </div>

@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
+import { PixelArt } from '@atoms/PixelArt';
 import { Typography } from '@atoms/Typography';
 import { bucketByLocalDay } from '@utils/points-history';
 
@@ -74,6 +75,7 @@ export const PointsChart: FC<PointsChartProps> = ({ series, translations, classN
       <div className={`points-chart ${className}`}>
         <Typography variant="h4">{translations.title}</Typography>
         <div className="points-chart__empty">
+          <PixelArt name="ball-kick" size={56} className="points-chart__empty-art" animated />
           <Typography variant="body">{translations.noData}</Typography>
         </div>
       </div>

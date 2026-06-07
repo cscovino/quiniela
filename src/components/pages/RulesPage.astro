@@ -2,6 +2,7 @@
 import { SCORING } from '@/config/scoring';
 import { BADGE_DEFINITIONS } from '@app-types/badges';
 import { Icon } from '@atoms/Icon';
+import { PixelArt } from '@atoms/PixelArt/PixelArt';
 import { getTranslations } from '@utils/i18n';
 
 export interface Props {
@@ -108,6 +109,34 @@ const scoringCategories = [
         ))
       }
     </div>
+  </section>
+
+  <!-- Section 3: Prizes -->
+  <section class="rules-page__prizes">
+    <h2>{t.prizes.title}</h2>
+    <div class="prizes-grid">
+      <div class="prize-card prize-card--gold">
+        <PixelArt name="medal-gold" size={40} className="prize-medal" />
+        <span class="prize-card__place">{t.prizes.firstPlace}</span>
+        <span class="prize-card__percentage">60%</span>
+      </div>
+      <div class="prize-card prize-card--silver">
+        <PixelArt name="medal-silver" size={40} className="prize-medal" />
+        <span class="prize-card__place">{t.prizes.secondPlace}</span>
+        <span class="prize-card__percentage">25%</span>
+      </div>
+      <div class="prize-card prize-card--bronze">
+        <PixelArt name="medal-bronze" size={40} className="prize-medal" />
+        <span class="prize-card__place">{t.prizes.thirdPlace}</span>
+        <span class="prize-card__percentage">10%</span>
+      </div>
+      <div class="prize-card prize-card--exact">
+        <PixelArt name="goal" size={40} className="prize-medal" />
+        <span class="prize-card__place">{t.prizes.mostExact}</span>
+        <span class="prize-card__percentage">5%</span>
+      </div>
+    </div>
+    <p class="prizes-tiebreaker">{t.prizes.tiebreaker}</p>
   </section>
 </main>
 
@@ -297,6 +326,89 @@ const scoringCategories = [
     color: var(--text-secondary);
   }
 
+  /* Prizes Section */
+  .rules-page__prizes {
+    margin-top: var(--space-8);
+  }
+
+  .rules-page__prizes h2 {
+    font-family: var(--font-pixel);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+    color: var(--color-gold-500);
+  }
+
+  .prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .prize-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-3);
+    border: var(--border-pixel-sm);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .prize-medal {
+    margin-bottom: var(--space-2);
+  }
+
+  .prize-card__place {
+    font-family: var(--font-pixel);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .prize-card__percentage {
+    font-family: var(--font-pixel);
+    font-size: var(--heading-sm);
+  }
+
+  .prize-card--gold {
+    border-color: var(--color-gold-500);
+  }
+
+  .prize-card--gold .prize-card__percentage {
+    color: var(--color-gold-500);
+  }
+
+  .prize-card--silver {
+    border-color: var(--color-warm-400);
+  }
+
+  .prize-card--silver .prize-card__percentage {
+    color: var(--color-warm-400);
+  }
+
+  .prize-card--bronze {
+    border-color: var(--color-warning);
+  }
+
+  .prize-card--bronze .prize-card__percentage {
+    color: var(--color-warning);
+  }
+
+  .prize-card--exact {
+    border-color: var(--color-accent-500);
+  }
+
+  .prize-card--exact .prize-card__percentage {
+    color: var(--color-accent-500);
+  }
+
+  .prizes-tiebreaker {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
   /* Responsive */
   @media (max-width: 480px) {
     .rules-page {
@@ -327,6 +439,10 @@ const scoringCategories = [
 
     .scoring-grid {
       grid-template-columns: repeat(2, 1fr);
+    }
+
+    .prizes-grid {
+      grid-template-columns: repeat(4, 1fr);
     }
   }
 </style>

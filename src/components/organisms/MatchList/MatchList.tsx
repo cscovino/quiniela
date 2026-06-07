@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 
+import { PixelArt } from '@atoms/PixelArt';
 import { Typography } from '@atoms/Typography';
 import { MatchCard, type MatchCardProps } from '@molecules/MatchCard';
 
@@ -28,6 +29,7 @@ export const MatchList: FC<MatchListProps> = ({
     return (
       <div className={`match-list match-list--empty ${className}`}>
         {title && <Typography variant="h3">{title}</Typography>}
+        <PixelArt name="football" size={64} className="match-list__empty-art" animated />
         <Typography variant="body">{emptyMessage}</Typography>
       </div>
     );

@@ -1,4 +1,5 @@
 ---
+import { PixelArt } from '@atoms/PixelArt/PixelArt';
 import BaseLayout from '@layouts/BaseLayout.astro';
 
 const pathname = Astro.url.pathname;
@@ -27,6 +28,9 @@ const homeHref = `/${locale}`;
 <BaseLayout locale={locale} title={`${t.title} - Quiniela`} description={t.body}>
   <section class="not-found">
     <div class="not-found__inner">
+      <div class="not-found__art">
+        <PixelArt name="whistle" size={72} animated />
+      </div>
       <h1 class="not-found__heading">{t.heading}</h1>
       <p class="not-found__subheading">{t.subheading}</p>
       <p class="not-found__body">{t.body}</p>
@@ -47,6 +51,12 @@ const homeHref = `/${locale}`;
 
   .not-found__inner {
     max-width: 32rem;
+  }
+
+  .not-found__art {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
   }
 
   .not-found__heading {

@@ -2,6 +2,7 @@ import type { FC } from 'react';
 
 import type { AvatarOptions } from '@app-types/firestore';
 import { Button } from '@atoms/Button';
+import { PixelArt } from '@atoms/PixelArt';
 import { Typography } from '@atoms/Typography';
 import { RankingRow } from '@molecules/RankingRow';
 
@@ -69,6 +70,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
   if (rankings.length === 0) {
     return (
       <div className={`rankings-table rankings-table--empty ${className}`}>
+        <PixelArt name="podium" size={64} className="rankings-table__empty-art" animated />
         <Typography variant="body">{emptyMessage}</Typography>
       </div>
     );

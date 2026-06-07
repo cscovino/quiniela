@@ -4,6 +4,7 @@ import { getBuildData } from '@lib/build-data';
 import { TournamentHeader } from '@organisms/TournamentHeader/TournamentHeader';
 import { LiveMatchList } from '@organisms/LiveMatchList/LiveMatchList';
 import { Button } from '@atoms/Button/Button';
+import { PixelArt } from '@atoms/PixelArt/PixelArt';
 import type { MatchCardProps } from '@molecules/MatchCard/MatchCard';
 import { getTranslations, getRoute } from '@utils/i18n';
 
@@ -54,17 +55,28 @@ const tournamentInfo = buildData.tournament;
     />
 
     <section class="home-template__hero">
+      <div class="home-template__pixel-art-row">
+        <PixelArt name="goal" size={40} animated={true} className="hero-pixel-icon" />
+        <PixelArt name="ball-kick" size={40} animated={true} className="hero-pixel-icon" />
+        <PixelArt name="boot" size={40} animated={true} className="hero-pixel-icon" />
+      </div>
       <h2 class="home-template__hero-title">{t.pages.home.hero.title}</h2>
       <p>{t.pages.home.hero.subtitle}</p>
       <div class="home-template__actions">
         <Button href={predictionsUrl} variant="primary" size="lg">
+          <PixelArt name="jersey" size={40} animated={true} className="hero-pixel-icon" />
           {t.pages.home.hero.ctaPredict}
+          <PixelArt name="football" size={40} animated={true} className="hero-pixel-icon" />
         </Button>
         <Button href={rankingsUrl} variant="secondary" size="lg">
+          <PixelArt name="podium" size={40} animated={true} className="hero-pixel-icon" />
           {t.pages.home.hero.ctaStandings}
+          <PixelArt name="crowd" size={40} animated={true} className="hero-pixel-icon" />
         </Button>
         <Button href={rulesUrl} variant="accent" size="lg">
+          <PixelArt name="whistle" size={40} animated={true} className="hero-pixel-icon" />
           {t.pages.home.hero.ctaRules}
+          <PixelArt name="referee" size={40} animated={true} className="hero-pixel-icon" />
         </Button>
       </div>
     </section>
@@ -116,6 +128,39 @@ const tournamentInfo = buildData.tournament;
       var(--color-warm-500),
       var(--color-gold-500)
     );
+  }
+
+  .home-template__pixel-art-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .hero-pixel-icon {
+    animation: pixel-float 3s ease-in-out infinite;
+  }
+
+  .hero-pixel-icon--trophy {
+    animation-delay: 0.5s;
+  }
+
+  :global(.hero-pixel-icon:nth-child(3)) {
+    animation-delay: 1s;
+  }
+
+  :global(.hero-pixel-icon:nth-child(4)) {
+    animation-delay: 1.5s;
+  }
+
+  @keyframes pixel-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
   }
 
   .home-template__hero-title {

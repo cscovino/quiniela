@@ -72,10 +72,10 @@ describe('RankingRow', () => {
     expect(container.firstChild).toHaveClass('ranking-row--current');
   });
 
-  it('shows rank change arrow', () => {
+  it('shows rank change arrow for non-podium positions', () => {
     const { container } = render(
       <RankingRow
-        position={3}
+        position={5}
         displayName="Carlos"
         points={45}
         accuracy={85}
@@ -84,6 +84,22 @@ describe('RankingRow', () => {
       />,
     );
     expect(container.querySelector('.ranking-row__rank-change--up')).toBeInTheDocument();
+  });
+
+  it('shows a podium medal instead of the rank arrow for the top 3', () => {
+    const { container } = render(
+      <RankingRow
+        position={1}
+        displayName="Carlos"
+        points={45}
+        accuracy={85}
+        streak={3}
+        rankChange="up"
+      />,
+    );
+    expect(container.querySelector('.ranking-row__medal')).toBeInTheDocument();
+    expect(container.querySelector('.pixel-art--medal-gold')).toBeInTheDocument();
+    expect(container.querySelector('.ranking-row__rank-change--up')).not.toBeInTheDocument();
   });
 
   it('shows badge icons when badges provided', () => {

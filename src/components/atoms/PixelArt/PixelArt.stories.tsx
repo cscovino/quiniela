@@ -24,6 +24,13 @@ const meta: Meta<typeof PixelArt> = {
         'ball-kick',
         'referee',
         'crowd',
+        'podium',
+        'boot',
+        'jersey',
+        'flag',
+        'cards',
+        'fireworks',
+        'confetti',
       ],
     },
     size: {
@@ -172,7 +179,21 @@ export const AllAssets: Story = {
             gap: '1.5rem',
           }}
         >
-          {(['ball-kick', 'referee', 'crowd', 'empty'] as PixelArtName[]).map((name) => (
+          {(
+            [
+              'ball-kick',
+              'referee',
+              'crowd',
+              'podium',
+              'boot',
+              'jersey',
+              'flag',
+              'cards',
+              'fireworks',
+              'confetti',
+              'empty',
+            ] as PixelArtName[]
+          ).map((name) => (
             <div
               key={name}
               style={{

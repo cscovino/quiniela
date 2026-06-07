@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
 import { Icon } from '@atoms/Icon';
+import { PixelArt } from '@atoms/PixelArt';
 import { Typography } from '@atoms/Typography';
 
 import './TournamentHeader.css';
@@ -34,8 +35,12 @@ export const TournamentHeader: FC<TournamentHeaderProps> = ({
   return (
     <div className={`tournament-header ${className}`}>
       <div className="tournament-header__title">
-        <Icon name="trophy" size={32} />
-        <Typography variant="h1">{name}</Typography>
+        <PixelArt name="trophy" size={50} animated={true} />
+        <Typography variant="h1">
+          {name}
+          <PixelArt name="stadium" size={40} animated={true} className="pixel-icon" />
+          <PixelArt name="fireworks" size={50} animated={true} className="pixel-icon" />
+        </Typography>
       </div>
 
       <div className="tournament-header__meta">

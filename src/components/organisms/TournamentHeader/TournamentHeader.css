@@ -56,3 +56,8 @@
   gap: var(--space-2);
   color: var(--text-secondary);
 }
+
+.pixel-icon {
+  display: inline-block;
+  padding-inline: var(--space-1);
+}

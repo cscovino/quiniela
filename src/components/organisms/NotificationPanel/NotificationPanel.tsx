@@ -2,6 +2,7 @@ import type { FC } from 'react';
 
 import { Button } from '@atoms/Button';
 import { Icon, type IconName } from '@atoms/Icon';
+import { PixelArt } from '@atoms/PixelArt';
 import { Typography } from '@atoms/Typography';
 
 import './NotificationPanel.css';
@@ -48,7 +49,7 @@ export const NotificationPanel: FC<NotificationPanelProps> = ({
   if (notifications.length === 0) {
     return (
       <div className={`notification-panel notification-panel--empty ${className}`}>
-        <Icon name="bell" size={32} />
+        <PixelArt name="confetti" size={56} className="notification-panel__empty-art" animated />
         <Typography variant="body">{translations.noNotifications}</Typography>
       </div>
     );

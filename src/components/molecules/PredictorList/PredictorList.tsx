@@ -4,6 +4,7 @@ import { BADGE_DEFINITIONS } from '@app-types/badges';
 import type { Predictor, PredictorStats } from '@app-types/firestore';
 import { Button } from '@atoms/Button';
 import { Icon } from '@atoms/Icon';
+import { PixelArt } from '@atoms/PixelArt';
 import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Tooltip } from '@atoms/Tooltip';
 import { Typography } from '@atoms/Typography';
@@ -122,6 +123,7 @@ export const PredictorList: FC<PredictorListProps> = ({
     >
       {predictors.length === 0 && (
         <div className="predictor-list__empty">
+          <PixelArt name="jersey" size={64} className="predictor-list__empty-art" animated />
           <Typography variant="body">{labels.empty}</Typography>
         </div>
       )}

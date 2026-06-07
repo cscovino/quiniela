@@ -64,3 +64,9 @@
 .pixel-art--celebrate {
   animation: goal-celebration 0.8s ease-in-out;
 }
+
+/* Decorative bursts loop continuously rather than firing once */
+.pixel-art--fireworks.pixel-art--celebrate,
+.pixel-art--confetti.pixel-art--celebrate {
+  animation: goal-celebration 1.4s ease-in-out infinite;
+}

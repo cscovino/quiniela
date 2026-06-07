@@ -56,6 +56,15 @@
     "predictionOnly": {
       "label": "Solo Predicción",
       "description": "Las predicciones de ganador en la fase eliminatoria no se puntúan. Son solo para ayudarte a elegir el cuadro final y no afectan tu posición en la clasificación."
+    },
+    "prizes": {
+      "title": "Premios",
+      "distribution": "Distribución de Premios",
+      "firstPlace": "1er Lugar",
+      "secondPlace": "2do Lugar",
+      "thirdPlace": "3er Lugar",
+      "mostExact": "Más Aciertos Exactos",
+      "tiebreaker": "En caso de empate en puntos, el desempate es el número de aciertos exactos"
     }
   }
 }

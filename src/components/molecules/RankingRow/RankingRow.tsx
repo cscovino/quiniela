@@ -4,6 +4,8 @@ import { getBadgeDefinition, getBadgeName } from '@app-types/badges';
 import type { AvatarOptions, Predictor } from '@app-types/firestore';
 import type { IconName } from '@atoms/Icon';
 import { Icon } from '@atoms/Icon';
+import type { PixelArtName } from '@atoms/PixelArt';
+import { PixelArt } from '@atoms/PixelArt';
 import { PredictorAvatar } from '@atoms/PredictorAvatar';
 import { Tooltip } from '@atoms/Tooltip';
 import { Typography } from '@atoms/Typography';
@@ -40,6 +42,13 @@ const RANK_ARROW: Record<string, IconName> = {
   up: 'chevron-up',
   down: 'chevron-down',
   same: 'chevron-right',
+};
+
+// Top-3 finishers get a pixel-art medal instead of the rank-change arrow.
+const PODIUM_MEDAL: Record<number, PixelArtName> = {
+  1: 'medal-gold',
+  2: 'medal-silver',
+  3: 'medal-bronze',
 };
 
 // Localized labels for the stat icons (shown as tooltips). Kept here, like the
@@ -82,6 +91,8 @@ export const RankingRow: FC<RankingRowProps> = ({
 }) => {
   const statLabels = STAT_LABELS[locale];
 
+  const medalName = PODIUM_MEDAL[position];
+
   const earnedBadges = badges
     ? Object.keys(badges)
         .map((id) => getBadgeDefinition(id))
@@ -94,13 +105,17 @@ export const RankingRow: FC<RankingRowProps> = ({
       data-tour={isFirst ? 'ranking-row' : undefined}
     >
       <div className="ranking-row__position" data-tour={isFirst ? 'ranking-position' : undefined}>
-        {rankChange && (
-          <span
-            className={`ranking-row__rank-change ranking-row__rank-change--${rankChange}`}
-            aria-label={rankChange}
-          >
-            <Icon name={RANK_ARROW[rankChange]} size={14} />
-          </span>
+        {medalName ? (
+          <PixelArt name={medalName} size={22} className="ranking-row__medal" animated />
+        ) : (
+          rankChange && (
+            <span
+              className={`ranking-row__rank-change ranking-row__rank-change--${rankChange}`}
+              aria-label={rankChange}
+            >
+              <Icon name={RANK_ARROW[rankChange]} size={14} />
+            </span>
+          )
         )}
         <span className={`ranking-row__position-number ranking-row__position--${position}`}>
           #{position}

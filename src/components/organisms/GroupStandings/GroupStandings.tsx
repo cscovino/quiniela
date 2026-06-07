@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 
+import { PixelArt } from '@atoms/PixelArt';
 import { Typography } from '@atoms/Typography';
 import { GroupHeader, type GroupStanding } from '@molecules/GroupHeader';
 import { TeamFlag } from '@molecules/TeamFlag';
@@ -29,6 +30,7 @@ export const GroupStandings: FC<GroupStandingsProps> = ({
   if (groups.length === 0) {
     return (
       <div className={`group-standings group-standings--empty ${className}`}>
+        <PixelArt name="stadium" size={64} className="group-standings__empty-art" animated />
         <Typography variant="body">{translations.noGroups}</Typography>
       </div>
     );
@@ -63,7 +65,9 @@ export const GroupStandings: FC<GroupStandingsProps> = ({
                 <span className="group-standings__col group-standings__col--team">
                   <TeamFlag fifaCode={team.fifaCode} size="sm" />
                   <span className="group-standings__team-name">{team.teamName}</span>
-                  <span className="group-standings__team-code" aria-hidden="true">{team.fifaCode}</span>
+                  <span className="group-standings__team-code" aria-hidden="true">
+                    {team.fifaCode}
+                  </span>
                 </span>
                 <span className="group-standings__col">{team.played}</span>
                 <span className="group-standings__col">{team.won}</span>

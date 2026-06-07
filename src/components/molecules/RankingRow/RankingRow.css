@@ -31,6 +31,10 @@
   font-weight: var(--font-weight-bold);
 }
 
+.ranking-row__medal {
+  flex-shrink: 0;
+}
+
 .ranking-row__position--1 {
   color: #ffd700;
 }

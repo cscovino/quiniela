@@ -56,6 +56,15 @@
     "predictionOnly": {
       "label": "Prediction Only",
       "description": "Knockout winner predictions are not scored. They are only to help to chose the final four and do not affect your ranking position."
+    },
+    "prizes": {
+      "title": "Prizes",
+      "distribution": "Prize Distribution",
+      "firstPlace": "1st Place",
+      "secondPlace": "2nd Place",
+      "thirdPlace": "3rd Place",
+      "mostExact": "Most Exact Bets",
+      "tiebreaker": "In case of a tie in points, the tiebreaker is the number of exact bets"
     }
   }
 }

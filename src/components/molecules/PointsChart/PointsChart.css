@@ -8,9 +8,17 @@
 }
 
 .points-chart__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
   padding: var(--space-8);
   text-align: center;
   color: var(--text-muted);
+}
+
+.points-chart__empty-art {
+  opacity: 0.9;
 }
 
 .points-chart__container {
