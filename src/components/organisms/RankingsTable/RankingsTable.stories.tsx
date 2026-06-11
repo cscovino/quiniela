@@ -168,3 +168,133 @@ export const WithFinishedResults: Story = {
     currentUserId: 'user-2',
   },
 };
+
+// ─── Grouped by match day ───────────────────────────────────────────
+
+const mockBetsByDay = [
+  {
+    matchId: 'd1a', homeTeam: 'ARG', awayTeam: 'BRA', homeScore: 2, awayScore: 1,
+    status: 'finished' as const, actualHome: 2, actualAway: 1, isExact: true, isWinner: true,
+    date: '2026-06-11', dayLabel: 'Jor. 1 — 11 Jun',
+  },
+  {
+    matchId: 'd1b', homeTeam: 'GER', awayTeam: 'ESP', homeScore: 1, awayScore: 0,
+    status: 'finished' as const, actualHome: 1, actualAway: 1, isExact: false, isWinner: true,
+    date: '2026-06-11', dayLabel: 'Jor. 1 — 11 Jun',
+  },
+  {
+    matchId: 'd1c', homeTeam: 'FRA', awayTeam: 'ENG', homeScore: 0, awayScore: 2,
+    status: 'finished' as const, actualHome: 0, actualAway: 1, isExact: false, isWinner: false,
+    date: '2026-06-11', dayLabel: 'Jor. 1 — 11 Jun',
+  },
+  {
+    matchId: 'd2a', homeTeam: 'MEX', awayTeam: 'USA', homeScore: 2, awayScore: 1,
+    status: 'finished' as const, actualHome: 2, actualAway: 1, isExact: true, isWinner: true,
+    date: '2026-06-15', dayLabel: 'Jor. 2 — 15 Jun',
+  },
+  {
+    matchId: 'd2b', homeTeam: 'NED', awayTeam: 'POR', homeScore: 2, awayScore: 2,
+    status: 'finished' as const, actualHome: 2, actualAway: 2, isExact: true, isWinner: true,
+    date: '2026-06-15', dayLabel: 'Jor. 2 — 15 Jun',
+  },
+  {
+    matchId: 'd3a', homeTeam: 'ESP', awayTeam: 'CRO', homeScore: 3, awayScore: 0,
+    status: 'scheduled' as const,
+    date: '2026-06-19', dayLabel: 'Jor. 3 — 19 Jun',
+  },
+  {
+    matchId: 'd3b', homeTeam: 'ENG', awayTeam: 'ITA', homeScore: 1, awayScore: 1,
+    status: 'scheduled' as const,
+    date: '2026-06-19', dayLabel: 'Jor. 3 — 19 Jun',
+  },
+  {
+    matchId: 'd4a', homeTeam: 'ARG', awayTeam: 'NED', homeScore: 1, awayScore: 0,
+    status: 'scheduled' as const,
+    date: '2026-06-23', dayLabel: 'Jor. 4 — 23 Jun',
+  },
+];
+
+export const WithDays: Story = {
+  args: {
+    rankings: mockRankings.map((r, i) => ({
+      ...r,
+      todayMatchBets: mockBetsByDay.map((bet) => ({
+        ...bet,
+        homeScore: bet.homeScore + (i % 2),
+      })),
+      todayPoints: i * 3,
+    })),
+    currentUserId: 'user-3',
+    title: 'Rankings — Predicciones por jornada',
+  },
+};
+
+export const WithDaysEnglish: Story = {
+  args: {
+    rankings: mockRankings.map((r, i) => ({
+      ...r,
+      todayMatchBets: mockBetsByDay.map((bet) => ({
+        ...bet,
+        dayLabel: bet.dayLabel
+          .replace('Jor. 1', 'MD 1').replace('Jor. 2', 'MD 2')
+          .replace('Jor. 3', 'MD 3').replace('Jor. 4', 'MD 4'),
+        homeScore: bet.homeScore + (i % 2),
+      })),
+      todayPoints: i * 3,
+    })),
+    currentUserId: 'user-3',
+    title: 'Rankings — Predictions by matchday',
+  },
+};
+
+// ─── Group standings + final four + best players, after the match results ───
+
+const mockGroupPredictions = [
+  {
+    groupId: 'a', label: 'Jor. A',
+    teams: [
+      { fifaCode: 'MEX', position: 1, correct: true },
+      { fifaCode: 'USA', position: 2, correct: false },
+      { fifaCode: 'RSA', position: 3, correct: null },
+      { fifaCode: 'KOR', position: 4, correct: null },
+    ],
+  },
+  {
+    groupId: 'b', label: 'Jor. B',
+    teams: [
+      { fifaCode: 'ESP', position: 1, correct: true },
+      { fifaCode: 'GER', position: 2, correct: true },
+      { fifaCode: 'CRO', position: 3, correct: false },
+      { fifaCode: 'JPN', position: 4, correct: null },
+    ],
+  },
+];
+
+const mockFinalPhase = {
+  positions: [
+    { fifaCode: 'ARG', position: 1, correct: true },
+    { fifaCode: 'BRA', position: 2, correct: false },
+    { fifaCode: 'FRA', position: 3, correct: null },
+    { fifaCode: 'ESP', position: 4, correct: null },
+  ],
+};
+
+const mockBestPlayers = {
+  scorer: { name: 'Mbappé', correct: true },
+  goalkeeper: { name: 'Martínez', correct: false },
+};
+
+export const WithAllPredictions: Story = {
+  args: {
+    rankings: mockRankings.map((r, i) => ({
+      ...r,
+      todayMatchBets: mockBetsByDay.map((bet) => ({ ...bet, homeScore: bet.homeScore + (i % 2) })),
+      groupPredictions: mockGroupPredictions,
+      finalPhasePrediction: mockFinalPhase,
+      bestPlayersPrediction: mockBestPlayers,
+      todayPoints: i * 3,
+    })),
+    currentUserId: 'user-3',
+    title: 'Rankings — Todas las predicciones',
+  },
+};

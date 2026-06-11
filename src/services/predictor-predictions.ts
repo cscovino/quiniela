@@ -1,0 +1,188 @@
+import type { Locale } from '@utils/i18n';
+
+/**
+ * Baked (build-time, immutable after the deadline) predictions for the
+ * non-match bet types. Joined client-side with live results to color them.
+ */
+export interface PredictedGroup {
+  groupId: string;
+  /** Predicted finishing order as team IDs (index 0 = 1st place). */
+  positions: string[];
+}
+
+export interface PredictedFinalPhase {
+  first: string;
+  second: string;
+  third: string;
+  fourth: string;
+}
+
+export interface PredictedBestPlayers {
+  bestScorer: string;
+  bestGoalkeeper: string;
+}
+
+/** Live results used to color the predictions. Empty until matches resolve. */
+export interface PredictionResults {
+  /** teamId (lowercase) → FIFA code, for flags. */
+  teams: Map<string, string>;
+  /** groupId → actual finishing order (team IDs). Absent until the group ends. */
+  groupStandings: Map<string, string[]>;
+  /** groupId → raw group name. */
+  groupNames: Map<string, string>;
+  finalStandings: PredictedFinalPhase | null;
+  bestPlayers: { topScorer: string; bestGoalkeeper: string } | null;
+}
+
+// ── Display views (what RankingRow renders) ────────────────────────────────
+
+export interface PredictedTeamCell {
+  fifaCode: string;
+  /** 1-based finishing slot. */
+  position: number;
+  /** true = exact slot correct, false = result known & wrong, null = no result yet. */
+  correct: boolean | null;
+}
+
+export interface GroupPredictionView {
+  groupId: string;
+  label: string;
+  teams: PredictedTeamCell[];
+}
+
+export interface FinalPhasePredictionView {
+  positions: PredictedTeamCell[];
+}
+
+export interface BestPlayerCell {
+  name: string;
+  correct: boolean | null;
+}
+
+export interface BestPlayersPredictionView {
+  scorer: BestPlayerCell;
+  goalkeeper: BestPlayerCell;
+}
+
+function fifaCodeOf(teamId: string, teams: Map<string, string>): string {
+  return teams.get(teamId.toLowerCase()) ?? teamId.toUpperCase();
+}
+
+function localizeGroupName(name: string, locale: Locale): string {
+  return locale === 'es' ? name.replace(/^Group\b/i, 'Grupo') : name;
+}
+
+/**
+ * Mirror of the server's best-player name normalization
+ * (functions/src/calculateBestPlayerResults.ts): lowercase, trim, strip
+ * diacritics, drop non-alphanumerics except spaces. Keep these in sync.
+ */
+function normalizeName(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip combining diacritical marks
+    .replace(/[^a-z0-9\s]/g, ''); // strip non-alphanumeric except spaces
+}
+
+/**
+ * Mirror of the server's `fuzzyMatch`: true when either normalized name contains
+ * the other, or when their surnames (last word, > 2 chars) match exactly. Kept
+ * in sync so the displayed correctness matches how points were actually scored.
+ */
+function fuzzyMatch(predicted: string, actual: string): boolean {
+  const normalizedPredicted = normalizeName(predicted);
+  const normalizedActual = normalizeName(actual);
+
+  if (!normalizedPredicted || !normalizedActual) return false;
+
+  if (
+    normalizedPredicted.includes(normalizedActual) ||
+    normalizedActual.includes(normalizedPredicted)
+  ) {
+    return true;
+  }
+
+  const predictedWords = normalizedPredicted.split(/\s+/).filter(Boolean);
+  const actualWords = normalizedActual.split(/\s+/).filter(Boolean);
+  const predictedSurname = predictedWords[predictedWords.length - 1];
+  const actualSurname = actualWords[actualWords.length - 1];
+
+  return (
+    !!predictedSurname &&
+    !!actualSurname &&
+    predictedSurname.length > 2 &&
+    predictedSurname === actualSurname
+  );
+}
+
+/**
+ * Build the group-stage prediction views. Each team cell is correct when the
+ * predicted team occupies that exact slot in the actual standings; `null` until
+ * the group's standings exist.
+ */
+export function buildGroupPredictions(
+  predicted: PredictedGroup[],
+  results: PredictionResults,
+  locale: Locale,
+): GroupPredictionView[] {
+  return [...predicted]
+    .sort((a, b) => a.groupId.localeCompare(b.groupId))
+    .map((group) => {
+      const actual = results.groupStandings.get(group.groupId);
+      return {
+        groupId: group.groupId,
+        label: localizeGroupName(results.groupNames.get(group.groupId) ?? group.groupId, locale),
+        teams: group.positions.map((teamId, i) => ({
+          fifaCode: fifaCodeOf(teamId, results.teams),
+          position: i + 1,
+          correct: actual ? actual[i]?.toLowerCase() === teamId.toLowerCase() : null,
+        })),
+      };
+    });
+}
+
+/**
+ * Build the final-four prediction view. Each slot is correct when the predicted
+ * team matches the actual team in that exact slot; `null` until final standings
+ * exist.
+ */
+export function buildFinalPhasePrediction(
+  predicted: PredictedFinalPhase | null | undefined,
+  results: PredictionResults,
+): FinalPhasePredictionView | null {
+  if (!predicted) return null;
+  const actual = results.finalStandings;
+  const slots: Array<keyof PredictedFinalPhase> = ['first', 'second', 'third', 'fourth'];
+  return {
+    positions: slots.map((slot, i) => ({
+      fifaCode: fifaCodeOf(predicted[slot], results.teams),
+      position: i + 1,
+      correct: actual ? actual[slot]?.toLowerCase() === predicted[slot]?.toLowerCase() : null,
+    })),
+  };
+}
+
+/**
+ * Build the best-players prediction view. Each pick is correct on the same
+ * fuzzy name match the server uses to award points; `null` until the result is
+ * published.
+ */
+export function buildBestPlayersPrediction(
+  predicted: PredictedBestPlayers | null | undefined,
+  results: PredictionResults,
+): BestPlayersPredictionView | null {
+  if (!predicted) return null;
+  const actual = results.bestPlayers;
+  return {
+    scorer: {
+      name: predicted.bestScorer,
+      correct: actual ? fuzzyMatch(predicted.bestScorer, actual.topScorer) : null,
+    },
+    goalkeeper: {
+      name: predicted.bestGoalkeeper,
+      correct: actual ? fuzzyMatch(predicted.bestGoalkeeper, actual.bestGoalkeeper) : null,
+    },
+  };
+}

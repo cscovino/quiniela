@@ -7,9 +7,11 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
 
-import { buildPastDeadlineEnv, RULES_FILE_PATH } from './setup';
+import { buildPastDeadlineEnv, seedTournament, RULES_FILE_PATH } from './setup';
+
+const TOURNAMENT = 'world-cup-2026';
 
 let env: RulesTestEnvironment;
 let pastDeadlineEnv: RulesTestEnvironment;
@@ -24,6 +26,11 @@ beforeAll(async () => {
     },
   });
   pastDeadlineEnv = await buildPastDeadlineEnv('demo-quiniela-predictors-past');
+});
+
+beforeEach(async () => {
+  await seedTournament(env, TOURNAMENT, Timestamp.fromMillis(Date.now() + 86400000 * 7));
+  await seedTournament(pastDeadlineEnv, TOURNAMENT, Timestamp.fromMillis(Date.now() - 86400000));
 });
 
 afterEach(async () => {

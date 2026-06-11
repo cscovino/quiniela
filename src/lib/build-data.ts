@@ -340,6 +340,59 @@ async function queryBuildData(db: DbClient, locale: Locale) {
   return { matches, standings, teams, allMatches, tournament };
 }
 
+interface RawBetDoc {
+  predictorId?: string;
+  matchId?: string;
+  homeScore?: number;
+  awayScore?: number;
+}
+
+interface RawGroupBetDoc {
+  predictorId?: string;
+  groupId?: string;
+  positions?: string[];
+}
+
+/**
+ * Group predicted scores by predictorId, keeping only the predictors that made
+ * the leaderboard. Bets are read once per build (immutable after the deadline),
+ * so the static page never triggers per-visitor bet reads.
+ */
+export function groupPredictedBets(
+  bets: RawBetDoc[],
+  predictorIds: Set<string>,
+): Map<string, Array<{ matchId: string; homeScore: number; awayScore: number }>> {
+  const map = new Map<string, Array<{ matchId: string; homeScore: number; awayScore: number }>>();
+  for (const b of bets) {
+    if (!b.predictorId || !b.matchId) continue;
+    if (!predictorIds.has(b.predictorId)) continue;
+    if (typeof b.homeScore !== 'number' || typeof b.awayScore !== 'number') continue;
+    const arr = map.get(b.predictorId) ?? [];
+    arr.push({ matchId: b.matchId, homeScore: b.homeScore, awayScore: b.awayScore });
+    map.set(b.predictorId, arr);
+  }
+  return map;
+}
+
+/**
+ * Group the per-group standings predictions by predictorId, keeping only ranked
+ * predictors. Each predictor has one doc per group with an ordered `positions`.
+ */
+export function groupGroupBets(
+  bets: RawGroupBetDoc[],
+  predictorIds: Set<string>,
+): Map<string, Array<{ groupId: string; positions: string[] }>> {
+  const map = new Map<string, Array<{ groupId: string; positions: string[] }>>();
+  for (const b of bets) {
+    if (!b.predictorId || !b.groupId || !Array.isArray(b.positions)) continue;
+    if (!predictorIds.has(b.predictorId)) continue;
+    const arr = map.get(b.predictorId) ?? [];
+    arr.push({ groupId: b.groupId, positions: b.positions });
+    map.set(b.predictorId, arr);
+  }
+  return map;
+}
+
 export async function queryBuildRankings(db: DbClient) {
   const [predictorsSnap, statsSnap] = await Promise.all([
     db.collectionGroup('predictors'),
@@ -397,7 +450,7 @@ export async function queryBuildRankings(db: DbClient) {
     if (!seen.has(key)) merged.push(stats);
   }
 
-  const sorted = merged.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 100);
+  const sorted = merged.sort((a, b) => b.totalPoints - a.totalPoints);
 
   const predictorRefs = new Set<string>();
   for (const s of sorted) {
@@ -442,6 +495,64 @@ export async function queryBuildRankings(db: DbClient) {
     });
   }
 
+  // Bake each ranked predictor's predictions (match scores, group standings,
+  // final four, best players). Read once per build; all are immutable after the
+  // deadline, so the static page carries them with no per-visitor reads. Live
+  // results are joined client-side to color them.
+  const predictorIdSet = new Set(sorted.map((s) => s.predictorId));
+  let predictedByPredictor = new Map<
+    string,
+    Array<{ matchId: string; homeScore: number; awayScore: number }>
+  >();
+  let groupsByPredictor = new Map<string, Array<{ groupId: string; positions: string[] }>>();
+  const finalPhaseByPredictor = new Map<
+    string,
+    { first: string; second: string; third: string; fourth: string }
+  >();
+  const bestPlayersByPredictor = new Map<
+    string,
+    { bestScorer: string; bestGoalkeeper: string }
+  >();
+  try {
+    const [betsSnap, groupBetsSnap, finalSnap, bestSnap] = await Promise.all([
+      db.query(`tournaments/${TOURNAMENT_ID}/bets`),
+      db.query(`tournaments/${TOURNAMENT_ID}/group_bets`),
+      db.query(`tournaments/${TOURNAMENT_ID}/final_phase_bets`),
+      db.query(`tournaments/${TOURNAMENT_ID}/best_players_bets`),
+    ]);
+
+    predictedByPredictor = groupPredictedBets(
+      betsSnap.docs.map((d) => d.data() as unknown as RawBetDoc),
+      predictorIdSet,
+    );
+    groupsByPredictor = groupGroupBets(
+      groupBetsSnap.docs.map((d) => d.data() as unknown as RawGroupBetDoc),
+      predictorIdSet,
+    );
+
+    // final_phase_bets / best_players_bets are keyed by predictorId (doc id).
+    for (const d of finalSnap.docs) {
+      if (!predictorIdSet.has(d.id)) continue;
+      const data = d.data() as Record<string, unknown>;
+      finalPhaseByPredictor.set(d.id, {
+        first: (data.first as string) ?? '',
+        second: (data.second as string) ?? '',
+        third: (data.third as string) ?? '',
+        fourth: (data.fourth as string) ?? '',
+      });
+    }
+    for (const d of bestSnap.docs) {
+      if (!predictorIdSet.has(d.id)) continue;
+      const data = d.data() as Record<string, unknown>;
+      bestPlayersByPredictor.set(d.id, {
+        bestScorer: (data.bestScorer as string) ?? '',
+        bestGoalkeeper: (data.bestGoalkeeper as string) ?? '',
+      });
+    }
+  } catch {
+    // Leaderboard still renders without predictions if the bets read fails.
+  }
+
   const rankings: RankingsTableProps['rankings'] = sorted.map((s) => {
     const key = `users/${s.userId}/predictors/${s.predictorId}`;
     const avatarData = avatarMap.get(key);
@@ -459,6 +570,10 @@ export async function queryBuildRankings(db: DbClient) {
       points: s.totalPoints,
       accuracy: Math.round(s.accuracy * 100),
       streak: s.currentStreak,
+      predictedBets: predictedByPredictor.get(s.predictorId),
+      predictedGroups: groupsByPredictor.get(s.predictorId),
+      predictedFinalPhase: finalPhaseByPredictor.get(s.predictorId),
+      predictedBestPlayers: bestPlayersByPredictor.get(s.predictorId),
     };
   });
 
@@ -508,4 +623,33 @@ export async function getBuildRankings() {
   // eslint-disable-next-line no-console
   console.warn('[build-data] getBuildRankings failed, returning empty:', errors);
   return [];
+}
+
+const DEFAULT_START_DATE = '2026-06-11';
+
+async function queryTournamentStartDate(db: DbClient): Promise<string> {
+  const snap = await db.doc(`tournaments/${TOURNAMENT_ID}`);
+  const raw = snap.exists ? snap.data() : {};
+  const startDate =
+    (raw.startDate as { toDate: () => Date })?.toDate?.() || new Date(DEFAULT_START_DATE);
+  return startDate.toISOString();
+}
+
+/**
+ * Tournament start as an ISO string, for runtime feature gating in client
+ * islands. Falls back to the known WC2026 opener date if the doc can't be read.
+ */
+export async function getTournamentStartDate(): Promise<string> {
+  for (const create of [createAdminDb, createWebDb]) {
+    try {
+      const db = await create();
+      return await queryTournamentStartDate(db);
+    } catch {
+      // try next client
+    }
+  }
+
+  // eslint-disable-next-line no-console
+  console.warn('[build-data] getTournamentStartDate failed, using default opener date');
+  return new Date(DEFAULT_START_DATE).toISOString();
 }

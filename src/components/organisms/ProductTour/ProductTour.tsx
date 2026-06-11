@@ -126,6 +126,10 @@ export function useProductTour({
       prevBtnText: buttons?.previous,
       doneBtnText: buttons?.done,
       progressText: buttons?.progress,
+      onHighlightStarted: (element) => {
+        if (!element) return;
+        element.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      },
       onCloseClick: () => {
         driverRef.current?.destroy();
         onClose?.();

@@ -31,7 +31,7 @@ export interface ApiRankingEntry {
 
 /**
  * Fetch the tournament rankings from the server function. Sorted by total
- * points descending, capped at the server-side top 100.
+ * points descending; returns every ranked predictor (no top-N cap).
  *
  * Throws on a non-2xx response or network failure so callers can decide
  * whether to fall back (e.g. keep server-rendered initial data).

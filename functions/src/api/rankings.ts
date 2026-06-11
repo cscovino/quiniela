@@ -162,7 +162,7 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
         statsSnap.docs as unknown as MinimalDoc[],
       );
 
-      const sorted = merged.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 100);
+      const sorted = merged.sort((a, b) => b.totalPoints - a.totalPoints);
 
       const predictorRefs = new Set<string>();
       for (const s of sorted) {

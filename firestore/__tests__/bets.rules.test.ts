@@ -23,6 +23,15 @@ beforeAll(async () => {
   });
 });
 
+beforeEach(async () => {
+  // Seed tournament doc with future kickoff so isBeforeTournamentStart passes
+  await env.withSecurityRulesDisabled(async (safeCtx) => {
+    await setDoc(doc(safeCtx.firestore(), 'tournaments/t1'), {
+      firstMatchKickoff: Timestamp.fromMillis(Date.now() + 86400000 * 7),
+    });
+  });
+});
+
 afterEach(async () => {
   await env.clearFirestore();
 });

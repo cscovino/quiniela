@@ -129,7 +129,7 @@ export function buildPredictionWizardTour(t: PredictionWizardTourTranslations): 
 export function buildRankingsTour(t: RankingsTourTranslations): TourStepConfig[] {
   return [
     {
-      element: '[data-tour="rankings-list"]',
+      element: '[data-tour="ranking-row"]',
       title: t.boardTitle,
       description: t.boardDescription,
       side: 'bottom',

@@ -33,11 +33,10 @@ service cloud.firestore {
              request.time < matchData.predictionDeadline;
     }
     
-    function isBeforeTournamentStart() {
-      return request.time < timestamp.date(2026, 6, 12) &&
-             !(request.time >= timestamp.date(2026, 6, 11) &&
-               request.time < timestamp.date(2026, 6, 12) &&
-               request.time.hour >= 21);
+    function isBeforeTournamentStart(tournamentId) {
+      let tournament = get(/databases/$(database)/documents/tournaments/$(tournamentId));
+      return tournament.data.firstMatchKickoff != null &&
+             request.time < tournament.data.firstMatchKickoff;
     }
     
     function canPredictOnMatch(tournamentId, matchId) {
@@ -56,8 +55,8 @@ service cloud.firestore {
       // Locked at tournament start: no new brackets, no edits to existing ones
       match /predictors/{predictorId} {
         allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
-        allow create: if request.auth != null && request.auth.uid == userId && isBeforeTournamentStart();
-        allow update: if request.auth.uid == userId && isBeforeTournamentStart();
+        allow create: if request.auth != null && request.auth.uid == userId && isBeforeTournamentStart('world-cup-2026');
+        allow update: if request.auth.uid == userId && isBeforeTournamentStart('world-cup-2026');
         allow delete: if request.auth.uid == userId;
         
         // Predictor stats - read own, Cloud Functions write
@@ -112,7 +111,7 @@ service cloud.firestore {
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
           canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
-          isBeforeTournamentStart() &&
+          isBeforeTournamentStart(tournamentId) &&
           request.resource.data.homeScore is int &&
           request.resource.data.homeScore >= 0 &&
           request.resource.data.homeScore <= 15 &&
@@ -122,7 +121,7 @@ service cloud.firestore {
         allow update: if
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
-          isBeforeTournamentStart() &&
+          isBeforeTournamentStart(tournamentId) &&
           canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
           request.resource.data.matchId == resource.data.matchId &&
           request.resource.data.homeScore is int &&
@@ -140,11 +139,11 @@ service cloud.firestore {
         allow create: if
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
-          isBeforeTournamentStart();
+          isBeforeTournamentStart(tournamentId);
         allow update: if
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
-          isBeforeTournamentStart();
+          isBeforeTournamentStart(tournamentId);
         allow delete: if isAdmin();
       }
       
@@ -155,14 +154,14 @@ service cloud.firestore {
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
           canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
-          isBeforeTournamentStart() &&
+          isBeforeTournamentStart(tournamentId) &&
           request.resource.data.predictedWinner != null &&
           request.resource.data.predictedWinner != '';
         allow update: if
           isOwnerNew() &&
           isPredictorOwner(request.resource.data.predictorId) &&
           canPredictOnMatch(tournamentId, request.resource.data.matchId) &&
-          isBeforeTournamentStart() &&
+          isBeforeTournamentStart(tournamentId) &&
           request.resource.data.predictedWinner != null &&
           request.resource.data.predictedWinner != '';
         allow delete: if isAdmin();
@@ -179,7 +178,7 @@ service cloud.firestore {
         allow read: if request.auth != null;
         allow create, update: if request.auth != null && 
           request.auth.uid == request.resource.data.userId &&
-          isBeforeTournamentStart();
+          isBeforeTournamentStart(tournamentId);
         allow delete: if isAdmin();
       }
       
@@ -188,7 +187,7 @@ service cloud.firestore {
         allow read: if request.auth != null;
         allow create, update: if request.auth != null && 
           request.auth.uid == request.resource.data.userId &&
-          isBeforeTournamentStart();
+          isBeforeTournamentStart(tournamentId);
         allow delete: if isAdmin();
       }
     }

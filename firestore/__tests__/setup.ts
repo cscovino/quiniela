@@ -4,6 +4,7 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
 
 const RULES_FILE = resolve(__dirname, '../../firestore/firestore.rules');
 
@@ -25,25 +26,35 @@ export async function buildTestEnv(
 }
 
 /**
- * Build a RulesTestEnvironment where the tournament-start deadline is shifted to
- * the past (2020-01-01), so "after deadline" rule assertions can pass even when
- * the real clock is before 2026-06-11.
+ * Create a second, isolated test env (used for "past deadline" scenarios).
+ * Unlike buildTestEnv, no string replacement is needed — the "past" behavior
+ * is achieved by seeding a tournament doc with an expired firstMatchKickoff.
  */
 export async function buildPastDeadlineEnv(
   projectId = 'demo-quiniela-past',
 ): Promise<RulesTestEnvironment> {
-  const rulesSource = readFileSync(RULES_FILE, 'utf8');
-  const pastDeadlineRules = rulesSource.replace(
-    'timestamp.date(2026, 6, 11)',
-    'timestamp.date(2020, 1, 1)',
-  );
   return initializeTestEnvironment({
     projectId,
     firestore: {
-      rules: pastDeadlineRules,
+      rules: readFileSync(RULES_FILE, 'utf8'),
       host: '127.0.0.1',
       port: 8080,
     },
+  });
+}
+
+/**
+ * Seed the tournament document with a firstMatchKickoff Timestamp.
+ */
+export async function seedTournament(
+  env: RulesTestEnvironment,
+  tournamentId: string,
+  kickoff: Timestamp,
+): Promise<void> {
+  await env.withSecurityRulesDisabled(async (safeCtx) => {
+    await setDoc(doc(safeCtx.firestore(), `tournaments/${tournamentId}`), {
+      firstMatchKickoff: kickoff,
+    });
   });
 }
 

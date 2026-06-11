@@ -1361,6 +1361,7 @@ async function seedTournament() {
     slug: TOURNAMENT_ID,
     name: 'FIFA World Cup 2026',
     startDate: admin.firestore.Timestamp.fromDate(new Date('2026-06-11T00:00:00Z')),
+    firstMatchKickoff: admin.firestore.Timestamp.fromDate(new Date('2026-06-11T19:00:00Z')),
     endDate: admin.firestore.Timestamp.fromDate(new Date('2026-07-19T23:59:59Z')),
     status: 'draft',
     phases: [

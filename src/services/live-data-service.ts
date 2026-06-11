@@ -1,13 +1,15 @@
-import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
 
 import type { MatchCardProps } from '@molecules/MatchCard';
 import type { GroupStandingsProps } from '@organisms/GroupStandings';
-import type { RankingEntry, TodayMatchBet } from '@organisms/RankingsTable';
+import type { RankingEntry } from '@organisms/RankingsTable';
 import { getLocalizedName, type Locale, type LocalizedName } from '@utils/i18n';
 
 import { TOURNAMENT_ID } from '../config/tournament';
 import type { GroupStandings, Match, Team } from '../types/firestore';
 import { getDb } from './firebase';
+import type { MatchInfo } from './matchday-bets';
+import type { PredictionResults } from './predictor-predictions';
 import { fetchRankingsFromApi } from './rankings-api';
 
 async function getTeamsMap(): Promise<Map<string, Team>> {
@@ -202,9 +204,9 @@ function loadPreviousRankings(): Map<string, number> {
 
 function storeRankingsSnapshot(entries: { predictorId: string; position: number }[]): void {
   try {
-    // Key on predictorId, not userId: one account can have multiple predictors in
-    // the top-100, and a userId key would collapse them (last-write-wins) and yield
-    // wrong rank-change arrows. predictorId is the unique ranking-row identity.
+    // Key on predictorId, not userId: one account can have multiple predictors on
+    // the leaderboard, and a userId key would collapse them (last-write-wins) and
+    // yield wrong rank-change arrows. predictorId is the unique ranking-row identity.
     const data: [string, number][] = entries.map((e) => [e.predictorId, e.position]);
     localStorage.setItem(RANKINGS_SNAPSHOT_KEY, JSON.stringify(data));
   } catch {
@@ -224,115 +226,110 @@ function computeRankChange(
   return 'same';
 }
 
-async function fetchTodayBets(): Promise<{
-  matchList: TodayMatchBet[];
-  predictorBets: Map<string, TodayMatchBet[]>;
-}> {
+/**
+ * Live match facts (teams, date, status, result) keyed by matchId. Read at
+ * runtime so match results and correctness stay fresh without a redeploy. The
+ * predicted scores themselves are baked at build time (immutable after the
+ * deadline) and joined onto this map client-side via `buildMatchdayBets`.
+ *
+ * This is the whole matches collection (~tournament size, not per-predictor),
+ * so the cost is bounded and independent of how many predictors are ranked.
+ */
+export async function fetchMatchInfoMap(): Promise<Map<string, MatchInfo>> {
   try {
     const teams = await getTeamsMap();
-    const matchesRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches');
-    const matchesSnap = await getDocs(matchesRef);
+    const matchesSnap = await getDocs(
+      collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches'),
+    );
 
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayEnd = new Date(todayStart);
-    todayEnd.setDate(todayEnd.getDate() + 1);
-
-    const todayMatchIds: string[] = [];
-    const todayMatches = new Map<
-      string,
-      {
-        homeTeam: string;
-        awayTeam: string;
-        status: string;
-        actualHome?: number;
-        actualAway?: number;
-      }
-    >();
-
-    for (const doc of matchesSnap.docs) {
-      const data = doc.data() as Match;
-      const matchDate = data.date.toDate();
-      if (matchDate >= todayStart && matchDate < todayEnd) {
-        todayMatchIds.push(doc.id);
-        const home = data.homeTeamId
-          ? (teams.get(data.homeTeamId.toLowerCase())?.fifaCode ?? data.homeTeamId.toUpperCase())
-          : 'TBD';
-        const away = data.awayTeamId
-          ? (teams.get(data.awayTeamId.toLowerCase())?.fifaCode ?? data.awayTeamId.toUpperCase())
-          : 'TBD';
-        todayMatches.set(doc.id, {
-          homeTeam: home,
-          awayTeam: away,
-          status: data.status,
-          actualHome: data.result.home ?? undefined,
-          actualAway: data.result.away ?? undefined,
-        });
-      }
-    }
-
-    if (todayMatchIds.length === 0) {
-      return { matchList: [], predictorBets: new Map() };
-    }
-
-    const betsRef = collection(getDb(), 'tournaments', TOURNAMENT_ID, 'bets');
-    const betsQuery = query(betsRef, where('matchId', 'in', todayMatchIds));
-    const betsSnap = await getDocs(betsQuery);
-
-    const predictorBets = new Map<string, TodayMatchBet[]>();
-    const matchList: TodayMatchBet[] = [];
-
-    for (const todayId of todayMatchIds) {
-      const info = todayMatches.get(todayId)!;
-      matchList.push({
-        matchId: todayId,
-        homeTeam: info.homeTeam,
-        awayTeam: info.awayTeam,
-        homeScore: 0,
-        awayScore: 0,
-        status: info.status,
-        actualHome: info.actualHome,
-        actualAway: info.actualAway,
+    const map = new Map<string, MatchInfo>();
+    for (const d of matchesSnap.docs) {
+      const data = d.data() as Match;
+      const home = data.homeTeamId
+        ? (teams.get(data.homeTeamId.toLowerCase())?.fifaCode ?? data.homeTeamId.toUpperCase())
+        : 'TBD';
+      const away = data.awayTeamId
+        ? (teams.get(data.awayTeamId.toLowerCase())?.fifaCode ?? data.awayTeamId.toUpperCase())
+        : 'TBD';
+      map.set(d.id, {
+        homeTeam: home,
+        awayTeam: away,
+        date: data.date.toDate(),
+        status: data.status,
+        actualHome: data.result.home ?? undefined,
+        actualAway: data.result.away ?? undefined,
       });
     }
-
-    for (const doc of betsSnap.docs) {
-      const bet = doc.data() as {
-        matchId: string;
-        predictorId: string;
-        homeScore: number;
-        awayScore: number;
-        isExact?: boolean;
-        isWinner?: boolean;
-      };
-      const info = todayMatches.get(bet.matchId);
-      if (!info) continue;
-
-      const entry: TodayMatchBet = {
-        matchId: bet.matchId,
-        homeTeam: info.homeTeam,
-        awayTeam: info.awayTeam,
-        homeScore: bet.homeScore,
-        awayScore: bet.awayScore,
-        status: info.status,
-        actualHome: info.actualHome,
-        actualAway: info.actualAway,
-        isExact: bet.isExact,
-        isWinner: bet.isWinner,
-      };
-
-      const existing = predictorBets.get(bet.predictorId) || [];
-      existing.push(entry);
-      predictorBets.set(bet.predictorId, existing);
-    }
-
-    return { matchList, predictorBets };
+    return map;
   } catch {
-    return { matchList: [], predictorBets: new Map() };
+    return new Map();
   }
 }
 
-export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
+/**
+ * Live results used to color the baked group / final-four / best-player
+ * predictions: actual group standings, the final four, and the best-player
+ * picks, plus a teamId→FIFA-code map for flags. Read at runtime (small,
+ * tournament-sized collections) so correctness stays fresh without a redeploy.
+ */
+export async function fetchPredictionResults(): Promise<PredictionResults> {
+  const empty: PredictionResults = {
+    teams: new Map(),
+    groupStandings: new Map(),
+    groupNames: new Map(),
+    finalStandings: null,
+    bestPlayers: null,
+  };
+
+  try {
+    const db = getDb();
+    const [teamsRaw, standingsSnap, groupsSnap, finalDoc, bestDoc] = await Promise.all([
+      getTeamsMap(),
+      getDocs(collection(db, 'tournaments', TOURNAMENT_ID, 'group_standings')),
+      getDocs(collection(db, 'tournaments', TOURNAMENT_ID, 'groups')),
+      getDoc(doc(db, 'tournaments', TOURNAMENT_ID, 'final_standings', 'final')),
+      getDoc(doc(db, 'tournaments', TOURNAMENT_ID, 'best_players_results', 'actual')),
+    ]);
+
+    const teams = new Map<string, string>();
+    for (const [key, team] of teamsRaw) teams.set(key, team.fifaCode);
+
+    const groupStandings = new Map<string, string[]>();
+    for (const d of standingsSnap.docs) {
+      const data = d.data() as GroupStandings;
+      const ordered = [...(data.standings ?? [])]
+        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+        .map((s) => s.teamId);
+      groupStandings.set(data.groupId ?? d.id, ordered);
+    }
+
+    const groupNames = new Map<string, string>();
+    for (const d of groupsSnap.docs) {
+      groupNames.set(d.id, (d.data() as { name?: string }).name ?? d.id);
+    }
+
+    const final = finalDoc.exists() ? (finalDoc.data() as Record<string, string>) : null;
+    const finalStandings = final
+      ? {
+          first: final.first ?? '',
+          second: final.second ?? '',
+          third: final.third ?? '',
+          fourth: final.fourth ?? '',
+        }
+      : null;
+
+    const best = bestDoc.exists() ? (bestDoc.data() as Record<string, string>) : null;
+    const bestPlayers = best
+      ? { topScorer: best.topScorer ?? '', bestGoalkeeper: best.bestGoalkeeper ?? '' }
+      : null;
+
+    return { teams, groupStandings, groupNames, finalStandings, bestPlayers };
+  } catch {
+    return empty;
+  }
+}
+
+export async function fetchLiveRankings(): Promise<RankingEntry[]> {
   // Heavy work (collectionGroup stats scan + per-predictor profile reads) runs
   // server-side in the cached `/api/rankings` function. On any failure we return
   // an empty array; useLiveData keeps the server-rendered initial rankings.
@@ -350,12 +347,10 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
     return [];
   }
 
-  const sorted = apiStats.slice(0, limit);
+  // All ranked predictors — no top-N cap.
+  const sorted = apiStats;
 
-  const [prevRankings, todayBets] = await Promise.all([
-    Promise.resolve(loadPreviousRankings()),
-    fetchTodayBets(),
-  ]);
+  const prevRankings = loadPreviousRankings();
 
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -386,7 +381,6 @@ export async function fetchLiveRankings(limit = 100): Promise<RankingEntry[]> {
       streak: s.currentStreak,
       badges: s.badgesAwarded ?? undefined,
       rankChange: computeRankChange(index, s.predictorId, prevRankings),
-      todayMatchBets: todayBets.predictorBets.get(s.predictorId),
     };
   });
 

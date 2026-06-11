@@ -6,6 +6,13 @@
   background: var(--bg-card);
   border: var(--border-width-sm) solid var(--border-color);
   transition: background var(--duration-fast) var(--ease-out);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.ranking-row::-webkit-scrollbar {
+  display: none;
 }
 
 .ranking-row:hover {
@@ -18,6 +25,10 @@
 }
 
 .ranking-row__position {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: inherit;
   min-width: 60px;
   display: flex;
   align-items: center;
@@ -69,16 +80,22 @@
 }
 
 .ranking-row__user {
+  position: sticky;
+  left: 60px;
+  z-index: 2;
+  background: inherit;
+  box-shadow: 1px 0 0 var(--border-color);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: var(--space-2);
   flex: 1;
-  min-width: 0;
 }
 
 /* Avatar keeps a fixed size so the name always starts at the same x. */
 .ranking-row__user > :first-child {
   flex-shrink: 0;
+  align-self: center;
 }
 
 /* Name + badges. Inline on desktop; stacked (badges below name) on mobile. */
@@ -152,11 +169,80 @@
 
 .ranking-row__match-predictions {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
   padding: var(--space-2) 0 0 var(--space-2);
   border-top: var(--border-width-sm) solid var(--border-color);
   margin-top: var(--space-2);
+  overflow-x: auto;
+}
+
+.ranking-row__predictions-scroll {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Placeholder shown while baked predictions are joined with live match info. */
+.ranking-row__match-predictions--loading {
+  gap: var(--space-2);
+}
+
+.ranking-row__prediction-skeleton {
+  display: block;
+  flex-shrink: 0;
+  width: 64px;
+  height: 24px;
+  background: var(--color-secondary-700);
+  animation: ranking-row-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ranking-row-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.ranking-row__day-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  border-right: var(--border-width-sm) solid var(--border-color);
+  padding-right: var(--space-2);
+}
+
+.ranking-row__day-group:last-child {
+  border-right: none;
+}
+
+.ranking-row__day-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-pixel);
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ranking-row__day-label--done {
+  color: var(--text-tertiary);
+}
+
+.ranking-row__day-check {
+  color: var(--color-success);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.ranking-row__day-bets {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 .ranking-row__match-prediction {
@@ -199,14 +285,103 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Mobile: the row becomes the horizontal scroll container, with the position
-   and predictor (avatar + name) columns frozen to the left via position: sticky
-   while stats and match predictions scroll. Placed last so these rules win over
-   the base .ranking-row__* declarations above when the viewport is small. */
+/* Group-standings & final-four cells: a flag with its predicted finishing slot.
+   Bordered like match-prediction pills and tinted by exact-position correctness. */
+.ranking-row__pos-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 2px;
+  border: var(--border-width-sm) solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.ranking-row__pos-ordinal {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--text-tertiary);
+}
+
+.ranking-row__pos-cell--correct {
+  border-color: var(--color-success);
+}
+
+.ranking-row__pos-cell--correct .ranking-row__pos-ordinal {
+  color: var(--color-success);
+}
+
+.ranking-row__pos-cell--wrong {
+  border-color: var(--color-error);
+  opacity: 0.7;
+}
+
+/* Best-players chips: role label over the predicted player name. */
+.ranking-row__player-chips {
+  gap: var(--space-1);
+}
+
+.ranking-row__player-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px var(--space-2);
+  border: var(--border-width-sm) solid var(--border-color);
+  background: var(--bg-card);
+  white-space: nowrap;
+}
+
+.ranking-row__player-role {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+}
+
+.ranking-row__player-name {
+  font-size: var(--text-xs);
+}
+
+.ranking-row__player-chip--correct {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.ranking-row__player-chip--wrong {
+  border-color: var(--color-error);
+  opacity: 0.7;
+}
+
+/* Desktop/tablet: fix the position, predictor and stats columns to consistent
+   widths so the stat icons line up across every row — whether or not the row
+   has a predictions strip — and let the strip take the remaining width. This
+   mirrors the column consistency the mobile sticky layout already has. */
+@media (min-width: 481px) {
+  .ranking-row__user {
+    flex: 0 0 auto;
+    width: 240px;
+  }
+
+  .ranking-row__stats {
+    flex: 0 0 auto;
+  }
+
+  .ranking-row__match-predictions {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+/* Mobile: tighter layout with narrower sticky columns. Position + predictor
+   columns are sticky at all breakpoints (set at the base above) so they stay
+   visible during row scroll. This media query narrows the column widths for
+   small viewports. Placed last to win over the base declarations. */
 @media (max-width: 480px) {
   .ranking-row {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0;
     padding: var(--space-2) 0;
     overflow-x: auto;
@@ -249,7 +424,7 @@
 
   .ranking-row__stats {
     gap: var(--space-3);
-    padding-left: var(--space-2);
+    padding-inline: var(--space-2);
   }
 
   .ranking-row__name {
@@ -278,6 +453,20 @@
     margin-top: 0;
     border-top: none;
     border-left: var(--border-width-sm) solid var(--border-color);
+  }
+
+  .ranking-row__day-group {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .ranking-row__day-group:not(:last-child)::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: var(--border-width-sm);
+    background: var(--border-color);
+    margin-top: var(--space-1);
   }
 }
 

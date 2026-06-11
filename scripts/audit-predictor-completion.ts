@@ -27,6 +27,7 @@ const EXPECTED = {
 
 interface MissingReport {
   userId: string;
+  email: string;
   predictorId: string;
   predictorName: string;
   missing: {
@@ -39,18 +40,23 @@ interface MissingReport {
   completenessPercent: number;
 }
 
-async function getAllPredictors(): Promise<Array<{ userId: string; predictorId: string; name: string }>> {
-  const predictors: Array<{ userId: string; predictorId: string; name: string }> = [];
+async function getAllPredictors(): Promise<
+  Array<{ userId: string; email: string; predictorId: string; name: string }>
+> {
+  const predictors: Array<{ userId: string; email: string; predictorId: string; name: string }> =
+    [];
 
   const usersSnap = await db.collection('users').get();
 
   for (const userDoc of usersSnap.docs) {
     const userId = userDoc.id;
+    const email = (userDoc.data().email as string | undefined) ?? '';
     const predictorsSnap = await userDoc.ref.collection('predictors').get();
 
     for (const predictorDoc of predictorsSnap.docs) {
       predictors.push({
         userId,
+        email,
         predictorId: predictorDoc.id,
         name: predictorDoc.data().name ?? '(unnamed)',
       });
@@ -103,7 +109,7 @@ async function hasBestPlayersBet(predictorId: string): Promise<boolean> {
 }
 
 async function auditPredictor(
-  predictor: { userId: string; predictorId: string; name: string },
+  predictor: { userId: string; email: string; predictorId: string; name: string },
 ): Promise<MissingReport> {
   const [betsCount, groupBetsCount, hasFinal, hasBest] = await Promise.all([
     getBetsCount(predictor.predictorId),
@@ -123,6 +129,7 @@ async function auditPredictor(
 
   return {
     userId: predictor.userId,
+    email: predictor.email,
     predictorId: predictor.predictorId,
     predictorName: predictor.name,
     missing: {
@@ -172,7 +179,9 @@ function printReport(reports: MissingReport[]): void {
 
   for (const [userId, userReports] of sortedUsers) {
     const userTotalMissing = userReports.reduce((s, r) => s + r.totalMissing, 0);
+    const email = userReports[0]?.email || '(no email)';
     console.log(`👤 USER: ${userId}`);
+    console.log(`   📧 ${email}`);
     console.log(`   Missing ${userTotalMissing} total bets across ${userReports.length} predictor(s):\n`);
 
     for (const report of userReports.sort((a, b) => a.totalMissing - b.totalMissing)) {
@@ -233,11 +242,12 @@ Examples:
   const reports = await Promise.all(predictors.map(auditPredictor));
 
   if (csvMode) {
-    // CSV output: userId,predictorId,predictorName,completenessPercent,betsMissing,groupBetsMissing,missingFinal,missingBest
-    console.log('userId,predictorId,predictorName,completenessPercent,betsMissing,groupBetsMissing,missingFinal,missingBest');
+    // CSV output: userId,email,predictorId,predictorName,completenessPercent,betsMissing,groupBetsMissing,missingFinal,missingBest
+    console.log('userId,email,predictorId,predictorName,completenessPercent,betsMissing,groupBetsMissing,missingFinal,missingBest');
     for (const r of reports.sort((a, b) => a.userId.localeCompare(b.userId))) {
       console.log([
         r.userId,
+        r.email,
         r.predictorId,
         `"${r.predictorName}"`,
         r.completenessPercent,

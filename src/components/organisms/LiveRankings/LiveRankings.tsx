@@ -11,12 +11,32 @@ import {
   useProductTour,
 } from '@organisms/ProductTour';
 import { RankingsTable, type RankingsTableProps } from '@organisms/RankingsTable';
-import { fetchLiveRankings } from '@services/live-data-service';
+import {
+  fetchLiveRankings,
+  fetchMatchInfoMap,
+  fetchPredictionResults,
+} from '@services/live-data-service';
+import { buildMatchdayBets } from '@services/matchday-bets';
+import {
+  buildBestPlayersPrediction,
+  buildFinalPhasePrediction,
+  buildGroupPredictions,
+} from '@services/predictor-predictions';
 
 import './LiveRankings.css';
 
-export interface LiveRankingsProps extends Omit<RankingsTableProps, 'rankings'> {
+/** URL query param that forces the match-predictions strip on for testing in prod. */
+const PREVIEW_PARAM = 'previewRankings';
+
+export interface LiveRankingsProps
+  extends Omit<RankingsTableProps, 'rankings' | 'showMatchPredictions'> {
   initialRankings: RankingsTableProps['rankings'];
+  /**
+   * Tournament start as an ISO string. The per-day match-predictions strip stays
+   * hidden until this moment passes. Override for prod testing with the
+   * `?previewRankings=1` query param. Omitted → treated as not started yet.
+   */
+  tournamentStartDate?: string;
   /** i18n strings for the guided tour. Falls back to English when omitted. */
   tour?: Partial<RankingsTourTranslations> & {
     buttonLabel?: string;
@@ -66,9 +86,27 @@ const DEFAULT_TOUR: RankingsTourTranslations = {
     "Each pair of flags is one of today's matches with the score you predicted. Green = exact, yellow = winner, red = miss.",
 };
 
-export const LiveRankings: FC<LiveRankingsProps> = ({ initialRankings, tour, ...rest }) => {
+export const LiveRankings: FC<LiveRankingsProps> = ({
+  initialRankings,
+  tournamentStartDate,
+  tour,
+  locale = 'en',
+  ...rest
+}) => {
   const [rankings, setRankings] = useState<RankingsTableProps['rankings']>(initialRankings);
   const [loading, setLoading] = useState(false);
+
+  // Gate the match-predictions strip until the tournament starts. Resolved in an
+  // effect (not during render) so the SSG build always emits the "hidden" markup
+  // and there's no hydration mismatch; the override query param is window-only.
+  const [showMatchPredictions, setShowMatchPredictions] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const override = params.get(PREVIEW_PARAM) === '1' || params.get(PREVIEW_PARAM) === 'true';
+    const started =
+      !!tournamentStartDate && Date.now() >= new Date(tournamentStartDate).getTime();
+    setShowMatchPredictions(started || override);
+  }, [tournamentStartDate]);
 
   const tourSteps = useMemo(() => buildRankingsTour({ ...DEFAULT_TOUR, ...tour }), [tour]);
 
@@ -86,10 +124,44 @@ export const LiveRankings: FC<LiveRankingsProps> = ({ initialRankings, tour, ...
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetchLiveRankings(100)
-      .then((data) => {
+    // Fetch fresh stats, live match info, and live results in parallel, then
+    // join the baked predictions (from the build-time initialRankings) with the
+    // live results to produce the colored views each row renders.
+    Promise.all([fetchLiveRankings(), fetchMatchInfoMap(), fetchPredictionResults()])
+      .then(([liveRows, matchInfo, results]) => {
         if (cancelled) return;
-        if (data.length > 0) setRankings(data);
+
+        // The baked predictions only exist on initialRankings (the static page);
+        // the live stats rows carry none, so index them by predictorId.
+        const baked = new Map(
+          initialRankings.filter((r) => r.predictorId).map((r) => [r.predictorId as string, r]),
+        );
+
+        const base = liveRows.length > 0 ? liveRows : initialRankings;
+        const enriched = base.map((row) => {
+          const src = (row.predictorId && baked.get(row.predictorId)) || row;
+          const matchBets = src.predictedBets;
+          return {
+            ...row,
+            // Preserve the baked predictions so the per-row loading flag and any
+            // later re-join keep working on the live rows too.
+            predictedBets: matchBets,
+            predictedGroups: src.predictedGroups,
+            predictedFinalPhase: src.predictedFinalPhase,
+            predictedBestPlayers: src.predictedBestPlayers,
+            todayMatchBets:
+              matchInfo.size > 0 && row.predictorId && matchBets
+                ? buildMatchdayBets(matchBets, matchInfo, locale)
+                : row.todayMatchBets,
+            groupPredictions: src.predictedGroups
+              ? buildGroupPredictions(src.predictedGroups, results, locale)
+              : undefined,
+            finalPhasePrediction: buildFinalPhasePrediction(src.predictedFinalPhase, results),
+            bestPlayersPrediction: buildBestPlayersPrediction(src.predictedBestPlayers, results),
+          };
+        });
+
+        setRankings(enriched);
         setLoading(false);
       })
       .catch(() => {
@@ -99,7 +171,7 @@ export const LiveRankings: FC<LiveRankingsProps> = ({ initialRankings, tour, ...
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialRankings, locale]);
 
   // Auto-start the tour once the leaderboard has rendered and its target
   // elements are in the DOM. Steps whose targets are missing (e.g. no
@@ -133,7 +205,13 @@ export const LiveRankings: FC<LiveRankingsProps> = ({ initialRankings, tour, ...
           </span>
         </Button>
       </header>
-      <RankingsTable rankings={rankings} {...rest} />
+      <RankingsTable
+        rankings={rankings}
+        showMatchPredictions={showMatchPredictions}
+        predictionsLoading={showMatchPredictions && loading}
+        locale={locale}
+        {...rest}
+      />
     </div>
   );
 };

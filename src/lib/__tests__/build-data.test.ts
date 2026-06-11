@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { DbClient, QueryOptions, RowDoc } from '../build-data';
-import { queryBuildRankings } from '../build-data';
+import { groupPredictedBets, queryBuildRankings } from '../build-data';
 
 interface DocStub {
   id: string;
@@ -152,5 +152,56 @@ describe('queryBuildRankings', () => {
 
     const rankings = await queryBuildRankings(db);
     expect(rankings.map((r) => r.predictorId)).toEqual(['p2', 'p3', 'p1']);
+  });
+});
+
+describe('groupPredictedBets', () => {
+  it('groups predicted scores by predictorId, keeping only ranked predictors', () => {
+    const bets = [
+      { predictorId: 'p1', matchId: 'm1', homeScore: 2, awayScore: 1 },
+      { predictorId: 'p1', matchId: 'm2', homeScore: 0, awayScore: 0 },
+      { predictorId: 'p2', matchId: 'm1', homeScore: 1, awayScore: 1 },
+      { predictorId: 'p9', matchId: 'm1', homeScore: 3, awayScore: 0 }, // not ranked
+    ];
+    const result = groupPredictedBets(bets, new Set(['p1', 'p2']));
+
+    expect(result.get('p1')).toEqual([
+      { matchId: 'm1', homeScore: 2, awayScore: 1 },
+      { matchId: 'm2', homeScore: 0, awayScore: 0 },
+    ]);
+    expect(result.get('p2')).toEqual([{ matchId: 'm1', homeScore: 1, awayScore: 1 }]);
+    expect(result.has('p9')).toBe(false);
+  });
+
+  it('skips malformed bet docs (missing ids or non-numeric scores)', () => {
+    const bets = [
+      { predictorId: 'p1', matchId: 'm1', homeScore: 2, awayScore: 1 },
+      { matchId: 'm2', homeScore: 1, awayScore: 0 }, // no predictorId
+      { predictorId: 'p1', homeScore: 1, awayScore: 0 }, // no matchId
+      { predictorId: 'p1', matchId: 'm3', homeScore: undefined, awayScore: 0 }, // bad score
+    ];
+    const result = groupPredictedBets(bets, new Set(['p1']));
+    expect(result.get('p1')).toEqual([{ matchId: 'm1', homeScore: 2, awayScore: 1 }]);
+  });
+});
+
+describe('queryBuildRankings — no top-N cap', () => {
+  it('returns every predictor, not just the first 100', async () => {
+    const count = 150;
+    const predictors: DocStub[] = Array.from({ length: count }, (_, i) =>
+      makeSnap(`users/u1/predictors/p${i}`, {}),
+    );
+    const stats: DocStub[] = Array.from({ length: count }, (_, i) =>
+      makeSnap(`users/u1/predictors/p${i}/stats`, {
+        totalPoints: i,
+        accuracy: 0.5,
+        currentStreak: 0,
+        exactBets: 0,
+      }),
+    );
+    const db = makeDb(predictors, stats);
+
+    const rankings = await queryBuildRankings(db);
+    expect(rankings).toHaveLength(count);
   });
 });
