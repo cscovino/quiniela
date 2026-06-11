@@ -127,6 +127,11 @@
   --color-error-bg: #2e0a0a;
   --color-error-border: #d32f2f;
 
+  /* Semantic - Partial (Orange for correct-winner, wrong-score predictions) */
+  --color-partial: #ffa726;
+  --color-partial-bg: #2e1f0a;
+  --color-partial-border: #fb8c00;
+
   /* Semantic - Warning (Orange for deadlines) */
   --color-warning: #ff9800;
   --color-warning-bg: #2e1f0a;
@@ -263,6 +268,11 @@
   --color-error: #d32f2f;
   --color-error-bg: #ffebee;
   --color-error-border: #ff5252;
+
+  /* Semantic - Partial (Orange for correct-winner, wrong-score predictions) */
+  --color-partial: #f57c00;
+  --color-partial-bg: #fff3e0;
+  --color-partial-border: #fb8c00;
 
   /* Semantic - Warning */
   --color-warning: #e65100;

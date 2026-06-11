@@ -266,11 +266,10 @@
 }
 
 .ranking-row__match-prediction--partial {
-  /* A clear, bright orange. The themed --color-warning (#e65100 in light mode)
-     is a burnt orange that reads too close to the error red, making "correct
-     winner, wrong score" look like a miss. */
-  border-color: #f57c00;
-  color: #f57c00;
+  /* Dedicated "partial" orange — distinct from --color-warning (deadlines),
+     which is a burnt orange too close to the error red. */
+  border-color: var(--color-partial);
+  color: var(--color-partial);
 }
 
 .ranking-row__match-prediction--wrong {
