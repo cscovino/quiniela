@@ -64,18 +64,27 @@ export interface RankingRowProps {
   isFirst?: boolean;
 }
 
-function groupBetsByDay(bets: TodayMatchBet[]): { date: string; label: string; finished: boolean; bets: TodayMatchBet[] }[] {
-  const groups = new Map<string, { date: string; label: string; finished: boolean; bets: TodayMatchBet[] }>();
+function groupBetsByDay(
+  bets: TodayMatchBet[],
+): { date: string; label: string; finished: boolean; bets: TodayMatchBet[] }[] {
+  const groups = new Map<
+    string,
+    { date: string; label: string; finished: boolean; bets: TodayMatchBet[] }
+  >();
   for (const bet of bets) {
     const key = bet.date || 'other';
-    const existing = groups.get(key) || { date: key, label: bet.dayLabel || key, finished: true, bets: [] };
+    const existing = groups.get(key) || {
+      date: key,
+      label: bet.dayLabel || key,
+      finished: true,
+      bets: [],
+    };
     existing.bets.push(bet);
     if (bet.status !== 'finished') existing.finished = false;
     groups.set(key, existing);
   }
-  return Array.from(groups.values())
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .sort((a, b) => (a.finished === b.finished ? 0 : a.finished ? 1 : -1));
+  // Strict chronological order regardless of whether a matchday has finished.
+  return Array.from(groups.values()).sort((a, b) => a.date.localeCompare(b.date));
 }
 
 function renderPrediction(bet: TodayMatchBet): ReactNode {

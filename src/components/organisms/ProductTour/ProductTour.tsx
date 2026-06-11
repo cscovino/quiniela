@@ -128,7 +128,18 @@ export function useProductTour({
       progressText: buttons?.progress,
       onHighlightStarted: (element) => {
         if (!element) return;
-        element.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        // The default scrollIntoView aligns the target to the very top of the
+        // viewport, which lands it behind the sticky `.nav-bar` and throws off
+        // the highlight/popover. Scroll with an offset for the header height so
+        // the element clears it. driver.js re-syncs the stage on the resulting
+        // scroll event.
+        const nav = document.querySelector('.nav-bar');
+        const offset = (nav instanceof HTMLElement ? nav.offsetHeight : 0) + 16;
+        const rect = element.getBoundingClientRect();
+        if (rect.top < offset || rect.bottom > window.innerHeight) {
+          const top = Math.max(0, window.scrollY + rect.top - offset);
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
       },
       onCloseClick: () => {
         driverRef.current?.destroy();
