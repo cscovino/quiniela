@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions/v1';
 
+import { recomputePredictorTotals } from './recomputePredictorTotals';
 import { doRecomputeRanks } from './recomputeRanks';
 import { SCORING } from './scoring';
 
@@ -104,6 +105,27 @@ export const calculateGroupResults = functions.firestore
       return null;
     }
 
+    // Guard 3: only score once the ENTIRE group stage is complete. Otherwise we
+    // would lock in points against a partial table (e.g. after a single match,
+    // standings list only the teams that have played). We return WITHOUT setting
+    // pointsCalculated so the next standings update (when the final group match
+    // finishes) re-evaluates and scores against the full table.
+    const groupMatchesSnap = await db
+      .collection(`tournaments/${tournamentId}/matches`)
+      .where('groupId', '==', groupId)
+      .get();
+    const totalGroupMatches = groupMatchesSnap.size;
+    const finishedGroupMatches = groupMatchesSnap.docs.filter(
+      (d) => (d.data() as { status?: string }).status === 'finished',
+    ).length;
+
+    if (totalGroupMatches === 0 || finishedGroupMatches < totalGroupMatches) {
+      functions.logger.log(
+        `[calculateGroupResults] Group ${groupId} not complete (${finishedGroupMatches}/${totalGroupMatches} matches finished) — deferring scoring`,
+      );
+      return null;
+    }
+
     functions.logger.log(
       `[calculateGroupResults] Scoring group bets for ${tournamentId}/${groupId} — ${standings.length} teams (top: ${standings
         .slice(0, 4)
@@ -141,6 +163,9 @@ export const calculateGroupResults = functions.firestore
 
       batch.update(betDoc.ref, {
         points,
+        // Persisted so groupQualified can be DERIVED (summed) idempotently,
+        // rather than incremented per group-scoring event.
+        exactQualified,
         scoredAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       });
@@ -169,20 +194,9 @@ export const calculateGroupResults = functions.firestore
 
     // Update predictor stats for each affected predictor
     for (const [predictorId, score] of predictorScores) {
-      const statsRef = db
-        .collection(`users/${score.userId}/predictors/${predictorId}/stats`)
-        .doc(tournamentId);
-
-      await statsRef.set(
-        {
-          totalPoints: FieldValue.increment(score.points),
-          groupQualified: FieldValue.increment(score.exactQualified),
-          lastUpdated: FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
+      const derived = await recomputePredictorTotals(score.userId, predictorId, tournamentId);
       functions.logger.log(
-        `[calculateGroupResults] Updated stats for predictor ${predictorId}: +${score.points} pts, +${score.exactQualified} qualified`,
+        `[calculateGroupResults] Recomputed stats for predictor ${predictorId}: totalPoints=${derived.totalPoints} (group=${derived.groupPoints}, qualified=${derived.groupQualified})`,
       );
     }
 

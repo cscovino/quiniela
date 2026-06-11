@@ -2,6 +2,8 @@ import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions/v1';
 
+import { recomputePredictorTotals } from './recomputePredictorTotals';
+
 const db = admin.firestore();
 
 interface BetData {
@@ -208,7 +210,6 @@ export const updatePredictorStats = functions.firestore
       {
         predictorId,
         tournamentId,
-        totalPoints: computed.totalPoints,
         exactBets: computed.exactBets,
         winnerBets: computed.winnerBets,
         totalBets: computed.totalBets,
@@ -223,8 +224,14 @@ export const updatePredictorStats = functions.firestore
       { merge: true },
     );
 
+    // Derive totalPoints (and per-category subtotals) from all bet collections.
+    // Owned solely by recomputePredictorTotals so the value stays idempotent
+    // and accounts for group/knockout/final-four/best-player points too — not
+    // just the match bets this trigger recomputes above.
+    const derived = await recomputePredictorTotals(userId, predictorId, tournamentId);
+
     functions.logger.log(
-      `[updatePredictorStats] SUCCESS: Updated ${statsRef.path} with ${computed.totalPoints}pts, ${computed.exactBets} exact, ${computed.winnerBets} winner, accuracy=${computed.accuracy.toFixed(3)}`,
+      `[updatePredictorStats] SUCCESS: Updated ${statsRef.path} with ${derived.totalPoints}pts total (${derived.matchPoints} match), ${computed.exactBets} exact, ${computed.winnerBets} winner, accuracy=${computed.accuracy.toFixed(3)}`,
     );
 
     return null;

@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions/v1';
 
+import { recomputePredictorTotals } from './recomputePredictorTotals';
 import { SCORING } from './scoring';
 
 const db = admin.firestore();
@@ -149,18 +150,9 @@ export const calculateKnockoutResults = functions.firestore
     );
 
     for (const [predictorId, score] of predictorScores) {
-      const statsRef = db
-        .collection(`users/${score.userId}/predictors/${predictorId}/stats`)
-        .doc(tournamentId);
-      await statsRef.set(
-        {
-          totalPoints: FieldValue.increment(score.points),
-          lastUpdated: FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
+      const derived = await recomputePredictorTotals(score.userId, predictorId, tournamentId);
       functions.logger.log(
-        `[calculateKnockoutResults] Updated stats for predictor ${predictorId}: +${score.points} pts`,
+        `[calculateKnockoutResults] Recomputed stats for predictor ${predictorId}: totalPoints=${derived.totalPoints} (knockout=${derived.knockoutPoints})`,
       );
     }
 

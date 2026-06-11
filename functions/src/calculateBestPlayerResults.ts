@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions/v1';
 
+import { recomputePredictorTotals } from './recomputePredictorTotals';
 import { doRecomputeRanks } from './recomputeRanks';
 import { SCORING } from './scoring';
 
@@ -172,19 +173,9 @@ export const calculateBestPlayerResults = functions.firestore
 
     // Update predictor stats for each affected predictor
     for (const [predictorId, score] of predictorScores) {
-      const statsRef = db
-        .collection(`users/${score.userId}/predictors/${predictorId}/stats`)
-        .doc(tournamentId);
-
-      await statsRef.set(
-        {
-          totalPoints: FieldValue.increment(score.points),
-          lastUpdated: FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
+      const derived = await recomputePredictorTotals(score.userId, predictorId, tournamentId);
       functions.logger.log(
-        `[calculateBestPlayerResults] Updated stats for predictor ${predictorId}: +${score.points} pts`,
+        `[calculateBestPlayerResults] Recomputed stats for predictor ${predictorId}: totalPoints=${derived.totalPoints} (bestPlayer=${derived.bestPlayerPoints})`,
       );
     }
 

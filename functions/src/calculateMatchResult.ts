@@ -141,5 +141,9 @@ export const calculateMatchResult = functions.firestore
       `[calculateMatchResult] Committing batch: ${betsSnapshot.size} bets updated for match ${matchId}`,
     );
 
+    // Stats are NOT updated here. Each bet's points change fires
+    // updatePredictorStats, which derives totalPoints from all bet collections
+    // (idempotent). Incrementing here would double-count on function retries.
+
     return null;
   });

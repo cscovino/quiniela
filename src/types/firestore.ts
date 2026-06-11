@@ -201,6 +201,13 @@ export interface PredictorStats {
   lastRankUpdate?: Timestamp;
   lastUpdated: Timestamp;
   groupQualified?: number;
+  // Per-category subtotals that sum into totalPoints. Derived (set absolutely)
+  // by recomputePredictorTotals so totalPoints stays idempotent.
+  matchPoints?: number;
+  groupPoints?: number;
+  knockoutPoints?: number;
+  finalFourPoints?: number;
+  bestPlayerPoints?: number;
 }
 
 export interface Notification {
