@@ -29,6 +29,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "seed": "tsx --env-file=.env scripts/seed-tournament.ts",
+    "fix-badges": "tsx --env-file=.env scripts/fix-badges.ts",
+    "fix-badges:dry-run": "tsx --env-file=.env scripts/fix-badges.ts --dry-run",
     "set-admin": "tsx --env-file=.env scripts/set-admin-role.ts",
     "sync-displayname": "tsx --env-file=.env scripts/sync-user-displayname.ts",
     "migrate:knockout": "tsx --env-file=.env scripts/migrate-knockout-schedule.ts",
@@ -47,6 +49,11 @@
     "migrate:schedule:execute": "tsx --env-file=.env scripts/migrate-match-schedule.ts --execute",
     "audit:completion": "tsx --env-file=.env scripts/audit-predictor-completion.ts",
     "audit:completion:csv": "tsx --env-file=.env scripts/audit-predictor-completion.ts --csv",
+    "predictors:deleted": "tsx --env-file=.env scripts/fetch-soft-deleted-predictors.ts",
+    "predictors:deleted:csv": "tsx --env-file=.env scripts/fetch-soft-deleted-predictors.ts --csv",
+    "set:best-player-bet": "tsx --env-file=.env scripts/set-best-player-bet.ts --",
+    "verify:group-bets": "tsx --env-file=.env scripts/verify-group-bets.ts --",
+    "set:predictor-predictions": "tsx --env-file=.env scripts/set-predictor-predictions.ts --",
     "prepare": "husky"
   },
   "lint-staged": {

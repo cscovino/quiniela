@@ -27,9 +27,10 @@ export interface RankingRowProps {
   pixelArt?: { seed: string; options: AvatarOptions } | null;
   displayName: string;
   points: number;
-  todayPoints?: number;
   accuracy: number;
   streak: number;
+  exactMatches?: number;
+  bestStreak?: number;
   badges?: Record<string, string>;
   rankChange?: 'up' | 'down' | 'same';
   todayMatchBets?: TodayMatchBet[];
@@ -57,6 +58,11 @@ export interface RankingRowProps {
    */
   predictionsLoading?: boolean;
   /**
+   * Shows skeleton placeholders for the stats (points, accuracy, streak) while
+   * data is being loaded. Defaults to false.
+   */
+  pointsLoading?: boolean;
+  /**
    * Marks this row as the top-of-list row used as a tour target. When true, the
    * row's sub-elements expose `data-tour` hooks that the product tour uses to
    * highlight each column. Defaults to false.
@@ -83,8 +89,28 @@ function groupBetsByDay(
     if (bet.status !== 'finished') existing.finished = false;
     groups.set(key, existing);
   }
-  // Strict chronological order regardless of whether a matchday has finished.
-  return Array.from(groups.values()).sort((a, b) => a.date.localeCompare(b.date));
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  return Array.from(groups.values()).sort((a, b) => {
+    const aIsToday = a.date === today;
+    const bIsToday = b.date === today;
+    const aIsPast = a.date < today;
+    const bIsPast = b.date < today;
+    const aIsFuture = a.date > today;
+    const bIsFuture = b.date > today;
+
+    if (aIsToday && !bIsToday) return -1;
+    if (bIsToday && !aIsToday) return 1;
+
+    if (aIsFuture && bIsPast) return -1;
+    if (bIsFuture && aIsPast) return 1;
+
+    if (aIsFuture && bIsFuture) return a.date.localeCompare(b.date);
+    if (aIsPast && bIsPast) return a.date.localeCompare(b.date);
+
+    return 0;
+  });
 }
 
 function renderPrediction(bet: TodayMatchBet): ReactNode {
@@ -202,19 +228,21 @@ const PODIUM_MEDAL: Record<number, PixelArtName> = {
 // badge names in badges.ts, rather than threaded through the catalog.
 const STAT_LABELS: Record<
   'en' | 'es',
-  { points: string; today: string; accuracy: string; streak: string }
+  { points: string; accuracy: string; streak: string; exactMatches: string; bestStreak: string }
 > = {
   en: {
     points: 'Total points',
-    today: "Today's points",
     accuracy: 'Accuracy',
     streak: 'Current streak',
+    exactMatches: 'Exact matches',
+    bestStreak: 'Best streak',
   },
   es: {
     points: 'Puntos totales',
-    today: 'Puntos de hoy',
     accuracy: 'Precisión',
     streak: 'Racha actual',
+    exactMatches: ' aciertos exactos',
+    bestStreak: 'Mejor racha',
   },
 };
 
@@ -233,9 +261,10 @@ export const RankingRow: FC<RankingRowProps> = ({
   pixelArt,
   displayName,
   points,
-  todayPoints,
   accuracy,
   streak,
+  exactMatches,
+  bestStreak,
   badges,
   rankChange,
   todayMatchBets,
@@ -249,6 +278,7 @@ export const RankingRow: FC<RankingRowProps> = ({
   isFirst = false,
   showMatchPredictions = true,
   predictionsLoading = false,
+  pointsLoading = false,
 }) => {
   const statLabels = STAT_LABELS[locale];
   const sectionLabels = SECTION_LABELS[locale];
@@ -321,7 +351,7 @@ export const RankingRow: FC<RankingRowProps> = ({
                   content={getBadgeName(def!.id, locale)}
                   position="top"
                 >
-                  <Icon name={def!.icon} size={12} />
+                  <Icon name={def!.icon} size={18} />
                 </Tooltip>
               ))}
             </div>
@@ -329,48 +359,65 @@ export const RankingRow: FC<RankingRowProps> = ({
         </div>
       </div>
 
-      <div className="ranking-row__stats" data-tour={isFirst ? 'ranking-stats' : undefined}>
-        <Tooltip
-          className="ranking-row__stat"
-          content={statLabels.points}
-          position="top"
-          data-tour={isFirst ? 'ranking-points' : undefined}
-        >
-          <Icon name="star" size={14} />
-          <Typography variant="small">{points}</Typography>
-        </Tooltip>
-        {todayPoints != null && (
-          <Tooltip
-            className="ranking-row__stat ranking-row__stat--today"
-            content={statLabels.today}
-            position="top"
-            data-tour={isFirst ? 'ranking-today' : undefined}
-          >
-            <Icon name="zap" size={14} />
-            <Typography variant="small">+{todayPoints}</Typography>
-          </Tooltip>
-        )}
-        <Tooltip
-          className="ranking-row__stat"
-          content={statLabels.accuracy}
-          position="top"
-          data-tour={isFirst ? 'ranking-accuracy' : undefined}
-        >
-          <Icon name="target" size={14} />
-          <Typography variant="small">{accuracy}%</Typography>
-        </Tooltip>
-        {streak > 0 && (
+      {pointsLoading ? (
+        <div className="ranking-row__stats ranking-row__stats--loading" data-tour={isFirst ? 'ranking-stats' : undefined}>
+          <span className="ranking-row__stat-skeleton" />
+          <span className="ranking-row__stat-skeleton" />
+          <span className="ranking-row__stat-skeleton" />
+        </div>
+      ) : (
+        <div className="ranking-row__stats" data-tour={isFirst ? 'ranking-stats' : undefined}>
           <Tooltip
             className="ranking-row__stat"
-            content={statLabels.streak}
+            content={statLabels.points}
             position="top"
-            data-tour={isFirst ? 'ranking-streak' : undefined}
+            data-tour={isFirst ? 'ranking-points' : undefined}
           >
-            <Icon name="fire" size={14} />
-            <Typography variant="small">{streak}</Typography>
+            <Icon name="star" size={14} />
+            <Typography variant="small">{points}</Typography>
           </Tooltip>
-        )}
-      </div>
+          <Tooltip
+            className="ranking-row__stat"
+            content={statLabels.accuracy}
+            position="top"
+            data-tour={isFirst ? 'ranking-accuracy' : undefined}
+          >
+            <Icon name="target" size={14} />
+            <Typography variant="small">{accuracy}%</Typography>
+          </Tooltip>
+          {streak > 0 && (
+            <Tooltip
+              className="ranking-row__stat"
+              content={statLabels.streak}
+              position="top"
+              data-tour={isFirst ? 'ranking-streak' : undefined}
+            >
+              <Icon name="fire" size={14} />
+              <Typography variant="small">{streak}</Typography>
+            </Tooltip>
+          )}
+          {exactMatches != null && exactMatches > 0 && (
+            <Tooltip
+              className="ranking-row__stat"
+              content={statLabels.exactMatches}
+              position="top"
+            >
+              <Icon name="check" size={14} />
+              <Typography variant="small">{exactMatches}</Typography>
+            </Tooltip>
+          )}
+          {bestStreak != null && bestStreak > 0 && (
+            <Tooltip
+              className="ranking-row__stat"
+              content={statLabels.bestStreak}
+              position="top"
+            >
+              <Icon name="trophy" size={14} />
+              <Typography variant="small">{bestStreak}</Typography>
+            </Tooltip>
+          )}
+        </div>
+      )}
 
       {showMatchPredictions && predictionsLoading && (
         <div

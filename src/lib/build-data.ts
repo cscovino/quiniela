@@ -57,6 +57,7 @@ interface PredictorStatsData {
   totalPoints: number;
   accuracy: number;
   currentStreak: number;
+  maxStreak: number;
   exactBets: number;
   predictorId: string;
 }
@@ -399,11 +400,26 @@ export async function queryBuildRankings(db: DbClient) {
     db.collectionGroup('stats'),
   ]);
 
+  const activePredictors = new Map<string, { userId: string; predictorId: string }>();
+  const deletedKeys = new Set<string>();
+  predictorsSnap.forEach((doc) => {
+    const data = doc.data() as { deletedAt?: unknown };
+    const refPath = (doc as unknown as { ref: { path: string } }).ref.path;
+    const pathParts = refPath.split('/');
+    const userId = pathParts[1];
+    const predictorId = pathParts[3];
+    const key = `${userId}/${predictorId}`;
+    if (data.deletedAt == null) {
+      activePredictors.set(key, { userId, predictorId });
+    } else {
+      deletedKeys.add(key);
+    }
+  });
+
   const statsByKey = new Map<
     string,
     PredictorStatsData & { userId: string; predictorId: string }
   >();
-  const predictorsByKey = new Map<string, { userId: string; predictorId: string }>();
 
   statsSnap.forEach((doc) => {
     const refPath = (doc as unknown as { ref: { path: string } }).ref.path;
@@ -417,20 +433,12 @@ export async function queryBuildRankings(db: DbClient) {
     });
   });
 
-  predictorsSnap.forEach((doc) => {
-    const refPath = (doc as unknown as { ref: { path: string } }).ref.path;
-    const pathParts = refPath.split('/');
-    const userId = pathParts[1];
-    const predictorId = pathParts[3];
-    predictorsByKey.set(`${userId}/${predictorId}`, { userId, predictorId });
-  });
-
-  // Merge: predictors with stats get the stats, predictors without stats
+  // Merge: active predictors with stats get the stats, predictors without stats
   // get a zero-points entry. Also include any stats whose predictor doc
   // is missing (orphaned) — they still represent a participant.
   const merged: Array<PredictorStatsData & { userId: string; predictorId: string }> = [];
   const seen = new Set<string>();
-  for (const [key, meta] of predictorsByKey) {
+  for (const [key, meta] of activePredictors) {
     seen.add(key);
     const stats = statsByKey.get(key);
     if (stats) {
@@ -442,12 +450,13 @@ export async function queryBuildRankings(db: DbClient) {
         totalPoints: 0,
         accuracy: 0,
         currentStreak: 0,
+        maxStreak: 0,
         exactBets: 0,
       });
     }
   }
   for (const [key, stats] of statsByKey) {
-    if (!seen.has(key)) merged.push(stats);
+    if (!seen.has(key) && !deletedKeys.has(key)) merged.push(stats);
   }
 
   const sorted = merged.sort((a, b) => b.totalPoints - a.totalPoints);
@@ -570,6 +579,8 @@ export async function queryBuildRankings(db: DbClient) {
       points: s.totalPoints,
       accuracy: Math.round(s.accuracy * 100),
       streak: s.currentStreak,
+      exactMatches: s.exactBets,
+      bestStreak: s.maxStreak,
       predictedBets: predictedByPredictor.get(s.predictorId),
       predictedGroups: groupsByPredictor.get(s.predictorId),
       predictedFinalPhase: finalPhaseByPredictor.get(s.predictorId),

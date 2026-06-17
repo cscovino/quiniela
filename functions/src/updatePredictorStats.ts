@@ -17,11 +17,12 @@ interface BetData {
 
 interface MatchStatusData {
   status: string;
+  date?: admin.firestore.Timestamp;
 }
 
 export function computeStatsFromBets(
   bets: BetData[],
-  matchStatuses: Map<string, string>,
+  matchStatuses: Map<string, MatchStatusData>,
 ): {
   totalPoints: number;
   exactBets: number;
@@ -31,6 +32,8 @@ export function computeStatsFromBets(
   accuracy: number;
   currentStreak: number;
   maxStreak: number;
+  exactStreak: number;
+  maxExactStreak: number;
   pointsHistory: { points: number; matchId: string }[];
 } {
   let totalPoints = 0;
@@ -41,19 +44,32 @@ export function computeStatsFromBets(
   let currentStreak = 0;
   let maxStreak = 0;
   let tempStreak = 0;
+  let exactStreak = 0;
+  let maxExactStreak = 0;
+  let tempExactStreak = 0;
   const pointsHistory: { points: number; matchId: string }[] = [];
+
+  const finishedBetsWithDate: Array<{ date: Date; isExact: boolean; isWinner: boolean; points: number; matchId: string }> = [];
 
   for (const data of bets) {
     totalBets += 1;
     totalPoints += data.points;
 
     const matchStatus = matchStatuses.get(data.matchId);
-    const isFinished = matchStatus === 'finished';
+    const isFinished = matchStatus?.status === 'finished';
 
     if (isFinished) {
       finishedBets += 1;
       if (data.isExact) exactBets += 1;
       if (data.isWinner) winnerBets += 1;
+      const matchDate = matchStatus?.date;
+      finishedBetsWithDate.push({
+        date: matchDate?.toDate() ?? new Date(0),
+        isExact: data.isExact,
+        isWinner: data.isWinner,
+        points: data.points,
+        matchId: data.matchId,
+      });
     }
 
     if (data.points > 0) {
@@ -75,6 +91,20 @@ export function computeStatsFromBets(
     }
   }
 
+  finishedBetsWithDate.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  for (const fb of finishedBetsWithDate) {
+    if (fb.isExact) {
+      tempExactStreak += 1;
+      if (tempExactStreak > maxExactStreak) {
+        maxExactStreak = tempExactStreak;
+      }
+    } else {
+      tempExactStreak = 0;
+    }
+    exactStreak = tempExactStreak;
+  }
+
   const accuracy = finishedBets > 0 ? winnerBets / finishedBets : 0;
 
   return {
@@ -86,6 +116,8 @@ export function computeStatsFromBets(
     accuracy,
     currentStreak,
     maxStreak,
+    exactStreak,
+    maxExactStreak,
     pointsHistory,
   };
 }
@@ -101,6 +133,8 @@ interface PredictorStatsData {
   accuracy: number;
   currentStreak: number;
   maxStreak: number;
+  exactStreak: number;
+  maxExactStreak: number;
   pointsHistory: { timestamp: admin.firestore.Timestamp; points: number; matchId: string }[];
   badgesAwarded: Record<string, string>;
   lastUpdated: admin.firestore.Timestamp;
@@ -152,7 +186,7 @@ export const updatePredictorStats = functions.firestore
 
     // Fetch match statuses to calculate accuracy against finished matches only
     const matchIds = [...new Set(bets.map((b) => b.matchId))];
-    const matchStatuses = new Map<string, string>();
+    const matchStatuses = new Map<string, MatchStatusData>();
     if (matchIds.length > 0) {
       const batchSize = 30;
       for (let i = 0; i < matchIds.length; i += batchSize) {
@@ -163,7 +197,7 @@ export const updatePredictorStats = functions.firestore
           .get();
         matchesSnapshot.forEach((doc) => {
           const data = doc.data() as MatchStatusData;
-          matchStatuses.set(doc.id, data.status);
+          matchStatuses.set(doc.id, data);
         });
       }
       functions.logger.log(
@@ -217,6 +251,8 @@ export const updatePredictorStats = functions.firestore
         accuracy: computed.accuracy,
         currentStreak: computed.currentStreak,
         maxStreak: computed.maxStreak,
+        exactStreak: computed.exactStreak,
+        maxExactStreak: computed.maxExactStreak,
         pointsHistory,
         badgesAwarded: existingBadges,
         lastUpdated: FieldValue.serverTimestamp(),

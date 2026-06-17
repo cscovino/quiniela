@@ -352,37 +352,22 @@ export async function fetchLiveRankings(): Promise<RankingEntry[]> {
 
   const prevRankings = loadPreviousRankings();
 
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayEnd = new Date(todayStart);
-  todayEnd.setDate(todayEnd.getDate() + 1);
-
-  const entries: RankingEntry[] = sorted.map((s, index) => {
-    const todayPoints =
-      s.pointsHistory?.reduce((sum, entry) => {
-        const entryDate = new Date(entry.timestamp);
-        if (entryDate >= todayStart && entryDate < todayEnd) {
-          return sum + entry.points;
-        }
-        return sum;
-      }, 0) ?? undefined;
-
-    return {
-      userId: s.userId,
-      predictorId: s.predictorId,
-      displayName: s.displayName || s.predictorId,
-      avatarUrl: s.avatarUrl || undefined,
-      avatar: s.avatar || undefined,
-      pixelArt: s.pixelArt ?? undefined,
-      favouriteTeamId: s.favouriteTeamId ?? undefined,
-      points: s.totalPoints,
-      todayPoints,
-      accuracy: Math.round(s.accuracy * 100),
-      streak: s.currentStreak,
-      badges: s.badgesAwarded ?? undefined,
-      rankChange: computeRankChange(index, s.predictorId, prevRankings),
-    };
-  });
+  const entries: RankingEntry[] = sorted.map((s, index) => ({
+    userId: s.userId,
+    predictorId: s.predictorId,
+    displayName: s.displayName || s.predictorId,
+    avatarUrl: s.avatarUrl || undefined,
+    avatar: s.avatar || undefined,
+    pixelArt: s.pixelArt ?? undefined,
+    favouriteTeamId: s.favouriteTeamId ?? undefined,
+    points: s.totalPoints,
+    accuracy: Math.round(s.accuracy * 100),
+    streak: s.currentStreak,
+    exactMatches: s.exactBets,
+    bestStreak: s.maxStreak,
+    badges: s.badgesAwarded ?? undefined,
+    rankChange: computeRankChange(index, s.predictorId, prevRankings),
+  }));
 
   // Map over `sorted` (ApiRankingEntry, predictorId is required) rather than `entries`
   // (view model, predictorId optional) — 1:1 in order, so positions are identical.

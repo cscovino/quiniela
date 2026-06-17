@@ -12,9 +12,19 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   {
     id: 'first-blood',
     name: { en: 'First Blood', es: 'Primera Sangre' },
-    description: { en: 'Made your first prediction', es: 'Hiciste tu primera predicción exacta' },
+    description: { en: 'Made your first prediction', es: 'Hiciste tu primera predicción' },
     icon: 'sword',
     condition: { en: 'Make 1 exact prediction', es: 'Haz 1 predicción exacta' },
+  },
+  {
+    id: 'back-to-back',
+    name: { en: 'Back to Back', es: 'Dos de Seguido' },
+    description: { en: '2 exact predictions in a row', es: '2 predicciones exactas seguidas' },
+    icon: 'zap',
+    condition: {
+      en: 'Get 2 exact predictions in a row',
+      es: 'Acierta 2 predicciones exactas seguidas',
+    },
   },
   {
     id: 'on-fire',
@@ -27,18 +37,32 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     },
   },
   {
+    id: 'perfectionist',
+    name: { en: 'Perfectionist', es: 'Perfeccionista' },
+    description: { en: '5 exact predictions total', es: '5 predicciones exactas en total' },
+    icon: 'star',
+    condition: { en: 'Get 5 exact predictions', es: 'Acierta 5 predicciones exactas' },
+  },
+  {
     id: 'consistent',
     name: { en: 'Consistent', es: 'Consistente' },
-    description: { en: '20+ correct predictions total', es: '20+ predicciones correctas en total' },
+    description: { en: '20 correct predictions total', es: '20 predicciones correctas en total' },
     icon: 'target',
     condition: { en: 'Get 20 correct predictions', es: 'Acierta 20 predicciones' },
   },
   {
+    id: 'almost-perfect',
+    name: { en: 'Almost Perfect', es: 'Casi Perfecto' },
+    description: { en: '12 correct predictions total', es: '12 predicciones correctas en total' },
+    icon: 'target',
+    condition: { en: 'Get 12 correct predictions', es: 'Acierta 12 predicciones' },
+  },
+  {
     id: 'top-10',
-    name: { en: 'Top 10', es: 'Top 10' },
-    description: { en: 'Reached top 10% of the ranking', es: 'Llegaste al top 10% del ranking' },
+    name: { en: 'Top 5', es: 'Top 5' },
+    description: { en: 'Reached top 5% of the ranking', es: 'Llegaste al top 5% del ranking' },
     icon: 'award',
-    condition: { en: 'Be in the top 10% of the ranking', es: 'Estar en el top 10% del ranking' },
+    condition: { en: 'Be in the top 5% of the ranking', es: 'Estar en el top 5% del ranking' },
   },
   {
     id: 'perfect-group',

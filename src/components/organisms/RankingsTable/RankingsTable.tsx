@@ -39,9 +39,10 @@ export interface RankingEntry {
   pixelArt?: { seed: string; options: AvatarOptions } | null;
   displayName: string;
   points: number;
-  todayPoints?: number;
   accuracy: number;
   streak: number;
+  exactMatches?: number;
+  bestStreak?: number;
   badges?: Record<string, string>;
   rankChange?: 'up' | 'down' | 'same';
   todayMatchBets?: TodayMatchBet[];
@@ -102,6 +103,11 @@ export interface RankingsTableProps {
    * false.
    */
   predictionsLoading?: boolean;
+  /**
+   * Shows skeleton placeholders for the stats (points, accuracy, streak) in each
+   * row while data is being loaded. Defaults to false.
+   */
+  pointsLoading?: boolean;
 }
 
 export const RankingsTable: FC<RankingsTableProps> = ({
@@ -119,6 +125,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
   className = '',
   showMatchPredictions = true,
   predictionsLoading = false,
+  pointsLoading = false,
 }) => {
   if (rankings.length === 0) {
     return (
@@ -142,9 +149,10 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             pixelArt={entry.pixelArt}
             displayName={entry.displayName}
             points={entry.points}
-            todayPoints={entry.todayPoints}
             accuracy={entry.accuracy}
             streak={entry.streak}
+            exactMatches={entry.exactMatches}
+            bestStreak={entry.bestStreak}
             badges={entry.badges}
             rankChange={entry.rankChange}
             todayMatchBets={entry.todayMatchBets}
@@ -157,6 +165,7 @@ export const RankingsTable: FC<RankingsTableProps> = ({
             isFirst={index === 0}
             showMatchPredictions={showMatchPredictions}
             predictionsLoading={predictionsLoading && hasBakedPredictions(entry)}
+            pointsLoading={pointsLoading}
           />
         ))}
       </div>

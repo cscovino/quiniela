@@ -95,6 +95,7 @@ export const LiveRankings: FC<LiveRankingsProps> = ({
 }) => {
   const [rankings, setRankings] = useState<RankingsTableProps['rankings']>(initialRankings);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Gate the match-predictions strip until the tournament starts. Resolved in an
   // effect (not during render) so the SSG build always emits the "hidden" markup
@@ -123,7 +124,12 @@ export const LiveRankings: FC<LiveRankingsProps> = ({
 
   useEffect(() => {
     let cancelled = false;
+    // If we already have rankings from SSR, mark as refreshing (not full loading)
+    const hasExistingData = initialRankings.length > 0;
     setLoading(true);
+    if (hasExistingData) {
+      setRefreshing(true);
+    }
     // Fetch fresh stats, live match info, and live results in parallel, then
     // join the baked predictions (from the build-time initialRankings) with the
     // live results to produce the colored views each row renders.
@@ -163,10 +169,12 @@ export const LiveRankings: FC<LiveRankingsProps> = ({
 
         setRankings(enriched);
         setLoading(false);
+        setRefreshing(false);
       })
       .catch(() => {
         if (cancelled) return;
         setLoading(false);
+        setRefreshing(false);
       });
     return () => {
       cancelled = true;
@@ -209,6 +217,7 @@ export const LiveRankings: FC<LiveRankingsProps> = ({
         rankings={rankings}
         showMatchPredictions={showMatchPredictions}
         predictionsLoading={showMatchPredictions && loading}
+        pointsLoading={refreshing}
         locale={locale}
         {...rest}
       />

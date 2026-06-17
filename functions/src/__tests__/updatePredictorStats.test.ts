@@ -4,13 +4,18 @@ import { computeStatsFromBets } from '../updatePredictorStats';
 
 import './setup';
 
-const allFinished = new Map<string, string>([
-  ['m1', 'finished'],
-  ['m2', 'finished'],
-  ['m3', 'finished'],
-  ['m4', 'finished'],
-  ['m5', 'finished'],
-  ['m6', 'finished'],
+interface MockMatchStatus {
+  status: string;
+  date?: { toDate: () => Date };
+}
+
+const allFinished = new Map<string, MockMatchStatus>([
+  ['m1', { status: 'finished' }],
+  ['m2', { status: 'finished' }],
+  ['m3', { status: 'finished' }],
+  ['m4', { status: 'finished' }],
+  ['m5', { status: 'finished' }],
+  ['m6', { status: 'finished' }],
 ]);
 
 describe('computeStatsFromBets', () => {
@@ -24,6 +29,8 @@ describe('computeStatsFromBets', () => {
     expect(result.accuracy).toBe(0);
     expect(result.currentStreak).toBe(0);
     expect(result.maxStreak).toBe(0);
+    expect(result.exactStreak).toBe(0);
+    expect(result.maxExactStreak).toBe(0);
     expect(result.pointsHistory).toEqual([]);
   });
 
@@ -40,6 +47,8 @@ describe('computeStatsFromBets', () => {
     expect(result.accuracy).toBeCloseTo(1); // 1 winner / 1 finished bet
     expect(result.currentStreak).toBe(1);
     expect(result.maxStreak).toBe(1);
+    expect(result.exactStreak).toBe(1);
+    expect(result.maxExactStreak).toBe(1);
   });
 
   it('accumulates multiple bets with mixed points', () => {
@@ -64,6 +73,8 @@ describe('computeStatsFromBets', () => {
     expect(result.accuracy).toBeCloseTo(2 / 3); // 2 winners / 3 finished bets
     expect(result.currentStreak).toBe(0);
     expect(result.maxStreak).toBe(2);
+    expect(result.exactStreak).toBe(0);
+    expect(result.maxExactStreak).toBe(1);
   });
 
   it('tracks currentStreak and maxStreak correctly', () => {
@@ -79,11 +90,13 @@ describe('computeStatsFromBets', () => {
         isWinner: false,
       },
       { userId: 'u1', predictorId: 'p1', matchId: 'm4', points: 3, isExact: true, isWinner: true },
-      { userId: 'u1', predictorId: 'p1', matchId: 'm5', points: 1, isExact: false, isWinner: true },
+      { userId: 'u1', predictorId: 'p1', matchId: 'm5', points: 3, isExact: true, isWinner: true },
     ];
     const result = computeStatsFromBets(bets, allFinished);
     expect(result.currentStreak).toBe(2);
     expect(result.maxStreak).toBe(2);
+    expect(result.exactStreak).toBe(2);
+    expect(result.maxExactStreak).toBe(2);
   });
 
   it('caps maxStreak when streak is broken and later exceeded', () => {
@@ -105,6 +118,8 @@ describe('computeStatsFromBets', () => {
     const result = computeStatsFromBets(bets, allFinished);
     expect(result.currentStreak).toBe(3);
     expect(result.maxStreak).toBe(3);
+    expect(result.exactStreak).toBe(3);
+    expect(result.maxExactStreak).toBe(3);
   });
 
   it('populates pointsHistory with only winning bets', () => {
@@ -147,10 +162,10 @@ describe('computeStatsFromBets', () => {
         isWinner: false,
       },
     ];
-    const matchStatuses = new Map<string, string>([
-      ['m1', 'finished'],
-      ['m2', 'scheduled'],
-      ['m3', 'finished'],
+    const matchStatuses = new Map<string, MockMatchStatus>([
+      ['m1', { status: 'finished' }],
+      ['m2', { status: 'scheduled' }],
+      ['m3', { status: 'finished' }],
     ]);
     // 2 finished bets (m1, m3), 1 winner bet
     const result = computeStatsFromBets(bets, matchStatuses);
@@ -171,7 +186,7 @@ describe('computeStatsFromBets', () => {
         isWinner: false,
       },
     ];
-    const matchStatuses = new Map<string, string>([['m1', 'scheduled']]);
+    const matchStatuses = new Map<string, MockMatchStatus>([['m1', { status: 'scheduled' }]]);
     const result = computeStatsFromBets(bets, matchStatuses);
     expect(result.finishedBets).toBe(0);
     expect(result.accuracy).toBe(0);

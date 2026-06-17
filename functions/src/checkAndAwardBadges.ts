@@ -14,6 +14,8 @@ interface PredictorStatsData {
   accuracy: number;
   currentStreak: number;
   maxStreak: number;
+  exactStreak: number;
+  maxExactStreak: number;
   pointsHistory: { timestamp: admin.firestore.Timestamp; points: number; matchId: string }[];
   badgesAwarded: Record<string, string>;
   rank?: number;
@@ -34,8 +36,20 @@ const BADGE_CONDITIONS: BadgeCondition[] = [
     check: (stats) => stats.exactBets >= 1,
   },
   {
+    badgeId: 'back-to-back',
+    check: (stats) => stats.exactStreak >= 2,
+  },
+  {
     badgeId: 'on-fire',
-    check: (stats) => stats.currentStreak >= 3,
+    check: (stats) => stats.exactStreak >= 3,
+  },
+  {
+    badgeId: 'perfectionist',
+    check: (stats) => stats.exactBets >= 5,
+  },
+  {
+    badgeId: 'almost-perfect',
+    check: (stats) => stats.winnerBets >= 12,
   },
   {
     badgeId: 'consistent',
@@ -47,7 +61,7 @@ const BADGE_CONDITIONS: BadgeCondition[] = [
   },
   {
     badgeId: 'top-10',
-    check: (stats) => (stats.percentile ?? 1) <= 0.1,
+    check: (stats) => (stats.percentile ?? 1) <= 0.05,
   },
 ];
 

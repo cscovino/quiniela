@@ -22,20 +22,45 @@
     "badges": {
       "title": "Insignias",
       "howToEarn": "Cómo obtenerla",
+      "badge_lucky": {
+        "name": "Afortunado",
+        "description": "Hiciste tu primera predicción",
+        "condition": "Haz cualquier predicción"
+      },
       "badge_first-blood": {
         "name": "Primera Sangre",
-        "description": "Hiciste tu primera predicción",
-        "condition": "Haz 1 predicción"
+        "description": "Hiciste tu primera predicción exacta",
+        "condition": "Haz 1 predicción exacta"
+      },
+      "badge_back-to-back": {
+        "name": "Dos de Seguido",
+        "description": "2 predicciones exactas seguidas",
+        "condition": "Acierta 2 predicciones exactas seguidas"
       },
       "badge_on-fire": {
         "name": "En Llamas",
         "description": "3 predicciones exactas seguidas",
         "condition": "Acierta 3 predicciones exactas seguidas"
       },
+      "badge_perfectionist": {
+        "name": "Perfeccionista",
+        "description": "5 predicciones exactas en total",
+        "condition": "Acierta 5 predicciones exactas"
+      },
+      "badge_almost-perfect": {
+        "name": "Casi Perfecto",
+        "description": "12 predicciones correctas en total",
+        "condition": "Acierta 12 predicciones"
+      },
       "badge_consistent": {
         "name": "Consistente",
-        "description": "10+ predicciones correctas en total",
-        "condition": "Acierta 10 predicciones"
+        "description": "20 predicciones correctas en total",
+        "condition": "Acierta 20 predicciones"
+      },
+      "badge_veteran": {
+        "name": "Veterano",
+        "description": "50 predicciones realizadas en total",
+        "condition": "Haz 50 predicciones"
       },
       "badge_top-10": {
         "name": "Top 10",

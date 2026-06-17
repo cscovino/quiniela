@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
 import type { TodayMatchBet } from '@organisms/RankingsTable';
 
 import { RankingRow } from './RankingRow';
@@ -130,8 +131,9 @@ export const SingleDay: Story = {
     points: 120,
     accuracy: 85,
     streak: 7,
+    exactMatches: 5,
+    bestStreak: 12,
     todayMatchBets: dayBets.filter((b) => b.date === '2026-06-11'),
-    todayPoints: 8,
     locale: 'es',
   },
 };
@@ -143,8 +145,9 @@ export const MixedDays: Story = {
     points: 98,
     accuracy: 78,
     streak: 4,
+    exactMatches: 3,
+    bestStreak: 9,
     todayMatchBets: dayBets,
-    todayPoints: 12,
     locale: 'es',
   },
 };
@@ -156,13 +159,14 @@ export const MixedDaysEnglish: Story = {
     points: 110,
     accuracy: 82,
     streak: 5,
+    exactMatches: 7,
+    bestStreak: 15,
     todayMatchBets: dayBets.map((b) => ({
       ...b,
       dayLabel: b.dayLabel!
         .replace('Jor. 1', 'MD 1').replace('Jor. 2', 'MD 2')
         .replace('Jor. 3', 'MD 3').replace('Jor. 4', 'MD 4'),
     })),
-    todayPoints: 12,
     locale: 'en',
   },
 };

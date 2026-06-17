@@ -5,6 +5,7 @@ import { Icon } from '@atoms/Icon';
 import { PixelArt } from '@atoms/PixelArt';
 import { Typography } from '@atoms/Typography';
 import { TeamFlag } from '@molecules/TeamFlag';
+
 import type { TodayMatchBet } from './RankingsTable';
 
 // ─── Mock match predictions by day (finished days last) ─────────────

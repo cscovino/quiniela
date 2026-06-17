@@ -18,6 +18,7 @@ export interface SortedStat {
   totalPoints: number;
   accuracy: number;
   currentStreak: number;
+  maxStreak: number;
   exactBets: number;
   badgesAwarded: Record<string, string>;
   pointsHistory: Array<{ timestamp: number; points: number }>;
@@ -54,6 +55,7 @@ export function buildRankingEntries(
       totalPoints: s.totalPoints,
       accuracy: s.accuracy,
       currentStreak: s.currentStreak,
+      maxStreak: s.maxStreak,
       exactBets: s.exactBets,
       badgesAwarded: s.badgesAwarded,
       pointsHistory: s.pointsHistory,
@@ -65,6 +67,7 @@ interface StatsDocData {
   totalPoints?: number;
   accuracy?: number;
   currentStreak?: number;
+  maxStreak?: number;
   exactBets?: number;
   badgesAwarded?: Record<string, string>;
   pointsHistory?: PointsHistoryEntry[];
@@ -104,6 +107,7 @@ export function mergePredictorStats(
       totalPoints: data.totalPoints || 0,
       accuracy: data.accuracy || 0,
       currentStreak: data.currentStreak || 0,
+      maxStreak: data.maxStreak || 0,
       exactBets: data.exactBets || 0,
       badgesAwarded: data.badgesAwarded || {},
       // Serialize Firestore Timestamps to epoch ms so the client can
@@ -135,6 +139,7 @@ export function mergePredictorStats(
         totalPoints: 0,
         accuracy: 0,
         currentStreak: 0,
+        maxStreak: 0,
         exactBets: 0,
         badgesAwarded: {},
         pointsHistory: [],
@@ -153,7 +158,7 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
   withAppCheck(async (req, res) => {
     try {
       const [predictorsSnap, statsSnap] = await Promise.all([
-        db.collectionGroup('predictors').get(),
+        db.collectionGroup('predictors').where('deletedAt', '==', null).get(),
         db.collectionGroup('stats').get(),
       ]);
 

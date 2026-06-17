@@ -23,6 +23,7 @@ export interface ApiRankingEntry {
   /** Raw accuracy in the 0..1 range (multiply by 100 for a percentage). */
   accuracy: number;
   currentStreak: number;
+  maxStreak: number;
   exactBets: number;
   badgesAwarded: Record<string, string>;
   /** Points history with timestamps serialized as epoch milliseconds. */

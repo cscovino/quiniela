@@ -4,11 +4,6 @@ import { getBadgeAwards } from '../checkAndAwardBadges';
 
 import './setup';
 
-interface TimestampLike {
-  seconds: number;
-  nanoseconds: number;
-}
-
 describe('getBadgeAwards', () => {
   it('returns empty object when no badges earned', () => {
     const stats = {
@@ -21,6 +16,8 @@ describe('getBadgeAwards', () => {
       accuracy: 0,
       currentStreak: 0,
       maxStreak: 0,
+      exactStreak: 0,
+      maxExactStreak: 0,
       pointsHistory: [],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 },
@@ -29,7 +26,7 @@ describe('getBadgeAwards', () => {
     expect(result).toEqual({});
   });
 
-  it('awards first-blood when totalBets >= 1', () => {
+  it('awards first-blood when exactBets >= 1', () => {
     const stats = {
       predictorId: 'p1',
       tournamentId: 't1',
@@ -40,6 +37,8 @@ describe('getBadgeAwards', () => {
       accuracy: 1,
       currentStreak: 1,
       maxStreak: 1,
+      exactStreak: 1,
+      maxExactStreak: 1,
       pointsHistory: [{ timestamp: { seconds: 0, nanoseconds: 0 }, points: 3, matchId: 'm1' }],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 },
@@ -48,7 +47,7 @@ describe('getBadgeAwards', () => {
     expect(result['first-blood']).toBeDefined();
   });
 
-  it('awards on-fire when currentStreak >= 3', () => {
+  it('awards on-fire when exactStreak >= 3', () => {
     const stats = {
       predictorId: 'p1',
       tournamentId: 't1',
@@ -59,6 +58,8 @@ describe('getBadgeAwards', () => {
       accuracy: 1,
       currentStreak: 3,
       maxStreak: 3,
+      exactStreak: 3,
+      maxExactStreak: 3,
       pointsHistory: [],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 },
@@ -78,6 +79,8 @@ describe('getBadgeAwards', () => {
       accuracy: 10 / 24,
       currentStreak: 2,
       maxStreak: 4,
+      exactStreak: 0,
+      maxExactStreak: 2,
       pointsHistory: [],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 },
@@ -97,6 +100,8 @@ describe('getBadgeAwards', () => {
       accuracy: 1,
       currentStreak: 16,
       maxStreak: 16,
+      exactStreak: 16,
+      maxExactStreak: 16,
       pointsHistory: [],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 },
@@ -118,6 +123,8 @@ describe('getBadgeAwards', () => {
       accuracy: 1,
       currentStreak: 2,
       maxStreak: 2,
+      exactStreak: 2,
+      maxExactStreak: 2,
       pointsHistory: [],
       badgesAwarded: existingBadges,
       lastUpdated: { seconds: 0, nanoseconds: 0 },
@@ -127,7 +134,8 @@ describe('getBadgeAwards', () => {
       stats as unknown as Parameters<typeof getBadgeAwards>[1],
     );
     expect(result['first-blood']).toBe('2024-01-01T00:00:00.000Z');
-    expect(Object.keys(result).length).toBe(1);
+    expect(result['back-to-back']).toBeDefined();
+    expect(Object.keys(result).length).toBe(2);
   });
 
   it('awards multiple badges simultaneously', () => {
@@ -135,12 +143,14 @@ describe('getBadgeAwards', () => {
       predictorId: 'p1',
       tournamentId: 't1',
       totalPoints: 48,
-      exactBets: 1,
+      exactBets: 3,
       winnerBets: 20,
       totalBets: 48,
       accuracy: 1,
       currentStreak: 48,
       maxStreak: 48,
+      exactStreak: 3,
+      maxExactStreak: 3,
       pointsHistory: [],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 },
@@ -148,7 +158,9 @@ describe('getBadgeAwards', () => {
     };
     const result = getBadgeAwards({}, stats as unknown as Parameters<typeof getBadgeAwards>[1]);
     expect(result['first-blood']).toBeDefined();
+    expect(result['back-to-back']).toBeDefined();
     expect(result['on-fire']).toBeDefined();
+    expect(result['almost-perfect']).toBeDefined();
     expect(result['perfect-group']).toBeDefined();
     expect(result['consistent']).toBeDefined();
   });
@@ -165,6 +177,8 @@ describe('getBadgeAwards', () => {
       accuracy: 1,
       currentStreak: 3,
       maxStreak: 3,
+      exactStreak: 3,
+      maxExactStreak: 3,
       pointsHistory: [],
       badgesAwarded: existingBadges,
       lastUpdated: { seconds: 0, nanoseconds: 0 },
@@ -188,6 +202,8 @@ describe('getBadgeAwards', () => {
       accuracy: 1,
       currentStreak: 1,
       maxStreak: 1,
+      exactStreak: 1,
+      maxExactStreak: 1,
       pointsHistory: [],
       badgesAwarded: {},
       lastUpdated: { seconds: 0, nanoseconds: 0 },

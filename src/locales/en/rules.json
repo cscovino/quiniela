@@ -22,20 +22,45 @@
     "badges": {
       "title": "Badges",
       "howToEarn": "How to earn it",
+      "badge_lucky": {
+        "name": "Lucky",
+        "description": "Made your first prediction",
+        "condition": "Make any prediction"
+      },
       "badge_first-blood": {
         "name": "First Blood",
-        "description": "Made your first prediction",
-        "condition": "Make 1 prediction"
+        "description": "Made your first exact prediction",
+        "condition": "Make 1 exact prediction"
+      },
+      "badge_back-to-back": {
+        "name": "Back to Back",
+        "description": "2 exact predictions in a row",
+        "condition": "Get 2 exact predictions in a row"
       },
       "badge_on-fire": {
         "name": "On Fire",
         "description": "3 exact predictions in a row",
         "condition": "Get 3 exact predictions in a row"
       },
+      "badge_perfectionist": {
+        "name": "Perfectionist",
+        "description": "5 exact predictions total",
+        "condition": "Get 5 exact predictions"
+      },
+      "badge_almost-perfect": {
+        "name": "Almost Perfect",
+        "description": "12 correct predictions total",
+        "condition": "Get 12 correct predictions"
+      },
       "badge_consistent": {
         "name": "Consistent",
-        "description": "10+ correct predictions total",
-        "condition": "Get 10 correct predictions"
+        "description": "20 correct predictions total",
+        "condition": "Get 20 correct predictions"
+      },
+      "badge_veteran": {
+        "name": "Veteran",
+        "description": "Made 50 predictions total",
+        "condition": "Make 50 predictions"
       },
       "badge_top-10": {
         "name": "Top 10",
