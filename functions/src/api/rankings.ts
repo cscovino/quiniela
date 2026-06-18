@@ -158,12 +158,16 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
   withAppCheck(async (req, res) => {
     try {
       const [predictorsSnap, statsSnap] = await Promise.all([
-        db.collectionGroup('predictors').where('deletedAt', '==', null).get(),
+        db.collectionGroup('predictors').get(),
         db.collectionGroup('stats').get(),
       ]);
 
+      const activePredictors = predictorsSnap.docs.filter(
+        (doc) => (doc.data() as { deletedAt?: unknown }).deletedAt == null,
+      );
+
       const merged = mergePredictorStats(
-        predictorsSnap.docs as unknown as MinimalDoc[],
+        activePredictors as unknown as MinimalDoc[],
         statsSnap.docs as unknown as MinimalDoc[],
       );
 
