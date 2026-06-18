@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quiniela-v6';
+const CACHE_NAME = 'quiniela-v7';
 
 const STATIC_ASSETS = [
   '/manifest.json',
@@ -36,6 +36,7 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/src/') ||
     url.pathname.startsWith('/@') ||
     url.pathname.startsWith('/node_modules/') ||
+    url.pathname.startsWith('/api/') ||
     url.pathname === '/sw.js'
   ) {
     return;

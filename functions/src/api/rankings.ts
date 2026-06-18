@@ -206,5 +206,5 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
       functions.logger.error('rankings function error:', error);
       res.status(500).json({ error: 'Failed to fetch rankings' });
     }
-  }, 'public, s-maxage=60, stale-while-revalidate=300'),
+  }, 'public, s-maxage=10, stale-while-revalidate=30'),
 );
