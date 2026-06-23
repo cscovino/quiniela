@@ -36,39 +36,107 @@ interface GroupBetData {
   groupId: string;
   positions: string[];
   points: number;
+  thirdPlaceScored?: boolean;
   scoredAt?: admin.firestore.Timestamp;
   createdAt: admin.firestore.Timestamp;
   updatedAt: admin.firestore.Timestamp;
 }
 
+interface AllGroupStandings {
+  [groupId: string]: TeamStanding[];
+}
+
+function getTop8ThirdPlaceTeamIds(allGroupStandings: AllGroupStandings): Set<string> {
+  const thirdPlaceRecords: Array<{
+    teamId: string;
+    points: number;
+    goalDifference: number;
+    goalsFor: number;
+  }> = [];
+
+  for (const standings of Object.values(allGroupStandings)) {
+    if (standings.length < 3) continue;
+    const third = standings[2];
+    thirdPlaceRecords.push({
+      teamId: third.teamId,
+      points: third.points,
+      goalDifference: third.goalDifference,
+      goalsFor: third.goalsFor,
+    });
+  }
+
+  thirdPlaceRecords.sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+    return b.goalsFor - a.goalsFor;
+  });
+
+  const top8 = new Set<string>();
+  for (let i = 0; i < Math.min(8, thirdPlaceRecords.length); i++) {
+    top8.add(thirdPlaceRecords[i].teamId.toUpperCase());
+  }
+  return top8;
+}
+
 // -- Pure scoring logic (directly testable) --
+
+export type ScoringPhase = 'positions-1-and-2' | 'position-3' | 'all';
 
 export function scoreGroupBet(
   positions: string[],
   standings: TeamStanding[],
+  phase: ScoringPhase = 'all',
+  allGroupStandings?: AllGroupStandings,
 ): { points: number; exactMatches: number; wrongPositionMatches: number; exactQualified: number } {
   let points = 0;
   let exactMatches = 0;
   let wrongPositionMatches = 0;
   let exactQualified = 0;
 
-  const qualifiedTeamIds = new Set(standings.slice(0, 4).map((s) => s.teamId));
+  const qualifiedTeamIds = new Set<string>();
 
-  for (let i = 0; i < positions.length; i++) {
+  if (phase === 'positions-1-and-2') {
+    qualifiedTeamIds.add(standings[0]?.teamId?.toUpperCase() ?? '');
+    qualifiedTeamIds.add(standings[1]?.teamId?.toUpperCase() ?? '');
+  } else {
+    qualifiedTeamIds.add(standings[0]?.teamId?.toUpperCase() ?? '');
+    qualifiedTeamIds.add(standings[1]?.teamId?.toUpperCase() ?? '');
+    if (allGroupStandings) {
+      const top8Third = getTop8ThirdPlaceTeamIds(allGroupStandings);
+      for (const teamId of top8Third) {
+        qualifiedTeamIds.add(teamId);
+      }
+    } else {
+      qualifiedTeamIds.add(standings[2]?.teamId?.toUpperCase() ?? '');
+    }
+  }
+
+  const maxPosition = phase === 'positions-1-and-2' ? 2 : 3;
+
+  for (let i = 0; i < positions.length && i < maxPosition; i++) {
     const predictedTeam = positions[i];
     const actualTeamAtPosition = standings[i]?.teamId;
 
     if (predictedTeam?.toUpperCase() === actualTeamAtPosition?.toUpperCase()) {
-      points += SCORING.GROUP.EXACT_POSITION; // 3
+      points += SCORING.GROUP.EXACT_POSITION;
       exactMatches++;
     } else if (
+      i < 2 &&
       actualTeamAtPosition &&
       standings.some((s) => s.teamId?.toUpperCase() === predictedTeam?.toUpperCase())
     ) {
-      points += SCORING.GROUP.QUALIFIED; // 1
+      points += SCORING.GROUP.QUALIFIED;
       wrongPositionMatches++;
+    } else if (i === 2 && qualifiedTeamIds.has(predictedTeam?.toUpperCase())) {
+      if (
+        actualTeamAtPosition &&
+        standings.some((s) => s.teamId?.toUpperCase() === predictedTeam?.toUpperCase())
+      ) {
+        points += SCORING.GROUP.QUALIFIED;
+        wrongPositionMatches++;
+      }
     }
-    if (i < 4 && qualifiedTeamIds.has(predictedTeam)) {
+    if (qualifiedTeamIds.has(predictedTeam?.toUpperCase())) {
       exactQualified++;
     }
   }
@@ -105,11 +173,7 @@ export const calculateGroupResults = functions.firestore
       return null;
     }
 
-    // Guard 3: only score once the ENTIRE group stage is complete. Otherwise we
-    // would lock in points against a partial table (e.g. after a single match,
-    // standings list only the teams that have played). We return WITHOUT setting
-    // pointsCalculated so the next standings update (when the final group match
-    // finishes) re-evaluates and scores against the full table.
+    // Guard 3: only score when this group's 6 matches are finished
     const groupMatchesSnap = await db
       .collection(`tournaments/${tournamentId}/matches`)
       .where('groupId', '==', groupId)
@@ -159,13 +223,19 @@ export const calculateGroupResults = functions.firestore
 
     for (const betDoc of betsSnapshot.docs) {
       const bet = betDoc.data() as GroupBetData;
-      const { points, exactQualified } = scoreGroupBet(bet.positions, standings);
+      // Phase 1: only score 1st and 2nd positions (always qualified)
+      const { points, exactQualified } = scoreGroupBet(
+        bet.positions,
+        standings,
+        'positions-1-and-2',
+      );
 
       batch.update(betDoc.ref, {
         points,
         // Persisted so groupQualified can be DERIVED (summed) idempotently,
         // rather than incremented per group-scoring event.
         exactQualified,
+        thirdPlaceScored: false,
         scoredAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       });
@@ -214,5 +284,148 @@ export const calculateGroupResults = functions.firestore
       );
     }
 
+    // Phase 2: if all groups are done, automatically score third place
+    const allStandingsSnap = await db
+      .collection(`tournaments/${tournamentId}/group_standings`)
+      .get();
+    const allGroupsDone = allStandingsSnap.docs.every(
+      (d) => (d.data() as GroupStandingsData).pointsCalculated === true,
+    );
+
+    if (allGroupsDone) {
+      functions.logger.log(
+        `[calculateGroupResults] All groups done — triggering third-place scoring`,
+      );
+      try {
+        await runThirdPlaceScoring(tournamentId);
+        functions.logger.log(`[calculateGroupResults] Third-place scoring completed`);
+      } catch (err) {
+        functions.logger.error('[calculateGroupResults] Third-place scoring failed', err);
+      }
+    }
+
     return null;
   });
+
+// -- Phase 2: Third-place scoring (shared logic) --
+
+async function runThirdPlaceScoring(tournamentId: string): Promise<number> {
+  functions.logger.log(
+    `[calculateThirdPlaceResults] Starting third-place scoring for ${tournamentId}`,
+  );
+
+  // Build allGroupStandings map
+  const allStandingsSnap = await db.collection(`tournaments/${tournamentId}/group_standings`).get();
+  const allGroupStandings: AllGroupStandings = {};
+  for (const doc of allStandingsSnap.docs) {
+    const data = doc.data() as GroupStandingsData;
+    if (data.standings && data.standings.length > 0) {
+      allGroupStandings[doc.id] = data.standings;
+    }
+  }
+
+  // Query bets where third place hasn't been scored yet
+  const betsSnap = await db
+    .collection(`tournaments/${tournamentId}/group_bets`)
+    .where('thirdPlaceScored', '==', false)
+    .get();
+
+  functions.logger.log(
+    `[calculateThirdPlaceResults] Found ${betsSnap.size} bets to score for third place`,
+  );
+
+  if (betsSnap.empty) {
+    return 0;
+  }
+
+  const batch = db.batch();
+  const predictorScores: Map<string, { userId: string; additionalPoints: number }> = new Map();
+
+  for (const betDoc of betsSnap.docs) {
+    const bet = betDoc.data() as GroupBetData;
+    const standings = allGroupStandings[bet.groupId];
+    if (!standings || standings.length < 3) continue;
+
+    const { points: thirdPlacePoints } = scoreGroupBet(
+      bet.positions,
+      standings,
+      'position-3',
+      allGroupStandings,
+    );
+
+    const newTotalPoints = (bet.points || 0) + thirdPlacePoints;
+
+    batch.update(betDoc.ref, {
+      points: newTotalPoints,
+      thirdPlaceScored: true,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    const existing = predictorScores.get(bet.predictorId);
+    if (existing) {
+      existing.additionalPoints += thirdPlacePoints;
+    } else {
+      predictorScores.set(bet.predictorId, {
+        userId: bet.userId,
+        additionalPoints: thirdPlacePoints,
+      });
+    }
+
+    functions.logger.log(
+      `[calculateThirdPlaceResults] Bet ${betDoc.id}: added ${thirdPlacePoints} third-place pts (total now ${newTotalPoints})`,
+    );
+  }
+
+  await batch.commit();
+  functions.logger.log(
+    `[calculateThirdPlaceResults] Committed ${betsSnap.size} third-place updates`,
+  );
+
+  // Recompute predictor totals and ranks for affected predictors
+  for (const [predictorId, score] of predictorScores) {
+    await recomputePredictorTotals(score.userId, predictorId, tournamentId);
+  }
+
+  try {
+    await doRecomputeRanks(tournamentId);
+  } catch (err) {
+    functions.logger.error('[calculateThirdPlaceResults] Rank recompute failed', err);
+  }
+
+  return betsSnap.size;
+}
+
+// -- Phase 2 callable (for manual re-runs if needed) --
+
+export const calculateThirdPlaceResults = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Must be signed in.');
+  }
+
+  const tournamentId = data?.tournamentId as string | undefined;
+  if (!tournamentId) {
+    throw new functions.https.HttpsError('invalid-argument', 'tournamentId is required');
+  }
+
+  const allMatchesSnap = await db
+    .collection(`tournaments/${tournamentId}/matches`)
+    .where('groupId', '!=', null)
+    .get();
+  const totalMatches = allMatchesSnap.size;
+  const finishedMatches = allMatchesSnap.docs.filter(
+    (d) => (d.data() as { status?: string }).status === 'finished',
+  ).length;
+
+  if (finishedMatches < totalMatches) {
+    functions.logger.warn(
+      `[calculateThirdPlaceResults] Group stage not complete (${finishedMatches}/${totalMatches}) — aborting`,
+    );
+    throw new functions.https.HttpsError(
+      'failed-precondition',
+      `Group stage not complete: ${finishedMatches}/${totalMatches} matches finished`,
+    );
+  }
+
+  const scored = await runThirdPlaceScoring(tournamentId);
+  return { scored };
+});

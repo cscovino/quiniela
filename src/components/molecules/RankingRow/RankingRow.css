@@ -327,6 +327,14 @@
   color: var(--color-success);
 }
 
+.ranking-row__pos-cell--partial {
+  border-color: var(--color-partial);
+}
+
+.ranking-row__pos-cell--partial .ranking-row__pos-ordinal {
+  color: var(--color-partial);
+}
+
 .ranking-row__pos-cell--wrong {
   border-color: var(--color-error);
   opacity: 0.7;

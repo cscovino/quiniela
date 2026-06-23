@@ -1,3 +1,4 @@
+import type { TeamStanding } from '@app-types/firestore';
 import type { Locale } from '@utils/i18n';
 
 /**
@@ -26,8 +27,8 @@ export interface PredictedBestPlayers {
 export interface PredictionResults {
   /** teamId (lowercase) → FIFA code, for flags. */
   teams: Map<string, string>;
-  /** groupId → actual finishing order (team IDs). Absent until the group ends. */
-  groupStandings: Map<string, string[]>;
+  /** groupId → actual standings (with points, goal diff, etc.). Absent until the group ends. */
+  groupStandings: Map<string, TeamStanding[]>;
   /** groupId → raw group name. */
   groupNames: Map<string, string>;
   finalStandings: PredictedFinalPhase | null;
@@ -40,8 +41,8 @@ export interface PredictedTeamCell {
   fifaCode: string;
   /** 1-based finishing slot. */
   position: number;
-  /** true = exact slot correct, false = result known & wrong, null = no result yet. */
-  correct: boolean | null;
+  /** true = exact slot correct, 'partial' = qualified but wrong slot, false = wrong/missed, null = no result yet. */
+  correct: boolean | 'partial' | null;
 }
 
 export interface GroupPredictionView {
@@ -119,14 +120,16 @@ function fuzzyMatch(predicted: string, actual: string): boolean {
 
 /**
  * Build the group-stage prediction views. Each team cell is correct when the
- * predicted team occupies that exact slot in the actual standings; `null` until
- * the group's standings exist.
+ * predicted team occupies that exact slot in the actual standings; `partial`
+ * when the team qualified (top 2 or best 8 third-place) but in the wrong slot;
+ * `null` until the group's standings exist.
  */
 export function buildGroupPredictions(
   predicted: PredictedGroup[],
   results: PredictionResults,
   locale: Locale,
 ): GroupPredictionView[] {
+  const qualifiedThirdPlace = computeBest8ThirdPlace(results.groupStandings);
   return [...predicted]
     .sort((a, b) => a.groupId.localeCompare(b.groupId))
     .map((group) => {
@@ -137,10 +140,65 @@ export function buildGroupPredictions(
         teams: group.positions.map((teamId, i) => ({
           fifaCode: fifaCodeOf(teamId, results.teams),
           position: i + 1,
-          correct: actual ? actual[i]?.toLowerCase() === teamId.toLowerCase() : null,
+          correct: actual ? computeGroupCellCorrect(teamId, i, actual, qualifiedThirdPlace) : null,
         })),
       };
     });
+}
+
+/** Number of qualifying positions per group (top 2 advance to knockout). */
+const QUALIFYING_SIZE = 2;
+/** Number of best third-place teams that qualify. */
+const THIRD_PLACE_QUALIFY_SIZE = 8;
+
+function computeBest8ThirdPlace(groupStandings: Map<string, TeamStanding[]>): Set<string> {
+  const thirdPlaceRecords: Array<{
+    teamId: string;
+    points: number;
+    goalDifference: number;
+    goalsFor: number;
+  }> = [];
+
+  for (const standings of groupStandings.values()) {
+    if (standings.length >= 3 && standings[2]) {
+      const third = standings[2];
+      thirdPlaceRecords.push({
+        teamId: third.teamId,
+        points: third.points ?? 0,
+        goalDifference: third.goalDifference ?? 0,
+        goalsFor: third.goalsFor ?? 0,
+      });
+    }
+  }
+
+  thirdPlaceRecords.sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+    return b.goalsFor - a.goalsFor;
+  });
+
+  return new Set(
+    thirdPlaceRecords.slice(0, THIRD_PLACE_QUALIFY_SIZE).map((r) => r.teamId.toUpperCase()),
+  );
+}
+
+function computeGroupCellCorrect(
+  teamId: string,
+  predictedIndex: number,
+  actual: TeamStanding[],
+  qualifiedThirdPlace: Set<string>,
+): boolean | 'partial' {
+  const teamStanding = actual.find((s) => s.teamId.toLowerCase() === teamId.toLowerCase());
+  if (!teamStanding) return false;
+  const actualIndex = actual.indexOf(teamStanding);
+  if (actualIndex === -1) return false;
+  if (actualIndex === predictedIndex) return true;
+  // Qualified via top 2
+  if (actualIndex < QUALIFYING_SIZE) return 'partial';
+  // Qualified via best 8 third-place
+  if (actualIndex === 2 && qualifiedThirdPlace.has(teamStanding.teamId.toUpperCase()))
+    return 'partial';
+  return false;
 }
 
 /**

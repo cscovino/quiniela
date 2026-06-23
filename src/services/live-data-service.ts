@@ -238,9 +238,7 @@ function computeRankChange(
 export async function fetchMatchInfoMap(): Promise<Map<string, MatchInfo>> {
   try {
     const teams = await getTeamsMap();
-    const matchesSnap = await getDocs(
-      collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches'),
-    );
+    const matchesSnap = await getDocs(collection(getDb(), 'tournaments', TOURNAMENT_ID, 'matches'));
 
     const map = new Map<string, MatchInfo>();
     for (const d of matchesSnap.docs) {
@@ -294,12 +292,12 @@ export async function fetchPredictionResults(): Promise<PredictionResults> {
     const teams = new Map<string, string>();
     for (const [key, team] of teamsRaw) teams.set(key, team.fifaCode);
 
-    const groupStandings = new Map<string, string[]>();
+    const groupStandings = new Map<string, import('@app-types/firestore').TeamStanding[]>();
     for (const d of standingsSnap.docs) {
       const data = d.data() as GroupStandings;
-      const ordered = [...(data.standings ?? [])]
-        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-        .map((s) => s.teamId);
+      const ordered = [...(data.standings ?? [])].sort(
+        (a, b) => (a.position ?? 0) - (b.position ?? 0),
+      );
       groupStandings.set(data.groupId ?? d.id, ordered);
     }
 

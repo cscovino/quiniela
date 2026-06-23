@@ -87,10 +87,12 @@ interface MinimalDoc {
  *   shows them as "ready to play", not absent)
  * - Orphaned stats (no matching predictor doc) are kept so historical
  *   participants don't drop off the board
+ * - Stats belonging to deleted (soft-deleted) predictors are excluded
  */
 export function mergePredictorStats(
   predictorsSnap: MinimalDoc[],
   statsSnap: MinimalDoc[],
+  deletedPredictorKeys: Set<string> = new Set(),
 ): SortedStat[] {
   const statsByKey = new Map<string, SortedStat>();
 
@@ -147,8 +149,11 @@ export function mergePredictorStats(
     }
   });
 
+  // Orphaned stats are kept so historical participants don't drop off the board.
+  // They are only added if the predictor doc is missing (not if it was deleted).
+  // We exclude stats belonging to soft-deleted predictors.
   for (const [key, stat] of statsByKey) {
-    if (!seen.has(key)) merged.push(stat);
+    if (!seen.has(key) && !deletedPredictorKeys.has(key)) merged.push(stat);
   }
 
   return merged;
@@ -162,13 +167,24 @@ export const rankings = functions.runWith({ minInstances: 0 }).https.onRequest(
         db.collectionGroup('stats').get(),
       ]);
 
-      const activePredictors = predictorsSnap.docs.filter(
-        (doc) => (doc.data() as { deletedAt?: unknown }).deletedAt == null,
-      );
+      const deletedPredictorKeys = new Set<string>();
+      const activePredictors = predictorsSnap.docs.filter((doc) => {
+        const data = doc.data() as { deletedAt?: unknown };
+        const pathParts = doc.ref.path.split('/');
+        const userId = pathParts[1];
+        const predictorId = pathParts[3];
+        const key = `${userId}/${predictorId}`;
+        if (data.deletedAt != null) {
+          deletedPredictorKeys.add(key);
+          return false;
+        }
+        return true;
+      });
 
       const merged = mergePredictorStats(
         activePredictors as unknown as MinimalDoc[],
         statsSnap.docs as unknown as MinimalDoc[],
+        deletedPredictorKeys,
       );
 
       const sorted = merged.sort((a, b) => b.totalPoints - a.totalPoints);

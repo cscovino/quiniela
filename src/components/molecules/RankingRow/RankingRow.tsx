@@ -158,8 +158,9 @@ function renderMatchdayBlocks(bets: TodayMatchBet[]): ReactNode {
   ));
 }
 
-function cellResultClass(correct: boolean | null): string {
+function cellResultClass(correct: boolean | 'partial' | null): string {
   if (correct === true) return 'ranking-row__pos-cell--correct';
+  if (correct === 'partial') return 'ranking-row__pos-cell--partial';
   if (correct === false) return 'ranking-row__pos-cell--wrong';
   return '';
 }
@@ -360,7 +361,10 @@ export const RankingRow: FC<RankingRowProps> = ({
       </div>
 
       {pointsLoading ? (
-        <div className="ranking-row__stats ranking-row__stats--loading" data-tour={isFirst ? 'ranking-stats' : undefined}>
+        <div
+          className="ranking-row__stats ranking-row__stats--loading"
+          data-tour={isFirst ? 'ranking-stats' : undefined}
+        >
           <span className="ranking-row__stat-skeleton" />
           <span className="ranking-row__stat-skeleton" />
           <span className="ranking-row__stat-skeleton" />
@@ -397,21 +401,13 @@ export const RankingRow: FC<RankingRowProps> = ({
             </Tooltip>
           )}
           {exactMatches != null && exactMatches > 0 && (
-            <Tooltip
-              className="ranking-row__stat"
-              content={statLabels.exactMatches}
-              position="top"
-            >
+            <Tooltip className="ranking-row__stat" content={statLabels.exactMatches} position="top">
               <Icon name="check" size={14} />
               <Typography variant="small">{exactMatches}</Typography>
             </Tooltip>
           )}
           {bestStreak != null && bestStreak > 0 && (
-            <Tooltip
-              className="ranking-row__stat"
-              content={statLabels.bestStreak}
-              position="top"
-            >
+            <Tooltip className="ranking-row__stat" content={statLabels.bestStreak} position="top">
               <Icon name="trophy" size={14} />
               <Typography variant="small">{bestStreak}</Typography>
             </Tooltip>
