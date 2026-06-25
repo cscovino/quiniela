@@ -33,6 +33,10 @@ export interface PredictionResults {
   groupNames: Map<string, string>;
   finalStandings: PredictedFinalPhase | null;
   bestPlayers: { topScorer: string; bestGoalkeeper: string } | null;
+  /** groupId → whether 1st/2nd positions are finalized for that group. */
+  groupPointsCalculated: Map<string, boolean>;
+  /** Whether top-8 third-place teams are finalized (all groups finished). */
+  isThirdPlaceDecided: boolean;
 }
 
 // ── Display views (what RankingRow renders) ────────────────────────────────
@@ -49,6 +53,7 @@ export interface GroupPredictionView {
   groupId: string;
   label: string;
   teams: PredictedTeamCell[];
+  finished: boolean;
 }
 
 export interface FinalPhasePredictionView {
@@ -134,13 +139,22 @@ export function buildGroupPredictions(
     .sort((a, b) => a.groupId.localeCompare(b.groupId))
     .map((group) => {
       const actual = results.groupStandings.get(group.groupId);
+      const pointsCalculated = results.groupPointsCalculated.get(group.groupId) ?? false;
       return {
         groupId: group.groupId,
         label: localizeGroupName(results.groupNames.get(group.groupId) ?? group.groupId, locale),
+        finished: pointsCalculated,
         teams: group.positions.map((teamId, i) => ({
           fifaCode: fifaCodeOf(teamId, results.teams),
           position: i + 1,
-          correct: actual ? computeGroupCellCorrect(teamId, i, actual, qualifiedThirdPlace) : null,
+          correct: computeGroupCellCorrect(
+            teamId,
+            i,
+            actual!,
+            qualifiedThirdPlace,
+            pointsCalculated,
+            results.isThirdPlaceDecided,
+          ),
         })),
       };
     });
@@ -187,18 +201,35 @@ function computeGroupCellCorrect(
   predictedIndex: number,
   actual: TeamStanding[],
   qualifiedThirdPlace: Set<string>,
-): boolean | 'partial' {
+  pointsCalculated: boolean,
+  isThirdPlaceDecided: boolean,
+): boolean | 'partial' | null {
+  if (!actual) return null;
   const teamStanding = actual.find((s) => s.teamId.toLowerCase() === teamId.toLowerCase());
   if (!teamStanding) return false;
   const actualIndex = actual.indexOf(teamStanding);
   if (actualIndex === -1) return false;
-  if (actualIndex === predictedIndex) return true;
-  // Qualified via top 2
-  if (actualIndex < QUALIFYING_SIZE) return 'partial';
-  // Qualified via best 8 third-place
-  if (actualIndex === 2 && qualifiedThirdPlace.has(teamStanding.teamId.toUpperCase()))
-    return 'partial';
-  return false;
+
+  // 1st and 2nd positions: colors only when pointsCalculated
+  if (predictedIndex < QUALIFYING_SIZE) {
+    if (!pointsCalculated) return null;
+    if (actualIndex === predictedIndex) return true;
+    // Qualified (top 2 or via best 8 thirds) but wrong slot
+    if (actualIndex < QUALIFYING_SIZE) return 'partial';
+    if (qualifiedThirdPlace.has(teamStanding.teamId.toUpperCase())) return 'partial';
+    return false;
+  }
+  // 3rd position: colors only when top-8 thirds are finalized
+  if (predictedIndex === 2) {
+    if (!isThirdPlaceDecided) return null;
+    if (qualifiedThirdPlace.has(teamStanding.teamId.toUpperCase())) return 'partial';
+    return null;
+  }
+  // 4th position: never colored (no points for 4th place)
+  if (predictedIndex === 3) {
+    return null;
+  }
+  return null;
 }
 
 /**

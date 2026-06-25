@@ -35,6 +35,8 @@ const emptyResults = () => ({
   groupNames: new Map<string, string>(),
   finalStandings: null,
   bestPlayers: null,
+  groupPointsCalculated: new Map<string, boolean>(),
+  isThirdPlaceDecided: false,
 });
 
 describe('LiveRankings', () => {
@@ -304,6 +306,8 @@ describe('LiveRankings', () => {
         groupNames: new Map([['a', 'Group A']]),
         finalStandings: null,
         bestPlayers: null,
+        groupPointsCalculated: new Map<string, boolean>(),
+        isThirdPlaceDecided: false,
       });
 
       render(

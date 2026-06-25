@@ -165,15 +165,19 @@ function cellResultClass(correct: boolean | 'partial' | null): string {
   return '';
 }
 
-function renderTeamCell(cell: PredictedTeamCell): ReactNode {
+function renderTeamCell(cell: PredictedTeamCell, isGroupFinished: boolean): ReactNode {
+  const positionClass =
+    isGroupFinished && (cell.position === 1 || cell.position === 2 || cell.position === 4)
+      ? ` ranking-row__pos-ordinal--${cell.position}`
+      : '';
   return (
     <span
       key={cell.position}
-      className={`ranking-row__pos-cell ${cellResultClass(cell.correct)}`}
+      className={`ranking-row__pos-cell${isGroupFinished ? ' ranking-row__pos-cell--finished' : ''} ${cellResultClass(cell.correct)}`}
       title={`${cell.position}°`}
     >
       <TeamFlag fifaCode={cell.fifaCode} size="sm" />
-      <span className="ranking-row__pos-ordinal">{cell.position}°</span>
+      <span className={`ranking-row__pos-ordinal${positionClass}`}>{cell.position}°</span>
     </span>
   );
 }
@@ -184,7 +188,9 @@ function renderGroupBlocks(groups: GroupPredictionView[]): ReactNode {
       <Typography variant="caption" className="ranking-row__day-label">
         {group.label}
       </Typography>
-      <div className="ranking-row__day-bets">{group.teams.map(renderTeamCell)}</div>
+      <div className="ranking-row__day-bets">
+        {group.teams.map((cell) => renderTeamCell(cell, group.finished))}
+      </div>
     </div>
   ));
 }

@@ -277,36 +277,69 @@ export async function fetchPredictionResults(): Promise<PredictionResults> {
     groupNames: new Map(),
     finalStandings: null,
     bestPlayers: null,
+    groupPointsCalculated: new Map(),
+    isThirdPlaceDecided: false,
   };
 
   try {
     const db = getDb();
-    const [teamsRaw, standingsSnap, groupsSnap, finalDoc, bestDoc] = await Promise.all([
-      getTeamsMap(),
-      getDocs(collection(db, 'tournaments', TOURNAMENT_ID, 'group_standings')),
-      getDocs(collection(db, 'tournaments', TOURNAMENT_ID, 'groups')),
-      getDoc(doc(db, 'tournaments', TOURNAMENT_ID, 'final_standings', 'final')),
-      getDoc(doc(db, 'tournaments', TOURNAMENT_ID, 'best_players_results', 'actual')),
-    ]);
+    let teamsRaw, standingsSnap, groupsSnap, finalDoc, bestDoc;
+    try {
+      teamsRaw = await getTeamsMap();
+    } catch {
+      teamsRaw = new Map();
+    }
+    try {
+      standingsSnap = await getDocs(
+        collection(db, 'tournaments', TOURNAMENT_ID, 'group_standings'),
+      );
+    } catch {
+      standingsSnap = { docs: [] } as typeof standingsSnap;
+    }
+    try {
+      groupsSnap = await getDocs(collection(db, 'tournaments', TOURNAMENT_ID, 'groups'));
+    } catch {
+      groupsSnap = { docs: [] } as typeof groupsSnap;
+    }
+    try {
+      finalDoc = await getDoc(doc(db, 'tournaments', TOURNAMENT_ID, 'final_standings', 'final'));
+    } catch {
+      finalDoc = null as unknown as typeof finalDoc;
+    }
+    try {
+      bestDoc = await getDoc(
+        doc(db, 'tournaments', TOURNAMENT_ID, 'best_players_results', 'actual'),
+      );
+    } catch {
+      bestDoc = null as unknown as typeof bestDoc;
+    }
 
     const teams = new Map<string, string>();
     for (const [key, team] of teamsRaw) teams.set(key, team.fifaCode);
 
     const groupStandings = new Map<string, import('@app-types/firestore').TeamStanding[]>();
+    const groupPointsCalculated = new Map<string, boolean>();
     for (const d of standingsSnap.docs) {
       const data = d.data() as GroupStandings;
       const ordered = [...(data.standings ?? [])].sort(
         (a, b) => (a.position ?? 0) - (b.position ?? 0),
       );
-      groupStandings.set(data.groupId ?? d.id, ordered);
+      const groupId = data.groupId ?? d.id;
+      groupStandings.set(groupId, ordered);
+      groupPointsCalculated.set(groupId, data.pointsCalculated ?? false);
     }
+
+    // Third-place is decided only when ALL groups have pointsCalculated: true
+    const isThirdPlaceDecided =
+      standingsSnap.docs.length > 0 &&
+      standingsSnap.docs.every((d) => (d.data() as GroupStandings).pointsCalculated === true);
 
     const groupNames = new Map<string, string>();
     for (const d of groupsSnap.docs) {
       groupNames.set(d.id, (d.data() as { name?: string }).name ?? d.id);
     }
 
-    const final = finalDoc.exists() ? (finalDoc.data() as Record<string, string>) : null;
+    const final = finalDoc?.exists() ? (finalDoc.data() as Record<string, string>) : null;
     const finalStandings = final
       ? {
           first: final.first ?? '',
@@ -316,12 +349,20 @@ export async function fetchPredictionResults(): Promise<PredictionResults> {
         }
       : null;
 
-    const best = bestDoc.exists() ? (bestDoc.data() as Record<string, string>) : null;
+    const best = bestDoc?.exists() ? (bestDoc.data() as Record<string, string>) : null;
     const bestPlayers = best
       ? { topScorer: best.topScorer ?? '', bestGoalkeeper: best.bestGoalkeeper ?? '' }
       : null;
 
-    return { teams, groupStandings, groupNames, finalStandings, bestPlayers };
+    return {
+      teams,
+      groupStandings,
+      groupNames,
+      finalStandings,
+      bestPlayers,
+      groupPointsCalculated,
+      isThirdPlaceDecided,
+    };
   } catch {
     return empty;
   }

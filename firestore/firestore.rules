@@ -172,6 +172,18 @@ service cloud.firestore {
         allow read: if true;
         allow write: if false;
       }
+
+      // Final standings - read only, Cloud Functions write
+      match /final_standings/{standingId} {
+        allow read: if true;
+        allow write: if false;
+      }
+
+      // Best players results - read only, Cloud Functions write
+      match /best_players_results/{resultId} {
+        allow read: if true;
+        allow write: if false;
+      }
       
       // Final phase bets - predictor owns their bet with deadline enforcement
       match /final_phase_bets/{predictorId} {

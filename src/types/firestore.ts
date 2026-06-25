@@ -170,6 +170,7 @@ export interface GroupStandings {
   groupId: string;
   lastUpdated: Timestamp;
   standings: TeamStanding[];
+  pointsCalculated?: boolean;
 }
 
 export interface User {

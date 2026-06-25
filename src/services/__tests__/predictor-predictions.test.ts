@@ -44,6 +44,8 @@ const baseResults = (over: Partial<PredictionResults> = {}): PredictionResults =
   ]),
   finalStandings: null,
   bestPlayers: null,
+  groupPointsCalculated: new Map(),
+  isThirdPlaceDecided: false,
   ...over,
 });
 
@@ -71,6 +73,11 @@ describe('buildGroupPredictions', () => {
           ],
         ],
       ]),
+      groupPointsCalculated: new Map([
+        ['a', true],
+        ['b', true],
+      ]),
+      isThirdPlaceDecided: true,
     });
     const views = buildGroupPredictions(
       [
@@ -89,10 +96,10 @@ describe('buildGroupPredictions', () => {
     // actual: mex(1st), usa(2nd), rsa(3rd), kor(4th)
     // predicted: mex(1st), rsa(2nd), usa(3rd), kor(4th)
     // slot1 mex ✓ exact
-    // slot2 rsa ✗ wrong (predicted 2nd but actual 3rd; but rsa qualifies via best 8 third-place → partial)
-    // slot3 usa ✗ wrong (predicted 3rd but actual 2nd; usa qualifies via top 2 → partial)
-    // slot4 kor ✓ exact
-    expect(groupA.teams.map((t) => t.correct)).toEqual([true, 'partial', 'partial', true]);
+    // slot2 rsa ✗ wrong (predicted 2nd but actual 3rd; qualifies via best 8 third-place → partial)
+    // slot3 usa ✗ wrong (predicted 3rd but actual 2nd; does NOT qualify via best 8 thirds → null, no color)
+    // slot4 kor ✓ exact → null (4th position never colored)
+    expect(groupA.teams.map((t) => t.correct)).toEqual([true, 'partial', null, null]);
   });
 
   it('leaves correctness null when a group has no standings yet', () => {
@@ -127,6 +134,11 @@ describe('buildGroupPredictions', () => {
           ],
         ],
       ]),
+      groupPointsCalculated: new Map([
+        ['a', true],
+        ['b', true],
+      ]),
+      isThirdPlaceDecided: true,
     });
     // Predict usa, mex in slots 1-2 but they actually finish 2nd and 1st (swapped)
     const views = buildGroupPredictions(
@@ -136,9 +148,9 @@ describe('buildGroupPredictions', () => {
     );
     // usa: predicted 1st, actual 2nd → qualifies but wrong slot → partial
     // mex: predicted 2nd, actual 1st → qualifies but wrong slot → partial
-    // rsa: predicted 3rd, actual 3rd → exact match
-    // kor: predicted 4th, actual 4th → exact match
-    expect(views[0].teams.map((t) => t.correct)).toEqual(['partial', 'partial', true, true]);
+    // rsa: predicted 3rd, actual 3rd → partial (qualifies via best 8 third-place)
+    // kor: predicted 4th, actual 4th → null (4th position never colored)
+    expect(views[0].teams.map((t) => t.correct)).toEqual(['partial', 'partial', 'partial', null]);
   });
 
   it('marks as partial when team qualifies via best third-place but predicted 3rd', () => {
@@ -164,6 +176,11 @@ describe('buildGroupPredictions', () => {
           ],
         ],
       ]),
+      groupPointsCalculated: new Map([
+        ['a', true],
+        ['b', true],
+      ]),
+      isThirdPlaceDecided: true,
     });
     // Predict rsa 3rd, kor 4th - rsa actually qualifies as best 8 third-place
     const views = buildGroupPredictions(
@@ -173,9 +190,9 @@ describe('buildGroupPredictions', () => {
     );
     // mex: predicted 1st, actual 1st → exact
     // usa: predicted 2nd, actual 2nd → exact
-    // rsa: predicted 3rd, actual 3rd → exact (but also qualifies via best 8 third-place)
-    // kor: predicted 4th, actual 4th → exact
-    expect(views[0].teams.map((t) => t.correct)).toEqual([true, true, true, true]);
+    // rsa: predicted 3rd, actual 3rd → partial (qualifies via best 8 third-place)
+    // kor: predicted 4th, actual 4th → null (4th position never colored)
+    expect(views[0].teams.map((t) => t.correct)).toEqual([true, true, 'partial', null]);
   });
 });
 
