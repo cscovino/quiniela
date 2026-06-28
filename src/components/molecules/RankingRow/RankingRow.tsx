@@ -439,8 +439,6 @@ export const RankingRow: FC<RankingRowProps> = ({
           data-tour={isFirst ? 'ranking-matches' : undefined}
         >
           <div className="ranking-row__predictions-scroll">
-            {hasMatchBets && renderMatchdayBlocks(todayMatchBets!)}
-            {hasGroups && renderGroupBlocks(groupPredictions!)}
             {hasFinalPhase && renderFinalPhaseBlock(finalPhasePrediction!, sectionLabels.finalFour)}
             {hasBestPlayers && (
               <div className="ranking-row__day-group">
@@ -453,6 +451,8 @@ export const RankingRow: FC<RankingRowProps> = ({
                 </div>
               </div>
             )}
+            {hasGroups && renderGroupBlocks(groupPredictions!)}
+            {hasMatchBets && renderMatchdayBlocks(todayMatchBets!)}
           </div>
         </div>
       )}

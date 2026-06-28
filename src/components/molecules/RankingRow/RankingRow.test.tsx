@@ -1,5 +1,12 @@
 import { render, screen } from '@testing-library/react';
 
+import type { TodayMatchBet } from '@organisms/RankingsTable';
+import type {
+  BestPlayersPredictionView,
+  FinalPhasePredictionView,
+  GroupPredictionView,
+} from '@services/predictor-predictions';
+
 import { RankingRow } from './RankingRow';
 
 describe('RankingRow', () => {
@@ -116,5 +123,76 @@ describe('RankingRow', () => {
     const badges = document.querySelector('.ranking-row__badges');
     expect(badges).toBeInTheDocument();
     expect(badges?.children.length).toBe(2);
+  });
+
+  it('renders the four prediction sections in the requested order (Final 4, Best players, Groups, Matches)', () => {
+    const finalPhasePrediction: FinalPhasePredictionView = {
+      positions: [
+        { fifaCode: 'ARG', position: 1, correct: true },
+        { fifaCode: 'BRA', position: 2, correct: false },
+        { fifaCode: 'FRA', position: 3, correct: null },
+        { fifaCode: 'ESP', position: 4, correct: null },
+      ],
+    };
+    const bestPlayersPrediction: BestPlayersPredictionView = {
+      scorer: { name: 'Mbappé', correct: true },
+      goalkeeper: { name: 'Martínez', correct: false },
+    };
+    const groupPredictions: GroupPredictionView[] = [
+      {
+        groupId: 'a',
+        label: 'Group A',
+        finished: true,
+        teams: [
+          { fifaCode: 'MEX', position: 1, correct: true },
+          { fifaCode: 'USA', position: 2, correct: false },
+          { fifaCode: 'RSA', position: 3, correct: null },
+          { fifaCode: 'KOR', position: 4, correct: null },
+        ],
+      },
+    ];
+    const todayMatchBets: TodayMatchBet[] = [
+      {
+        matchId: 'd1a',
+        homeTeam: 'ARG',
+        awayTeam: 'BRA',
+        homeScore: 2,
+        awayScore: 1,
+        status: 'finished',
+        date: '2026-06-11',
+        dayLabel: 'MD 1 — 11 Jun',
+      },
+    ];
+
+    const { container } = render(
+      <RankingRow
+        position={1}
+        displayName="Carlos"
+        points={45}
+        accuracy={85}
+        streak={3}
+        finalPhasePrediction={finalPhasePrediction}
+        bestPlayersPrediction={bestPlayersPrediction}
+        groupPredictions={groupPredictions}
+        todayMatchBets={todayMatchBets}
+      />,
+    );
+
+    const scroll = container.querySelector('.ranking-row__predictions-scroll');
+    expect(scroll).toBeInTheDocument();
+    const blocks = Array.from(scroll!.children) as HTMLElement[];
+
+    const classify = (el: HTMLElement): string => {
+      if (el.querySelector('.ranking-row__player-chip')) return 'bestPlayers';
+      if (el.querySelector('.ranking-row__match-prediction')) return 'match';
+      if (el.querySelector('.ranking-row__pos-cell')) {
+        const label = el.querySelector('.ranking-row__day-label')?.textContent?.trim() ?? '';
+        if (label === 'Final 4') return 'finalFour';
+        return 'group';
+      }
+      return 'unknown';
+    };
+
+    expect(blocks.map(classify)).toEqual(['finalFour', 'bestPlayers', 'group', 'match']);
   });
 });
