@@ -214,16 +214,24 @@ function computeGroupCellCorrect(
   if (predictedIndex < QUALIFYING_SIZE) {
     if (!pointsCalculated) return null;
     if (actualIndex === predictedIndex) return true;
-    // Qualified (top 2 or via best 8 thirds) but wrong slot
+    // Team is in a qualifying position but wrong slot
     if (actualIndex < QUALIFYING_SIZE) return 'partial';
-    if (qualifiedThirdPlace.has(teamStanding.teamId.toUpperCase())) return 'partial';
+    // Team is 3rd but might qualify via best-8-thirds - only color when third place is decided
+    if (qualifiedThirdPlace.has(teamStanding.teamId.toUpperCase())) {
+      return isThirdPlaceDecided ? 'partial' : null;
+    }
     return false;
   }
-  // 3rd position: colors only when top-8 thirds are finalized
+  // 3rd position: points are only awarded when the actual team classified
+  // (i.e. finished 3rd AND made the top-8-thirds). Coloring is gated on
+  // isThirdPlaceDecided so we don't reveal a not-yet-final result.
   if (predictedIndex === 2) {
     if (!isThirdPlaceDecided) return null;
-    if (qualifiedThirdPlace.has(teamStanding.teamId.toUpperCase())) return 'partial';
-    return null;
+    if (actualIndex === predictedIndex) {
+      return qualifiedThirdPlace.has(teamStanding.teamId.toUpperCase()) ? true : false;
+    }
+    if (actualIndex < QUALIFYING_SIZE) return 'partial';
+    return false;
   }
   // 4th position: never colored (no points for 4th place)
   if (predictedIndex === 3) {
