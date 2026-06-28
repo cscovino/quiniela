@@ -2,26 +2,21 @@ import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions/v1';
 
+import {
+  type AllGroupStandings,
+  scoreGroupBet,
+  type ScoringPhase,
+  type TeamStanding,
+} from './groupScoring';
 import { recomputePredictorTotals } from './recomputePredictorTotals';
 import { doRecomputeRanks } from './recomputeRanks';
-import { SCORING } from './scoring';
+
+export { scoreGroupBet };
+export type { AllGroupStandings, ScoringPhase, TeamStanding };
 
 const db = admin.firestore();
 
 // -- Types --
-
-interface TeamStanding {
-  teamId: string;
-  position: number;
-  played: number;
-  won: number;
-  drawn: number;
-  lost: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDifference: number;
-  points: number;
-}
 
 interface GroupStandingsData {
   groupId: string;
@@ -35,113 +30,15 @@ interface GroupBetData {
   predictorId: string;
   groupId: string;
   positions: string[];
+  classifiedTeamIds?: string[];
   points: number;
+  exactMatches?: number;
+  wrongPositionMatches?: number;
+  exactQualified?: number;
   thirdPlaceScored?: boolean;
   scoredAt?: admin.firestore.Timestamp;
   createdAt: admin.firestore.Timestamp;
   updatedAt: admin.firestore.Timestamp;
-}
-
-interface AllGroupStandings {
-  [groupId: string]: TeamStanding[];
-}
-
-function getTop8ThirdPlaceTeamIds(allGroupStandings: AllGroupStandings): Set<string> {
-  const thirdPlaceRecords: Array<{
-    teamId: string;
-    points: number;
-    goalDifference: number;
-    goalsFor: number;
-  }> = [];
-
-  for (const standings of Object.values(allGroupStandings)) {
-    if (standings.length < 3) continue;
-    const third = standings[2];
-    thirdPlaceRecords.push({
-      teamId: third.teamId,
-      points: third.points,
-      goalDifference: third.goalDifference,
-      goalsFor: third.goalsFor,
-    });
-  }
-
-  thirdPlaceRecords.sort((a, b) => {
-    if (b.points !== a.points) return b.points - a.points;
-    if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
-    return b.goalsFor - a.goalsFor;
-  });
-
-  const top8 = new Set<string>();
-  for (let i = 0; i < Math.min(8, thirdPlaceRecords.length); i++) {
-    top8.add(thirdPlaceRecords[i].teamId.toUpperCase());
-  }
-  return top8;
-}
-
-// -- Pure scoring logic (directly testable) --
-
-export type ScoringPhase = 'positions-1-and-2' | 'position-3' | 'all';
-
-export function scoreGroupBet(
-  positions: string[],
-  standings: TeamStanding[],
-  phase: ScoringPhase = 'all',
-  allGroupStandings?: AllGroupStandings,
-): { points: number; exactMatches: number; wrongPositionMatches: number; exactQualified: number } {
-  let points = 0;
-  let exactMatches = 0;
-  let wrongPositionMatches = 0;
-  let exactQualified = 0;
-
-  const qualifiedTeamIds = new Set<string>();
-
-  if (phase === 'positions-1-and-2') {
-    qualifiedTeamIds.add(standings[0]?.teamId?.toUpperCase() ?? '');
-    qualifiedTeamIds.add(standings[1]?.teamId?.toUpperCase() ?? '');
-  } else {
-    qualifiedTeamIds.add(standings[0]?.teamId?.toUpperCase() ?? '');
-    qualifiedTeamIds.add(standings[1]?.teamId?.toUpperCase() ?? '');
-    if (allGroupStandings) {
-      const top8Third = getTop8ThirdPlaceTeamIds(allGroupStandings);
-      for (const teamId of top8Third) {
-        qualifiedTeamIds.add(teamId);
-      }
-    } else {
-      qualifiedTeamIds.add(standings[2]?.teamId?.toUpperCase() ?? '');
-    }
-  }
-
-  const maxPosition = phase === 'positions-1-and-2' ? 2 : 3;
-
-  for (let i = 0; i < positions.length && i < maxPosition; i++) {
-    const predictedTeam = positions[i];
-    const actualTeamAtPosition = standings[i]?.teamId;
-
-    if (predictedTeam?.toUpperCase() === actualTeamAtPosition?.toUpperCase()) {
-      points += SCORING.GROUP.EXACT_POSITION;
-      exactMatches++;
-    } else if (
-      i < 2 &&
-      actualTeamAtPosition &&
-      standings.some((s) => s.teamId?.toUpperCase() === predictedTeam?.toUpperCase())
-    ) {
-      points += SCORING.GROUP.QUALIFIED;
-      wrongPositionMatches++;
-    } else if (i === 2 && qualifiedTeamIds.has(predictedTeam?.toUpperCase())) {
-      if (
-        actualTeamAtPosition &&
-        standings.some((s) => s.teamId?.toUpperCase() === predictedTeam?.toUpperCase())
-      ) {
-        points += SCORING.GROUP.QUALIFIED;
-        wrongPositionMatches++;
-      }
-    }
-    if (qualifiedTeamIds.has(predictedTeam?.toUpperCase())) {
-      exactQualified++;
-    }
-  }
-
-  return { points, exactMatches, wrongPositionMatches, exactQualified };
 }
 
 // -- Trigger handler --
@@ -157,7 +54,6 @@ export const calculateGroupResults = functions.firestore
       `[calculateGroupResults] Triggered: tournament=${tournamentId}, group=${groupId}`,
     );
 
-    // Guard 1: skip if already scored
     if (after.pointsCalculated) {
       functions.logger.log(
         `[calculateGroupResults] Group ${groupId} already scored (pointsCalculated=true) — skipping`,
@@ -167,13 +63,11 @@ export const calculateGroupResults = functions.firestore
 
     const standings = after.standings;
 
-    // Guard 2: check standings exist
     if (!standings || standings.length === 0) {
       functions.logger.error(`[calculateGroupResults] Group ${groupId} has no standings`);
       return null;
     }
 
-    // Guard 3: only score when this group's 6 matches are finished
     const groupMatchesSnap = await db
       .collection(`tournaments/${tournamentId}/matches`)
       .where('groupId', '==', groupId)
@@ -197,7 +91,6 @@ export const calculateGroupResults = functions.firestore
         .join(',')})`,
     );
 
-    // Query all group_bets for this group
     const betsSnapshot = await db
       .collection(`tournaments/${tournamentId}/group_bets`)
       .where('groupId', '==', groupId)
@@ -215,7 +108,6 @@ export const calculateGroupResults = functions.firestore
       return null;
     }
 
-    // Collect scoring results per predictor for stats updates
     const predictorScores: Map<string, { userId: string; points: number; exactQualified: number }> =
       new Map();
 
@@ -223,7 +115,6 @@ export const calculateGroupResults = functions.firestore
 
     for (const betDoc of betsSnapshot.docs) {
       const bet = betDoc.data() as GroupBetData;
-      // Phase 1: only score 1st and 2nd positions (always qualified)
       const { points, exactQualified } = scoreGroupBet(
         bet.positions,
         standings,
@@ -232,8 +123,6 @@ export const calculateGroupResults = functions.firestore
 
       batch.update(betDoc.ref, {
         points,
-        // Persisted so groupQualified can be DERIVED (summed) idempotently,
-        // rather than incremented per group-scoring event.
         exactQualified,
         thirdPlaceScored: false,
         scoredAt: FieldValue.serverTimestamp(),
@@ -252,7 +141,6 @@ export const calculateGroupResults = functions.firestore
       );
     }
 
-    // Mark group standings as scored
     batch.update(change.after.ref, {
       pointsCalculated: true,
     });
@@ -262,7 +150,6 @@ export const calculateGroupResults = functions.firestore
       `[calculateGroupResults] Committed batch: ${betsSnapshot.size} group bets scored`,
     );
 
-    // Update predictor stats for each affected predictor
     for (const [predictorId, score] of predictorScores) {
       const derived = await recomputePredictorTotals(score.userId, predictorId, tournamentId);
       functions.logger.log(
@@ -284,7 +171,6 @@ export const calculateGroupResults = functions.firestore
       );
     }
 
-    // Phase 2: if all groups are done, automatically score third place
     const allStandingsSnap = await db
       .collection(`tournaments/${tournamentId}/group_standings`)
       .get();
@@ -314,7 +200,6 @@ async function runThirdPlaceScoring(tournamentId: string): Promise<number> {
     `[calculateThirdPlaceResults] Starting third-place scoring for ${tournamentId}`,
   );
 
-  // Build allGroupStandings map
   const allStandingsSnap = await db.collection(`tournaments/${tournamentId}/group_standings`).get();
   const allGroupStandings: AllGroupStandings = {};
   for (const doc of allStandingsSnap.docs) {
@@ -324,7 +209,6 @@ async function runThirdPlaceScoring(tournamentId: string): Promise<number> {
     }
   }
 
-  // Query bets where third place hasn't been scored yet
   const betsSnap = await db
     .collection(`tournaments/${tournamentId}/group_bets`)
     .where('thirdPlaceScored', '==', false)
@@ -345,6 +229,13 @@ async function runThirdPlaceScoring(tournamentId: string): Promise<number> {
     const bet = betDoc.data() as GroupBetData;
     const standings = allGroupStandings[bet.groupId];
     if (!standings || standings.length < 3) continue;
+
+    if (bet.classifiedTeamIds && bet.classifiedTeamIds.length > 0) {
+      functions.logger.log(
+        `[calculateThirdPlaceResults] Bet ${betDoc.id} already has classifiedTeamIds — skipping (recalculateGroupPoints will handle it)`,
+      );
+      continue;
+    }
 
     const { points: thirdPlacePoints } = scoreGroupBet(
       bet.positions,
@@ -381,7 +272,6 @@ async function runThirdPlaceScoring(tournamentId: string): Promise<number> {
     `[calculateThirdPlaceResults] Committed ${betsSnap.size} third-place updates`,
   );
 
-  // Recompute predictor totals and ranks for affected predictors
   for (const [predictorId, score] of predictorScores) {
     await recomputePredictorTotals(score.userId, predictorId, tournamentId);
   }

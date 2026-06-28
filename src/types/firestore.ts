@@ -113,7 +113,13 @@ export interface GroupBet {
   predictorId: string;
   groupId: string;
   positions: string[];
+  classifiedTeamIds: string[];
   points: number;
+  exactMatches?: number;
+  wrongPositionMatches?: number;
+  exactQualified?: number;
+  thirdPlaceScored?: boolean;
+  scoredAt?: Timestamp;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

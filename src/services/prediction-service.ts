@@ -232,11 +232,13 @@ export const predictionService = {
       }
 
       const betId = `${predictorId}-${groupId}`;
+      const classifiedTeamIds = positions.slice(0, 3).map((id) => id.toUpperCase());
       const betData: Omit<GroupBet, 'createdAt' | 'updatedAt'> = {
         userId,
         predictorId,
         groupId,
         positions,
+        classifiedTeamIds,
         points: 0,
       };
 
@@ -384,6 +386,7 @@ export const predictionService = {
 
       const betId = `${predictorId}-${groupId}`;
       const betRef = doc(getDb(), 'tournaments', TOURNAMENT_ID, 'group_bets', betId);
+      const classifiedTeamIds = positions.slice(0, 3).map((id) => id.toUpperCase());
 
       batch.set(
         betRef,
@@ -392,6 +395,7 @@ export const predictionService = {
           predictorId,
           groupId,
           positions,
+          classifiedTeamIds,
           points: 0,
           updatedAt: serverTimestamp(),
         },
