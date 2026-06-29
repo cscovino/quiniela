@@ -6,7 +6,6 @@ const db = admin.firestore();
 export interface CategorySubtotals {
   matchPoints: number;
   groupPoints: number;
-  knockoutPoints: number;
   finalFourPoints: number;
   bestPlayerPoints: number;
 }
@@ -35,7 +34,7 @@ export function sumField(bets: Array<Record<string, unknown>>, field: string): n
 }
 
 export function totalFromSubtotals(s: CategorySubtotals): number {
-  return s.matchPoints + s.groupPoints + s.knockoutPoints + s.finalFourPoints + s.bestPlayerPoints;
+  return s.matchPoints + s.groupPoints + s.finalFourPoints + s.bestPlayerPoints;
 }
 
 async function fetchPredictorBets(
@@ -69,10 +68,9 @@ export async function recomputePredictorTotals(
   predictorId: string,
   tournamentId: string,
 ): Promise<DerivedTotals> {
-  const [matchBets, groupBets, knockoutBets, finalPhaseBets, bestPlayersBets] = await Promise.all([
+  const [matchBets, groupBets, finalPhaseBets, bestPlayersBets] = await Promise.all([
     fetchPredictorBets(tournamentId, 'bets', predictorId),
     fetchPredictorBets(tournamentId, 'group_bets', predictorId),
-    fetchPredictorBets(tournamentId, 'knockout_bets', predictorId),
     fetchPredictorBets(tournamentId, 'final_phase_bets', predictorId),
     fetchPredictorBets(tournamentId, 'best_players_bets', predictorId),
   ]);
@@ -80,7 +78,6 @@ export async function recomputePredictorTotals(
   const subtotals: CategorySubtotals = {
     matchPoints: sumPoints(matchBets),
     groupPoints: sumPoints(groupBets),
-    knockoutPoints: sumPoints(knockoutBets),
     finalFourPoints: sumPoints(finalPhaseBets),
     bestPlayerPoints: sumPoints(bestPlayersBets),
   };

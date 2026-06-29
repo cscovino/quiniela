@@ -82,15 +82,23 @@ export const resolveKnockoutMatches = functions.firestore
     const batch = db.batch();
     for (const change of changes) {
       const ref = db.collection(`tournaments/${tournamentId}/matches`).doc(change.slug);
-      batch.update(ref, {
-        homeTeamId: change.homeTeamId,
-        awayTeamId: change.awayTeamId,
-        tbd: false,
-        tbdHome: FieldValue.delete(),
-        tbdAway: FieldValue.delete(),
+      const update: Record<string, unknown> = {
         updatedAt: FieldValue.serverTimestamp(),
-      });
-      functions.logger.log(`Resolved ${change.slug}: ${change.homeTeamId} vs ${change.awayTeamId}`);
+      };
+      if (change.homeTeamId !== null) {
+        update.homeTeamId = change.homeTeamId;
+        update.tbdHome = FieldValue.delete();
+      }
+      if (change.awayTeamId !== null) {
+        update.awayTeamId = change.awayTeamId;
+        update.tbdAway = FieldValue.delete();
+      }
+      const hasAnySide = change.homeTeamId !== null || change.awayTeamId !== null;
+      if (hasAnySide) update.tbd = false;
+      batch.update(ref, update);
+      functions.logger.log(
+        `Resolved ${change.slug}: ${change.homeTeamId ?? 'TBD'} vs ${change.awayTeamId ?? 'TBD'}`,
+      );
     }
 
     await batch.commit();

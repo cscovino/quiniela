@@ -170,7 +170,7 @@ describe('resolveAllBrackets — R32', () => {
     expect(r32_1?.awayTeamId).toBe('BIH');
   });
 
-  it('leaves best-third R32 slots unresolved when fewer than 8 third-place teams are known', () => {
+  it('partially resolves best-third R32 slots when fewer than 8 third-place teams are known', () => {
     const partial = allGroupStandings.slice(0, 4);
     const result = resolveAllBrackets(partial, []);
     const bestThirdMatches = [
@@ -184,9 +184,11 @@ describe('resolveAllBrackets — R32', () => {
       'r32-15',
     ];
     const resolved = result.resolved.filter((m) => bestThirdMatches.includes(m.slug));
-    expect(resolved).toHaveLength(0);
-    const groupOnlyMatches = result.resolved.filter((m) => m.slug.startsWith('r32-'));
-    expect(groupOnlyMatches.every((m) => ['r32-1', 'r32-3', 'r32-4'].includes(m.slug))).toBe(true);
+    expect(resolved.length).toBeGreaterThan(0);
+    for (const m of resolved) {
+      expect(m.homeTeamId).not.toBeNull();
+      expect(m.awayTeamId).toBeNull();
+    }
   });
 });
 
@@ -199,7 +201,7 @@ describe('resolveAllBrackets — R16', () => {
     expect(r16_1).toEqual({ slug: 'r16-1', homeTeamId: 'GER', awayTeamId: 'POR' });
   });
 
-  it('leaves r16 unresolved if feeders not finished', () => {
+  it('partially resolves r16 when only one feeder is finished', () => {
     const r32 = finishedMatch('r32-2', 'GER', 'ARG', 1, 0);
     const r32b: MatchResult = {
       slug: 'r32-5',
@@ -210,7 +212,7 @@ describe('resolveAllBrackets — R16', () => {
     };
     const result = resolveAllBrackets(allGroupStandings, [r32, r32b]);
     const r16_1 = result.resolved.find((m) => m.slug === 'r16-1');
-    expect(r16_1).toBeUndefined();
+    expect(r16_1).toEqual({ slug: 'r16-1', homeTeamId: 'GER', awayTeamId: null });
   });
 });
 
@@ -231,11 +233,11 @@ describe('resolveAllBrackets — final & third-place', () => {
     expect(tp).toEqual({ slug: 'third-place', homeTeamId: 'FRA', awayTeamId: 'BRA' });
   });
 
-  it('returns empty if only one SF is finished', () => {
+  it('partially resolves final when only one SF is finished', () => {
     const sf1 = finishedMatch('sf-1', 'ARG', 'FRA', 2, 0);
     const result = resolveAllBrackets(allGroupStandings, [sf1]);
     const final = result.resolved.find((m) => m.slug === 'final');
-    expect(final).toBeUndefined();
+    expect(final).toEqual({ slug: 'final', homeTeamId: 'ARG', awayTeamId: null });
   });
 });
 

@@ -60,16 +60,15 @@ describe('sumField', () => {
 });
 
 describe('totalFromSubtotals', () => {
-  it('adds all five category subtotals', () => {
+  it('adds all four category subtotals', () => {
     expect(
       totalFromSubtotals({
         matchPoints: 3,
         groupPoints: 1,
-        knockoutPoints: 1,
         finalFourPoints: 5,
         bestPlayerPoints: 5,
       }),
-    ).toBe(15);
+    ).toBe(14);
   });
 });
 
@@ -86,7 +85,6 @@ describe('recomputePredictorTotals', () => {
         { points: 0, predictorId: 'p1' },
       ],
       group_bets: [{ points: 1, exactQualified: 2, predictorId: 'p1' }],
-      knockout_bets: [{ points: 1, predictorId: 'p1' }],
       final_phase_bets: [{ points: 5, predictorId: 'p1' }],
       best_players_bets: [{ points: 5, predictorId: 'p1' }],
     };
@@ -96,16 +94,15 @@ describe('recomputePredictorTotals', () => {
     expect(result).toEqual({
       matchPoints: 3,
       groupPoints: 1,
-      knockoutPoints: 1,
       finalFourPoints: 5,
       bestPlayerPoints: 5,
-      totalPoints: 15,
+      totalPoints: 14,
       groupQualified: 2,
     });
 
     expect(h.setMock).toHaveBeenCalledTimes(1);
     const [payload, options] = h.setMock.mock.calls[0];
-    expect(payload.totalPoints).toBe(15); // a plain number, not a FieldValue.increment
+    expect(payload.totalPoints).toBe(14); // a plain number, not a FieldValue.increment
     expect(typeof payload.totalPoints).toBe('number');
     expect(payload.matchPoints).toBe(3);
     expect(payload.groupQualified).toBe(2);

@@ -212,7 +212,6 @@ export interface PredictorStats {
   // by recomputePredictorTotals so totalPoints stays idempotent.
   matchPoints?: number;
   groupPoints?: number;
-  knockoutPoints?: number;
   finalFourPoints?: number;
   bestPlayerPoints?: number;
 }

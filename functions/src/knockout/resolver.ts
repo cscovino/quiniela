@@ -29,8 +29,8 @@ export interface MatchResult {
 
 export interface ResolvedMatch {
   slug: string;
-  homeTeamId: string;
-  awayTeamId: string;
+  homeTeamId: string | null;
+  awayTeamId: string | null;
 }
 
 export interface ResolutionResult {
@@ -138,7 +138,7 @@ function resolveEntry(
 ): ResolvedMatch | null {
   const homeTeamId = resolveSlot(entry.home, groupStandings, matchResults);
   const awayTeamId = resolveSlot(entry.away, groupStandings, matchResults);
-  if (!homeTeamId || !awayTeamId) return null;
+  if (homeTeamId === null && awayTeamId === null) return null;
   return { slug, homeTeamId, awayTeamId };
 }
 

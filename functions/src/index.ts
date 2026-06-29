@@ -16,7 +16,6 @@ export { standings } from './api/standings';
 export { calculateBestPlayerResults } from './calculateBestPlayerResults';
 export { calculateFinalFourResults } from './calculateFinalFourResults';
 export { calculateGroupResults } from './calculateGroupResults';
-export { calculateKnockoutResults } from './calculateKnockoutResults';
 export { calculateMatchResult } from './calculateMatchResult';
 export { checkAndAwardBadges } from './checkAndAwardBadges';
 export { deriveFinalStandings } from './deriveFinalStandings';

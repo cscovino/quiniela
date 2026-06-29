@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quiniela-v8';
+const CACHE_NAME = 'quiniela-v9';
 
 const STATIC_ASSETS = [
   '/manifest.json',
