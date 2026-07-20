@@ -4,12 +4,18 @@ import { useState } from 'react';
 import type { Match, MatchStatus } from '@app-types/firestore';
 import { Button } from '@atoms/Button';
 import { Typography } from '@atoms/Typography';
+import { KNOCKOUT_PHASES } from '@utils/predictions-flow';
 
 import './AdminMatchResultForm.css';
 
 export interface AdminMatchResultFormProps {
   match: Match & { id: string };
-  onSubmit: (homeScore: number | null, awayScore: number | null, status: MatchStatus) => void;
+  onSubmit: (
+    homeScore: number | null,
+    awayScore: number | null,
+    status: MatchStatus,
+    penaltyResult?: { home: number; away: number } | null,
+  ) => void;
   onCancel: () => void;
 }
 
@@ -20,14 +26,27 @@ export const AdminMatchResultForm: FC<AdminMatchResultFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
+  const isKnockout = (KNOCKOUT_PHASES as string[]).includes(match.phase);
+
   const [homeScore, setHomeScore] = useState<string>(
     match.result.home !== null ? match.result.home.toString() : '',
   );
   const [awayScore, setAwayScore] = useState<string>(
     match.result.away !== null ? match.result.away.toString() : '',
   );
+  const [penaltyHomeScore, setPenaltyHomeScore] = useState<string>(
+    match.penaltyResult?.home != null ? match.penaltyResult.home.toString() : '',
+  );
+  const [penaltyAwayScore, setPenaltyAwayScore] = useState<string>(
+    match.penaltyResult?.away != null ? match.penaltyResult.away.toString() : '',
+  );
   const [status, setStatus] = useState<MatchStatus>(match.status);
   const [error, setError] = useState<string | null>(null);
+
+  const home = homeScore === '' ? null : parseInt(homeScore, 10);
+  const away = awayScore === '' ? null : parseInt(awayScore, 10);
+  const isDraw = home !== null && away !== null && home === away;
+  const showPenalties = isKnockout && isDraw;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -36,7 +55,7 @@ export const AdminMatchResultForm: FC<AdminMatchResultFormProps> = ({
     const scoresAllowed = status === 'finished' || status === 'live';
 
     if (!scoresAllowed) {
-      onSubmit(null, null, status);
+      onSubmit(null, null, status, null);
       return;
     }
 
@@ -47,19 +66,30 @@ export const AdminMatchResultForm: FC<AdminMatchResultFormProps> = ({
     }
 
     if (bothEmpty) {
-      onSubmit(null, null, status);
+      onSubmit(null, null, status, null);
       return;
     }
 
-    const home = parseInt(homeScore, 10);
-    const away = parseInt(awayScore, 10);
+    const homeVal = parseInt(homeScore, 10);
+    const awayVal = parseInt(awayScore, 10);
 
-    if (isNaN(home) || isNaN(away) || home < 0 || away < 0) {
+    if (isNaN(homeVal) || isNaN(awayVal) || homeVal < 0 || awayVal < 0) {
       setError('Scores must be non-negative integers');
       return;
     }
 
-    onSubmit(home, away, status);
+    let penaltyResult: { home: number; away: number } | null = null;
+    if (showPenalties) {
+      const penHome = parseInt(penaltyHomeScore, 10);
+      const penAway = parseInt(penaltyAwayScore, 10);
+      if (isNaN(penHome) || isNaN(penAway) || penHome < 0 || penAway < 0) {
+        setError('Penalty scores must be non-negative integers');
+        return;
+      }
+      penaltyResult = { home: penHome, away: penAway };
+    }
+
+    onSubmit(homeVal, awayVal, status, penaltyResult);
   };
 
   return (
@@ -83,36 +113,80 @@ export const AdminMatchResultForm: FC<AdminMatchResultFormProps> = ({
         </div>
 
         {(status === 'finished' || status === 'live') && (
-          <div className="admin-match-result-form__scores">
-            <label>
-              <Typography variant="small">{match.homeTeamId?.toUpperCase() || 'Home'}</Typography>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                min="0"
-                max="99"
-                value={homeScore}
-                onChange={(e) => setHomeScore(e.target.value)}
-                className="admin-match-result-form__input"
-                placeholder="0"
-              />
-            </label>
-            <label>
-              <Typography variant="small">{match.awayTeamId?.toUpperCase() || 'Away'}</Typography>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                min="0"
-                max="99"
-                value={awayScore}
-                onChange={(e) => setAwayScore(e.target.value)}
-                className="admin-match-result-form__input"
-                placeholder="0"
-              />
-            </label>
-          </div>
+          <>
+            <div className="admin-match-result-form__scores">
+              <label>
+                <Typography variant="small">{match.homeTeamId?.toUpperCase() || 'Home'}</Typography>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  min="0"
+                  max="99"
+                  value={homeScore}
+                  onChange={(e) => setHomeScore(e.target.value)}
+                  className="admin-match-result-form__input"
+                  placeholder="0"
+                />
+              </label>
+              <label>
+                <Typography variant="small">{match.awayTeamId?.toUpperCase() || 'Away'}</Typography>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  min="0"
+                  max="99"
+                  value={awayScore}
+                  onChange={(e) => setAwayScore(e.target.value)}
+                  className="admin-match-result-form__input"
+                  placeholder="0"
+                />
+              </label>
+            </div>
+
+            {showPenalties && (
+              <div className="admin-match-result-form__penalties">
+                <Typography variant="small" className="admin-match-result-form__penalties-label">
+                  Penalty Shootout
+                </Typography>
+                <div className="admin-match-result-form__scores">
+                  <label>
+                    <Typography variant="small">
+                      {match.homeTeamId?.toUpperCase() || 'Home'}
+                    </Typography>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      min="0"
+                      max="99"
+                      value={penaltyHomeScore}
+                      onChange={(e) => setPenaltyHomeScore(e.target.value)}
+                      className="admin-match-result-form__input"
+                      placeholder="0"
+                    />
+                  </label>
+                  <label>
+                    <Typography variant="small">
+                      {match.awayTeamId?.toUpperCase() || 'Away'}
+                    </Typography>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      min="0"
+                      max="99"
+                      value={penaltyAwayScore}
+                      onChange={(e) => setPenaltyAwayScore(e.target.value)}
+                      className="admin-match-result-form__input"
+                      placeholder="0"
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

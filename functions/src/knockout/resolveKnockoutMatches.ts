@@ -18,6 +18,7 @@ interface MatchData {
   homeTeamId: string | null;
   awayTeamId: string | null;
   result: { home: number | null; away: number | null };
+  penaltyResult?: { home: number; away: number } | null;
   status: string;
   pointsCalculated?: boolean;
 }
@@ -45,6 +46,9 @@ async function loadMatches(tournamentId: string): Promise<MatchResult[]> {
       homeTeamId: data.homeTeamId,
       awayTeamId: data.awayTeamId,
       result: data.result,
+      penaltyResult:
+        (data as MatchData & { penaltyResult?: { home: number; away: number } | null })
+          .penaltyResult ?? null,
     };
   });
 }

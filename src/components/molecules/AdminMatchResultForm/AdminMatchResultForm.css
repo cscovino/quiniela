@@ -30,6 +30,18 @@
   flex: 1;
 }
 
+.admin-match-result-form__penalties {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--color-primary-500);
+}
+
+.admin-match-result-form__penalties-label {
+  color: var(--color-accent-500);
+}
+
 .admin-match-result-form__input,
 .admin-match-result-form__select {
   padding: var(--space-2);

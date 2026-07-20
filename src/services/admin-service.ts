@@ -9,6 +9,7 @@ export const updateMatchResult = async (
   homeScore: number | null,
   awayScore: number | null,
   status: MatchStatus,
+  penaltyResult?: { home: number; away: number } | null,
 ): Promise<void> => {
   const matchRef = doc(getDb(), 'tournaments', tournamentId, 'matches', matchId);
 
@@ -19,6 +20,7 @@ export const updateMatchResult = async (
     status: MatchStatus;
     updatedAt: ReturnType<typeof serverTimestamp>;
     result: { home: number | null; away: number | null };
+    penaltyResult?: { home: number; away: number } | null;
   } = {
     status,
     updatedAt: serverTimestamp(),
@@ -27,6 +29,10 @@ export const updateMatchResult = async (
         ? { home: homeScore, away: awayScore }
         : { home: null, away: null },
   };
+
+  if (penaltyResult !== undefined) {
+    updateData.penaltyResult = penaltyResult;
+  }
 
   await updateDoc(matchRef, updateData);
 };

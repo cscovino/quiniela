@@ -60,12 +60,15 @@ export const AdminMatchesPage: FC = () => {
     homeScore: number | null,
     awayScore: number | null,
     status: MatchStatus,
+    penaltyResult?: { home: number; away: number } | null,
   ) => {
     try {
-      await updateMatchResult(TOURNAMENT_ID, matchId, homeScore, awayScore, status);
+      await updateMatchResult(TOURNAMENT_ID, matchId, homeScore, awayScore, status, penaltyResult);
       setMatches((prev) =>
         prev.map((m) =>
-          m.id === matchId ? { ...m, result: { home: homeScore, away: awayScore }, status } : m,
+          m.id === matchId
+            ? { ...m, result: { home: homeScore, away: awayScore }, status, penaltyResult }
+            : m,
         ),
       );
     } catch (err) {

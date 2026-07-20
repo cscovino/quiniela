@@ -25,6 +25,7 @@ export interface MatchResult {
   homeTeamId: string | null;
   awayTeamId: string | null;
   result: { home: number | null; away: number | null };
+  penaltyResult?: { home: number; away: number } | null;
 }
 
 export interface ResolvedMatch {
@@ -115,6 +116,14 @@ function resolveWinnerOf(slug: string, matchResults: Map<string, MatchResult>): 
   if (match.result.home === null || match.result.away === null) return null;
   if (!match.homeTeamId || !match.awayTeamId) return null;
 
+  if (match.result.home === match.result.away && match.penaltyResult) {
+    const homePenalties = Number(match.penaltyResult.home);
+    const awayPenalties = Number(match.penaltyResult.away);
+    if (homePenalties > awayPenalties) return normalizeTeamId(match.homeTeamId);
+    if (homePenalties < awayPenalties) return normalizeTeamId(match.awayTeamId);
+    return null;
+  }
+
   const homeWin = match.result.home > match.result.away;
   return normalizeTeamId(homeWin ? match.homeTeamId : match.awayTeamId);
 }
@@ -125,6 +134,12 @@ function resolveLoserOf(slug: string, matchResults: Map<string, MatchResult>): s
   if (match.status !== 'finished') return null;
   if (match.result.home === null || match.result.away === null) return null;
   if (!match.homeTeamId || !match.awayTeamId) return null;
+
+  if (match.result.home === match.result.away && match.penaltyResult) {
+    return normalizeTeamId(
+      match.penaltyResult.home > match.penaltyResult.away ? match.awayTeamId : match.homeTeamId,
+    );
+  }
 
   const homeWin = match.result.home > match.result.away;
   return normalizeTeamId(homeWin ? match.awayTeamId : match.homeTeamId);

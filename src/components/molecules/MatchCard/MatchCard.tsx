@@ -21,6 +21,11 @@ export interface MatchResult {
   away: number | null;
 }
 
+export interface PenaltyResult {
+  home: number;
+  away: number;
+}
+
 export interface MatchCardProps {
   homeTeam: Team;
   awayTeam: Team;
@@ -34,6 +39,7 @@ export interface MatchCardProps {
   date: Date;
   status: MatchStatus;
   result?: MatchResult;
+  penaltyResult?: PenaltyResult;
   stadium?: string;
   phase?: string;
   translations: {
@@ -79,6 +85,7 @@ export const MatchCard: FC<MatchCardProps> = ({
   date,
   status,
   result,
+  penaltyResult,
   stadium,
   phase,
   translations,
@@ -142,14 +149,21 @@ export const MatchCard: FC<MatchCardProps> = ({
 
         <div className="match-card__vs">
           {status === 'finished' && result ? (
-            <Typography
-              variant={compact ? 'h3' : 'h2'}
-              className="match-card__score match-card__score--result"
-            >
-              {result.home}
-              <span className="match-card__score-separator">-</span>
-              {result.away}
-            </Typography>
+            <div className="match-card__score-wrapper">
+              <Typography
+                variant={compact ? 'h3' : 'h2'}
+                className="match-card__score match-card__score--result"
+              >
+                {result.home}
+                <span className="match-card__score-separator">-</span>
+                {result.away}
+              </Typography>
+              {penaltyResult && (
+                <Typography variant="small" className="match-card__penalty">
+                  ({penaltyResult.home}-{penaltyResult.away} pen)
+                </Typography>
+              )}
+            </div>
           ) : (
             <Typography variant="caption">{translations.vs}</Typography>
           )}

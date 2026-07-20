@@ -14,6 +14,7 @@ export interface AdminMatchListProps {
     homeScore: number | null,
     awayScore: number | null,
     status: MatchStatus,
+    penaltyResult?: { home: number; away: number } | null,
   ) => void;
 }
 
@@ -88,8 +89,8 @@ export const AdminMatchList: FC<AdminMatchListProps> = ({ matches, onUpdateResul
                 {editingMatchId === match.id ? (
                   <AdminMatchResultForm
                     match={match}
-                    onSubmit={(homeScore, awayScore, status) => {
-                      onUpdateResult(match.id, homeScore, awayScore, status);
+                    onSubmit={(homeScore, awayScore, status, penaltyResult) => {
+                      onUpdateResult(match.id, homeScore, awayScore, status, penaltyResult);
                       setEditingMatchId(null);
                     }}
                     onCancel={() => setEditingMatchId(null)}
